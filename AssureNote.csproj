@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{416887A8-C383-45E7-9841-3C616A0E4C31}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="css\dcase-node.css" />
+    <Content Include="css\historymenu.css" />
+    <Content Include="css\index.css" />
+    <Content Include="css\sidemenu.css" />
+    <Content Include="images\context.png" />
+    <Content Include="images\copy.png" />
+    <Content Include="images\dse.png" />
+    <Content Include="images\evidence.png" />
+    <Content Include="images\goal.png" />
+    <Content Include="images\logo.png" />
+    <Content Include="images\max.png" />
+    <Content Include="images\monitor.png" />
+    <Content Include="images\paste.png" />
+    <Content Include="images\remove.png" />
+    <Content Include="images\strategy.png" />
+    <Content Include="index.html" />
+    <Content Include="lib\animate-custom.css" />
+    <Content Include="lib\ASNParser.js" />
+    <Content Include="lib\bootstrap\css\bootstrap-theme.min.css" />
+    <Content Include="lib\bootstrap\css\bootstrap.min.css" />
+    <Content Include="lib\bootstrap\css\non-responsive.css" />
+    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="lib\bootstrap\js\bootstrap.min.js" />
+    <Content Include="lib\codemirror.css" />
+    <Content Include="lib\codemirror.js" />
+    <Content Include="lib\jquery.cookie.js" />
+    <Content Include="lib\jquery.min.js" />
+    <Content Include="lib\jquery.svg.css" />
+    <Content Include="lib\jquery.svg.min.js" />
+    <Content Include="lib\jquery.tmpl.min.js" />
+    <Content Include="lib\pointer.min.js" />
+    <Content Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="d.ts\ASNParser.d.ts" />
+    <TypeScriptCompile Include="d.ts\jquery.d.ts" />
+    <TypeScriptCompile Include="d.ts\pointer.d.ts" />
+    <TypeScriptCompile Include="index.ts" />
+    <TypeScriptCompile Include="src\CaseDecoder.ts" />
+    <TypeScriptCompile Include="src\CaseEncoder.ts" />
+    <TypeScriptCompile Include="src\CaseModel.ts" />
+    <TypeScriptCompile Include="src\CaseViewer.ts" />
+    <TypeScriptCompile Include="src\ColorMap.ts" />
+    <TypeScriptCompile Include="src\CommitModel.ts" />
+    <TypeScriptCompile Include="src\DragFile.ts" />
+    <TypeScriptCompile Include="src\EditorUtil.ts" />
+    <TypeScriptCompile Include="src\PlugInManager.ts" />
+    <TypeScriptCompile Include="src\Api.ts" />
+    <TypeScriptCompile Include="src\SideMenuModel.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>AssureNote</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>51291</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:51291/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES3</TypeScriptTarget>
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptTarget>ES3</TypeScriptTarget>
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" />
+</Project>
