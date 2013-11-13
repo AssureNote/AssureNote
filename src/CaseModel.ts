@@ -231,7 +231,7 @@ module AssureNote {
 		private isModified : boolean = false;
 		isEditable : boolean = false;
 		isLatest   : boolean = true;
-		constructor(public CaseName: string, summaryString: string, public oldasn: string, public CaseId: number, public CommitId: number, public pluginManager: PlugInManager) {
+		constructor(public CaseName: string, summaryString: string, public oldasn: string, public CaseId: number, public CommitId: number, public pluginManager: OldPlugInManager) {
 			this.IdCounters = [{}, {}, {}, {}, {}];
 			this.ElementMap = {};
 			this.TranslationMap = {};

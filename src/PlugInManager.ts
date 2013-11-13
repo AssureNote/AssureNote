@@ -21,7 +21,7 @@ module AssureNote {
 
 		PlugInEnv: any;
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			this.ActionPlugIn = null;
 			this.CheckerPlugIn = null;
 
@@ -40,7 +40,7 @@ module AssureNote {
 	}
 
 	export class AbstractPlugIn {
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 		}
 
 		DeleteFromDOM(): void { //TODO
@@ -55,7 +55,7 @@ module AssureNote {
 		EventName   : string;
 		EventTarget : string;
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -71,7 +71,7 @@ module AssureNote {
 
 	export class CheckerPlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -86,7 +86,7 @@ module AssureNote {
 
 	export class HTMLRenderPlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -101,7 +101,7 @@ module AssureNote {
 
 	export class MenuBarContentsPlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -116,7 +116,7 @@ module AssureNote {
 
 	export class SVGRenderPlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -131,7 +131,7 @@ module AssureNote {
 
 	export class LayoutEnginePlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -153,7 +153,7 @@ module AssureNote {
 
 	export class PatternPlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -168,7 +168,7 @@ module AssureNote {
 
 	export class ShortcutKeyPlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -183,7 +183,7 @@ module AssureNote {
 
 	export class SideMenuPlugIn extends AbstractPlugIn {
 
-		constructor(public plugInManager: PlugInManager) {
+		constructor(public plugInManager: OldPlugInManager) {
 			super(plugInManager);
 		}
 
@@ -199,7 +199,7 @@ module AssureNote {
 		}
 	}
 
-	export class PlugInManager {
+	export class OldPlugInManager {
 
 		ActionPlugInMap           : { [index: string]: ActionPlugIn };
 		CheckerPlugInMap          : { [index: string]: CheckerPlugIn };
@@ -243,9 +243,18 @@ module AssureNote {
 			//G,E,S,C, ... Jump to node
 		}
 
-		ViewNode(label: string, wx?: number, wy?: number): void {
+		DrawNode(label: string, wx?: number, wy?: number): void {
 			//FIXME tetsurom
+			Node = GetNode(label);
+			if (!ViewPort.IsVisible(Node, wx, wy)) {
+				LayoutManager.Do(ViwePort, Node, this, wx, wy);
+			}
+			ViewPort.MoveTo(Node, wx, wy);
 		} 
+
+		Redraw(): void {
+
+		}
 
 		GetNodePosition(label: string): Point {
 			return null; //FIXME tetsurom

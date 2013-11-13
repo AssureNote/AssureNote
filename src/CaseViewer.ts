@@ -508,7 +508,7 @@ module AssureNote {
 		ElementTop : NodeModel;
 		static ElementWidth = 250; /*look index.css*/
 
-		constructor(public Source: Case, public pluginManager : PlugInManager, public serverApi: ServerAPI, public Screen: ViewportManager) {
+		constructor(public Source: Case, public pluginManager : OldPlugInManager, public serverApi: ServerAPI, public Screen: ViewportManager) {
 			this.InitViewMap(Source);
 			this.Resize();
 		}
@@ -677,7 +677,7 @@ module AssureNote {
 	}
 
 	export class ViewportManager {
-
+		//windowX, windowY
 		ScrollManager: ScrollManager = new ScrollManager();
 		private OffsetX: number = 0;
 		private OffsetY: number = 0;
