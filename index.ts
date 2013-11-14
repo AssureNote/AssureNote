@@ -1,10 +1,8 @@
 ///<reference path='src/Api.ts'/>
 ///<reference path='src/DragFile.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
+///<reference path='src/AssureNote.ts'/>
 module AssureNote {
-	//TODO
-	var AssureNoteUtils: any;
-
 	//Deprecated
 	export class FixMeModel {
 	}
@@ -20,53 +18,6 @@ module AssureNote {
 		}
 	}
 
-	export class AssureNote {
-		PluginManager: PluginManager;
-		PictgramPanel: PictgramPanel;
-		PluginPanel: PluginPanel;
-		IsDebugMode: boolean;
-		FixMeModel: FixMeModel;
-
-		constructor() {
-			//var Api = new AssureNote.ServerAPI("http://", "", "");
-			this.PluginManager = new PluginManager(this);
-			this.PictgramPanel = new PictgramPanel(this);
-			this.PluginPanel = new PluginPanel(this);
-		}
-		
-		DebugP(Message: string): void {
-			console.log(Message);
-		}
-
-		ExecCommand(CommandLine: string): void {
-			this.DebugP(CommandLine);
-			var Plugin = this.PluginManager.GetCommandPlugin(CommandLine);
-			if (!Plugin) {
-				Plugin.ExecCommand(this, CommandLine);
-			}
-			else {
-				this.DebugP("undefined command: " + CommandLine);
-			}
-		}
-
-		LoadFile() {
-			this.FixMeModel = AssureNoteUtils.LoadFile();
-		}
-
-		ProcessDroppedFiles(Files: File[]): void {
-			if (Files[0]) {
-				var reader = new FileReader();
-				reader.onerror = (e) => {
-					console.log('error', (<any>e.target).error.code);
-				};
-				reader.onload = (e) => {
-					var dcaseFile = new DCaseFile((<any>e.target).result, Files[0].name);
-				};
-				reader.readAsText(Files[0], 'utf-8');
-			}
-		}
-	}
-
 	export class PictgramPanel {
 		LayoutEngine: LayoutEngine;
 		SVGLayer: SVGGElement;
@@ -75,11 +26,11 @@ module AssureNote {
 		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
 
-		constructor(public AssureNote: AssureNote) {
-			this.SVGLayer = <SVGGElement>(<any>document.getElementById("layer0"));
-			this.EventMapLayer = <HTMLDivElement>(document.getElementById("background"));
-			this.ContentLayer = <HTMLDivElement>(document.getElementById("layer1"));
-			this.ControlLayer = <HTMLDivElement>(document.getElementById("layer2"));
+		constructor(public AssureNoteApp: AssureNoteApp) {
+			this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));
+			this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
+			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
+			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
 
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
 			this.ContentLayer.onclick = (ev: MouseEvent) => {
@@ -90,25 +41,24 @@ module AssureNote {
 			this.ContentLayer.ondblclick = (ev: MouseEvent) => {
 			};
 			var cmdline = "";
-			this.ContentLayer.onkeydown = (ev: KeyboardEvent) => {
-				if (this.AssureNote.PluginPanel.IsVisible) {
+			document.onkeydown = (ev: KeyboardEvent) => {
+				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
 				//¡‚Ü‚Å‚É‰Ÿ‚µ‚½ƒL[‚Ì—ñ‚ðì‚Á‚Ä“n‚·
 				if (ev.keyCode == 186/*:*/) {
 					cmdline = "";
 				}
-
-				if (ev.keyCode == 13/*Enter*/ && cmdline.length > 0) {
-					AssureNote.ExecCommand(cmdline);
-				}
-				else {
-					cmdline += ev.keyCode;
-				}
-
+				//else if (ev.keyCode == 13/*Enter*/ && cmdline.length > 0) {
+				//	this.AssureNoteApp.ExecCommand(cmdline);
+				//}
+				//else {
+				//	cmdline += String.fromCharCode(ev.keyCode);
+				//}
+				return false;
 			};
 			this.ContentLayer.onmouseover = (event: MouseEvent) => {
-				if (this.AssureNote.PluginPanel.IsVisible) {
+				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
 				if ((<HTMLElement>event.srcElement).id) {
@@ -116,7 +66,7 @@ module AssureNote {
 			};
 
 			var DragHandler = (e) => {
-				if (this.AssureNote.PluginPanel.IsVisible) {
+				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					e.stopPropagation();
 					e.preventDefault();
 					return false;
@@ -127,10 +77,10 @@ module AssureNote {
 				.on('dragover', DragHandler)
 				.on('dragleave', DragHandler)
 				.on('drop', (ev) => {
-					if (this.AssureNote.PluginPanel.IsVisible) {
+					if (this.AssureNoteApp.PluginPanel.IsVisible) {
 						ev.stopPropagation();
 						ev.preventDefault();
-						AssureNote.ProcessDroppedFiles((<any>ev.originalEvent.dataTransfer).files);
+						this.AssureNoteApp.ProcessDroppedFiles((<any>ev.originalEvent.dataTransfer).files);
 						return false;
 					}
 				});
@@ -138,7 +88,7 @@ module AssureNote {
 
 
 		DisplayPictgram(): void {
-			this.AssureNote.PluginPanel.Clear();
+			this.AssureNoteApp.PluginPanel.Clear();
 		}
 
 		Draw(Label: string, wx: number, wy: number): void {
@@ -146,15 +96,15 @@ module AssureNote {
 		}
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
-			var Plugin = this.AssureNote.PluginManager.GetPanelPlugin(PluginName, Label);
-			Plugin.Display(this.AssureNote.PluginPanel, this.AssureNote.FixMeModel, Label);
+			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
+			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.FixMeModel, Label);
 		}
 	}
 
 	export class PluginPanel {
 		IsVisible: boolean;
 
-		constructor(public AssureNote: AssureNote) {
+		constructor(public AssureNoteApp: AssureNoteApp) {
 			//Editor, etc.
 		}
 
@@ -166,7 +116,7 @@ module AssureNote {
 		constructor() {
 		}
 
-		ExecCommand(AssureNote: AssureNote, CommandLine: string) {
+		ExecCommand(AssureNote: AssureNoteApp, CommandLine: string) {
 		}
 
 		Display(PluginPanel: PluginPanel, FixMeModel: FixMeModel, Label: string) {
@@ -174,24 +124,27 @@ module AssureNote {
 	}
 
 	export class PluginManager {
-		constructor(public AssureNote: AssureNote) {
+
+		constructor(public AssureNoteApp: AssureNoteApp) {
 			//Editor, etc.
 		}
+
 		GetPanelPlugin(Name: string, Label?: string): Plugin {
 			return null;
 		}
+
 		GetCommandPlugin(CommandLine: string): Plugin {
 			return null;
 		}
+
 	}
 
 }
 
 
-window.onload = () => {
+$(() => {
+	var AssureNoteApp = new AssureNote.AssureNoteApp();
 
-
-	//Importer.read((file: AssureNote.DCaseFile, )
 	//Api.GetCase(1, 1, (CaseData: any) => {
 	//	var contents = CaseData.contents;
 	//	var summary = CaseData.summary;
@@ -213,4 +166,4 @@ window.onload = () => {
 	//	Viewer.Screen.SetCaseCenter(TopView.AbsX, TopView.AbsY, TopView.HTMLDoc);
 
 	//});
-};
+});

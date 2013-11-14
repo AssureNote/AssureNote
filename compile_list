@@ -1,5 +1,6 @@
 index.ts
 src/Api.ts
+src/AssureNote.ts
 src/CaseDecoder.ts
 src/CaseEncoder.ts
 src/CaseModel.ts

@@ -5,6 +5,12 @@
 
 module AssureNote {
 
+
+
+
+
+
+	//Deprecated
 	export class PlugInSet {
 		//ノードを描画した後にノードのDOMにイベントを登録するplugin
 		//ActionPlugIn: ActionPlugIn;

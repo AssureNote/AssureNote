@@ -594,6 +594,7 @@ module AssureNote {
 			this.Update();
 		}
 
+		//FIXME Deprecated
 		DeleteHTMLElementAll(): void {
 			$('#layer0').children().remove();
 			$('#layer1').children().remove();
