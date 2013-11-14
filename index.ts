@@ -3,37 +3,12 @@
 ///<reference path='d.ts/jquery.d.ts'/>
 ///<reference path='src/AssureNote.ts'/>
 ///<reference path='src/Panel.ts'/>
+///<reference path='src/LayoutEngine.ts'/>
+///<reference path='src/PluginManager.ts'/>
 
 module AssureNote {
 	//Deprecated
 	export class FixMeModel {
-	}
-
-	export class Plugin {
-		constructor() {
-		}
-
-		ExecCommand(AssureNote: AssureNoteApp, CommandLine: string) {
-		}
-
-		Display(PluginPanel: PluginPanel, FixMeModel: FixMeModel, Label: string) {
-		}
-	}
-
-	export class PluginManager {
-
-		constructor(public AssureNoteApp: AssureNoteApp) {
-			//Editor, etc.
-		}
-
-		GetPanelPlugin(Name: string, Label?: string): Plugin {
-			return null;
-		}
-
-		GetCommandPlugin(CommandLine: string): Plugin {
-			return null;
-		}
-
 	}
 
 }

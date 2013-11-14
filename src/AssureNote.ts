@@ -1,5 +1,11 @@
 module AssureNote {
 
+	export class AssureNoteEvent {
+		Label: string;
+		constructor(public event: Event) {
+		}
+	}
+
 	module AssureNoteUtils {
 		export function LoadFile(): FixMeModel {
 			return null;

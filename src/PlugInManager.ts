@@ -5,12 +5,35 @@
 
 module AssureNote {
 
+	export class Plugin {
+		constructor() {
+		}
+
+		ExecCommand(AssureNote: AssureNoteApp, CommandLine: string) {
+		}
+
+		Display(PluginPanel: PluginPanel, FixMeModel: FixMeModel, Label: string) {
+		}
+	}
+
+	export class PluginManager {
+
+		constructor(public AssureNoteApp: AssureNoteApp) {
+			//Editor, etc.
+		}
+
+		GetPanelPlugin(Name: string, Label?: string): Plugin {
+			return null;
+		}
+
+		GetCommandPlugin(CommandLine: string): Plugin {
+			return null;
+		}
+
+	}
 
 
-
-
-
-	//Deprecated
+	//---------Deprecated-----------------
 	export class PlugInSet {
 		//ƒm[ƒh‚ğ•`‰æ‚µ‚½Œã‚Éƒm[ƒh‚ÌDOM‚ÉƒCƒxƒ“ƒg‚ğ“o˜^‚·‚éplugin
 		//ActionPlugIn: ActionPlugIn;
