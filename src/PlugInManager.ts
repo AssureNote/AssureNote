@@ -22,8 +22,8 @@ module AssureNote {
 		PlugInEnv: any;
 
 		constructor(public plugInManager: OldPlugInManager) {
-			this.ActionPlugIn = null;
-			this.CheckerPlugIn = null;
+			//this.ActionPlugIn = null;
+			//this.CheckerPlugIn = null;
 
 			this.HTMLRenderPlugIn = null;
 			this.SVGRenderPlugIn = null;
@@ -238,19 +238,19 @@ module AssureNote {
 			this.UILayer = [];
 		}
 
-		ExecCommand(cmdline: string): void {
-			//built-in command
-			//G,E,S,C, ... Jump to node
-		}
+		//ExecCommand(cmdline: string): void {
+		//	//built-in command
+		//	//G,E,S,C, ... Jump to node
+		//}
 
-		DrawNode(label: string, wx?: number, wy?: number): void {
-			//FIXME tetsurom
-			Node = GetNode(label);
-			if (!ViewPort.IsVisible(Node, wx, wy)) {
-				LayoutManager.Do(ViwePort, Node, this, wx, wy);
-			}
-			ViewPort.MoveTo(Node, wx, wy);
-		} 
+		//DrawNode(label: string, wx?: number, wy?: number): void {
+		//	//FIXME tetsurom
+		//	Node = GetNode(label);
+		//	if (!ViewPort.IsVisible(Node, wx, wy)) {
+		//		LayoutManager.Do(ViwePort, Node, this, wx, wy);
+		//	}
+		//	ViewPort.MoveTo(Node, wx, wy);
+		//}
 
 		Redraw(): void {
 
@@ -262,9 +262,9 @@ module AssureNote {
 
 		//Deprecated
 		SetPlugIn(key: string, plugIn: PlugInSet) {
-			if(plugIn.ActionPlugIn) {
-				this.SetActionPlugIn(key, plugIn.ActionPlugIn);
-			}
+			//if(plugIn.ActionPlugIn) {
+			//	this.SetActionPlugIn(key, plugIn.ActionPlugIn);
+			//}
 			if(plugIn.HTMLRenderPlugIn) {
 				this.SetHTMLRenderPlugIn(key, plugIn.HTMLRenderPlugIn);
 			}

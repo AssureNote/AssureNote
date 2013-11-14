@@ -9,7 +9,15 @@ module AssureNote {
 	export class FixMeModel {
 	}
 
+	//TODO
 	export class LayoutEngine {
+		constructor() {
+		}
+
+		//FIXME Rename
+		Do(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
+			//TODO
+		}
 	}
 
 	export class AssureNote {
@@ -134,7 +142,7 @@ module AssureNote {
 		}
 
 		Draw(Label: string, wx: number, wy: number): void {
-			this.LayoutEngine.DoBababababa(this, Label, wx, wy);
+			this.LayoutEngine.Do(this, Label, wx, wy);
 		}
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
