@@ -60,12 +60,11 @@
     <TypeScriptCompile Include="src\CaseViewer.ts" />
     <TypeScriptCompile Include="src\ColorMap.ts" />
     <TypeScriptCompile Include="src\CommitModel.ts" />
-    <TypeScriptCompile Include="src\DragFile.ts" />
     <TypeScriptCompile Include="src\EditorUtil.ts" />
     <TypeScriptCompile Include="src\AssureNote.ts" />
     <TypeScriptCompile Include="src\LayoutEngine.ts" />
     <TypeScriptCompile Include="src\Panel.ts" />
-    <TypeScriptCompile Include="src\PlugInManager.ts" />
+    <TypeScriptCompile Include="src\PluginManager.ts" />
     <TypeScriptCompile Include="src\Api.ts" />
     <TypeScriptCompile Include="src\SideMenuModel.ts" />
   </ItemGroup>
