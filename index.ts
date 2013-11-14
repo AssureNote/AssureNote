@@ -52,27 +52,29 @@ module AssureNote {
 	}
 
 	export class PictgramPanel {
+		LayoutEngine: LayoutEngine;
 		SVGLayer: SVGGElement;
 		EventMapLayer: HTMLDivElement;
 		ContentLayer: HTMLDivElement;
-		ControllLayer: HTMLDivElement;
+		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
 
 		constructor(public AssureNote: AssureNote) {
 			this.SVGLayer = <SVGGElement>(<any>document.getElementById("layer0"));
 			this.EventMapLayer = <HTMLDivElement>(document.getElementById("background"));
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("layer1"));
+			this.ControlLayer = <HTMLDivElement>(document.getElementById("layer2"));
 
 			this.ViewPort = new ViewportManager();
-			contentlayer.onclick = (ev: any) => {
+			this.ContentLayer.onclick = (ev: MouseEvent) => {
 				//ここで、ノード名に変換してイベントオブジェクトをラップ
 				alert("Hi!");
 				return false;
 			};
-			contentlayer.ondblclick = (ev: any) => {
+			this.ContentLayer.ondblclick = (ev: MouseEvent) => {
 			};
 			var cmdline = "";
-			contentlayer.onkeydown = (ev: KeyboardEvent) => {
+			this.ContentLayer.onkeydown = (ev: KeyboardEvent) => {
 				if (this.PluginPanel.IsVisible) {
 					return false;
 				}
@@ -89,7 +91,14 @@ module AssureNote {
 				}
 
 			};
-			var controllayer: HTMLDivElement = <HTMLDivElement>(document.getElementById("layer2"));
+			this.ContentLayer.onmouseover = (event: MouseEvent) => {
+				if (this.AssureNote.PluginPanel.IsVisible) {
+					return;
+				}
+				if ((<HTMLElement>event.srcElement).id) {
+				}
+			};
+
 			var DragHandler = (e) => {
 				if (this.AssureNote.PluginPanel.IsVisible) {
 					e.stopPropagation();
@@ -117,7 +126,7 @@ module AssureNote {
 		}
 
 		Draw(Label: string, wx: number, wy: number): void {
-
+			this.LayoutEngine.DoBababababa(this, Label, wx, wy);
 		}
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {

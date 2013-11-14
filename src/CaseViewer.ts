@@ -589,7 +589,7 @@ module AssureNote {
             var svgfrag = document.createDocumentFragment();
             this.ViewMap[this.ElementTop.Label].AppendHTMLElementRecursive(svgfrag, divfrag, this);
             this.Screen.PictgramLayer.appendChild(svgfrag);
-            this.Screen.NodeContentLayer.appendChild(divfrag);
+            this.Screen.ContentLayer.appendChild(divfrag);
 			this.pluginManager.RegisterActionEventListeners(this, this.Source, this.serverApi);
 			this.Update();
 		}
@@ -669,8 +669,8 @@ module AssureNote {
 		}
 
 		OnDoubleTap(e: PointerEvent, Screen: ViewportManager) {
-			var width: number = Screen.NodeContentLayer.clientWidth;
-			var height: number = Screen.NodeContentLayer.clientHeight;
+			var width: number = Screen.ContentLayer.clientWidth;
+			var height: number = Screen.ContentLayer.clientHeight;
 			var pointer = this.Pointers[0];
 			//Screen.SetOffset(width / 2 - pointer.pageX, height / 2 - pointer.pageY);
 		}
@@ -683,29 +683,24 @@ module AssureNote {
 		private OffsetY: number = 0;
 		private LogicalOffsetX: number = 0;
 		private LogicalOffsetY: number = 0;
-		private Scale: number = 1;
+		private Scale: number = 1.0;
 
-		constructor(public PictgramLayer: SVGGElement, public NodeContentLayer: HTMLDivElement, public NodeletIconLayer: HTMLDivElement, public SVGAdaptionLayer: HTMLDivElement) {
-			this.NodeContentLayer.style["transformOrigin"]       = "left top";
-			this.NodeContentLayer.style["MozTransformOrigin"]    = "left top";
-			this.NodeContentLayer.style["msTransformOrigin"]     = "left top";
-			this.NodeContentLayer.style["OTransformOrigin"]      = "left top";
-			this.NodeContentLayer.style["webkitTransformOrigin"] = "left top";
-			this.NodeletIconLayer.style["transformOrigin"]       = "left top";
-			this.NodeletIconLayer.style["MozTransformOrigin"]    = "left top";
-			this.NodeletIconLayer.style["msTransformOrigin"]     = "left top";
-			this.NodeletIconLayer.style["OTransformOrigin"]      = "left top";
-			this.NodeletIconLayer.style["webkitTransformOrigin"] = "left top";
+		constructor(public PictgramLayer: SVGGElement, public ContentLayer: HTMLDivElement, public NodeletIconLayer: HTMLDivElement, public EventMapLayer: HTMLDivElement) {
+			this.ContentLayer.style["transformOrigin"]       = "left top";
+			this.ContentLayer.style["MozTransformOrigin"]    = "left top";
+			this.ContentLayer.style["msTransformOrigin"]     = "left top";
+			this.ContentLayer.style["OTransformOrigin"]      = "left top";
+			this.ContentLayer.style["webkitTransformOrigin"] = "left top";
 			this.UpdateAttr();
 			var OnPointer = (e: PointerEvent) => { this.ScrollManager.OnPointerEvent(e, this); };
-			this.SVGAdaptionLayer.addEventListener("pointerdown", OnPointer, false);
-			this.SVGAdaptionLayer.addEventListener("pointermove", OnPointer, false);
-			this.SVGAdaptionLayer.addEventListener("pointerup", OnPointer, false);
-			this.SVGAdaptionLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
-			this.NodeContentLayer.addEventListener("pointerdown", OnPointer, false);
-			this.NodeContentLayer.addEventListener("pointermove", OnPointer, false);
-			this.NodeContentLayer.addEventListener("pointerup", OnPointer, false);
-			this.NodeContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
+			this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
+			this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
+			this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
+			this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
+			this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
+			this.ContentLayer.addEventListener("pointermove", OnPointer, false);
+			this.ContentLayer.addEventListener("pointerup", OnPointer, false);
+			this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
 			//BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
 		}
 
@@ -729,11 +724,11 @@ module AssureNote {
 			var attr: string = ViewportManager.translateA(this.OffsetX, this.OffsetY) + ViewportManager.scaleA(this.Scale);
 			var style: string = ViewportManager.translateS(this.OffsetX, this.OffsetY) + ViewportManager.scaleS(this.Scale);
 			this.PictgramLayer.setAttribute("transform", attr);
-			this.NodeContentLayer.style["transform"]       = style;
-			this.NodeContentLayer.style["MozTransform"]    = style;
-			this.NodeContentLayer.style["webkitTransform"] = style;
-			this.NodeContentLayer.style["msTransform"]     = style;
-			this.NodeContentLayer.style["OTransform"]      = style;
+			this.ContentLayer.style["transform"]       = style;
+			this.ContentLayer.style["MozTransform"]    = style;
+			this.ContentLayer.style["webkitTransform"] = style;
+			this.ContentLayer.style["msTransform"]     = style;
+			this.ContentLayer.style["OTransform"]      = style;
 			this.NodeletIconLayer.style["transform"]       = style;
 			this.NodeletIconLayer.style["MozTransform"]    = style;
 			this.NodeletIconLayer.style["webkitTransform"] = style;
