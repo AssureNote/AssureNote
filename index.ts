@@ -1,5 +1,4 @@
 ///<reference path='src/Api.ts'/>
-///<reference path='src/DragFile.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
 ///<reference path='src/AssureNote.ts'/>
 ///<reference path='src/Panel.ts'/>
