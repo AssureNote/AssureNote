@@ -2,18 +2,26 @@
 ///<reference path='src/DragFile.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
 module AssureNote {
+	//TODO
 	var AssureNoteUtils: any;
 
+	//Deprecated
+	export class FixMeModel {
+	}
+
+	export class LayoutEngine {
+	}
+
 	export class AssureNote {
-		PluginManager: OldPlugInManager;
+		PluginManager: PluginManager;
 		PictgramPanel: PictgramPanel;
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
-		FixMeModel: any;
+		FixMeModel: FixMeModel;
 
 		constructor() {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
-			this.PluginManager = new OldPlugInManager("");
+			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
 		}
@@ -65,7 +73,7 @@ module AssureNote {
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("layer1"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("layer2"));
 
-			this.ViewPort = new ViewportManager();
+			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
 			this.ContentLayer.onclick = (ev: MouseEvent) => {
 				//ここで、ノード名に変換してイベントオブジェクトをラップ
 				alert("Hi!");
@@ -75,7 +83,7 @@ module AssureNote {
 			};
 			var cmdline = "";
 			this.ContentLayer.onkeydown = (ev: KeyboardEvent) => {
-				if (this.PluginPanel.IsVisible) {
+				if (this.AssureNote.PluginPanel.IsVisible) {
 					return false;
 				}
 				//今までに押したキーの列を作って渡す
@@ -130,7 +138,7 @@ module AssureNote {
 		}
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
-			var Plugin = this.PluginManager.GetPanelPlugin(PluginName, Label);
+			var Plugin = this.AssureNote.PluginManager.GetPanelPlugin(PluginName, Label);
 			Plugin.Display(this.AssureNote.PluginPanel, this.AssureNote.FixMeModel, Label);
 		}
 	}
@@ -147,6 +155,14 @@ module AssureNote {
 	}
 
 	export class Plugin {
+		constructor() {
+		}
+
+		ExecCommand(AssureNote: AssureNote, CommandLine: string) {
+		}
+
+		Display(PluginPanel: PluginPanel, FixMeModel: FixMeModel, Label: string) {
+		}
 	}
 
 	export class PluginManager {

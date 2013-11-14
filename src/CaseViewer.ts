@@ -588,7 +588,7 @@ module AssureNote {
             var divfrag = document.createDocumentFragment();
             var svgfrag = document.createDocumentFragment();
             this.ViewMap[this.ElementTop.Label].AppendHTMLElementRecursive(svgfrag, divfrag, this);
-            this.Screen.PictgramLayer.appendChild(svgfrag);
+            this.Screen.SVGLayer.appendChild(svgfrag);
             this.Screen.ContentLayer.appendChild(divfrag);
 			this.pluginManager.RegisterActionEventListeners(this, this.Source, this.serverApi);
 			this.Update();
@@ -685,7 +685,7 @@ module AssureNote {
 		private LogicalOffsetY: number = 0;
 		private Scale: number = 1.0;
 
-		constructor(public PictgramLayer: SVGGElement, public ContentLayer: HTMLDivElement, public NodeletIconLayer: HTMLDivElement, public EventMapLayer: HTMLDivElement) {
+		constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
 			this.ContentLayer.style["transformOrigin"]       = "left top";
 			this.ContentLayer.style["MozTransformOrigin"]    = "left top";
 			this.ContentLayer.style["msTransformOrigin"]     = "left top";
@@ -723,17 +723,17 @@ module AssureNote {
 		private UpdateAttr(): void {
 			var attr: string = ViewportManager.translateA(this.OffsetX, this.OffsetY) + ViewportManager.scaleA(this.Scale);
 			var style: string = ViewportManager.translateS(this.OffsetX, this.OffsetY) + ViewportManager.scaleS(this.Scale);
-			this.PictgramLayer.setAttribute("transform", attr);
+			this.SVGLayer.setAttribute("transform", attr);
 			this.ContentLayer.style["transform"]       = style;
 			this.ContentLayer.style["MozTransform"]    = style;
 			this.ContentLayer.style["webkitTransform"] = style;
 			this.ContentLayer.style["msTransform"]     = style;
 			this.ContentLayer.style["OTransform"]      = style;
-			this.NodeletIconLayer.style["transform"]       = style;
-			this.NodeletIconLayer.style["MozTransform"]    = style;
-			this.NodeletIconLayer.style["webkitTransform"] = style;
-			this.NodeletIconLayer.style["msTransform"]     = style;
-			this.NodeletIconLayer.style["OTransform"]      = style;
+			this.ControlLayer.style["transform"]       = style;
+			this.ControlLayer.style["MozTransform"]    = style;
+			this.ControlLayer.style["webkitTransform"] = style;
+			this.ControlLayer.style["msTransform"]     = style;
+			this.ControlLayer.style["OTransform"]      = style;
 		}
 
 		SetScale(scale: number): void {
@@ -810,11 +810,11 @@ module AssureNote {
 		}
 
 		GetCaseWidth(): number {
-			return this.PictgramLayer.getBoundingClientRect().width;
+			return this.SVGLayer.getBoundingClientRect().width;
 		}
 
 		GetCaseHeight(): number {
-			return this.PictgramLayer.getBoundingClientRect().height;
+			return this.SVGLayer.getBoundingClientRect().height;
 		}
 
 		GetScale() {
