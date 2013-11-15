@@ -864,7 +864,6 @@ class GSNDoc {
 	}
 	
 	void FormatDoc(HashMap<String, GSNNode> NodeRef, StringWriter Stream) {
-		
 		if (this.TopGoal != null) {
 			this.TopGoal.FormatNode(NodeRef, Stream);
 		}
@@ -897,11 +896,13 @@ class GSNRecord {
 	}
 
 	void AddHistory(int Rev, String Author, String Role, String Date, String Process) {
-		/*local*/History History = new History(Rev, Author, Role, Date, Process, null);
-		while (!(Rev < this.HistoryList.size())) {
-			this.HistoryList.add(null);
+		if(Rev >= 0) {
+			/*local*/History History = new History(Rev, Author, Role, Date, Process, null);
+			while (!(Rev < this.HistoryList.size())) {
+				this.HistoryList.add(null);
+			}
+			this.HistoryList.set(Rev, History);
 		}
-		this.HistoryList.set(Rev, History);
 	}
 
 	void ParseHistoryTag(String Line, StringReader Reader) {
@@ -909,9 +910,9 @@ class GSNRecord {
 		if (loc != -1) {
 			/*local*/String Key = Line.substring(0, loc).trim();
 			try {
-				/*local*/String Value = Line.substring(loc + 1).trim();
+				/*local*/String Value = Line.substring(loc + 2).trim();
 				/*local*/String[] Records = Value.split(";");
-				this.AddHistory(Integer.parseInt(Key.substring(1)), Records[0], Records[1], Records[2], Records[3]);
+				this.AddHistory(WikiSyntax.ParseInt(Key.substring(1), -1), Records[0], Records[1], Records[2], Records[3]);
 			} catch (Exception e) { // any parse errors are ignored
 				Reader.LogError("Invalid format of history tag", e.getMessage());
 			}
@@ -1031,7 +1032,7 @@ class GSNRecord {
 		return null;
 	}
 
-	public void FormatCase(StringWriter Writer) {
+	public void FormatRecord(StringWriter Writer) {
 		/*local*/HashMap<String, GSNNode> RefMap = new HashMap<String, GSNNode>();
 		TagUtils.FormatHistoryTag(this.HistoryList, Writer);
 		for (int i = 0; i < this.DocList.size(); i++) {
@@ -1154,11 +1155,12 @@ class ParserContext {
 //			if(ParentNode.GoalLevel != Level) {
 //				Reader.LogError("mismatched level", Line);
 //			}
+			Level = ParentNode.GoalLevel;
 		}
 		if(this.NullableDoc != null) {
 			LabelNumber = this.NullableDoc.CheckLabelNumber(ParentNode, NodeType, LabelNumber);
 		}
-		NewNode = new GSNNode(this.NullableDoc, ParentNode, ParentNode.GoalLevel, NodeType, LabelNumber, HistoryTriple);
+		NewNode = new GSNNode(this.NullableDoc, ParentNode, Level, NodeType, LabelNumber, HistoryTriple);
 		if(this.FirstNode == null) {
 			this.FirstNode = NewNode;
 		}
@@ -1242,6 +1244,7 @@ public class AssureNoteParser {
 			br.close();
 		} catch (IOException e) {
 			System.err.println("cannot open: " + File);
+			System.exit(1);
 		}
 		return sb.toString();
 	}
@@ -1263,17 +1266,37 @@ public class AssureNoteParser {
 //		Doc.UpdateNode(null, Reader, RefMap);
 //	}
 	
-	public final static void main(String[] file) {
-		/*local*/String TextDoc = ReadFile(file[0]);
+	public final static void cat(String[] argv) {
 		/*local*/GSNRecord Record = new GSNRecord();
-		Record.Parse(TextDoc);
-		// Record.StartToEdit("u", "r", "d", "p");
-		// Record.GetEditingNode();
-		// Record.ApplyTemplate("Label", Template);
-		// Record.Commit();
-		// Record.Merge(Record);
+		for(int i = 1; i < argv.length; i++) {
+			String TextDoc = ReadFile(argv[i]);
+			Record.Parse(TextDoc);
+		}
 		/*local*/StringWriter Writer = new StringWriter();
-		Record.FormatCase(Writer);
-		System.out.println("--------\n" + Writer.toString());
+		Record.FormatRecord(Writer);
+		System.out.println(Writer.toString());
+		System.exit(0);
+	}
+	
+	public final static void main(String[] argv) {
+		if(argv.length > 1) {
+			if(argv[0].equals("-c")) {
+				cat(argv);
+			}
+		}
+		System.out.println("Usage: AssureNoteParser");
+		System.out.println(" -c files: join files");
+//		
+//		/*local*/String TextDoc = ReadFile(file[0]);
+//		/*local*/GSNRecord Record = new GSNRecord();
+//		Record.Parse(TextDoc);
+//		// Record.StartToEdit("u", "r", "d", "p");
+//		// Record.GetEditingNode();
+//		// Record.ApplyTemplate("Label", Template);
+//		// Record.Commit();
+//		// Record.Merge(Record);
+//		/*local*/StringWriter Writer = new StringWriter();
+//		Record.FormatRecord(Writer);
+//		System.out.println("--------\n" + Writer.toString());
 	}
 }

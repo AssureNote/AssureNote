@@ -1,0 +1,20 @@
+#0::deos;owner;day1;plan
+#1::deos;dev;day2;design
+
+*G1 #0:0:0
+System is dependable.
+*C1.1 #0:1:1
+System is Aspen2
+*S1.2 #1:1:1
+Arguing over subsystems.
+**G2 #1:1:1
+Server is dependable.
+**G3 #1:1:1
+Cliant is dependable.
+
+=====
+*G1 #0:0:0
+System is dependable.
+*C1.1 #0:0:0
+System is aspen
+
