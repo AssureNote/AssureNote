@@ -1,9 +1,13 @@
 module AssureNote {
 
 
-	module AssureNoteUtils {
+	export module AssureNoteUtils {
 		export function LoadFile(): FixMeModel {
 			return null;
+		}
+
+		export function GetNodeLabel(event: Event): string {
+			return (<HTMLElement>event.srcElement).id;
 		}
 
 	}
@@ -27,13 +31,13 @@ module AssureNote {
 		}
 
 		ExecCommand(CommandLine: string): void {
-			this.DebugP(CommandLine);
 			var Plugin = this.PluginManager.GetCommandPlugin(CommandLine);
-			if (!Plugin) {
+			if (Plugin != null) {
 				Plugin.ExecCommand(this, CommandLine);
 			}
 			else {
 				this.DebugP("undefined command: " + CommandLine);
+				alert("undefined command: " + CommandLine);
 			}
 		}
 
