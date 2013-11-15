@@ -32,7 +32,7 @@ module AssureNote {
 				//¡‚Ü‚Å‚É‰Ÿ‚µ‚½ƒL[‚Ì—ñ‚ğì‚Á‚Ä“n‚·
 				if (ev.keyCode == 186/*:*/) {
 					CmdLine.Show();
-					return false;
+					//return false;
 				}
 				else if (ev.keyCode == 13/*Enter*/ && CmdLine.IsEnable()) {
 					this.AssureNoteApp.ExecCommand(CmdLine.GetValue());

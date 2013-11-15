@@ -31,14 +31,13 @@ module AssureNote {
 		}
 
 		ExecCommand(CommandLine: string): void {
-			this.DebugP(CommandLine);
 			var Plugin = this.PluginManager.GetCommandPlugin(CommandLine);
 			if (Plugin != null) {
 				Plugin.ExecCommand(this, CommandLine);
 			}
 			else {
 				this.DebugP("undefined command: " + CommandLine);
-				alert(CommandLine);
+				alert("undefined command: " + CommandLine);
 			}
 		}
 
