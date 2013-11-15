@@ -1,0 +1,43 @@
+<project name="AssureItNotation" default="jar">
+	<!-- directory / file definition -->
+	<property name="BinaryName" value="AssureNoteParser" />
+	<property name="source_dir" value="src" />
+	<property name="build_dir"  value="bin" />
+
+	<!-- ================================== -->
+	<!--                BUILD               -->
+	<!-- ================================== -->
+	<target name="build">
+		<mkdir dir="${build_dir}" />
+		<javac srcdir="${source_dir}" destdir="${build_dir}" debug="on" target="1.6" source="1.6" includeantruntime="false">
+			<include name="**/*.java" />
+		</javac>
+	</target>
+
+	<!-- ================================== -->
+	<!--            GENERATE JAR            -->
+	<!-- ================================== -->
+	<target name="jar" depends="build">
+		<jar jarfile="${BinaryName}.jar">
+			<fileset dir="${build_dir}" includes="**/*.class" />
+			<manifest>
+				<attribute name="Main-Class" value="org.assurenote.AssureNoteParser" />
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- ================================== -->
+	<!--               CLEAN                -->
+	<!-- ================================== -->
+	<target name="clean">
+		<delete>
+			<fileset dir="${build_dir}" includes="**/*.class"/>
+		</delete>
+		<delete file="${BinaryName}.jar" />
+	</target>
+	<!-- ================================== -->
+	<!--               TEST                 -->
+	<!-- ================================== -->
+	<target name="test">
+	</target>
+</project>
