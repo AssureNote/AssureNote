@@ -52,7 +52,7 @@ module AssureNote {
 					console.log('error', (<any>e.target).error.code);
 				};
 				reader.onload = (e) => {
-					var dcaseFile = [(<any>e.target).result, Files[0].name];
+					var LoadFile = { content: (<any>e.target).result, name: Files[0].name };
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

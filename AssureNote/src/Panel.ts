@@ -29,10 +29,9 @@ module AssureNote {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
-				//¡‚Ü‚Å‚É‰Ÿ‚µ‚½ƒL[‚Ì—ñ‚ðì‚Á‚Ä“n‚·
+
 				if (ev.keyCode == 186/*:*/) {
 					CmdLine.Show();
-					//return false;
 				}
 				else if (ev.keyCode == 13/*Enter*/ && CmdLine.IsEnable()) {
 					this.AssureNoteApp.ExecCommand(CmdLine.GetValue());
@@ -43,7 +42,6 @@ module AssureNote {
 				//else {
 				//	cmdline += String.fromCharCode(ev.keyCode);
 				//}
-				//return false;
 			};
 			this.ContentLayer.onmouseover = (event: MouseEvent) => {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
