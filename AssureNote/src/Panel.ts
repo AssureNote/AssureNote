@@ -1,3 +1,6 @@
+///<reference path='./AssureNote.ts'/>
+///<reference path='./CommandLine.ts'/>
+
 module AssureNote {
 	export class PictgramPanel {
 		LayoutEngine: LayoutEngine;
@@ -14,25 +17,29 @@ module AssureNote {
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
 
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
-			this.ContentLayer.onclick = (ev: MouseEvent) => {
-				//ここで、ノード名に変換してイベントオブジェクトをラップ
-				alert("Hi!");
+			this.ContentLayer.onclick = (event: MouseEvent) => {
+				var Label: string = AssureNoteUtils.GetNodeLabel(event);
 				return false;
 			};
+
 			this.ContentLayer.ondblclick = (ev: MouseEvent) => {
 			};
-			var cmdline = "";
+			var CmdLine = new CommandLine();
 			document.onkeydown = (ev: KeyboardEvent) => {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
 				//今までに押したキーの列を作って渡す
 				if (ev.keyCode == 186/*:*/) {
-					cmdline = "";
+					CmdLine.Show();
+					return false;
 				}
-				//else if (ev.keyCode == 13/*Enter*/ && cmdline.length > 0) {
-				//	this.AssureNoteApp.ExecCommand(cmdline);
-				//}
+				else if (ev.keyCode == 13/*Enter*/ && CmdLine.IsEnable()) {
+					this.AssureNoteApp.ExecCommand(CmdLine.GetValue());
+					CmdLine.Hide();
+					CmdLine.Clear();
+					return false;
+				}
 				//else {
 				//	cmdline += String.fromCharCode(ev.keyCode);
 				//}
@@ -42,7 +49,7 @@ module AssureNote {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
-				if ((<HTMLElement>event.srcElement).id) {
+				if (AssureNoteUtils.GetNodeLabel(event)) {
 				}
 			};
 
@@ -83,10 +90,17 @@ module AssureNote {
 	}
 
 	export class PluginPanel {
+		Editor: any;
 		IsVisible: boolean;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
-			//Editor, etc.
+			this.Editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+				lineNumbers: false,
+				mode: "text/x-asn",
+				lineWrapping: true,
+			});
+			this.Editor.setSize("300px", "200px"); //FIXME
+			$('#editor-wrapper').css({ display: 'none', opacity: '1.0' });
 		}
 
 		Clear(): void {

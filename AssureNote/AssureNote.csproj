@@ -62,6 +62,7 @@
     <TypeScriptCompile Include="src\CommitModel.ts" />
     <TypeScriptCompile Include="src\EditorUtil.ts" />
     <TypeScriptCompile Include="src\AssureNote.ts" />
+    <TypeScriptCompile Include="src\CommandLine.ts" />
     <TypeScriptCompile Include="src\LayoutEngine.ts" />
     <TypeScriptCompile Include="src\Panel.ts" />
     <TypeScriptCompile Include="src\PluginManager.ts" />
