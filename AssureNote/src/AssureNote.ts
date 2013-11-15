@@ -1,10 +1,5 @@
 module AssureNote {
 
-	export class AssureNoteEvent {
-		Label: string;
-		constructor(public event: Event) {
-		}
-	}
 
 	module AssureNoteUtils {
 		export function LoadFile(): FixMeModel {
@@ -24,7 +19,7 @@ module AssureNote {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
-			this.PluginPanel = new PluginPanel(this);
+			this.PluginPanel =   new PluginPanel(this);
 		}
 
 		DebugP(Message: string): void {
