@@ -498,6 +498,25 @@ class GSNNode {
 		this.SetContent(new StringReader(TextDoc).GetLineList(true/*UntilSection*/));
 	}
 	
+	ArrayList<GSNNode> GetNodeHistoryList() {
+		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
+		/*local*/GSNNode LastNode = null;
+		for(/*local*/History NodeHistory : this.BaseDoc.Record.HistoryList) {
+			if(NodeHistory.Doc != null) {
+				GSNNode Node = NodeHistory.Doc.GetNode(this.GetLabel());
+				if(Node != null) {
+					if(Node.Created == this.Created) {
+						if(LastNode == null || LastNode.LastModified != this.LastModified) {
+							NodeList.add(Node);
+							LastNode = Node;
+						}
+					}
+				}
+			}
+		}
+		return NodeList;
+	}
+	
 	private void AppendSubNode(GSNNode Node) {
 		assert(Node.BaseDoc == this.BaseDoc);
 		if (this.SubNodeList == null) {
@@ -608,26 +627,30 @@ class GSNNode {
 		}
 	}
 	
-	void ReplaceSubNode(String DocText) {
+	void ReplaceSubNode(GSNNode NewNode) {
+		this.MergeSubNode(NewNode, null);
+		if(this.ParentNode != null) {
+			for(/*local*/int i = 0; i < this.ParentNode.SubNodeList.size(); i++) {
+				if(this.ParentNode.SubNodeList.get(i) == this) {
+					this.ParentNode.SubNodeList.set(i, NewNode);
+				}
+			}
+		}
+		else {
+			assert(NewNode.IsGoal());
+			this.BaseDoc.TopGoal = NewNode;
+		}
+	}
+
+	void ReplaceSubNodeAsText(String DocText) {
 		/*local*/StringReader Reader = new StringReader(DocText);
 		/*local*/ParserContext Parser = new ParserContext(null, this.ParentNode);
 		/*local*/GSNNode NewNode = Parser.ParseNode(Reader, null);
 		if(NewNode != null) {
-			this.MergeSubNode(NewNode, null);
-			if(this.ParentNode != null) {
-				for(/*local*/int i = 0; i < this.ParentNode.SubNodeList.size(); i++) {
-					if(this.ParentNode.SubNodeList.get(i) == this) {
-						this.ParentNode.SubNodeList.set(i, NewNode);
-					}
-				}
-			}
-			else {
-				this.BaseDoc.TopGoal = NewNode;
-			}
-			this.BaseDoc.RemapNodeMap();
+			this.ReplaceSubNode(NewNode);
 		}
 	}
-
+	
 	boolean HasSubNodeLabel(String Label) {
 		if(Label.equals(this.GetLabel())) {
 			return true;
@@ -642,7 +665,7 @@ class GSNNode {
 	
 	void MergeSubNode(GSNNode NewNode, HashMap<String,String> LabelMap) {
 		assert(this.BaseDoc != null);
-		assert(NewNode.BaseDoc != null);
+		NewNode.LastModified = null; // this.BaseDoc has Last
 		if(NewNode.LabelNumber != null) {
 			/*local*/String Label = NewNode.GetLabel();
 			/*local*/GSNNode OldNode = this.BaseDoc.GetNode(Label);
@@ -849,6 +872,7 @@ class GSNDoc {
 			this.TopGoal.FormatNode(NodeRef, Stream);
 		}
 	}
+	
 }
 
 
@@ -955,55 +979,82 @@ class GSNRecord {
 	}
 
 	public void Commit() {
-		// TODO Auto-generated method stub
+		this.EditingDoc = null;
 	}
 
-	public void Merge(GSNRecord BranchRecord) {
-		/*local*/int CommonRev = this.HistoryList.size();
-		/*local*/boolean IsLinearHistory = true;
-		for (/*local*/int Rev = 0; Rev < BranchRecord.HistoryList.size(); Rev++) {
-			/*local*/History BranchHistory = BranchRecord.GetHistory(Rev);
+	public void Merge(GSNRecord NewRecord) {
+		/*local*/int CommonHistory = -1;
+		/*local*/boolean CanFastFoward = true;
+		for (/*local*/int Rev = 0; Rev < this.HistoryList.size(); Rev++) {
 			/*local*/History MasterHistory = this.GetHistory(Rev);
-			if (MasterHistory == null || !MasterHistory.EqualsHistory(BranchHistory)) {
-				if (BranchHistory.Rev != this.HistoryList.size()) {
-					IsLinearHistory = false;
-				}
-				BranchHistory.Rev = this.HistoryList.size();
-				this.HistoryList.add(BranchHistory);
+			/*local*/History NewHistory = NewRecord.GetHistory(Rev);
+			if (NewHistory != null && MasterHistory.EqualsHistory(MasterHistory)) {
+				CommonHistory = Rev;
+				continue;
 			}
+			break;
 		}
-		if (IsLinearHistory) {
-			for (/*local*/int i = CommonRev; i < BranchRecord.DocList.size(); i++) {
-				/*local*/GSNDoc BranchDoc = BranchRecord.DocList.get(i);
-				BranchDoc.Record = this;
-				this.DocList.add(BranchDoc);
-			}
-		} else {
-			/*local*/ArrayList<GSNNode> ConflictList = new ArrayList<GSNNode>();
-			/*local*/GSNDoc Doc = BranchRecord.GetLatestDoc();
-			Doc.TopGoal.Merge(this.GetLatestDoc(), CommonRev, ConflictList);
-			// for(GSNNode BranchNode : MergedNodeList) {
-			// String Label = BranchNode.GetLabel();
-			// GSNNode MasterNode = Doc.NodeMap.get(Label);
-			// if(MasterNode != null || MasterNode.Created.Rev ==
-			// BranchNode.Created.Rev) {
-			// if(MasterNode.IsSameParent(BranchNode)) {
-			// if(MasterNode.LastModified.Rev == BranchNode.Branched.Rev) {
-			// MasterNode.NodeDoc = BranchNode.NodeDoc;
-			// MasterNode.Digest = BranchNode.Digest;
-			// MasterNode.HasTag = BranchNode.HasTag;
-			// MasterNode.Branched = BranchNode.Branched;
-			// MasterNode.LastModified = BranchNode.LastModified;
-			// }
-			// else {
-			// MasterNode.ConflictedWith(BranchNode.NodeDoc);
-			// }
-			// }
-			// }
-			// }
+		if(CommonHistory == -1) {
+			MergeAsReplaceTopGoal(NewRecord);
+		}
+		if(CommonHistory == this.HistoryList.size()-1) {
+			MergeAsFastFoward(NewRecord);
+		}
+//		else {
+//			int NewRev = CommonHistory + 1;
+//			int 
+//			for(int MasterRev = CommonHistory + 1; MasterRev < this.HistoryList.size(); MasterRev++) {
+//				/*local*/History MasterHistory = this.GetHistory(Rev);
+//				/*local*/History NewHistory = NewRecord.GetHistory(Rev);
+//				
+//			}
+//			
+//			/*local*/ArrayList<GSNNode> ConflictList = new ArrayList<GSNNode>();
+//			/*local*/GSNDoc Doc = NewRecord.GetLatestDoc();
+//			Doc.TopGoal.Merge(this.GetLatestDoc(), CommonHistory, ConflictList);
+//			// for(GSNNode BranchNode : MergedNodeList) {
+//			// String Label = BranchNode.GetLabel();
+//			// GSNNode MasterNode = Doc.NodeMap.get(Label);
+//			// if(MasterNode != null || MasterNode.Created.Rev ==
+//			// BranchNode.Created.Rev) {
+//			// if(MasterNode.IsSameParent(BranchNode)) {
+//			// if(MasterNode.LastModified.Rev == BranchNode.Branched.Rev) {
+//			// MasterNode.NodeDoc = BranchNode.NodeDoc;
+//			// MasterNode.Digest = BranchNode.Digest;
+//			// MasterNode.HasTag = BranchNode.HasTag;
+//			// MasterNode.Branched = BranchNode.Branched;
+//			// MasterNode.LastModified = BranchNode.LastModified;
+//			// }
+//			// else {
+//			// MasterNode.ConflictedWith(BranchNode.NodeDoc);
+//			// }
+//			// }
+//			// }
+//			// }
+//		}
+	}
+
+	public void MergeAsFastFoward(GSNRecord NewRecord) {
+		for (/*local*/int i = this.HistoryList.size(); i < NewRecord.DocList.size(); i++) {
+			/*local*/GSNDoc BranchDoc = NewRecord.DocList.get(i);
+			BranchDoc.Record = this;
+			this.HistoryList.add(BranchDoc.DocHistory);
+			this.DocList.add(BranchDoc);
 		}
 	}
 
+	public void MergeAsReplaceTopGoal(GSNRecord NewRecord) {
+		for(int i = 0; i < NewRecord.HistoryList.size(); i++) {
+			History NewHistory = NewRecord.HistoryList.get(i);
+			GSNDoc Doc = NewHistory != null ? NewHistory.Doc : null;
+			if(Doc != null) {
+				this.StartToEdit(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
+				this.EditingDoc.TopGoal.ReplaceSubNode(Doc.TopGoal);
+				this.Commit();
+			}
+		}
+	}
+	
 	GSNDoc GetLatestDoc() {
 		if (this.DocList.size() > 0) {
 			this.DocList.get(this.DocList.size() - 1);
@@ -1250,27 +1301,28 @@ public class AssureNoteParser {
 //		Doc.UpdateNode(null, Reader, RefMap);
 //	}
 	
-	public final static void cat(String[] argv) {
-		/*local*/GSNRecord Record = new GSNRecord();
-		for(int i = 1; i < argv.length; i++) {
-			String TextDoc = ReadFile(argv[i]);
-			Record.Parse(TextDoc);
+	public final static void merge(String MasterFile, String BranchFile) {
+		/*local*/GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(ReadFile(MasterFile));
+		if(BranchFile != null) {
+			/*local*/GSNRecord BranchRecord = new GSNRecord();
+			BranchRecord.Parse(ReadFile(BranchFile));
+			MasterRecord.Merge(BranchRecord);
 		}
 		/*local*/StringWriter Writer = new StringWriter();
-		Record.FormatRecord(Writer);
+		MasterRecord.FormatRecord(Writer);
 		System.out.println(Writer.toString());
 		System.exit(0);
 	}
-	
+
 	public final static void main(String[] argv) {
-		if(argv.length > 1) {
-			if(argv[0].equals("-c")) {
-				cat(argv);
-			}
+		if(argv.length == 2) {
+			merge(argv[0], argv[1]);
 		}
-		System.out.println("Usage: AssureNoteParser");
-		System.out.println(" -c files: join files");
-//		
+		if(argv.length == 1) {
+			merge(argv[0], null);
+		}
+		System.out.println("Usage: AssureNoteParser file [margingfile]");
 //		/*local*/String TextDoc = ReadFile(file[0]);
 //		/*local*/GSNRecord Record = new GSNRecord();
 //		Record.Parse(TextDoc);
