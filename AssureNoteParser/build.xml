@@ -10,6 +10,7 @@
 	<target name="build">
 		<mkdir dir="${build_dir}" />
 		<javac srcdir="${source_dir}" destdir="${build_dir}" debug="on" target="1.6" source="1.6" includeantruntime="false">
+			<classpath path="ext/itextpdf-5.4.4.jar" />
 			<include name="**/*.java" />
 		</javac>
 	</target>

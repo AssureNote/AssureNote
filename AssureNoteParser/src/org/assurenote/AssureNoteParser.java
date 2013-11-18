@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.itextpdf.text.DocumentException;
+
 class Lib {
 	static MessageDigest GetMD5() {
 		try {
@@ -1360,6 +1362,14 @@ public class AssureNoteParser {
 		}
 		if(argv.length == 1) {
 			merge(argv[0], null);
+		}
+		if(argv.length == 0) {
+			try {
+				PdfConverter.main(argv);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 		}
 		System.out.println("Usage: AssureNoteParser file [margingfile]");
 	}
