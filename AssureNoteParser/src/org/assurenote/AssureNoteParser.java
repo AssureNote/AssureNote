@@ -24,6 +24,7 @@
 
 // LangBase is a language-dependent code used in GreenTea.java
 
+//ifdef JAVA
 package org.assurenote;
 
 import java.io.BufferedReader;
@@ -36,6 +37,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.itextpdf.text.DocumentException;
+//endif VAJA
+
+//ifdef JAVA
 class Lib {
 	static MessageDigest GetMD5() {
 		try {
@@ -72,6 +77,7 @@ class Lib {
 		return Digest == null && Digest2 == null;
 	}
 }
+//endif VAJA
 
 class StringReader {
 	/*field*/int CurrentPos;
@@ -1360,6 +1366,14 @@ public class AssureNoteParser {
 		}
 		if(argv.length == 1) {
 			merge(argv[0], null);
+		}
+		if(argv.length == 0) {
+			try {
+				PdfConverter.main(argv);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 		}
 		System.out.println("Usage: AssureNoteParser file [margingfile]");
 	}
