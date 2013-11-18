@@ -40,7 +40,14 @@ module AssureNote {
             this.DocBase.append($('<h4>' + NodeModel.Label + '</h4>'));
             this.RawDocBase = <HTMLDivElement>this.DocBase[0];
 
-			this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);
+			//this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);
+			var statements: string[] = NodeModel.Statement.split("\n");
+			var content: string = "";
+			for (var i: number = 0; i < statements.length; i++) {
+				content += $('<div/>').text(statements[i]).html() + "<br>";
+			}
+			$('<p>' + content + '</p>').appendTo(this.DocBase);
+
             this.UpdateWidth(Viewer, NodeModel);
             this.Resize(Viewer, NodeModel);
         }
@@ -561,7 +568,8 @@ module AssureNote {
 		}
 
 		private LayoutElement() : void {
-			var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
+			//var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
+			var layout = new LayoutPortrait();
 			layout.Init(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
 			layout.LayoutAllView(this.ElementTop, 0, 0);
 		}
@@ -590,7 +598,7 @@ module AssureNote {
             this.ViewMap[this.ElementTop.Label].AppendHTMLElementRecursive(svgfrag, divfrag, this);
             this.Screen.SVGLayer.appendChild(svgfrag);
             this.Screen.ContentLayer.appendChild(divfrag);
-			this.pluginManager.RegisterActionEventListeners(this, this.Source, this.serverApi);
+			//this.pluginManager.RegisterActionEventListeners(this, this.Source, this.serverApi);
 			this.Update();
 		}
 

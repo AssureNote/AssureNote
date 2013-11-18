@@ -67,3 +67,44 @@ h4 {
 	padding: 20px 20px;
 	width : 210px;
 }
+
+.assureit-default {
+	fill: #b4d8df;
+	stroke: none;
+}
+
+.assureit-default-highlight {
+	fill: #b4d8df;
+	stroke: orange;
+}
+
+.assureit-todo {
+	fill: #FFFFFF;
+	stroke: #000000;
+	stroke-dasharray: 5, 5;
+}
+
+.assureit-todo-highlight {
+	fill: #FFFFFF;
+	stroke: orange
+}
+
+.assureit-search{
+	fill: #fae9b1;
+	stroke: none;
+}
+
+.assureit-search-highlight{
+	fill: #fae9b1;
+	stroke: orange;
+}
+
+.assureit-danger {
+	fill: #FFAA7D;
+	stroke: none;
+}
+
+.assureit-danger-highlight {
+	fill: #FFAA7D;
+	stroke: orange;
+}
