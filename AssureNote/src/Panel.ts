@@ -42,9 +42,6 @@ module AssureNote {
 					CmdLine.Clear();
 					return false;
 				}
-				//else {
-				//	cmdline += String.fromCharCode(ev.keyCode);
-				//}
 			};
 			this.ContentLayer.onmouseover = (event: MouseEvent) => {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {

@@ -33,9 +33,6 @@ var AssureNote;
                     CmdLine.Clear();
                     return false;
                 }
-                //else {
-                //	cmdline += String.fromCharCode(ev.keyCode);
-                //}
             };
             this.ContentLayer.onmouseover = function (event) {
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {

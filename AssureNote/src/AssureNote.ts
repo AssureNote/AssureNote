@@ -2,7 +2,6 @@
 
 module AssureNote {
 
-
 	export module AssureNoteUtils {
 
 		export function GetNodeLabel(event: Event): string {
