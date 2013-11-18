@@ -20,7 +20,7 @@ var AssureNote;
             };
             var CmdLine = new AssureNote.CommandLine();
             document.onkeydown = function (ev) {
-                if (_this.AssureNoteApp.PluginPanel.IsVisible) {
+                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return false;
                 }
 

@@ -28,7 +28,7 @@ module AssureNote {
 			};
 			var CmdLine = new CommandLine();
 			document.onkeydown = (ev: KeyboardEvent) => {
-				if (this.AssureNoteApp.PluginPanel.IsVisible) {
+				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
 
