@@ -24,6 +24,7 @@
 
 // LangBase is a language-dependent code used in GreenTea.java
 
+//ifdef JAVA
 package org.assurenote;
 
 import java.io.BufferedReader;
@@ -35,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+//endif VAJA
 
 class Lib {
 	static MessageDigest GetMD5() {

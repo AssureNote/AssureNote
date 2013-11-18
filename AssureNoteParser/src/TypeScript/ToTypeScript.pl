@@ -49,9 +49,6 @@ sub fixup {
 	return $text;
 }
 
-# Delegates.
-$src =~ s/Function(?:A|B|C)\(this, "(.+?)"\)/$Grammar\["$1"\]/g;
-
 # Restricted Java Comments
 $src =~ s/\/\*constructor\*\//#Constructor#/g;
 $src =~ s/\/\*local\*\//#Local#/g;
