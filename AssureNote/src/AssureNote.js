@@ -3,7 +3,14 @@ var AssureNote;
 (function (AssureNote) {
     (function (AssureNoteUtils) {
         function GetNodeLabel(event) {
-            return (event.srcElement).id;
+            var element = event.srcElement;
+            while (element != null) {
+                if (element.id != "") {
+                    return element.id;
+                }
+                element = element.parentElement;
+            }
+            return "";
         }
         AssureNoteUtils.GetNodeLabel = GetNodeLabel;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));

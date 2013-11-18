@@ -6,7 +6,14 @@ module AssureNote {
 	export module AssureNoteUtils {
 
 		export function GetNodeLabel(event: Event): string {
-			return (<HTMLElement>event.srcElement).id;
+			var element = <HTMLElement>event.srcElement;
+			while (element != null) {
+				if (element.id != "") {
+					return element.id;
+				}
+				element = element.parentElement;
+			}
+			return "";
 		}
 
 	}

@@ -13,6 +13,7 @@ var AssureNote;
 
             this.ContentLayer.onclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
+                _this.AssureNoteApp.DebugP(Label);
                 return false;
             };
 

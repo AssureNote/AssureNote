@@ -21,6 +21,7 @@ module AssureNote {
 
 			this.ContentLayer.onclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
+				this.AssureNoteApp.DebugP(Label);
 				return false;
 			};
 

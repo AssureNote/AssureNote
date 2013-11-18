@@ -410,4 +410,4 @@ var AssureNote;
     })();
     AssureNote.OldPlugInManager = OldPlugInManager;
 })(AssureNote || (AssureNote = {}));
-//# sourceMappingURL=PluginManager.js.map
+//# sourceMappingURL=PlugInManager.js.map
