@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 //endif VAJA
 
+//ifdef JAVA
 class Lib {
 	static MessageDigest GetMD5() {
 		try {
@@ -74,6 +75,7 @@ class Lib {
 		return Digest == null && Digest2 == null;
 	}
 }
+//endif VAJA
 
 class StringReader {
 	/*field*/int CurrentPos;

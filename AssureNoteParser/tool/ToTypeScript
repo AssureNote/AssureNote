@@ -7,17 +7,18 @@ build=src/TypeScript/
 # DO NOT CHANGE THE ORDER WITHOUT NECESSITY.
 source=
 source="${source} AssureNoteParser"
+target="AssureNoteParser"
 #
-ts=""
+libs=""
+libs="${libs} ${build}LibAssureNoteParser.ts"
 
+ts=""
 for s in ${source}; do
-    perl src/TypeScript/ToTypeScript.pl ${SourceDir}${s}.java > ${build}${s}.ts
-    #ts="${ts} ${build}${s}.ts"
+    perl src/TypeScript/ToTypeScript.pl ${SourceDir}${s}.java > "${build}_${s}.ts"
+    ts="${ts} ${build}_${s}.ts"
 done
 
-#perl src/TypeScript/PackLibraries.pl lib > ${build}GreenTeaLibraries.ts
-#ts="${ts} ${build}GreenTeaLibraries.ts"
-#ts="${ts} ${build}LibGreenTea.ts"
-#cat ${ts} > ${build}AssureNoteParser.ts
+cat ${ts} ${libs} > ${build}${target}.ts
+rm ${ts}
 
-tsc ${build}AssureNoteParser.ts
+tsc ${build}${target}.ts
