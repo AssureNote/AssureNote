@@ -181,6 +181,14 @@ module AssureNote {
 			return null;
 		}
 
+		//Deprecated
+		GetContextIndex(): number {
+			for (var i: number = 0; i < this.Children.length; i++) {
+				if (this.Children[i].Type == NodeType.Context) return i;
+			}
+			return -1;
+		}
+
 		//InvokePlugInModifier(EventType : string, EventBody : any) : boolean {
 		//	var recall = false;
 		//	for(var a in this.Annotations) {

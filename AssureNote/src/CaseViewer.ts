@@ -40,7 +40,14 @@ module AssureNote {
             this.DocBase.append($('<h4>' + NodeModel.Label + '</h4>'));
             this.RawDocBase = <HTMLDivElement>this.DocBase[0];
 
-			this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);
+			//this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);
+			var statements: string[] = NodeModel.Statement.split("\n");
+			var content: string = "";
+			for (var i: number = 0; i < statements.length; i++) {
+				content += $('<div/>').text(statements[i]).html() + "<br>";
+			}
+			$('<p>' + content + '</p>').appendTo(this.DocBase);
+
             this.UpdateWidth(Viewer, NodeModel);
             this.Resize(Viewer, NodeModel);
         }
@@ -391,12 +398,12 @@ module AssureNote {
 		}
 	}
 
-	export class NodeView {
+	export class OldNodeView {
 		CaseViewer: CaseViewer;
 		Source: NodeModel;
 		HTMLDoc: HTMLDoc;
 		SVGShape: SVGShape;
-		ParentShape: NodeView;
+		ParentShape: OldNodeView;
 		TemporaryColor: { [index: string]: string };
 
 		IsArrowWhite: boolean = false;
@@ -504,7 +511,7 @@ module AssureNote {
 	}
 
 	export class CaseViewer {
-		ViewMap: { [index: string]: NodeView; };
+		ViewMap: { [index: string]: OldNodeView; };
 		ElementTop : NodeModel;
 		static ElementWidth = 250; /*look index.css*/
 
@@ -517,7 +524,7 @@ module AssureNote {
 			this.ViewMap = {};
 			for (var elementkey in Source.ElementMap) {
 				var element = Source.ElementMap[elementkey];
-				this.ViewMap[element.Label] = new NodeView(this, element);
+				this.ViewMap[element.Label] = new OldNodeView(this, element);
 				if (element.Parent != null) {
 					this.ViewMap[element.Label].ParentShape = this.ViewMap[element.Parent.Label];
 				}
@@ -531,8 +538,8 @@ module AssureNote {
 			};
 		}
 
-		GetPlugInSVGRender(PlugInName: string): (caseViewer: CaseViewer, elementShape: NodeView) => boolean {
-			return (viewer: CaseViewer, shape: NodeView) : boolean => {
+		GetPlugInSVGRender(PlugInName: string): (caseViewer: CaseViewer, elementShape: OldNodeView) => boolean {
+			return (viewer: CaseViewer, shape: OldNodeView) : boolean => {
 				return this.pluginManager.SVGRenderPlugInMap[PlugInName].Delegate(viewer, shape);
 			};
 		}
@@ -551,7 +558,7 @@ module AssureNote {
 			}
 		}
 
-		DeleteViewsRecursive(root : NodeView) : void {
+		DeleteViewsRecursive(root : OldNodeView) : void {
 			var Children = root.Source.Children;
 			this.ViewMap[root.Source.Label].DeleteHTMLElementRecursive(null, null);
 			delete this.ViewMap[root.Source.Label];
@@ -561,17 +568,18 @@ module AssureNote {
 		}
 
 		private LayoutElement() : void {
-			var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
+			//var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
+			var layout = new LayoutPortrait();
 			layout.Init(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
 			layout.LayoutAllView(this.ElementTop, 0, 0);
 		}
 
-		private UpdateViewMapRecursive(model: NodeModel, view: NodeView) {
+		private UpdateViewMapRecursive(model: NodeModel, view: OldNodeView) {
 			for (var i in model.Children) {
 				var child_model: NodeModel = model.Children[i];
 				var child_view = this.ViewMap[child_model.Label];
 				if (child_view == null) {
-					child_view = new NodeView(this, child_model);
+					child_view = new OldNodeView(this, child_model);
 					this.ViewMap[child_model.Label] = child_view;
 					child_view.ParentShape = view;
 				}
@@ -590,7 +598,7 @@ module AssureNote {
             this.ViewMap[this.ElementTop.Label].AppendHTMLElementRecursive(svgfrag, divfrag, this);
             this.Screen.SVGLayer.appendChild(svgfrag);
             this.Screen.ContentLayer.appendChild(divfrag);
-			this.pluginManager.RegisterActionEventListeners(this, this.Source, this.serverApi);
+			//this.pluginManager.RegisterActionEventListeners(this, this.Source, this.serverApi);
 			this.Update();
 		}
 

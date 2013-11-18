@@ -149,11 +149,11 @@ module AssureNote {
 			super(plugInManager);
 		}
 
-		IsEnabled(caseViewer: CaseViewer, elementShape: NodeView /* add args as necessary */) : boolean {
+		IsEnabled(caseViewer: CaseViewer, elementShape: OldNodeView /* add args as necessary */) : boolean {
 			return true;
 		}
 
-		Delegate(caseViewer: CaseViewer, elementShape: NodeView /* add args as necessary */) : boolean {
+		Delegate(caseViewer: CaseViewer, elementShape: OldNodeView /* add args as necessary */) : boolean {
 			return true;
 		}
 	}
@@ -164,7 +164,7 @@ module AssureNote {
 			super(plugInManager);
 		}
 
-		Init(ViewMap: {[index:string]: NodeView}, Element: NodeModel, x: number, y: number, ElementWidth: number): void {
+		Init(ViewMap: {[index:string]: OldNodeView}, Element: NodeModel, x: number, y: number, ElementWidth: number): void {
 		}
 
 		LayoutAllView(ElementTop: NodeModel, x: number, y: number): void {
@@ -230,8 +230,8 @@ module AssureNote {
 
 	export class OldPlugInManager {
 
-		ActionPlugInMap           : { [index: string]: ActionPlugIn };
-		CheckerPlugInMap          : { [index: string]: CheckerPlugIn };
+		//ActionPlugInMap           : { [index: string]: ActionPlugIn };
+		//CheckerPlugInMap          : { [index: string]: CheckerPlugIn };
 
 		HTMLRenderPlugInMap       : { [index: string]: HTMLRenderPlugIn };
 		SVGRenderPlugInMap        : { [index: string]: SVGRenderPlugIn };
@@ -249,8 +249,8 @@ module AssureNote {
 
 
 		constructor(public basepath: string) {
-			this.ActionPlugInMap = {};
-			this.CheckerPlugInMap = {};
+			//this.ActionPlugInMap = {};
+			//this.CheckerPlugInMap = {};
 
 			this.HTMLRenderPlugInMap = {};
 			this.SVGRenderPlugInMap = {};
@@ -320,19 +320,19 @@ module AssureNote {
 			}
 		}
 
-		private SetActionPlugIn(key: string, actionPlugIn: ActionPlugIn) {
-			this.ActionPlugInMap[key] = actionPlugIn;
-		}
+		//private SetActionPlugIn(key: string, actionPlugIn: ActionPlugIn) {
+		//	this.ActionPlugInMap[key] = actionPlugIn;
+		//}
 
-		RegisterActionEventListeners(CaseViewer: CaseViewer, case0: Case, serverApi: ServerAPI): void {
-			for(var key in this.ActionPlugInMap) {
-				if(this.ActionPlugInMap[key].IsEnabled(CaseViewer, case0)) {
-					this.ActionPlugInMap[key].Delegate(CaseViewer, case0, serverApi);
-				}else {
-					this.ActionPlugInMap[key].DisableEvent(CaseViewer, case0, serverApi);
-				}
-			}
-		}
+		//RegisterActionEventListeners(CaseViewer: CaseViewer, case0: Case, serverApi: ServerAPI): void {
+		//	for(var key in this.ActionPlugInMap) {
+		//		if(this.ActionPlugInMap[key].IsEnabled(CaseViewer, case0)) {
+		//			this.ActionPlugInMap[key].Delegate(CaseViewer, case0, serverApi);
+		//		}else {
+		//			this.ActionPlugInMap[key].DisableEvent(CaseViewer, case0, serverApi);
+		//		}
+		//	}
+		//}
 
 		private SetHTMLRenderPlugIn(key: string, HTMLRenderPlugIn: HTMLRenderPlugIn): void {
 			this.HTMLRenderPlugInMap[key] = HTMLRenderPlugIn;

@@ -1,5 +1,6 @@
 ///<reference path='./AssureNote.ts'/>
 ///<reference path='./CommandLine.ts'/>
+declare var CodeMirror: any;
 
 module AssureNote {
 	export class PictgramPanel {
@@ -15,8 +16,9 @@ module AssureNote {
 			this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
-
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
+			this.LayoutEngine = new OldLayoutEngine(this.AssureNoteApp);
+
 			this.ContentLayer.onclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
 				return false;
@@ -26,13 +28,12 @@ module AssureNote {
 			};
 			var CmdLine = new CommandLine();
 			document.onkeydown = (ev: KeyboardEvent) => {
-				if (this.AssureNoteApp.PluginPanel.IsVisible) {
+				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
-				//¡‚Ü‚Å‚É‰Ÿ‚µ‚½ƒL[‚Ì—ñ‚ðì‚Á‚Ä“n‚·
+
 				if (ev.keyCode == 186/*:*/) {
 					CmdLine.Show();
-					//return false;
 				}
 				else if (ev.keyCode == 13/*Enter*/ && CmdLine.IsEnable()) {
 					this.AssureNoteApp.ExecCommand(CmdLine.GetValue());
@@ -43,7 +44,6 @@ module AssureNote {
 				//else {
 				//	cmdline += String.fromCharCode(ev.keyCode);
 				//}
-				//return false;
 			};
 			this.ContentLayer.onmouseover = (event: MouseEvent) => {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
@@ -57,18 +57,18 @@ module AssureNote {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					e.stopPropagation();
 					e.preventDefault();
-					return false;
+					//return false;
 				}
 			};
 			$(this.EventMapLayer)
-				.on('dragenter', DragHandler)
+				.on('dragenter', (e) => { console.log("o"); })
 				.on('dragover', DragHandler)
 				.on('dragleave', DragHandler)
-				.on('drop', (ev) => {
+				.on('drop', (event: JQueryEventObject) => {
 					if (this.AssureNoteApp.PluginPanel.IsVisible) {
-						ev.stopPropagation();
-						ev.preventDefault();
-						this.AssureNoteApp.ProcessDroppedFiles((<any>ev.originalEvent.dataTransfer).files);
+						event.stopPropagation();
+						event.preventDefault();
+						this.AssureNoteApp.ProcessDroppedFiles((<any>(<any>event.originalEvent).dataTransfer).files);
 						return false;
 					}
 				});
@@ -91,7 +91,7 @@ module AssureNote {
 
 	export class PluginPanel {
 		Editor: any;
-		IsVisible: boolean;
+		IsVisible: boolean = true;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			this.Editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
