@@ -8,8 +8,6 @@ my $Sym  = "(?:(?!$Keyword\\b)\\b(?!\\d)\\w+\\b)";
 my $Type = "(?:$Sym(?:<.*?>)?(?:\\[\\s*\\d*\\s*\\])*)";
 my $Attr = "(?:\\b(?:public|private|protected|static|final)\\b\\s*)";
 
-my $Grammar = "GreenTeaGrammar";
-
 my $src = join '', <DATAFILE>;
 
 my @StringLiterals;
@@ -49,9 +47,6 @@ sub fixup {
 	return $text;
 }
 
-# Delegates.
-$src =~ s/Function(?:A|B|C)\(this, "(.+?)"\)/$Grammar\["$1"\]/g;
-
 # Restricted Java Comments
 $src =~ s/\/\*constructor\*\//#Constructor#/g;
 $src =~ s/\/\*local\*\//#Local#/g;
@@ -73,20 +68,6 @@ $src =~ s/("(?:[^\\"]|\\.)*?")/&ProtectString($1)/ge;
 
 $src =~ s/};/}/g;
 
-sub GreenTeaConstsSection{
-	my $text = $_[0];
-	$text =~ s/(?:$Attr*)($Type)\s+($Sym)((?:\[\s*\d*\s*\])?)/var $2: $1$3/g;
-	$text =~ s/$Attr//g;
-	return $text;
-}
-
-sub GreenTeaUtilsSection{
-	my $text = $_[0];
-	$text =~ s/$Attr*//g;
-	$text =~ s/($Attr*)($Type)\s+($Sym)\s*\((.*?)\)/function $1$3(#params#$4): $2/g;
-	return $text;
-}
-
 sub Params{
 	my $text = $_[0];
 	$text =~ s/($Type)\s+($Sym)/$2: $1/g;
@@ -96,11 +77,6 @@ sub Params{
 sub UnQuote {
 	my $text = $_[0];
 }
-
-$src =~ s/interface GreenTeaConsts {(.*?)^}/GreenTeaConstsSection($1)/ems;
-$src =~ s/class GreenTeaUtils(.*?)^}/GreenTeaUtilsSection($1)/ems;
-
-$src =~ s/\bimplements\s+GreenTeaConsts\b//gms;
 
 # Comments
 $src =~ s/^\/\/[#\s]*ifdef\s+JAVA.*?VAJA//gms;
@@ -144,9 +120,7 @@ $src =~ s/\bfinal\b//g;
 $src =~ s/\bprotected\b//g;
 $src =~ s/\@Override\s*//g;
 $src =~ s/\@Deprecated\s*//g;
-$src =~ s/\bextends GreenTeaUtils\s*//g;
 $src =~ s/\bpublic interface\s*/interface /g;
-$src =~ s/\bGreenTeaUtils\.//g;
 $src =~ s/\binstanceof\s+string\b/instanceof String/g;
 $src =~ s/\binstanceof\s+number\b/instanceof Number/g;
 $src =~ s/\b([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*) instanceof String/(typeof $1 == 'string' || $1 instanceof String)/g;
@@ -172,14 +146,6 @@ $src =~ s/\bpublic\s*class\b/class/g;
 # Delegates.
 #$src =~ s/(?!\.)\b(Parse|Type)(?:Unary|Binary|Const|Block)\b(?!\()/LibLoadFunc.Load$1Func(Context, this, "$2")/g;
 $src =~ s/\bGtDelegate(?:Common|Token|Match|Type)\b/any/g;
-$src =~ s/$Grammar\.$Grammar/$Grammar/g;
-
-$src =~ s/\bGtGrammar\.Load(Token|Parse|Type)Func\b/LibLoadFunc.Load$1Func/g;
-
-# For debug
-#$src =~ s/(LibGreenTea\.)?DebugP\(/console.log("DEBUG: " + /g;
-#$src =~ s/LibGreenTea\.println\(/console.log(/g;
-#src =~ s/function console.log\("DEBUG: " \+ /function DebugP(/g;
 
 $src =~ s/#Constructor#//g;
 $src =~ s/#Local#//g;
