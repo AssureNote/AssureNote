@@ -417,8 +417,8 @@ var AssureNote;
     })();
     AssureNote.SVGShapeFactory = SVGShapeFactory;
 
-    var NodeView = (function () {
-        function NodeView(CaseViewer, NodeModel) {
+    var OldNodeView = (function () {
+        function OldNodeView(CaseViewer, NodeModel) {
             this.IsArrowWhite = false;
             this.AbsX = 0;
             this.AbsY = 0;
@@ -432,12 +432,12 @@ var AssureNote;
             this.SVGShape.Render(CaseViewer, NodeModel, this.HTMLDoc);
             this.TemporaryColor = null;
         }
-        NodeView.prototype.Resize = function () {
+        OldNodeView.prototype.Resize = function () {
             this.HTMLDoc.Resize(this.CaseViewer, this.Source);
             this.SVGShape.Resize(this.CaseViewer, this.Source, this.HTMLDoc);
         };
 
-        NodeView.prototype.Update = function () {
+        OldNodeView.prototype.Update = function () {
             this.Resize();
             this.HTMLDoc.SetPosition(this.AbsX, this.AbsY);
             this.SVGShape.SetPosition(this.AbsX, this.AbsY);
@@ -446,7 +446,7 @@ var AssureNote;
             }
         };
 
-        NodeView.prototype.AppendHTMLElement = function (svgroot, divroot, caseViewer) {
+        OldNodeView.prototype.AppendHTMLElement = function (svgroot, divroot, caseViewer) {
             divroot.appendChild(this.HTMLDoc.RawDocBase);
             svgroot.appendChild(this.SVGShape.ShapeGroup);
             this.InvokePlugInSVGRender(caseViewer);
@@ -460,7 +460,7 @@ var AssureNote;
             this.Update();
         };
 
-        NodeView.prototype.AppendHTMLElementRecursive = function (svgroot, divroot, caseViewer) {
+        OldNodeView.prototype.AppendHTMLElementRecursive = function (svgroot, divroot, caseViewer) {
             var Children = this.Source.Children;
             var ViewMap = this.CaseViewer.ViewMap;
             for (var i = 0; i < Children.length; i++) {
@@ -469,7 +469,7 @@ var AssureNote;
             this.AppendHTMLElement(svgroot, divroot, caseViewer);
         };
 
-        NodeView.prototype.DeleteHTMLElement = function (svgroot, divroot) {
+        OldNodeView.prototype.DeleteHTMLElement = function (svgroot, divroot) {
             this.HTMLDoc.DocBase.remove();
             $(this.SVGShape.ShapeGroup).remove();
             if (this.ParentShape != null)
@@ -477,7 +477,7 @@ var AssureNote;
             this.Update();
         };
 
-        NodeView.prototype.DeleteHTMLElementRecursive = function (svgroot, divroot) {
+        OldNodeView.prototype.DeleteHTMLElementRecursive = function (svgroot, divroot) {
             var Children = this.Source.Children;
             var ViewMap = this.CaseViewer.ViewMap;
             for (var i = 0; i < Children.length; i++) {
@@ -486,14 +486,14 @@ var AssureNote;
             this.DeleteHTMLElement(svgroot, divroot);
         };
 
-        NodeView.prototype.GetAbsoluteConnectorPosition = function (Dir) {
+        OldNodeView.prototype.GetAbsoluteConnectorPosition = function (Dir) {
             var p = this.SVGShape.GetConnectorPosition(Dir);
             p.x += this.AbsX;
             p.y += this.AbsY;
             return p;
         };
 
-        NodeView.prototype.InvokePlugInSVGRender = function (caseViewer) {
+        OldNodeView.prototype.InvokePlugInSVGRender = function (caseViewer) {
             var pluginMap = caseViewer.pluginManager.SVGRenderPlugInMap;
             for (var key in pluginMap) {
                 var render = caseViewer.GetPlugInSVGRender(key);
@@ -501,11 +501,11 @@ var AssureNote;
             }
         };
 
-        NodeView.prototype.SetArrowPosition = function (p1, p2, dir) {
+        OldNodeView.prototype.SetArrowPosition = function (p1, p2, dir) {
             this.SVGShape.SetArrowPosition(p1, p2, dir);
         };
 
-        NodeView.prototype.SetTemporaryColor = function (fill, stroke) {
+        OldNodeView.prototype.SetTemporaryColor = function (fill, stroke) {
             if ((!fill || fill == "none") && (!stroke || stroke == "none")) {
                 this.TemporaryColor = null;
             } else {
@@ -513,12 +513,12 @@ var AssureNote;
             }
         };
 
-        NodeView.prototype.GetTemporaryColor = function () {
+        OldNodeView.prototype.GetTemporaryColor = function () {
             return this.TemporaryColor;
         };
-        return NodeView;
+        return OldNodeView;
     })();
-    AssureNote.NodeView = NodeView;
+    AssureNote.OldNodeView = OldNodeView;
 
     var CaseViewer = (function () {
         function CaseViewer(Source, pluginManager, serverApi, Screen) {
@@ -533,7 +533,7 @@ var AssureNote;
             this.ViewMap = {};
             for (var elementkey in Source.ElementMap) {
                 var element = Source.ElementMap[elementkey];
-                this.ViewMap[element.Label] = new NodeView(this, element);
+                this.ViewMap[element.Label] = new OldNodeView(this, element);
                 if (element.Parent != null) {
                     this.ViewMap[element.Label].ParentShape = this.ViewMap[element.Parent.Label];
                 }
@@ -590,7 +590,7 @@ var AssureNote;
                 var child_model = model.Children[i];
                 var child_view = this.ViewMap[child_model.Label];
                 if (child_view == null) {
-                    child_view = new NodeView(this, child_model);
+                    child_view = new OldNodeView(this, child_model);
                     this.ViewMap[child_model.Label] = child_view;
                     child_view.ParentShape = view;
                 }

@@ -43,12 +43,12 @@ module AssureNote {
 		footelement: string[] = [];
 		contextId: number = -1;
 
-		ViewMap: { [index: string]: NodeView };
+		ViewMap: { [index: string]: OldNodeView };
 
 		constructor() {
 		}
 
-		Init(ViewMap: { [index: string]: NodeView }, Element: NodeModel, x: number, y: number, ElementWidth: number): void {
+		Init(ViewMap: { [index: string]: OldNodeView }, Element: NodeModel, x: number, y: number, ElementWidth: number): void {
 			this.footelement = [];
 			this.contextId = -1;
 			this.ElementWidth = ElementWidth;
@@ -65,8 +65,8 @@ module AssureNote {
 		}
 
 		UpdateContextElementPosition(ContextElement: NodeModel): void {
-			var ContextView: NodeView = this.ViewMap[ContextElement.Label];
-			var ParentView: NodeView = ContextView.ParentShape;
+			var ContextView: OldNodeView = this.ViewMap[ContextElement.Label];
+			var ParentView: OldNodeView = ContextView.ParentShape;
 			ContextView.IsArrowWhite = true;
 			ContextView.AbsX = (ParentView.AbsX + this.X_CONTEXT_MARGIN);
 			if (ParentView.Source.Type == NodeType.Evidence) {
@@ -82,7 +82,7 @@ module AssureNote {
 
 		SetAllElementPosition(Element: NodeModel): void {
 			var n: number = Element.Children.length;
-			var ParentView: NodeView = this.ViewMap[Element.Label];
+			var ParentView: OldNodeView = this.ViewMap[Element.Label];
 			var ContextIndex: number = Element.GetContextIndex();
 			if (n == 0) {
 				if (Element.Type == NodeType.Goal) {
@@ -161,7 +161,7 @@ module AssureNote {
 
 			var n: number = ElementList.length;
 			for (var i: number = 0; i < n; i++) {
-				var ChildView: NodeView = this.ViewMap[ElementList[i].Label];
+				var ChildView: OldNodeView = this.ViewMap[ElementList[i].Label];
 				if (ElementList[i].Type == NodeType.Context) {
 					continue;
 				}
@@ -172,9 +172,9 @@ module AssureNote {
 			return xPosition;
 		}
 
-		GetSameParentLabel(PreviousNodeView: NodeView, CurrentNodeView: NodeView): string {
-			var PreviousParentShape: NodeView = PreviousNodeView.ParentShape;
-			var CurrentParentShape: NodeView = CurrentNodeView.ParentShape;
+		GetSameParentLabel(PreviousNodeView: OldNodeView, CurrentNodeView: OldNodeView): string {
+			var PreviousParentShape: OldNodeView = PreviousNodeView.ParentShape;
+			var CurrentParentShape: OldNodeView = CurrentNodeView.ParentShape;
 			var PreviousParentArray: string[] = [];
 			var CurrentParentArray: string[] = [];
 
@@ -198,8 +198,8 @@ module AssureNote {
 			return null;
 		}
 
-		HasContextinParentNode(PreviousNodeView: NodeView, SameParentLabel: string): boolean {
-			var PreviousParentShape: NodeView = PreviousNodeView.ParentShape;
+		HasContextinParentNode(PreviousNodeView: OldNodeView, SameParentLabel: string): boolean {
+			var PreviousParentShape: OldNodeView = PreviousNodeView.ParentShape;
 			while (PreviousParentShape != null) {
 				if (PreviousParentShape.Source.Label == SameParentLabel) {
 					break;
@@ -215,8 +215,8 @@ module AssureNote {
 		SetFootElementPosition(): void {
 			var n: number = this.footelement.length;
 			for (var i: number = 0; i < n; i++) {
-				var PreviousNodeView: NodeView = this.ViewMap[this.footelement[i - 1]];
-				var CurrentNodeView: NodeView = this.ViewMap[this.footelement[i]];
+				var PreviousNodeView: OldNodeView = this.ViewMap[this.footelement[i - 1]];
+				var CurrentNodeView: OldNodeView = this.ViewMap[this.footelement[i]];
 				CurrentNodeView.AbsX = 0;
 				if (i != 0) {
 					var SameParentLabel: string = this.GetSameParentLabel(PreviousNodeView, CurrentNodeView);
@@ -255,8 +255,8 @@ module AssureNote {
 			var i: number = 0;
 			i = Element.GetContextIndex();
 			if (i != -1) { //emit context element data
-				var ContextView: NodeView = this.ViewMap[Element.Children[i].Label];
-				var ParentView: NodeView = ContextView.ParentShape;
+				var ContextView: OldNodeView = this.ViewMap[Element.Children[i].Label];
+				var ParentView: OldNodeView = ContextView.ParentShape;
 				var h1: number = ContextView.HTMLDoc.Height;
 				var h2: number = ParentView.HTMLDoc.Height;
 				var h: number = (h1 - h2) / 2;
@@ -266,7 +266,7 @@ module AssureNote {
 				this.EmitChildrenElement(Element, ParentView.AbsX, ParentView.AbsY, i, ((this.Y_MARGIN > Math.abs(h1 - h2)) ? h2 : Math.abs(h1 - h2)));
 			} else {  //emit element data except context
 				var h2: number = 0;
-				var CurrentView: NodeView = this.ViewMap[Element.Label];
+				var CurrentView: OldNodeView = this.ViewMap[Element.Label];
 				h2 = CurrentView.HTMLDoc.Height;
 				this.EmitChildrenElement(Element, x, y, i, h2);
 			}
@@ -276,7 +276,7 @@ module AssureNote {
 			var n: number = Node.Children.length;
 			var MaxYPostition: number = 0;
 			for (var i: number = 0; i < n; i++) {
-				var ElementView: NodeView = this.ViewMap[Node.Children[i].Label];
+				var ElementView: OldNodeView = this.ViewMap[Node.Children[i].Label];
 				var j: number = Node.Children[i].GetContextIndex();
 				var ContextHeight: number = 0;
 				if (j != -1) {
@@ -287,7 +287,7 @@ module AssureNote {
 				}
 				else {
 					var height: number = (ContextHeight > ElementView.HTMLDoc.Height) ? ContextHeight : ElementView.HTMLDoc.Height;
-					var ParentElementView: NodeView = this.ViewMap[Node.Label];
+					var ParentElementView: OldNodeView = this.ViewMap[Node.Label];
 					ElementView.AbsY = y;
 					ElementView.AbsY = y + this.Y_MARGIN + h;
 					MaxYPostition = (ElementView.AbsY > MaxYPostition) ? ElementView.AbsY : MaxYPostition;
@@ -295,7 +295,7 @@ module AssureNote {
 				}
 			}
 			for (var i: number = 0; i < n; i++) {
-				var ElementView: NodeView = this.ViewMap[Node.Children[i].Label];
+				var ElementView: OldNodeView = this.ViewMap[Node.Children[i].Label];
 				if (ContextId == i) {
 					continue;
 				}

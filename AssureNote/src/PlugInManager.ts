@@ -149,11 +149,11 @@ module AssureNote {
 			super(plugInManager);
 		}
 
-		IsEnabled(caseViewer: CaseViewer, elementShape: NodeView /* add args as necessary */) : boolean {
+		IsEnabled(caseViewer: CaseViewer, elementShape: OldNodeView /* add args as necessary */) : boolean {
 			return true;
 		}
 
-		Delegate(caseViewer: CaseViewer, elementShape: NodeView /* add args as necessary */) : boolean {
+		Delegate(caseViewer: CaseViewer, elementShape: OldNodeView /* add args as necessary */) : boolean {
 			return true;
 		}
 	}
@@ -164,7 +164,7 @@ module AssureNote {
 			super(plugInManager);
 		}
 
-		Init(ViewMap: {[index:string]: NodeView}, Element: NodeModel, x: number, y: number, ElementWidth: number): void {
+		Init(ViewMap: {[index:string]: OldNodeView}, Element: NodeModel, x: number, y: number, ElementWidth: number): void {
 		}
 
 		LayoutAllView(ElementTop: NodeModel, x: number, y: number): void {
