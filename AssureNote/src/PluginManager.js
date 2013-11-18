@@ -13,10 +13,10 @@ var AssureNote;
     var Plugin = (function () {
         function Plugin() {
         }
-        Plugin.prototype.ExecCommand = function (AssureNote, CommandLine) {
+        Plugin.prototype.ExecCommand = function (AssureNote, Args) {
         };
 
-        Plugin.prototype.Display = function (PluginPanel, FixMeModel, Label) {
+        Plugin.prototype.Display = function (PluginPanel, GSNDoc, Label) {
         };
         return Plugin;
     })();
@@ -410,4 +410,4 @@ var AssureNote;
     })();
     AssureNote.OldPlugInManager = OldPlugInManager;
 })(AssureNote || (AssureNote = {}));
-//# sourceMappingURL=PlugInManager.js.map
+//# sourceMappingURL=PluginManager.js.map

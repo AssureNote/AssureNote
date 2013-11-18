@@ -9,10 +9,10 @@ module AssureNote {
 		constructor() {
 		}
 
-		ExecCommand(AssureNote: AssureNoteApp, CommandLine: string) {
+		ExecCommand(AssureNote: AssureNoteApp, Args: string[]) {
 		}
 
-		Display(PluginPanel: PluginPanel, FixMeModel: FixMeModel, Label: string) {
+		Display(PluginPanel: PluginPanel, GSNDoc: GSNDoc, Label: string) {
 		}
 	}
 
@@ -35,9 +35,6 @@ module AssureNote {
 
 	//---------Deprecated-----------------
 	export class PlugInSet {
-		//ÉmÅ[ÉhÇï`âÊÇµÇΩå„Ç…ÉmÅ[ÉhÇÃDOMÇ…ÉCÉxÉìÉgÇìoò^Ç∑ÇÈplugin
-		//ActionPlugIn: ActionPlugIn;
-
 		HTMLRenderPlugIn: HTMLRenderPlugIn;
 		SVGRenderPlugIn: SVGRenderPlugIn;
 		LayoutEnginePlugIn: LayoutEnginePlugIn;
@@ -407,7 +404,7 @@ module AssureNote {
 				var plugin: ShortcutKeyPlugIn = this.ShortcutKeyPlugInMap[key];
 				if(plugin.IsEnabled(Case0, serverApi)) {
 					plugin.RegisterKeyEvents(caseViewer, Case0, serverApi);
-					}
+				}
 			}
 		}
 

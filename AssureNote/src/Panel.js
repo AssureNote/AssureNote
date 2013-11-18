@@ -70,7 +70,7 @@ var AssureNote;
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
             var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.FixMeModel, Label);
+            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNDoc, Label);
         };
         return PictgramPanel;
     })();

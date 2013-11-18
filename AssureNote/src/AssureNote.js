@@ -13,28 +13,36 @@ var AssureNote;
             return "";
         }
         AssureNoteUtils.GetNodeLabel = GetNodeLabel;
+
+        function GetNodePosition(Label) {
+            var element = document.getElementById(Label);
+            var view = element.getBoundingClientRect();
+            return new AssureNote.Point(view.left, view.top);
+        }
+        AssureNoteUtils.GetNodePosition = GetNodePosition;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
             //var Api = new AssureNote.ServerAPI("http://", "", "");
-            this.OldPluginManager = new AssureNote.OldPlugInManager("");
-            this.PluginManager = new AssureNote.PluginManager(this);
-            this.PictgramPanel = new AssureNote.PictgramPanel(this);
-            this.PluginPanel = new AssureNote.PluginPanel(this);
+            this.OldPluginManager = new OldPlugInManager("");
+            this.PluginManager = new PluginManager(this);
+            this.PictgramPanel = new PictgramPanel(this);
+            this.PluginPanel = new PluginPanel(this);
+            this.GSNDoc = new GSNDoc();
         }
         AssureNoteApp.prototype.DebugP = function (Message) {
             console.log(Message);
         };
 
         AssureNoteApp.prototype.ExecCommand = function (CommandLine) {
-            var Plugin = this.PluginManager.GetCommandPlugin(CommandLine);
+            var ParsedCommand = new AssureNote.CommandParser(CommandLine);
+            var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
             if (Plugin != null) {
-                Plugin.ExecCommand(this, CommandLine);
+                Plugin.ExecCommand(this, ParsedCommand.GetArgs());
             } else {
-                this.DebugP("undefined command: " + CommandLine);
-                alert("undefined command: " + CommandLine);
+                this.DebugP("undefined command: " + ParsedCommand.GetMethod());
             }
         };
 
@@ -59,9 +67,9 @@ var AssureNote;
                     _this.Case = Case0;
 
                     //---
+                    //var MasterRecord = new GSNRecord();
+                    //MasterRecord.Parse(Contents);
                     _this.PictgramPanel.Draw(root.Label, 0, 0);
-                    //GSNRecord MasterRecord = new GSNRecord();
-                    //MasterRecord.Parse(ReadFile(MasterFile));
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }

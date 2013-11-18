@@ -2,6 +2,32 @@
 
 module AssureNote {
 
+	export class CommandParser {
+		private Method: string;
+		private Args: string[] = [];
+
+		constructor(line: string) {
+			var s = line.split(" ");
+			this.Method = s[0].slice(1);
+			if (s.length > 1) {
+				this.Args = s.slice(1);
+			}
+		}
+
+		GetMethod(): string {
+			return this.Method;
+		}
+
+		GetArgs(): string[]{
+			return this.Args;
+		}
+
+		GetArg(n: number): string {
+			return this.Args[n];
+		}
+
+	}
+
 	export class CommandLine {
 		Element: JQuery = $("#command-line");
 		constructor() {

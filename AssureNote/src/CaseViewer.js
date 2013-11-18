@@ -579,9 +579,7 @@ var AssureNote;
         };
 
         CaseViewer.prototype.LayoutElement = function () {
-            //var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
-            var layout = new AssureNote.LayoutPortrait();
-            layout.Init(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
+            var layout = new AssureNote.LayoutPortrait(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
             layout.LayoutAllView(this.ElementTop, 0, 0);
         };
 

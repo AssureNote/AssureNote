@@ -568,9 +568,7 @@ module AssureNote {
 		}
 
 		private LayoutElement() : void {
-			//var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
-			var layout = new LayoutPortrait();
-			layout.Init(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
+			var layout = new LayoutPortrait(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
 			layout.LayoutAllView(this.ElementTop, 0, 0);
 		}
 

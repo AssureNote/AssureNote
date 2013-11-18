@@ -83,7 +83,7 @@ module AssureNote {
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
 			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.FixMeModel, Label);
+			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNDoc, Label);
 		}
 	}
 

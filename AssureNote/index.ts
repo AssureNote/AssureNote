@@ -8,6 +8,8 @@
 module AssureNote {
 
 	export class GSNRecord {
+		Parse(file: string): void {
+		}
 	}
 
 	export class GSNDoc {
@@ -82,100 +84,7 @@ module AssureNote {
 		}
 	}
 
-	var DefaultWidth = 96;
-	var DefaultMargin = 32;
-	var ContextMargin = 10;
-	var LevelMargin = 32;
-	var TreeMargin = 12;
-
-	export class SimpleLayoutEngine {
-		Width: number;
-		Height: number;
-		constructor() {
-			this.Width = 0;
-			this.Height = 0;
-		}
-
-		GetHeight(Node: NodeView): number {
-			return 72; // todo
-		}
-
-		Layout(ThisNode: NodeView): void {
-			this.Width = 0;
-			this.Height = 0;
-			if (ThisNode.IsVisible) {
-				var ParentWidth = DefaultWidth;
-				var ParentHeight = this.GetHeight(ThisNode);
-				if (ThisNode.Left != null) {
-					var OffsetGyLeft = 0;
-					for (var Node in ThisNode.Left) {
-						if (Node.IsVisible) {
-							Node.OffsetGx = - (DefaultWidth + DefaultMargin);
-							Node.OffsetGy = OffsetGyLeft;
-							OffsetGyLeft + (Node.GetHeight() + ContextMargin);
-						}
-					}
-					if (OffsetGyLeft > 0) {
-						ParentWidth += (DefaultWidth + DefaultMargin);
-						if (OffsetGyLeft > ParentHeight) {
-							ParentHeight = OffsetGyLeft;
-						}
-					}
-				}
-				if (ThisNode.Right != null) {
-					var OffsetGyRight = 0;
-					for (var Node in ThisNode.Right) {
-						if (Node.IsVisible) {
-							Node.OffsetGx = + (DefaultWidth + DefaultMargin);
-							Node.OffsetGy = OffsetGyRight;
-							OffsetGyRight + (Node.GetHeight() + ContextMargin);
-						}
-					}
-					if (OffsetGyRight > 0) {
-						ParentWidth += (DefaultWidth + DefaultMargin);
-						if (OffsetGyRight > ParentHeight) {
-							ParentHeight = OffsetGyRight;
-						}
-					}
-				}
-				var ChildrenWidth = 0;
-				ParentHeight += LevelMargin;
-				this.Height = ParentHeight;
-				if (ThisNode.Children != null) {
-					for (var Node in ThisNode.Children) {
-						if (Node.IsVisible) {
-							var LayoutedSubBox = new SimpleLayoutEngine();
-							Node.Layout(LayoutedSubBox);
-							Node.OffsetGx = ChildrenWidth;
-							Node.OffsetGy = ParentHeight;
-							ChildrenWidth += (LayoutedSubBox.Width + TreeMargin);
-							if (ParentHeight + LayoutedSubBox.Height > this.Height) {
-								this.Height = ParentHeight + LayoutedSubBox.Height;
-							}
-						}
-					}
-					for (var Node in ThisNode.Children) {
-						if (Node.IsVisible) {
-							Node.OffsetGx -= (ChildrenWidth / 2);  //centering
-						}
-					}
-				}
-				this.Width = (ChildrenWidth > ParentWidth) ? ChildrenWidth : ParentWidth;
-			}
-		}
-
-	}
-
-
 }
-
-module AssureNote {
-	//Deprecated
-	export class FixMeModel {
-	}
-
-}
-
 
 $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();

@@ -39,9 +39,91 @@ var AssureNote;
     })(LayoutEngine);
     AssureNote.OldLayoutEngine = OldLayoutEngine;
 
+    AssureNote.DefaultWidth = 96;
+    AssureNote.DefaultMargin = 32;
+    AssureNote.ContextMargin = 10;
+    AssureNote.LevelMargin = 32;
+    AssureNote.TreeMargin = 12;
+
+    var SimpleLayoutEngine = (function () {
+        function SimpleLayoutEngine() {
+            this.Width = 0;
+            this.Height = 0;
+        }
+        SimpleLayoutEngine.prototype.GetHeight = function (Node) {
+            return 72;
+        };
+
+        SimpleLayoutEngine.prototype.Layout = function (ThisNode) {
+            this.Width = 0;
+            this.Height = 0;
+            if (ThisNode.IsVisible) {
+                var ParentWidth = AssureNote.DefaultWidth;
+                var ParentHeight = this.GetHeight(ThisNode);
+                if (ThisNode.Left != null) {
+                    var OffsetGyLeft = 0;
+                    for (var Node in ThisNode.Left) {
+                        if (Node.IsVisible) {
+                            Node.OffsetGx = -(AssureNote.DefaultWidth + AssureNote.DefaultMargin);
+                            Node.OffsetGy = OffsetGyLeft;
+                            OffsetGyLeft + (Node.GetHeight() + AssureNote.ContextMargin);
+                        }
+                    }
+                    if (OffsetGyLeft > 0) {
+                        ParentWidth += (AssureNote.DefaultWidth + AssureNote.DefaultMargin);
+                        if (OffsetGyLeft > ParentHeight) {
+                            ParentHeight = OffsetGyLeft;
+                        }
+                    }
+                }
+                if (ThisNode.Right != null) {
+                    var OffsetGyRight = 0;
+                    for (var Node in ThisNode.Right) {
+                        if (Node.IsVisible) {
+                            Node.OffsetGx = +(AssureNote.DefaultWidth + AssureNote.DefaultMargin);
+                            Node.OffsetGy = OffsetGyRight;
+                            OffsetGyRight + (Node.GetHeight() + AssureNote.ContextMargin);
+                        }
+                    }
+                    if (OffsetGyRight > 0) {
+                        ParentWidth += (AssureNote.DefaultWidth + AssureNote.DefaultMargin);
+                        if (OffsetGyRight > ParentHeight) {
+                            ParentHeight = OffsetGyRight;
+                        }
+                    }
+                }
+                var ChildrenWidth = 0;
+                ParentHeight += AssureNote.LevelMargin;
+                this.Height = ParentHeight;
+                if (ThisNode.Children != null) {
+                    for (var Node in ThisNode.Children) {
+                        if (Node.IsVisible) {
+                            var LayoutedSubBox = new SimpleLayoutEngine();
+                            Node.Layout(LayoutedSubBox);
+                            Node.OffsetGx = ChildrenWidth;
+                            Node.OffsetGy = ParentHeight;
+                            ChildrenWidth += (LayoutedSubBox.Width + AssureNote.TreeMargin);
+                            if (ParentHeight + LayoutedSubBox.Height > this.Height) {
+                                this.Height = ParentHeight + LayoutedSubBox.Height;
+                            }
+                        }
+                    }
+                    for (var Node in ThisNode.Children) {
+                        if (Node.IsVisible) {
+                            Node.OffsetGx -= (ChildrenWidth / 2);
+                        }
+                    }
+                }
+                this.Width = (ChildrenWidth > ParentWidth) ? ChildrenWidth : ParentWidth;
+            }
+        };
+        return SimpleLayoutEngine;
+    })();
+    AssureNote.SimpleLayoutEngine = SimpleLayoutEngine;
+
     //Deperecated
     var LayoutPortrait = (function () {
-        function LayoutPortrait() {
+        function LayoutPortrait(ViewMap, Element, x, y, ElementWidth) {
             this.ElementWidth = 50;
             this.X_MARGIN = 200;
             this.Y_MARGIN = 150;
@@ -54,8 +136,6 @@ var AssureNote;
             this.X_MULTI_ELEMENT_MARGIN = 20;
             this.footelement = [];
             this.contextId = -1;
-        }
-        LayoutPortrait.prototype.Init = function (ViewMap, Element, x, y, ElementWidth) {
             this.footelement = [];
             this.contextId = -1;
             this.ElementWidth = ElementWidth;
@@ -63,8 +143,7 @@ var AssureNote;
             this.ViewMap[Element.Label].AbsY += y;
             this.X_MARGIN = ElementWidth + 50;
             this.X_CONTEXT_MARGIN = ElementWidth + 50;
-        };
-
+        }
         LayoutPortrait.prototype.LayoutAllView = function (Element, x, y) {
             this.Traverse(Element, x, y);
             this.SetFootElementPosition();
