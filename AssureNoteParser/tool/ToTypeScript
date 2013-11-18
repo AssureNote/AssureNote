@@ -1,0 +1,23 @@
+#!/bin/sh
+
+SourceDir=./src/org/assurenote/
+build=src/TypeScript/
+
+# These order of files is VERY IMPORTANT. 
+# DO NOT CHANGE THE ORDER WITHOUT NECESSITY.
+source=
+source="${source} AssureNoteParser"
+#
+ts=""
+
+for s in ${source}; do
+    perl src/TypeScript/ToTypeScript.pl ${SourceDir}${s}.java > ${build}${s}.ts
+    #ts="${ts} ${build}${s}.ts"
+done
+
+#perl src/TypeScript/PackLibraries.pl lib > ${build}GreenTeaLibraries.ts
+#ts="${ts} ${build}GreenTeaLibraries.ts"
+#ts="${ts} ${build}LibGreenTea.ts"
+#cat ${ts} > ${build}AssureNoteParser.ts
+
+tsc ${build}AssureNoteParser.ts

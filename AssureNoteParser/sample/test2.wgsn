@@ -1,0 +1,21 @@
+#0::2012-12-19;deos;owner;plan
+#1::2012-12-24;deos;dev;design
+Revision:: 1
+*G1 #0:0
+System is dependable.
+*C1.1 #0:1
+System is Aspen2
+*S1.2 #1:1
+Arguing over subsystems.
+**G2 #1:1
+Server is dependable.
+**G3 #1:1
+Cliant is dependable.
+
+*=====
+Revision::0
+*G1 #0:0
+System is dependable.
+*C1.1 #0:0
+System is aspen
+
