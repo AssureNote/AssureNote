@@ -208,14 +208,6 @@ var AssureNote;
                     return new AssureNote.Point(0, 0);
             }
         };
-
-        GSNShape.prototype.GetWidth = function () {
-            return 0;
-        };
-
-        GSNShape.prototype.GetHeight = function () {
-            return 0;
-        };
         return GSNShape;
     })();
     AssureNote.GSNShape = GSNShape;
@@ -239,33 +231,6 @@ var AssureNote;
             //super.Resize(CaseViewer, NodeModel, HTMLDoc);
             this.BodyRect.setAttribute("width", this.GetWidth().toString());
             this.BodyRect.setAttribute("height", this.GetHeight().toString());
-        };
-
-        GSNGoalShape.prototype.SetColor = function (key) {
-            this.BodyRect.setAttribute("class", key);
-        };
-
-        GSNGoalShape.prototype.GetColor = function () {
-            return this.BodyRect.getAttribute("class");
-        };
-
-        GSNGoalShape.prototype.EnableHighlight = function () {
-            var CurrentColor = this.GetColor();
-            if (!CurrentColor.match(/-highlight/)) {
-                this.BodyRect.removeAttribute("class");
-                this.BodyRect.setAttribute("class", CurrentColor + "-highlight");
-            }
-        };
-
-        GSNGoalShape.prototype.DisableHighlight = function () {
-            var CurrentColor = this.GetColor();
-            this.BodyRect.removeAttribute("class");
-            this.BodyRect.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-        };
-
-        GSNGoalShape.prototype.SetUndevelolpedSymbolPosition = function (point) {
-            this.UndevelopedSymbol.setAttribute("x", point.x.toString());
-            this.UndevelopedSymbol.setAttribute("y", point.y.toString());
         };
         return GSNGoalShape;
     })(GSNShape);
@@ -344,18 +309,6 @@ var AssureNote;
             return this.BodyPolygon.getAttribute("class");
         };
 
-        //EnableHighlight() {
-        //	var CurrentColor: string = this.GetColor();
-        //	if (!CurrentColor.match(/-highlight/)) {
-        //		this.BodyPolygon.removeAttribute("class");
-        //		this.BodyPolygon.setAttribute("class", CurrentColor + "-highlight");
-        //	}
-        //}
-        //DisableHighlight() {
-        //	var CurrentColor: string = this.GetColor();
-        //	this.BodyPolygon.removeAttribute("class");
-        //	this.BodyPolygon.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-        //}
         GSNStrategyShape.prototype.GetConnectorPosition = function (Dir) {
             switch (Dir) {
                 case AssureNote.Direction.Right:
