@@ -38,8 +38,8 @@ module AssureNote {
                 .css("position", "absolute")
                 .attr('id', NodeModel.Label);
             this.DocBase.append($('<h4>' + NodeModel.Label + '</h4>'));
-            this.RawDocBase = <HTMLDivElement>this.DocBase[0];
 
+			this.RawDocBase = <HTMLDivElement>this.DocBase[0];
 			//this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);
 			var statements: string[] = NodeModel.Statement.split("\n");
 			var content: string = "";

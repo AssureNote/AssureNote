@@ -49,9 +49,7 @@ var AssureNote;
                     //return false;
                 }
             };
-            $(this.EventMapLayer).on('dragenter', function (e) {
-                console.log("o");
-            }).on('dragover', DragHandler).on('dragleave', DragHandler).on('drop', function (event) {
+            $(this.EventMapLayer).on('dragenter', DragHandler).on('dragover', DragHandler).on('dragleave', DragHandler).on('drop', function (event) {
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     event.stopPropagation();
                     event.preventDefault();

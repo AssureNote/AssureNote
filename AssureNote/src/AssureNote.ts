@@ -27,7 +27,7 @@ module AssureNote {
 		PictgramPanel: PictgramPanel;
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
-		GSNDoc: GSNDoc;
+		GSNRecord: GSNRecord;
 
 		Case: Case; //Deprecated
 		OldPluginManager: OldPlugInManager; //Deprecated
@@ -38,7 +38,7 @@ module AssureNote {
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
-			this.GSNDoc = new GSNDoc();
+			this.GSNRecord = new GSNRecord();
 		}
 
 		DebugP(Message: string): void {

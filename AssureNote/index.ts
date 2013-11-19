@@ -19,17 +19,17 @@ module AssureNote {
 	}
 
 	export class Navigator {
-		CurrentDoc: GSNDoc;
-		CurrentLabel: string;
-		CurrentWx: number;
-		CurrentWy: number;
+		CurrentDoc: GSNDoc;// Convert to caseview
+		FocusedLabel: string;
+		FocusedWx: number;
+		FocusedWy: number;
 
 		Display(Label: string, Wx: number, Wy: number): void {
 			//TODO
 		}
 
 		Redraw(): void {
-			this.Display(this.CurrentLabel, this.CurrentWx, this.CurrentWy);
+			this.Display(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
 		}
 
 		NavigateUp(): void { }
@@ -79,7 +79,21 @@ module AssureNote {
 
 		DisplayContent(Content: HTMLElement) {
 			if (this.IsVisible) {
+				var div = document.createElement("div");
+				div.style.position = "absolute";
+				div.id = this.Label;
 
+				var h4 = document.createElement("h4");
+				h4.innerText = this.Label; //TODO
+
+				var p = document.createElement("p");
+				p.innerText = this.Label; //TODO
+
+				div.appendChild(h4);
+				div.appendChild(p);
+				Content.appendChild(div);
+				//div.clientHeight;
+				//div.clientWidth;
 			}
 		}
 	}

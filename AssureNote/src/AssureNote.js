@@ -26,11 +26,11 @@ var AssureNote;
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
             //var Api = new AssureNote.ServerAPI("http://", "", "");
-            this.OldPluginManager = new OldPlugInManager("");
-            this.PluginManager = new PluginManager(this);
-            this.PictgramPanel = new PictgramPanel(this);
-            this.PluginPanel = new PluginPanel(this);
-            this.GSNDoc = new GSNDoc();
+            this.OldPluginManager = new AssureNote.OldPlugInManager("");
+            this.PluginManager = new AssureNote.PluginManager(this);
+            this.PictgramPanel = new AssureNote.PictgramPanel(this);
+            this.PluginPanel = new AssureNote.PluginPanel(this);
+            this.GSNRecord = new AssureNote.GSNRecord();
         }
         AssureNoteApp.prototype.DebugP = function (Message) {
             console.log(Message);

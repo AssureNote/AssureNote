@@ -55,11 +55,10 @@ module AssureNote {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					e.stopPropagation();
 					e.preventDefault();
-					//return false;
 				}
 			};
 			$(this.EventMapLayer)
-				.on('dragenter', (e) => { console.log("o"); })
+				.on('dragenter', DragHandler)
 				.on('dragover', DragHandler)
 				.on('dragleave', DragHandler)
 				.on('drop', (event: JQueryEventObject) => {
@@ -83,7 +82,7 @@ module AssureNote {
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
 			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNDoc, Label);
+			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNRecord, Label);
 		}
 	}
 

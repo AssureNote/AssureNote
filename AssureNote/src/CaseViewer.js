@@ -30,6 +30,7 @@ var AssureNote;
             }
             this.DocBase = $('<div>').css("position", "absolute").attr('id', NodeModel.Label);
             this.DocBase.append($('<h4>' + NodeModel.Label + '</h4>'));
+
             this.RawDocBase = this.DocBase[0];
 
             //this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);

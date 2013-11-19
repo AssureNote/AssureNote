@@ -37,7 +37,7 @@ var AssureNote;
         };
 
         Navigator.prototype.Redraw = function () {
-            this.Display(this.CurrentLabel, this.CurrentWx, this.CurrentWy);
+            this.Display(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
         };
 
         Navigator.prototype.NavigateUp = function () {
@@ -86,6 +86,21 @@ var AssureNote;
 
         NodeView.prototype.DisplayContent = function (Content) {
             if (this.IsVisible) {
+                var div = document.createElement("div");
+                div.style.position = "absolute";
+                div.id = this.Label;
+
+                var h4 = document.createElement("h4");
+                h4.innerText = this.Label;
+
+                var p = document.createElement("p");
+                p.innerText = this.Label;
+
+                div.appendChild(h4);
+                div.appendChild(p);
+                Content.appendChild(div);
+                //div.clientHeight;
+                //div.clientWidth;
             }
         };
         return NodeView;
