@@ -201,15 +201,6 @@ module AssureNote {
 			}
 		}
 
-
-		GetWidth(): number {
-			return 0;
-		}
-
-		GetHeight(): number {
-			return 0;
-		}
-
 	}
 
 	export class GSNGoalShape extends GSNShape {
@@ -232,32 +223,6 @@ module AssureNote {
 			this.BodyRect.setAttribute("height", this.GetHeight().toString());
 		}
 
-		SetColor(key: string) {
-			this.BodyRect.setAttribute("class", key);
-		}
-
-		GetColor() {
-			return this.BodyRect.getAttribute("class");
-		}
-
-		EnableHighlight() : void {
-			var CurrentColor: string = this.GetColor();
-			if (!CurrentColor.match(/-highlight/)) {
-				this.BodyRect.removeAttribute("class");
-				this.BodyRect.setAttribute("class", CurrentColor + "-highlight");
-			}
-		}
-
-		DisableHighlight() : void {
-			var CurrentColor: string = this.GetColor();
-			this.BodyRect.removeAttribute("class");
-			this.BodyRect.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-		}
-
-		SetUndevelolpedSymbolPosition(point: Point) : void {
-			this.UndevelopedSymbol.setAttribute("x", point.x.toString());
-			this.UndevelopedSymbol.setAttribute("y", point.y.toString());
-		}
 	}
 
 	export class GSNContextShape extends GSNShape {
@@ -328,20 +293,6 @@ module AssureNote {
 			return this.BodyPolygon.getAttribute("class");
 		}
 
-		//EnableHighlight() {
-		//	var CurrentColor: string = this.GetColor();
-		//	if (!CurrentColor.match(/-highlight/)) {
-		//		this.BodyPolygon.removeAttribute("class");
-		//		this.BodyPolygon.setAttribute("class", CurrentColor + "-highlight");
-		//	}
-		//}
-
-		//DisableHighlight() {
-		//	var CurrentColor: string = this.GetColor();
-		//	this.BodyPolygon.removeAttribute("class");
-		//	this.BodyPolygon.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-		//}
-
 		GetConnectorPosition(Dir: Direction): Point {
 			switch (Dir) {
 				case Direction.Right:
@@ -374,29 +325,6 @@ module AssureNote {
 			this.BodyEllipse.setAttribute("ry", (this.Height / 2).toString());
 		}
 
-		/**
-		SetColor(key: string) {
-			this.BodyEllipse.setAttribute("class", key);
-		}
-
-		GetColor() {
-			return this.BodyEllipse.getAttribute("class");
-		}
-
-		EnableHighlight() {
-			var CurrentColor: string = this.GetColor();
-			if (!CurrentColor.match(/-highlight/)) {
-				this.BodyEllipse.removeAttribute("class");
-				this.BodyEllipse.setAttribute("class", CurrentColor + "-highlight");
-			}
-		}
-
-		DisableHighlight() {
-			var CurrentColor: string = this.GetColor();
-			this.BodyEllipse.removeAttribute("class");
-			this.BodyEllipse.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-		}
-		**/
 	}
 
 
