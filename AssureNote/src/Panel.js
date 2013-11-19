@@ -46,7 +46,6 @@ var AssureNote;
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     e.stopPropagation();
                     e.preventDefault();
-                    //return false;
                 }
             };
             $(this.EventMapLayer).on('dragenter', DragHandler).on('dragover', DragHandler).on('dragleave', DragHandler).on('drop', function (event) {
@@ -68,7 +67,7 @@ var AssureNote;
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
             var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNDoc, Label);
+            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNRecord, Label);
         };
         return PictgramPanel;
     })();

@@ -383,7 +383,7 @@ module AssureNote {
 
 	}
 
-	export class SVGShapeFactory {
+	export class OldSVGShapeFactory {
 		static Create(Type: NodeType): SVGShape {
 			switch (Type) {
 				case NodeType.Goal:
@@ -418,7 +418,7 @@ module AssureNote {
 			this.Source = NodeModel;
 			this.HTMLDoc = new HTMLDoc();
 			this.HTMLDoc.Render(CaseViewer, NodeModel);
-			this.SVGShape = SVGShapeFactory.Create(NodeModel.Type);
+			this.SVGShape = OldSVGShapeFactory.Create(NodeModel.Type);
 			this.SVGShape.Render(CaseViewer, NodeModel, this.HTMLDoc);
 			this.TemporaryColor = null;
 		}

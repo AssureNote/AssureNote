@@ -20,6 +20,21 @@ module AssureNote {
 			var view = element.getBoundingClientRect();
 			return new Point(view.left, view.top);
 		}
+
+		export function CreateGSNShape(NodeView: NodeView): GSNShape {
+
+			switch (NodeView.Model.GSNType) {
+				case GSNType.Goal:
+					return new GSNGoalShape(NodeView);
+				case GSNType.Context:
+					return new GSNContextShape(NodeView);
+				case GSNType.Strategy:
+					return new GSNStrategyShape(NodeView);
+				case GSNType.Evidence:
+					return new GSNEvidenceShape(NodeView);
+			}
+		}
+
 	}
 
 	export class AssureNoteApp {

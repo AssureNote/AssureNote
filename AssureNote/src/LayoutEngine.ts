@@ -35,20 +35,16 @@ module AssureNote {
 	export var TreeMargin = 12;
 
 	export class SimpleLayoutEngine {
-		Width: number;
-		Height: number;
 		constructor() {
-			this.Width = 0;
-			this.Height = 0;
 		}
 
 		GetHeight(Node: NodeView): number {
 			return 72; // todo
 		}
 
-		Layout(ThisNode: NodeView): void {
-			this.Width = 0;
-			this.Height = 0;
+		Layout(ThisNode: NodeView, Shape: GSNShape): void {
+			Shape.Width = 0;
+			Shape.Height = 0;
 			if (ThisNode.IsVisible) {
 				var ParentWidth = DefaultWidth;
 				var ParentHeight = this.GetHeight(ThisNode);
@@ -86,17 +82,17 @@ module AssureNote {
 				}
 				var ChildrenWidth = 0;
 				ParentHeight += LevelMargin;
-				this.Height = ParentHeight;
+				Shape.Height = ParentHeight;
 				if (ThisNode.Children != null) {
 					for (var Node in ThisNode.Children) {
 						if (Node.IsVisible) {
-							var LayoutedSubBox = new SimpleLayoutEngine();
-							Node.Layout(LayoutedSubBox);
+							var SubShape = Node.GetShape();
+							this.Layout(Node, SubShape);
 							Node.OffsetGx = ChildrenWidth;
 							Node.OffsetGy = ParentHeight;
-							ChildrenWidth += (LayoutedSubBox.Width + TreeMargin);
-							if (ParentHeight + LayoutedSubBox.Height > this.Height) {
-								this.Height = ParentHeight + LayoutedSubBox.Height;
+							ChildrenWidth += (SubShape.Width + TreeMargin);
+							if (ParentHeight + SubShape.Height > Shape.Height) {
+								Shape.Height = ParentHeight + SubShape.Height;
 							}
 						}
 					}
@@ -106,7 +102,7 @@ module AssureNote {
 						}
 					}
 				}
-				this.Width = (ChildrenWidth > ParentWidth) ? ChildrenWidth : ParentWidth;
+				Shape.Width = (ChildrenWidth > ParentWidth) ? ChildrenWidth : ParentWidth;
 			}
 		}
 

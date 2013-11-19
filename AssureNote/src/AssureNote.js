@@ -20,6 +20,20 @@ var AssureNote;
             return new AssureNote.Point(view.left, view.top);
         }
         AssureNoteUtils.GetNodePosition = GetNodePosition;
+
+        function CreateGSNShape(NodeView) {
+            switch (NodeView.Model.GSNType) {
+                case AssureNote.GSNType.Goal:
+                    return new AssureNote.GSNGoalShape(NodeView);
+                case AssureNote.GSNType.Context:
+                    return new AssureNote.GSNContextShape(NodeView);
+                case AssureNote.GSNType.Strategy:
+                    return new AssureNote.GSNStrategyShape(NodeView);
+                case AssureNote.GSNType.Evidence:
+                    return new AssureNote.GSNEvidenceShape(NodeView);
+            }
+        }
+        AssureNoteUtils.CreateGSNShape = CreateGSNShape;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

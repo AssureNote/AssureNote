@@ -47,16 +47,14 @@ var AssureNote;
 
     var SimpleLayoutEngine = (function () {
         function SimpleLayoutEngine() {
-            this.Width = 0;
-            this.Height = 0;
         }
         SimpleLayoutEngine.prototype.GetHeight = function (Node) {
             return 72;
         };
 
-        SimpleLayoutEngine.prototype.Layout = function (ThisNode) {
-            this.Width = 0;
-            this.Height = 0;
+        SimpleLayoutEngine.prototype.Layout = function (ThisNode, Shape) {
+            Shape.Width = 0;
+            Shape.Height = 0;
             if (ThisNode.IsVisible) {
                 var ParentWidth = AssureNote.DefaultWidth;
                 var ParentHeight = this.GetHeight(ThisNode);
@@ -94,17 +92,17 @@ var AssureNote;
                 }
                 var ChildrenWidth = 0;
                 ParentHeight += AssureNote.LevelMargin;
-                this.Height = ParentHeight;
+                Shape.Height = ParentHeight;
                 if (ThisNode.Children != null) {
                     for (var Node in ThisNode.Children) {
                         if (Node.IsVisible) {
-                            var LayoutedSubBox = new SimpleLayoutEngine();
-                            Node.Layout(LayoutedSubBox);
+                            var SubShape = Node.GetShape();
+                            this.Layout(Node, SubShape);
                             Node.OffsetGx = ChildrenWidth;
                             Node.OffsetGy = ParentHeight;
-                            ChildrenWidth += (LayoutedSubBox.Width + AssureNote.TreeMargin);
-                            if (ParentHeight + LayoutedSubBox.Height > this.Height) {
-                                this.Height = ParentHeight + LayoutedSubBox.Height;
+                            ChildrenWidth += (SubShape.Width + AssureNote.TreeMargin);
+                            if (ParentHeight + SubShape.Height > Shape.Height) {
+                                Shape.Height = ParentHeight + SubShape.Height;
                             }
                         }
                     }
@@ -114,7 +112,7 @@ var AssureNote;
                         }
                     }
                 }
-                this.Width = (ChildrenWidth > ParentWidth) ? ChildrenWidth : ParentWidth;
+                Shape.Width = (ChildrenWidth > ParentWidth) ? ChildrenWidth : ParentWidth;
             }
         };
         return SimpleLayoutEngine;

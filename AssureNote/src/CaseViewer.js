@@ -399,10 +399,10 @@ var AssureNote;
     })(SVGShape);
     AssureNote.EvidenceShape = EvidenceShape;
 
-    var SVGShapeFactory = (function () {
-        function SVGShapeFactory() {
+    var OldSVGShapeFactory = (function () {
+        function OldSVGShapeFactory() {
         }
-        SVGShapeFactory.Create = function (Type) {
+        OldSVGShapeFactory.Create = function (Type) {
             switch (Type) {
                 case AssureNote.NodeType.Goal:
                     return new GoalShape();
@@ -414,9 +414,9 @@ var AssureNote;
                     return new EvidenceShape();
             }
         };
-        return SVGShapeFactory;
+        return OldSVGShapeFactory;
     })();
-    AssureNote.SVGShapeFactory = SVGShapeFactory;
+    AssureNote.OldSVGShapeFactory = OldSVGShapeFactory;
 
     var OldNodeView = (function () {
         function OldNodeView(CaseViewer, NodeModel) {
@@ -429,7 +429,7 @@ var AssureNote;
             this.Source = NodeModel;
             this.HTMLDoc = new HTMLDoc();
             this.HTMLDoc.Render(CaseViewer, NodeModel);
-            this.SVGShape = SVGShapeFactory.Create(NodeModel.Type);
+            this.SVGShape = OldSVGShapeFactory.Create(NodeModel.Type);
             this.SVGShape.Render(CaseViewer, NodeModel, this.HTMLDoc);
             this.TemporaryColor = null;
         }
