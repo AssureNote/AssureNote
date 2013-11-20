@@ -98,9 +98,8 @@ $src =~ s/#EndArray#}/\]/g;
 
 # Methods. public int f(float n){...} => public f(#params#float n): int{...}
 $src =~ s/($Attr*)($Type)\s+($Sym)\s*\((.*?)\)/$1$3(#params#$4): $2/g;
-# Exceptions. } catch (Exception e) { => } catch (#params#Exception e) {
-$src =~ s/catch\s*\((.*?)\)/catch (#params#$1)/g;
-#$src =~ s/catch\(\s*($Type)\s+($Sym)\s*\)/catch($2)/g;
+# Exceptions. } catch (Exception e) { => } catch (e) {
+$src =~ s/catch\s*\(\s*($Type)\s+($Sym)\s*\)/catch($2)/g;
 # Method's parameters.
 $src =~ s/\(#params#(.*?)\)/"(" . Params($1) . ")"/eg;
 # Constants. public final static int N = 0; => var N: int = 0;
