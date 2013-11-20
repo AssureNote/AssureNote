@@ -13,6 +13,7 @@ var AssureNote;
 
             this.ContentLayer.onclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
+                _this.AssureNoteApp.DebugP(Label);
                 return false;
             };
 
@@ -32,9 +33,6 @@ var AssureNote;
                     CmdLine.Clear();
                     return false;
                 }
-                //else {
-                //	cmdline += String.fromCharCode(ev.keyCode);
-                //}
             };
             this.ContentLayer.onmouseover = function (event) {
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
@@ -48,12 +46,9 @@ var AssureNote;
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     e.stopPropagation();
                     e.preventDefault();
-                    //return false;
                 }
             };
-            $(this.EventMapLayer).on('dragenter', function (e) {
-                console.log("o");
-            }).on('dragover', DragHandler).on('dragleave', DragHandler).on('drop', function (event) {
+            $(this.EventMapLayer).on('dragenter', DragHandler).on('dragover', DragHandler).on('dragleave', DragHandler).on('drop', function (event) {
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     event.stopPropagation();
                     event.preventDefault();
@@ -72,7 +67,7 @@ var AssureNote;
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
             var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.FixMeModel, Label);
+            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNRecord, Label);
         };
         return PictgramPanel;
     })();

@@ -30,6 +30,7 @@ var AssureNote;
             }
             this.DocBase = $('<div>').css("position", "absolute").attr('id', NodeModel.Label);
             this.DocBase.append($('<h4>' + NodeModel.Label + '</h4>'));
+
             this.RawDocBase = this.DocBase[0];
 
             //this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);
@@ -398,10 +399,10 @@ var AssureNote;
     })(SVGShape);
     AssureNote.EvidenceShape = EvidenceShape;
 
-    var SVGShapeFactory = (function () {
-        function SVGShapeFactory() {
+    var OldSVGShapeFactory = (function () {
+        function OldSVGShapeFactory() {
         }
-        SVGShapeFactory.Create = function (Type) {
+        OldSVGShapeFactory.Create = function (Type) {
             switch (Type) {
                 case AssureNote.NodeType.Goal:
                     return new GoalShape();
@@ -413,9 +414,9 @@ var AssureNote;
                     return new EvidenceShape();
             }
         };
-        return SVGShapeFactory;
+        return OldSVGShapeFactory;
     })();
-    AssureNote.SVGShapeFactory = SVGShapeFactory;
+    AssureNote.OldSVGShapeFactory = OldSVGShapeFactory;
 
     var OldNodeView = (function () {
         function OldNodeView(CaseViewer, NodeModel) {
@@ -428,7 +429,7 @@ var AssureNote;
             this.Source = NodeModel;
             this.HTMLDoc = new HTMLDoc();
             this.HTMLDoc.Render(CaseViewer, NodeModel);
-            this.SVGShape = SVGShapeFactory.Create(NodeModel.Type);
+            this.SVGShape = OldSVGShapeFactory.Create(NodeModel.Type);
             this.SVGShape.Render(CaseViewer, NodeModel, this.HTMLDoc);
             this.TemporaryColor = null;
         }
@@ -579,9 +580,7 @@ var AssureNote;
         };
 
         CaseViewer.prototype.LayoutElement = function () {
-            //var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
-            var layout = new AssureNote.LayoutPortrait();
-            layout.Init(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
+            var layout = new AssureNote.LayoutPortrait(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
             layout.LayoutAllView(this.ElementTop, 0, 0);
         };
 

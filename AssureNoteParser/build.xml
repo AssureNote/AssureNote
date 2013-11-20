@@ -10,9 +10,9 @@
 	<target name="build">
 		<mkdir dir="${build_dir}" />
 		<javac srcdir="${source_dir}" destdir="${build_dir}" debug="on" target="1.6" source="1.6" includeantruntime="false">
-                        <!-- classpath path="xext/itext-pdfa-5.4.4.jar" / -->
-			<!-- classpath path="xext/itext-xtra-5.4.4.jar" / -->
-			<!-- classpath path="ext/itextpdf-5.4.4.jar" / -->
+			<classpath path="ext/itextpdf-5.4.4.jar" />
+			<classpath path="ext/itext-xtra-5.4.4.jar" />
+			<classpath path="ext/itext-pdfa-5.4.4.jar" />
 			<include name="**/*.java" />
 			<classpath path="ext/itextpdf-5.4.4.jar" />
 		</javac>
@@ -27,6 +27,9 @@
 			<manifest>
 				<attribute name="Main-Class" value="org.assurenote.AssureNoteParser" />
 			</manifest>
+			<zipfileset src="ext/itextpdf-5.4.4.jar" />
+			<zipfileset src="ext/itext-pdfa-5.4.4.jar" />
+			<zipfileset src="ext/itext-xtra-5.4.4.jar" />
 		</jar>
 	</target>
 

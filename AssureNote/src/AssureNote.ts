@@ -2,23 +2,50 @@
 
 module AssureNote {
 
-
 	export module AssureNoteUtils {
 
 		export function GetNodeLabel(event: Event): string {
-			return (<HTMLElement>event.srcElement).id;
+			var element = <HTMLElement>event.srcElement;
+			while (element != null) {
+				if (element.id != "") {
+					return element.id;
+				}
+				element = element.parentElement;
+			}
+			return "";
+		}
+
+		export function GetNodePosition(Label: string): Point {
+			var element = document.getElementById(Label);
+			var view = element.getBoundingClientRect();
+			return new Point(view.left, view.top);
+		}
+
+		export function CreateGSNShape(NodeView: NodeView): GSNShape {
+
+			switch (NodeView.Model.GSNType) {
+				case GSNType.Goal:
+					return new GSNGoalShape(NodeView);
+				case GSNType.Context:
+					return new GSNContextShape(NodeView);
+				case GSNType.Strategy:
+					return new GSNStrategyShape(NodeView);
+				case GSNType.Evidence:
+					return new GSNEvidenceShape(NodeView);
+			}
 		}
 
 	}
 
 	export class AssureNoteApp {
 		PluginManager: PluginManager;
-		OldPluginManager: OldPlugInManager; //Deprecated
 		PictgramPanel: PictgramPanel;
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
-		FixMeModel: FixMeModel;
-		Case: Case;
+		GSNRecord: GSNRecord;
+
+		Case: Case; //Deprecated
+		OldPluginManager: OldPlugInManager; //Deprecated
 
 		constructor() {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
@@ -26,6 +53,7 @@ module AssureNote {
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
+			this.GSNRecord = new GSNRecord();
 		}
 
 		DebugP(Message: string): void {
@@ -33,13 +61,13 @@ module AssureNote {
 		}
 
 		ExecCommand(CommandLine: string): void {
-			var Plugin = this.PluginManager.GetCommandPlugin(CommandLine);
+			var ParsedCommand = new CommandParser(CommandLine);
+			var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
 			if (Plugin != null) {
-				Plugin.ExecCommand(this, CommandLine);
+				Plugin.ExecCommand(this, ParsedCommand.GetArgs());
 			}
 			else {
-				this.DebugP("undefined command: " + CommandLine);
-				alert("undefined command: " + CommandLine);
+				this.DebugP("undefined command: " + ParsedCommand.GetMethod());
 			}
 		}
 
@@ -61,9 +89,9 @@ module AssureNote {
 					Case0.SetElementTop(root);
 					this.Case = Case0;
 					//---
+					//var MasterRecord = new GSNRecord();
+					//MasterRecord.Parse(Contents);	
 					this.PictgramPanel.Draw(root.Label, 0, 0);
-					//GSNRecord MasterRecord = new GSNRecord();
-					//MasterRecord.Parse(ReadFile(MasterFile));	
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

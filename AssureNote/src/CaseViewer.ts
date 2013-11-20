@@ -38,8 +38,8 @@ module AssureNote {
                 .css("position", "absolute")
                 .attr('id', NodeModel.Label);
             this.DocBase.append($('<h4>' + NodeModel.Label + '</h4>'));
-            this.RawDocBase = <HTMLDivElement>this.DocBase[0];
 
+			this.RawDocBase = <HTMLDivElement>this.DocBase[0];
 			//this.InvokePlugInHTMLRender(Viewer, NodeModel, this.DocBase);
 			var statements: string[] = NodeModel.Statement.split("\n");
 			var content: string = "";
@@ -383,7 +383,7 @@ module AssureNote {
 
 	}
 
-	export class SVGShapeFactory {
+	export class OldSVGShapeFactory {
 		static Create(Type: NodeType): SVGShape {
 			switch (Type) {
 				case NodeType.Goal:
@@ -418,7 +418,7 @@ module AssureNote {
 			this.Source = NodeModel;
 			this.HTMLDoc = new HTMLDoc();
 			this.HTMLDoc.Render(CaseViewer, NodeModel);
-			this.SVGShape = SVGShapeFactory.Create(NodeModel.Type);
+			this.SVGShape = OldSVGShapeFactory.Create(NodeModel.Type);
 			this.SVGShape.Render(CaseViewer, NodeModel, this.HTMLDoc);
 			this.TemporaryColor = null;
 		}
@@ -568,9 +568,7 @@ module AssureNote {
 		}
 
 		private LayoutElement() : void {
-			//var layout: LayoutEnginePlugIn = this.pluginManager.GetLayoutEngine();
-			var layout = new LayoutPortrait();
-			layout.Init(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
+			var layout = new LayoutPortrait(this.ViewMap, this.ElementTop, 0, 0, CaseViewer.ElementWidth);
 			layout.LayoutAllView(this.ElementTop, 0, 0);
 		}
 

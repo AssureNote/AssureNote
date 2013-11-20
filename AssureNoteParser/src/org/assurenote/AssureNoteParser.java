@@ -42,6 +42,10 @@ import com.itextpdf.text.DocumentException;
 
 //ifdef JAVA
 class Lib {
+	public final static ArrayList<GSNNode> EmptyNodeList = new ArrayList<GSNNode>();
+	public final static String LineFeed = "\n";
+	public final static String VersionDelim = "*=====";
+
 	static MessageDigest GetMD5() {
 		try {
 			/*local*/MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -76,6 +80,28 @@ class Lib {
 		}
 		return Digest == null && Digest2 == null;
 	}
+
+	public static String ReadFile(String File) {
+		/*local*/StringWriter sb = new StringWriter();
+		try {
+			/*local*/BufferedReader br = new BufferedReader(new FileReader(File));
+			/*local*/String Line;
+			/*local*/int linenum = 0;
+			while ((Line = br.readLine()) != null) {
+				if (linenum > 0) {
+					sb.print(Lib.LineFeed);
+				}
+				sb.print(Line);
+				linenum++;
+			}
+			br.close();
+		} catch (IOException e) {
+			System.err.println("cannot open: " + File);
+			System.exit(1);
+		}
+		return sb.toString();
+	}
+		
 }
 //endif VAJA
 
@@ -159,7 +185,6 @@ class StringReader {
 }
 
 class StringWriter {
-	public final static String LineFeed = "\n";
 	/*field*/StringBuilder sb;
 
 	StringWriter/*constructor*/() {
@@ -172,20 +197,20 @@ class StringWriter {
 
 	void println(String s) {
 		this.sb.append(s);
-		this.sb.append(LineFeed);
+		this.sb.append(Lib.LineFeed);
 	}
 
-	void println() {
-		this.sb.append(LineFeed);
+	void newline() {
+		this.sb.append(Lib.LineFeed);
 	}
 
 	public String toString() {
-		return sb.toString();
+		return this.sb.toString();
 	}
 }
 
 enum GSNType {
-	Goal, Context, Strategy, Evidence, Undefined;
+	Goal, Context, Strategy, Evidence, Undefined
 }
 
 class History {
@@ -224,7 +249,6 @@ class History {
 }
 
 class WikiSyntax {
-	public final static String VersionDelim = "*=====";
 
 	static int ParseInt(String NumText, int DefVal) {
 		try {
@@ -393,7 +417,6 @@ class TagUtils {
 }
 
 class GSNNode {
-	public final static ArrayList<GSNNode> EmptyNodeList = new ArrayList<GSNNode>();
 	/*field*/GSNDoc  BaseDoc;
 	/*field*/GSNNode ParentNode;
 	/*field*/ArrayList<GSNNode> SubNodeList;
@@ -431,7 +454,7 @@ class GSNNode {
 			this.LastModified = this.Created;
 		}
 		this.Digest = null;
-		this.NodeDoc = StringWriter.LineFeed;
+		this.NodeDoc = Lib.LineFeed;
 		this.HasTag = false;
 		if (this.ParentNode != null) {
 			ParentNode.AppendSubNode(this);
@@ -468,7 +491,7 @@ class GSNNode {
 	}
 
 	ArrayList<GSNNode> NonNullSubNodeList() {
-		return this.SubNodeList == null ? EmptyNodeList : this.SubNodeList;
+		return this.SubNodeList == null ? Lib.EmptyNodeList : this.SubNodeList;
 	}
 
 	public void Remap(HashMap<String, GSNNode> NodeMap) {
@@ -491,7 +514,7 @@ class GSNNode {
 		if(NewNumber != null) {
 			this.LabelNumber = NewNumber;
 		}
-		for(GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
 			Node.ReplaceLabels(LabelMap);
 		}
 	}
@@ -510,7 +533,7 @@ class GSNNode {
 			if (Loc > 0) {
 				this.HasTag = true;
 			}
-			Writer.println();
+			Writer.newline();
 			Writer.print(Line);
 			if (Line.length() > 0) {
 				Lib.UpdateMD5(md, Line);
@@ -522,7 +545,7 @@ class GSNNode {
 			this.NodeDoc = Writer.toString();
 		} else {
 			this.Digest = null;
-			this.NodeDoc = StringWriter.LineFeed;
+			this.NodeDoc = Lib.LineFeed;
 		}
 		if(!Lib.EqualsDigest(OldDigest, this.Digest) && this.BaseDoc != null) {
 			this.LastModified = this.BaseDoc.DocHistory;
@@ -625,13 +648,13 @@ class GSNNode {
 		if (RefNode == null) {
 			Writer.print(this.NodeDoc);
 			if (this.Digest != null) {
-				Writer.println();
+				Writer.newline();
 			}
 			if (RefKey != null) {
 				RefMap.put(RefKey, this);
 			}
 		} else {
-			Writer.println();
+			Writer.newline();
 		}
 		for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
 			Node.FormatNode(RefMap, Writer);
@@ -648,7 +671,7 @@ class GSNNode {
 		// MD5.FormatDigest(this.Digest, Stream);
 		Writer.print(this.NodeDoc);
 		if (this.Digest != null) {
-			Writer.println();
+			Writer.newline();
 		}
 		if (this.NonNullSubNodeList() != null) {
 			for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
@@ -795,7 +818,7 @@ class GSNDoc {
 	/*field*/History   DocHistory;
 	/*field*/int GoalCount;
 
-	GSNDoc(GSNRecord Record) {
+	GSNDoc/*constructor*/(GSNRecord Record) {
 		this.Record = Record;
 		this.TopGoal = null;
 		this.NodeMap = new HashMap<String, GSNNode>();
@@ -988,7 +1011,7 @@ class GSNRecord {
 		/*local*/StringReader Reader = new StringReader(TextDoc);
 		while (Reader.HasNext()) {
 			/*local*/GSNDoc Doc = new GSNDoc(this);
-			ParserContext Parser = new ParserContext(Doc, null);
+			/*local*/ParserContext Parser = new ParserContext(Doc, null);
 			Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
 		}
 	}
@@ -1029,10 +1052,10 @@ class GSNRecord {
 			break;
 		}
 		if(CommonHistory == -1) {
-			MergeAsReplaceTopGoal(NewRecord);
+			this.MergeAsReplaceTopGoal(NewRecord);
 		}
 		else if(CommonHistory == this.HistoryList.size()-1) {
-			MergeAsFastFoward(NewRecord);
+			this.MergeAsFastFoward(NewRecord);
 		}
 		else {
 			/*local*/GSNRecord Record1 = this.Duplicate();
@@ -1126,7 +1149,7 @@ class GSNRecord {
 			/*local*/GSNDoc Doc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				if(DocCount > 0) {
-					Writer.println(WikiSyntax.VersionDelim);
+					Writer.println(Lib.VersionDelim);
 				}
 				Doc.FormatDoc(RefMap, Writer);
 				DocCount += 1;
@@ -1143,7 +1166,7 @@ class ParserContext {
 	/*field*/GSNNode LastGoalNode;
 	/*field*/GSNNode LastNonContextNode;
 
-	ParserContext(GSNDoc NullableDoc, GSNNode ParentNode) {
+	ParserContext/*constructor*/(GSNDoc NullableDoc, GSNNode ParentNode) {
 		if(ParentNode == null) {
 			ParentNode = new GSNNode(NullableDoc, null, 0, GSNType.Goal, null, null);
 		}
@@ -1297,7 +1320,7 @@ class ParserContext {
 		while (Reader.HasNext()) {
 			/*local*/String Line = Reader.ReadLine();
 			if (Line.startsWith("*")) {
-				if (Line.startsWith(WikiSyntax.VersionDelim)) {
+				if (Line.startsWith(Lib.VersionDelim)) {
 					break;
 				}
 				if (this.IsValidSection(Line, Reader)) {
@@ -1322,33 +1345,12 @@ class ParserContext {
 }
 
 public class AssureNoteParser {
-	public static String ReadFile(String File) {
-		/*local*/StringWriter sb = new StringWriter();
-		try {
-			/*local*/BufferedReader br = new BufferedReader(new FileReader(File));
-			/*local*/String Line;
-			/*local*/int linenum = 0;
-			while ((Line = br.readLine()) != null) {
-				if (linenum > 0) {
-					sb.print(StringWriter.LineFeed);
-				}
-				sb.print(Line);
-				linenum++;
-			}
-			br.close();
-		} catch (IOException e) {
-			System.err.println("cannot open: " + File);
-			System.exit(1);
-		}
-		return sb.toString();
-	}
-		
 	public final static void merge(String MasterFile, String BranchFile) {
 		/*local*/GSNRecord MasterRecord = new GSNRecord();
-		MasterRecord.Parse(ReadFile(MasterFile));
+		MasterRecord.Parse(Lib.ReadFile(MasterFile));
 		if(BranchFile != null) {
 			/*local*/GSNRecord BranchRecord = new GSNRecord();
-			BranchRecord.Parse(ReadFile(BranchFile));
+			BranchRecord.Parse(Lib.ReadFile(BranchFile));
 			MasterRecord.Merge(BranchRecord);
 		}
 		else {
@@ -1362,10 +1364,10 @@ public class AssureNoteParser {
 
 	public final static void main(String[] argv) {
 		if(argv.length == 2) {
-			merge(argv[0], argv[1]);
+			AssureNoteParser.merge(argv[0], argv[1]);
 		}
 		if(argv.length == 1) {
-			merge(argv[0], null);
+			AssureNoteParser.merge(argv[0], null);
 		}
 		if(argv.length == 0) {
 			try {
