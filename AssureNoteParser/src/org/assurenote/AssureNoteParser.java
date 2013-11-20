@@ -180,7 +180,7 @@ class StringWriter {
 	}
 
 	public String toString() {
-		return sb.toString();
+		return this.sb.toString();
 	}
 }
 
@@ -1029,10 +1029,10 @@ class GSNRecord {
 			break;
 		}
 		if(CommonHistory == -1) {
-			MergeAsReplaceTopGoal(NewRecord);
+			this.MergeAsReplaceTopGoal(NewRecord);
 		}
 		else if(CommonHistory == this.HistoryList.size()-1) {
-			MergeAsFastFoward(NewRecord);
+			this.MergeAsFastFoward(NewRecord);
 		}
 		else {
 			/*local*/GSNRecord Record1 = this.Duplicate();
@@ -1362,10 +1362,10 @@ public class AssureNoteParser {
 
 	public final static void main(String[] argv) {
 		if(argv.length == 2) {
-			merge(argv[0], argv[1]);
+			AssureNoteParser.merge(argv[0], argv[1]);
 		}
 		if(argv.length == 1) {
-			merge(argv[0], null);
+			AssureNoteParser.merge(argv[0], null);
 		}
 		if(argv.length == 0) {
 			try {

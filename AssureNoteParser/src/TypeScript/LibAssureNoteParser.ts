@@ -1,3 +1,20 @@
+class MessageDigest {
+	constructor() {}
+}
+
+class Lib {
+	static GetMD5() : MessageDigest {
+		return null;
+	}
+
+	static UpdateMD5(md: MessageDigest, text: string) : void {
+	}
+
+	static EqualsDigest(digest1: byte[], digest2: byte) : boolean {
+		return null;
+	}
+}
+
 class Iterator<T> {//FIX ME!!
 }
 
