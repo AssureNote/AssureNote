@@ -1,3 +1,18 @@
+class StringBuilder {
+	str : string;
+	constructor() {
+		this.str = "";
+	}
+
+	append(str) : void {
+		this.str += str;
+	}
+
+	toString() : string {
+		return this.str;
+	}
+}
+
 class HashMap <string, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
@@ -26,6 +41,12 @@ class MessageDigest {
 }
 
 class Lib {
+	/* Static Fields */
+	static EmptyNodeList = new Array<GSNNode>();
+	static LineFeed : string = "\n";
+	static VersionDelim : string = "*=====";
+
+	/* Methods */
 	static GetMD5() : MessageDigest {
 		return null;
 	}

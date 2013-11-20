@@ -42,6 +42,10 @@ import com.itextpdf.text.DocumentException;
 
 //ifdef JAVA
 class Lib {
+	public final static ArrayList<GSNNode> EmptyNodeList = new ArrayList<GSNNode>();
+	public final static String LineFeed = "\n";
+	public final static String VersionDelim = "*=====";
+
 	static MessageDigest GetMD5() {
 		try {
 			/*local*/MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -85,7 +89,7 @@ class Lib {
 			/*local*/int linenum = 0;
 			while ((Line = br.readLine()) != null) {
 				if (linenum > 0) {
-					sb.print(StringWriter.LineFeed);
+					sb.print(Lib.LineFeed);
 				}
 				sb.print(Line);
 				linenum++;
@@ -181,7 +185,6 @@ class StringReader {
 }
 
 class StringWriter {
-	public final static String LineFeed = "\n";
 	/*field*/StringBuilder sb;
 
 	StringWriter/*constructor*/() {
@@ -194,11 +197,11 @@ class StringWriter {
 
 	void println(String s) {
 		this.sb.append(s);
-		this.sb.append(LineFeed);
+		this.sb.append(Lib.LineFeed);
 	}
 
 	void println() {
-		this.sb.append(LineFeed);
+		this.sb.append(Lib.LineFeed);
 	}
 
 	public String toString() {
@@ -246,7 +249,6 @@ class History {
 }
 
 class WikiSyntax {
-	public final static String VersionDelim = "*=====";
 
 	static int ParseInt(String NumText, int DefVal) {
 		try {
@@ -415,7 +417,6 @@ class TagUtils {
 }
 
 class GSNNode {
-	public final static ArrayList<GSNNode> EmptyNodeList = new ArrayList<GSNNode>();
 	/*field*/GSNDoc  BaseDoc;
 	/*field*/GSNNode ParentNode;
 	/*field*/ArrayList<GSNNode> SubNodeList;
@@ -453,7 +454,7 @@ class GSNNode {
 			this.LastModified = this.Created;
 		}
 		this.Digest = null;
-		this.NodeDoc = StringWriter.LineFeed;
+		this.NodeDoc = Lib.LineFeed;
 		this.HasTag = false;
 		if (this.ParentNode != null) {
 			ParentNode.AppendSubNode(this);
@@ -490,7 +491,7 @@ class GSNNode {
 	}
 
 	ArrayList<GSNNode> NonNullSubNodeList() {
-		return this.SubNodeList == null ? EmptyNodeList : this.SubNodeList;
+		return this.SubNodeList == null ? Lib.EmptyNodeList : this.SubNodeList;
 	}
 
 	public void Remap(HashMap<String, GSNNode> NodeMap) {
@@ -544,7 +545,7 @@ class GSNNode {
 			this.NodeDoc = Writer.toString();
 		} else {
 			this.Digest = null;
-			this.NodeDoc = StringWriter.LineFeed;
+			this.NodeDoc = Lib.LineFeed;
 		}
 		if(!Lib.EqualsDigest(OldDigest, this.Digest) && this.BaseDoc != null) {
 			this.LastModified = this.BaseDoc.DocHistory;
@@ -1148,7 +1149,7 @@ class GSNRecord {
 			/*local*/GSNDoc Doc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				if(DocCount > 0) {
-					Writer.println(WikiSyntax.VersionDelim);
+					Writer.println(Lib.VersionDelim);
 				}
 				Doc.FormatDoc(RefMap, Writer);
 				DocCount += 1;
@@ -1319,7 +1320,7 @@ class ParserContext {
 		while (Reader.HasNext()) {
 			/*local*/String Line = Reader.ReadLine();
 			if (Line.startsWith("*")) {
-				if (Line.startsWith(WikiSyntax.VersionDelim)) {
+				if (Line.startsWith(Lib.VersionDelim)) {
 					break;
 				}
 				if (this.IsValidSection(Line, Reader)) {
