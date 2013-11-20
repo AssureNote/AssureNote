@@ -36,6 +36,9 @@ class Lib {
 	static EqualsDigest(digest1: any/*byte[]*/, digest2: any/*byte[]*/) : boolean {
 		return null;
 	}
+	static ReadFile(file: string) : string {
+		return "";
+	}
 }
 
 class Iterator<T> {//FIX ME!!

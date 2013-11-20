@@ -76,6 +76,28 @@ class Lib {
 		}
 		return Digest == null && Digest2 == null;
 	}
+
+	public static String ReadFile(String File) {
+		/*local*/StringWriter sb = new StringWriter();
+		try {
+			/*local*/BufferedReader br = new BufferedReader(new FileReader(File));
+			/*local*/String Line;
+			/*local*/int linenum = 0;
+			while ((Line = br.readLine()) != null) {
+				if (linenum > 0) {
+					sb.print(StringWriter.LineFeed);
+				}
+				sb.print(Line);
+				linenum++;
+			}
+			br.close();
+		} catch (IOException e) {
+			System.err.println("cannot open: " + File);
+			System.exit(1);
+		}
+		return sb.toString();
+	}
+		
 }
 //endif VAJA
 
@@ -1322,33 +1344,12 @@ class ParserContext {
 }
 
 public class AssureNoteParser {
-	public static String ReadFile(String File) {
-		/*local*/StringWriter sb = new StringWriter();
-		try {
-			/*local*/BufferedReader br = new BufferedReader(new FileReader(File));
-			/*local*/String Line;
-			/*local*/int linenum = 0;
-			while ((Line = br.readLine()) != null) {
-				if (linenum > 0) {
-					sb.print(StringWriter.LineFeed);
-				}
-				sb.print(Line);
-				linenum++;
-			}
-			br.close();
-		} catch (IOException e) {
-			System.err.println("cannot open: " + File);
-			System.exit(1);
-		}
-		return sb.toString();
-	}
-		
 	public final static void merge(String MasterFile, String BranchFile) {
 		/*local*/GSNRecord MasterRecord = new GSNRecord();
-		MasterRecord.Parse(ReadFile(MasterFile));
+		MasterRecord.Parse(Lib.ReadFile(MasterFile));
 		if(BranchFile != null) {
 			/*local*/GSNRecord BranchRecord = new GSNRecord();
-			BranchRecord.Parse(ReadFile(BranchFile));
+			BranchRecord.Parse(Lib.ReadFile(BranchFile));
 			MasterRecord.Merge(BranchRecord);
 		}
 		else {
