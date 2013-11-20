@@ -185,7 +185,7 @@ class StringWriter {
 }
 
 enum GSNType {
-	Goal, Context, Strategy, Evidence, Undefined;
+	Goal, Context, Strategy, Evidence, Undefined
 }
 
 class History {
