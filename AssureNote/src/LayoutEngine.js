@@ -53,8 +53,6 @@ var AssureNote;
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode, Shape) {
-            Shape.Width = 0;
-            Shape.Height = 0;
             if (ThisNode.IsVisible) {
                 var ParentWidth = AssureNote.DefaultWidth;
                 var ParentHeight = this.GetHeight(ThisNode);

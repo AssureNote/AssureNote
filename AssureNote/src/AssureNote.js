@@ -34,6 +34,11 @@ var AssureNote;
             }
         }
         AssureNoteUtils.CreateGSNShape = CreateGSNShape;
+
+        function CreateSVGElement(name) {
+            return document.createElementNS('http://www.w3.org/2000/svg', name);
+        }
+        AssureNoteUtils.CreateSVGElement = CreateSVGElement;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

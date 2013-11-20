@@ -33,7 +33,22 @@ module AssureNote {
 				case GSNType.Evidence:
 					return new GSNEvidenceShape(NodeView);
 			}
-		}
+        }
+
+        export function CreateSVGElement(name: string): SVGElement;
+        export function CreateSVGElement(name: "path"): SVGPathElement;
+        export function CreateSVGElement(name: "g"): SVGGElement;
+        export function CreateSVGElement(name: "rect"): SVGRectElement;
+        export function CreateSVGElement(name: "ellipse"): SVGEllipseElement;
+        export function CreateSVGElement(name: "circle"): SVGCircleElement;
+        export function CreateSVGElement(name: "polygon"): SVGPolygonElement;
+        export function CreateSVGElement(name: "polyline"): SVGPolylineElement;
+        export function CreateSVGElement(name: "use"): SVGUseElement;
+        export function CreateSVGElement(name: "defs"): SVGDefsElement;
+        export function CreateSVGElement(name: "marker"): SVGMarkerElement;
+        export function CreateSVGElement(name: string): SVGElement {
+            return <SVGElement>document.createElementNS('http://www.w3.org/2000/svg', name);
+        }
 
 	}
 

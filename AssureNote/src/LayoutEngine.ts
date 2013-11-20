@@ -43,8 +43,6 @@ module AssureNote {
 		}
 
 		Layout(ThisNode: NodeView, Shape: GSNShape): void {
-			Shape.Width = 0;
-			Shape.Height = 0;
 			if (ThisNode.IsVisible) {
 				var ParentWidth = DefaultWidth;
 				var ParentHeight = this.GetHeight(ThisNode);

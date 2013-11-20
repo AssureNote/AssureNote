@@ -91,14 +91,34 @@ module AssureNote {
 		ArrowPath: SVGPathElement;
 		Content: HTMLElement;
 		ColorClassName: string;
-		Width: number;
-		Height: number;
+		private Width: number;
+        private Height: number;
+        private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
 			this.Width = 0;
 			this.Height = 0;
 			this.Content = null;
 		}
+
+        private static CreateArrowPath(): SVGPathElement {
+            if (!GSNShape.ArrowPathMaster) {
+                GSNShape.ArrowPathMaster = <SVGPathElement>document.createSVGElement("path");
+                GSNShape.ArrowPathMaster.setAttribute("marker-end", "url(#Triangle-black)");
+                GSNShape.ArrowPathMaster.setAttribute("fill", "none");
+                GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
+                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+            }
+            return <SVGPathElement>GSNShape.ArrowPathMaster.cloneNode();
+        }
+
+        GetWidth(): number {
+            return this.Width;
+        }
+
+        GetHeight(): number {
+            return this.Height;
+        }
 
 		Resize(LayoutEngine: SimpleLayoutEngine): void {
 			//this.Width = HTMLDoc.Width;
@@ -128,26 +148,22 @@ module AssureNote {
 		}
 
 		SetPosition(x: number, y: number) {
-			//var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
-			//mat.e = x;
-			//mat.f = y;
 			if (this.NodeView.IsVisible) {
 				var div = document.getElementById(this.NodeView.Label);
 				if (div != null) {
 					div.style.left = x + "px";
-					div.style.top = y + "px";
-				}
+					div.style.top  = y + "px";
+                }
+                var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
+			    mat.e = x;
+			    mat.f = y;
 			}
 		}
 
 		Render(): void {
-			this.ShapeGroup = <SVGGElement>document.createSVGElement("g");
+            this.ShapeGroup = AssureNoteUtils.CreateSVGElement("g");
 			this.ShapeGroup.setAttribute("transform", "translate(0,0)");
-			this.ArrowPath = <SVGPathElement>document.createSVGElement("path");
-			this.ArrowPath.setAttribute("marker-end", "url(#Triangle-black)");
-			this.ArrowPath.setAttribute("fill", "none");
-			this.ArrowPath.setAttribute("stroke", "gray");
-			this.ArrowPath.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+            this.ArrowPath = GSNShape.CreateArrowPath();
 		}
 
 		GetSVG(): SVGGElement {
@@ -199,8 +215,7 @@ module AssureNote {
 				default:
 					return new Point(0, 0);
 			}
-		}
-
+        }
 	}
 
 	export class GSNGoalShape extends GSNShape {
@@ -209,9 +224,9 @@ module AssureNote {
 
 		Render(): void {
 			super.Render();
-			this.BodyRect = <SVGRectElement>document.createSVGElement("rect");
+            this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
 			this.BodyRect.setAttribute("class", this.ColorClassName);
-			this.UndevelopedSymbol = <SVGUseElement>document.createSVGElement("use");
+            this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
 			this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
 			this.ShapeGroup.appendChild(this.BodyRect);
 			this.Resize();
@@ -230,7 +245,7 @@ module AssureNote {
 
 		Render(): void {
 			super.Render();
-			this.BodyRect = <SVGRectElement>document.createSVGElement("rect");
+            this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
 			this.BodyRect.setAttribute("class", this.ColorClassName);
 			this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
 			this.BodyRect.setAttribute("rx", "10");
@@ -241,8 +256,8 @@ module AssureNote {
 
 		Resize(): void {
 			//super.Resize();
-			this.BodyRect.setAttribute("width", this.Width.toString());
-			this.BodyRect.setAttribute("height", this.Height.toString());
+			this.BodyRect.setAttribute("width", this.GetWidth.toString());
+			this.BodyRect.setAttribute("height", this.GetHeight.toString());
 		}
 
 		SetColor(key: string) {
@@ -253,19 +268,19 @@ module AssureNote {
 			return this.BodyRect.getAttribute("class");
 		}
 
-		EnableHighlight() {
-			var CurrentColor: string = this.GetColor();
-			if (!CurrentColor.match(/-highlight/)) {
-				this.BodyRect.removeAttribute("class");
-				this.BodyRect.setAttribute("class", CurrentColor + "-highlight");
-			}
-		}
+		//EnableHighlight() {
+		//	var CurrentColor: string = this.GetColor();
+		//	if (!CurrentColor.match(/-highlight/)) {
+		//		this.BodyRect.removeAttribute("class");
+		//		this.BodyRect.setAttribute("class", CurrentColor + "-highlight");
+		//	}
+		//}
 
-		DisableHighlight() {
-			var CurrentColor: string = this.GetColor();
-			this.BodyRect.removeAttribute("class");
-			this.BodyRect.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-		}
+		//DisableHighlight() {
+		//	var CurrentColor: string = this.GetColor();
+		//	this.BodyRect.removeAttribute("class");
+		//	this.BodyRect.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
+		//}
 
 	}
 
@@ -274,15 +289,18 @@ module AssureNote {
 		delta: number = 20;
 
 		Render(): void {
-			super.Render();
-			this.BodyPolygon = <SVGPolygonElement>document.createSVGElement("polygon");
+            super.Render();
+            // TODO useタグに変える
+			this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
 			this.BodyPolygon.setAttribute("class", this.ColorClassName);
 			this.ShapeGroup.appendChild(this.BodyPolygon);
 			this.Resize();
 		}
 
-		Resize(): void {
-			this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + this.Width + ",0 " + (this.Width - this.delta) + "," + this.Height + " 0," + this.Height);
+        Resize(): void {
+            var w: number = this.GetWidth();
+            var h: number = this.GetHeight();
+            this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + w + ",0 " + (w - this.delta) + "," + h + " 0," + h);
 		}
 
 		SetColor(key: string) {
@@ -296,13 +314,13 @@ module AssureNote {
 		GetConnectorPosition(Dir: Direction): Point {
 			switch (Dir) {
 				case Direction.Right:
-					return new Point(this.Width - this.delta / 2, this.Height / 2);
+					return new Point(this.GetWidth() - this.delta / 2, this.GetHeight() / 2);
 				case Direction.Left:
-					return new Point(this.delta / 2, this.Height / 2);
+					return new Point(this.delta / 2, this.GetHeight() / 2);
 				case Direction.Top:
-					return new Point(this.Width / 2, 0);
+					return new Point(this.GetWidth() / 2, 0);
 				case Direction.Bottom:
-					return new Point(this.Width / 2, this.Height);
+					return new Point(this.GetWidth() / 2, this.GetHeight());
 			}
 		}
 	}
@@ -312,17 +330,18 @@ module AssureNote {
 
 		Render(): void {
 			super.Render();
-			this.BodyEllipse = <SVGEllipseElement>document.createSVGElement("ellipse");
+            // TODO useタグに変える
+            this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
 			this.BodyEllipse.setAttribute("class", this.ColorClassName);
 			this.ShapeGroup.appendChild(this.BodyEllipse);
 			this.Resize();
 		}
 
-		Resize(): void {
-			this.BodyEllipse.setAttribute("cx", (this.Width / 2).toString());
-			this.BodyEllipse.setAttribute("cy", (this.Height / 2).toString());
-			this.BodyEllipse.setAttribute("rx", (this.Width / 2).toString());
-			this.BodyEllipse.setAttribute("ry", (this.Height / 2).toString());
+        Resize(): void {
+			this.BodyEllipse.setAttribute("cx", (this.GetWidth() / 2).toString());
+			this.BodyEllipse.setAttribute("cy", (this.GetHeight() / 2).toString());
+			this.BodyEllipse.setAttribute("rx", (this.GetWidth() / 2).toString());
+			this.BodyEllipse.setAttribute("ry", (this.GetHeight() / 2).toString());
 		}
 
 	}
