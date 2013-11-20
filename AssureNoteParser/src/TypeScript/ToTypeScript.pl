@@ -59,6 +59,7 @@ $src =~ s/\/\*EndArray\*\//#EndArray#/g;
 $src =~ s/'(\\.)'/ord(fixup($1))/eg;
 $src =~ s/'(.)'/ord($1)/eg;
 $src =~ s/('..')/($1.charCodeAt(0))/g;
+$src =~ s/charAt\s*\(/charCodeAt(/g;
 
 # Protect Comments
 $src =~ s/(\/\*.*?\*\/)/&ProtectComment($1)/gmse;
@@ -81,8 +82,12 @@ sub UnQuote {
 # Comments
 $src =~ s/^\/\/[#\s]*ifdef\s+JAVA.*?VAJA//gms;
 $src =~ s/(\/\/.*?)$/&ProtectComment($1)/gems;
+# Remove assertion
+$src =~ s/\s*assert.*?//gm;
 # Foreach. for(int i : list) => for (int i #IN# list)
 $src =~ s/for\s*\((.*?)\s*:\s*(.*?)\)/for ($1 #IN# $2)/g;
+# Remove a type annotation in variable declarations for for/in expression
+$src =~ s/#Local#($Type)\s+($Sym)\s+#IN#/var $2 #IN#/g;
 # Fields. public static int n = 0; => public static n: int = 0;
 $src =~ s/#Field#($Attr*)($Type)\s+($Sym)/$1$3: $2/gm;
 # Local variables.  int n = 0; => var n: int = 0;

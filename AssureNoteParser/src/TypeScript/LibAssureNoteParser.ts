@@ -1,8 +1,56 @@
+class StringBuilder {
+	str : string;
+	constructor() {
+		this.str = "";
+	}
+
+	append(str) : void {
+		this.str += str;
+	}
+
+	toString() : string {
+		return this.str;
+	}
+}
+
+class HashMap <string, V>{
+	/* the type of key must be either string or number */
+	hash : {[key: string]: V};
+	constructor() {
+		this.hash = {};
+	}
+	put(key: string, value: V) : void {
+		this.hash[key] = value;
+	}
+
+	get(key: string) : V {
+		return this.hash[key];
+	}
+
+	size() : number {
+		return Object.keys(this.hash).length;
+	}
+
+	clear() : void {
+		this.hash = {};
+	}
+
+	keySet() : string[] {
+		return Object.keys(this.hash);
+	}
+}
+
 class MessageDigest {
 	constructor() {}
 }
 
 class Lib {
+	/* Static Fields */
+	static EmptyNodeList = new Array<GSNNode>();
+	static LineFeed : string = "\n";
+	static VersionDelim : string = "*=====";
+
+	/* Methods */
 	static GetMD5() : MessageDigest {
 		return null;
 	}
@@ -10,8 +58,11 @@ class Lib {
 	static UpdateMD5(md: MessageDigest, text: string) : void {
 	}
 
-	static EqualsDigest(digest1: byte[], digest2: byte) : boolean {
+	static EqualsDigest(digest1: any/*byte[]*/, digest2: any/*byte[]*/) : boolean {
 		return null;
+	}
+	static ReadFile(file: string) : string {
+		return "";
 	}
 }
 
@@ -26,6 +77,7 @@ interface Array {
         size(): number;
         clear(): void;
         remove(index: number): any;
+        remove(item: any): any;
         iterator(): Iterator<Array>;
 }
 
@@ -68,8 +120,17 @@ Object.defineProperty(Array.prototype, "set", {
 Object.defineProperty(Array.prototype, "remove", {
         enumerable : false,
         value : function(i) {
-                if(i >= this.length){
-                        throw new RangeError("invalid array index");
+                if(typeof i == 'number') {
+                        if(i >= this.length){
+                                throw new RangeError("invalid array index");
+                        }
+                } else {
+                        var item = i;
+                        i = 0;
+                        for (var j in this) {
+                                if (this[j] === i) break;
+                        }
+                        if (j == this.length) return null;
                 }
                 var v = this[i];
                 this.splice(i, 1);
