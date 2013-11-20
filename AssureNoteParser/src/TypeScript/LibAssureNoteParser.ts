@@ -1,3 +1,26 @@
+class HashMap <string, V>{
+	/* the type of key must be either string or number */
+	hash : {[key: string]: V};
+	constructor() {
+		this.hash = {};
+	}
+	put(key: string, value: V) : void {
+		this.hash[key] = value;
+	}
+
+	get(key: string) : V {
+		return this.hash[key];
+	}
+
+	size() : number {
+		return Object.keys(this.hash).length;
+	}
+
+	clear() : void {
+		this.hash = {};
+	}
+}
+
 class MessageDigest {
 	constructor() {}
 }
@@ -10,7 +33,7 @@ class Lib {
 	static UpdateMD5(md: MessageDigest, text: string) : void {
 	}
 
-	static EqualsDigest(digest1: byte[], digest2: byte) : boolean {
+	static EqualsDigest(digest1: any/*byte[]*/, digest2: any/*byte[]*/) : boolean {
 		return null;
 	}
 }
