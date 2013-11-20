@@ -200,7 +200,7 @@ class StringWriter {
 		this.sb.append(Lib.LineFeed);
 	}
 
-	void println() {
+	void newline() {
 		this.sb.append(Lib.LineFeed);
 	}
 
@@ -533,7 +533,7 @@ class GSNNode {
 			if (Loc > 0) {
 				this.HasTag = true;
 			}
-			Writer.println();
+			Writer.newline();
 			Writer.print(Line);
 			if (Line.length() > 0) {
 				Lib.UpdateMD5(md, Line);
@@ -648,13 +648,13 @@ class GSNNode {
 		if (RefNode == null) {
 			Writer.print(this.NodeDoc);
 			if (this.Digest != null) {
-				Writer.println();
+				Writer.newline();
 			}
 			if (RefKey != null) {
 				RefMap.put(RefKey, this);
 			}
 		} else {
-			Writer.println();
+			Writer.newline();
 		}
 		for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
 			Node.FormatNode(RefMap, Writer);
@@ -671,7 +671,7 @@ class GSNNode {
 		// MD5.FormatDigest(this.Digest, Stream);
 		Writer.print(this.NodeDoc);
 		if (this.Digest != null) {
-			Writer.println();
+			Writer.newline();
 		}
 		if (this.NonNullSubNodeList() != null) {
 			for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {

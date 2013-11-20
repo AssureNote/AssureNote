@@ -34,6 +34,10 @@ class HashMap <string, V>{
 	clear() : void {
 		this.hash = {};
 	}
+
+	keySet() : string[] {
+		return Object.keys(this.hash);
+	}
 }
 
 class MessageDigest {
@@ -73,6 +77,7 @@ interface Array {
         size(): number;
         clear(): void;
         remove(index: number): any;
+        remove(item: any): any;
         iterator(): Iterator<Array>;
 }
 
@@ -115,8 +120,17 @@ Object.defineProperty(Array.prototype, "set", {
 Object.defineProperty(Array.prototype, "remove", {
         enumerable : false,
         value : function(i) {
-                if(i >= this.length){
-                        throw new RangeError("invalid array index");
+                if(typeof i == 'number') {
+                        if(i >= this.length){
+                                throw new RangeError("invalid array index");
+                        }
+                } else {
+                        var item = i;
+                        i = 0;
+                        for (var j in this) {
+                                if (this[j] === i) break;
+                        }
+                        if (j == this.length) return null;
                 }
                 var v = this[i];
                 this.splice(i, 1);
