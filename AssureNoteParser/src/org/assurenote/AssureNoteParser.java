@@ -795,7 +795,7 @@ class GSNDoc {
 	/*field*/History   DocHistory;
 	/*field*/int GoalCount;
 
-	GSNDoc(GSNRecord Record) {
+	GSNDoc/*constructor*/(GSNRecord Record) {
 		this.Record = Record;
 		this.TopGoal = null;
 		this.NodeMap = new HashMap<String, GSNNode>();
@@ -988,7 +988,7 @@ class GSNRecord {
 		/*local*/StringReader Reader = new StringReader(TextDoc);
 		while (Reader.HasNext()) {
 			/*local*/GSNDoc Doc = new GSNDoc(this);
-			ParserContext Parser = new ParserContext(Doc, null);
+			/*local*/ParserContext Parser = new ParserContext(Doc, null);
 			Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
 		}
 	}
@@ -1143,7 +1143,7 @@ class ParserContext {
 	/*field*/GSNNode LastGoalNode;
 	/*field*/GSNNode LastNonContextNode;
 
-	ParserContext(GSNDoc NullableDoc, GSNNode ParentNode) {
+	ParserContext/*constructor*/(GSNDoc NullableDoc, GSNNode ParentNode) {
 		if(ParentNode == null) {
 			ParentNode = new GSNNode(NullableDoc, null, 0, GSNType.Goal, null, null);
 		}
