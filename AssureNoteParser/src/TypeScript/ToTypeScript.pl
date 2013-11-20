@@ -81,6 +81,8 @@ sub UnQuote {
 # Comments
 $src =~ s/^\/\/[#\s]*ifdef\s+JAVA.*?VAJA//gms;
 $src =~ s/(\/\/.*?)$/&ProtectComment($1)/gems;
+# Foreach. for(int i : list) => for (int i #IN# list)
+$src =~ s/for\s*\((.*?)\s*:\s*(.*?)\)/for ($1 #IN# $2)/g;
 # Fields. public static int n = 0; => public static n: int = 0;
 $src =~ s/#Field#($Attr*)($Type)\s+($Sym)/$1$3: $2/gm;
 # Local variables.  int n = 0; => var n: int = 0;
@@ -98,14 +100,13 @@ $src =~ s/#EndArray#}/\]/g;
 $src =~ s/($Attr*)($Type)\s+($Sym)\s*\((.*?)\)/$1$3(#params#$4): $2/g;
 # Exceptions. } catch (Exception e) { => } catch (#params#Exception e) {
 $src =~ s/catch\s*\((.*?)\)/catch (#params#$1)/g;
+#$src =~ s/catch\(\s*($Type)\s+($Sym)\s*\)/catch($2)/g;
 # Method's parameters.
 $src =~ s/\(#params#(.*?)\)/"(" . Params($1) . ")"/eg;
 # Constants. public final static int N = 0; => var N: int = 0;
 $src =~ s/(?:$Attr*) ($Type)\s+($Sym)((?:\[\s*\d*\s*\])?)/$2: $1$3/g;
 # Array literals.
 $src =~ s/=\s*{(.*?)}/= \[$1\]/g;
-
-$src =~ s/catch\(\s*($Type)\s+($Sym)\s*\)/catch($2)/g;
 
 # Types
 $src =~ s/(?!")\b(?:char|int|long|float|double|Charactor|Integer|Long|Float|Double)\b(?!")/number/g;
@@ -155,6 +156,7 @@ $src =~ s/#Field#//g;
 $src =~ s/#Cast#//g;
 $src =~ s/#BeginArray#//g;
 $src =~ s/#EndArray#//g;
+$src =~ s/#IN#/in/g;
 
 my $n = @Comments;
 my $i = 0;

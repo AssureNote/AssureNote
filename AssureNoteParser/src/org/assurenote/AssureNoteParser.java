@@ -491,7 +491,7 @@ class GSNNode {
 		if(NewNumber != null) {
 			this.LabelNumber = NewNumber;
 		}
-		for(GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
 			Node.ReplaceLabels(LabelMap);
 		}
 	}
