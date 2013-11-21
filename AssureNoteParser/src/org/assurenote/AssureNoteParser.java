@@ -303,15 +303,15 @@ class WikiSyntax {
 
 	static String FormatNodeType(GSNType NodeType) {
 		switch (NodeType) {
-		case Goal:
+		case /*enum(GSNType)*/Goal:
 			return "G";
-		case Context:
+		case /*enum(GSNType)*/Context:
 			return "C";
-		case Strategy:
+		case /*enum(GSNType)*/Strategy:
 			return "S";
-		case Evidence:
+		case /*enum(GSNType)*/Evidence:
 			return "E";
-		case Undefined:
+		case /*enum(GSNType)*/Undefined:
 		}
 		return "U";
 	}
