@@ -8,7 +8,9 @@
 
 module AssureNote {
 
-	export class GSNRecord {
+    export class GSNRecord {
+        constructor() {
+        }
 		Parse(file: string): void {
 		}
 	}
@@ -91,19 +93,19 @@ module AssureNote {
 		ArrowPath: SVGPathElement;
 		Content: HTMLElement;
 		ColorClassName: string;
-		private Width: number;
-        private Height: number;
+		private NodeWidth: number;
+        private NodeHeight: number;
+        public Width: number;
+        public Height: number;
         private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
-			this.Width = 0;
-			this.Height = 0;
 			this.Content = null;
 		}
 
         private static CreateArrowPath(): SVGPathElement {
             if (!GSNShape.ArrowPathMaster) {
-                GSNShape.ArrowPathMaster = <SVGPathElement>document.createSVGElement("path");
+                GSNShape.ArrowPathMaster = AssureNoteUtils.CreateSVGElement("path");
                 GSNShape.ArrowPathMaster.setAttribute("marker-end", "url(#Triangle-black)");
                 GSNShape.ArrowPathMaster.setAttribute("fill", "none");
                 GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");

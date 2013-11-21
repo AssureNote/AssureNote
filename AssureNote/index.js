@@ -108,13 +108,11 @@ var AssureNote;
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
-            this.Width = 0;
-            this.Height = 0;
             this.Content = null;
         }
         GSNShape.CreateArrowPath = function () {
             if (!GSNShape.ArrowPathMaster) {
-                GSNShape.ArrowPathMaster = document.createSVGElement("path");
+                GSNShape.ArrowPathMaster = AssureNote.AssureNoteUtils.CreateSVGElement("path");
                 GSNShape.ArrowPathMaster.setAttribute("marker-end", "url(#Triangle-black)");
                 GSNShape.ArrowPathMaster.setAttribute("fill", "none");
                 GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
