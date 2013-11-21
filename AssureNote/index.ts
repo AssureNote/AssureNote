@@ -77,14 +77,14 @@ module AssureNote {
 			if (this.Parent == null) {
 				return this.OffsetGx;
 			}
-			return this.GetGx() + this.OffsetGx;
+			return this.Parent.GetGx() + this.OffsetGx;
 		}
 
 		GetGy(): number {
 			if (this.Parent == null) {
 				return this.OffsetGy;
 			}
-			return this.GetGy() + this.OffsetGy;
+			return this.Parent.GetGy() + this.OffsetGy;
 		}
 	}
 
@@ -221,15 +221,16 @@ module AssureNote {
 	}
 
 	export class GSNGoalShape extends GSNShape {
-		BodyRect: SVGRectElement;
+		BodyRect: SVGUseElement;
 		UndevelopedSymbol: SVGUseElement;
 
 		Render(): void {
 			super.Render();
-            this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
-			this.BodyRect.setAttribute("class", this.ColorClassName);
+            this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
+			this.BodyRect.setAttribute("href", "goal-master");
+			//this.BodyRect.setAttribute("class", this.ColorClassName);
             this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
-			this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
+			this.UndevelopedSymbol.setAttribute("href", "#UndevelopdSymbol");
 			this.ShapeGroup.appendChild(this.BodyRect);
 			this.Resize();
 		}
@@ -262,13 +263,13 @@ module AssureNote {
 			this.BodyRect.setAttribute("height", this.GetHeight.toString());
 		}
 
-		SetColor(key: string) {
-			this.BodyRect.setAttribute("class", key);
-		}
+		//SetColor(key: string) {
+		//	this.BodyRect.setAttribute("class", key);
+		//}
 
-		GetColor() {
-			return this.BodyRect.getAttribute("class");
-		}
+		//GetColor() {
+		//	return this.BodyRect.getAttribute("class");
+		//}
 
 		//EnableHighlight() {
 		//	var CurrentColor: string = this.GetColor();
@@ -287,14 +288,14 @@ module AssureNote {
 	}
 
 	export class GSNStrategyShape extends GSNShape {
-		BodyPolygon: SVGPolygonElement;
+		BodyPolygon: SVGUseElement;
 		delta: number = 20;
 
 		Render(): void {
             super.Render();
-            // TODO useタグに変える
-			this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
-			this.BodyPolygon.setAttribute("class", this.ColorClassName);
+			this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
+			//this.BodyPolygon.setAttribute("class", this.ColorClassName);
+			this.BodyPolygon.setAttribute("href", "strategy-master");
 			this.ShapeGroup.appendChild(this.BodyPolygon);
 			this.Resize();
 		}
@@ -305,13 +306,13 @@ module AssureNote {
             this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + w + ",0 " + (w - this.delta) + "," + h + " 0," + h);
 		}
 
-		SetColor(key: string) {
-			this.BodyPolygon.setAttribute("class", key);
-		}
+		//SetColor(key: string) {
+		//	this.BodyPolygon.setAttribute("class", key);
+		//}
 
-		GetColor() {
-			return this.BodyPolygon.getAttribute("class");
-		}
+		//GetColor() {
+		//	return this.BodyPolygon.getAttribute("class");
+		//}
 
 		GetConnectorPosition(Dir: Direction): Point {
 			switch (Dir) {
@@ -328,22 +329,20 @@ module AssureNote {
 	}
 
 	export class GSNEvidenceShape extends GSNShape {
-		BodyEllipse: SVGEllipseElement;
+		BodyEllipse: SVGUseElement;
 
 		Render(): void {
 			super.Render();
-            // TODO useタグに変える
-            this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
-			this.BodyEllipse.setAttribute("class", this.ColorClassName);
+			this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
+			//this.BodyEllipse.setAttribute("class", this.ColorClassName);
+			this.BodyEllipse.setAttribute("href", "evidence-master");
 			this.ShapeGroup.appendChild(this.BodyEllipse);
 			this.Resize();
 		}
 
         Resize(): void {
-			this.BodyEllipse.setAttribute("cx", (this.GetWidth() / 2).toString());
-			this.BodyEllipse.setAttribute("cy", (this.GetHeight() / 2).toString());
-			this.BodyEllipse.setAttribute("rx", (this.GetWidth() / 2).toString());
-			this.BodyEllipse.setAttribute("ry", (this.GetHeight() / 2).toString());
+			this.BodyEllipse.setAttribute("width", this.GetWidth().toString());
+			this.BodyEllipse.setAttribute("height", this.GetHeight().toString());
 		}
 
 	}
