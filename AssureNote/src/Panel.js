@@ -62,7 +62,7 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Draw = function (Label, wx, wy) {
-            this.LayoutEngine.Do(this, Label, wx, wy);
+            this.LayoutEngine.DoLayout(this, Label, wx, wy);
         };
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {

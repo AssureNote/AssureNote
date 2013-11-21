@@ -24,6 +24,7 @@ document.createSVGElement = function (name: string): Element {
 /* VIEW (MVC) */
 module AssureNote {
 
+	//Deprecated
 	export class HTMLDoc {
         DocBase: JQuery;
         RawDocBase: HTMLDivElement;

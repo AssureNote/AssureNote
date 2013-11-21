@@ -19,7 +19,8 @@ module AssureNote {
 	}
 
 	export class GSNNode {
-		GSNType: GSNType;
+		constructor(public BaseDoc: AssureNote.GSNDoc, public ParentNode: GSNNode, public GoalLevel: number, public NodeType: GSNType, public LabelNumber: String, public HistoryTriple?: History[]) {
+		}
 	}
 
 	export enum GSNType {
@@ -52,7 +53,7 @@ module AssureNote {
 	}
 
 	export class NodeView {
-		Model: GSNNode;
+		//Model: GSNNode;
 		IsVisible: boolean;
 		Label: string;
 		OffsetGx: number;
@@ -65,6 +66,9 @@ module AssureNote {
 		Right: NodeView[];
 		Children: NodeView[];
 		Shape: GSNShape = null;
+
+		constructor(public Model: GSNNode) {
+		}
 
 		GetShape(): GSNShape {
 			if (this.Shape == null) {
@@ -86,13 +90,21 @@ module AssureNote {
 			}
 			return this.Parent.GetGy() + this.OffsetGy;
 		}
+
+		GetNodeType(): GSNType {
+			return this.Model.NodeType;
+		}
+
+		Render(): void {
+			this.GetShape().Render();
+		}
 	}
 
 	export class GSNShape {
 		ShapeGroup: SVGGElement;
 		ArrowPath: SVGPathElement;
 		Content: HTMLElement;
-		ColorClassName: string;
+		ColorClassName: string = Color.Default;
 		private NodeWidth: number;
         private NodeHeight: number;
         public Width: number;
@@ -114,12 +126,19 @@ module AssureNote {
             return <SVGPathElement>GSNShape.ArrowPathMaster.cloneNode();
         }
 
-        GetWidth(): number {
+		GetWidth(): number {
+			if (this.Width == null) {
+				this.Width = 250; //FIXME
+			}
             return this.Width;
         }
 
-        GetHeight(): number {
-            return this.Height;
+
+		GetHeight(): number {
+			if (this.Height == null) {
+				this.Height = 100; //FIXME
+			}
+			return this.Height;
         }
 
 		Resize(LayoutEngine: SimpleLayoutEngine): void {
@@ -221,16 +240,17 @@ module AssureNote {
 	}
 
 	export class GSNGoalShape extends GSNShape {
-		BodyRect: SVGUseElement;
+		BodyRect: SVGRectElement;
 		UndevelopedSymbol: SVGUseElement;
 
 		Render(): void {
 			super.Render();
-            this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
-			this.BodyRect.setAttribute("href", "goal-master");
-			//this.BodyRect.setAttribute("class", this.ColorClassName);
-            this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
-			this.UndevelopedSymbol.setAttribute("href", "#UndevelopdSymbol");
+			this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
+            //this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
+			//this.BodyRect.setAttribute("xlink:href", "#goal-masterhoge");
+			this.BodyRect.setAttribute("class", this.ColorClassName);
+            //this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
+			//this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
 			this.ShapeGroup.appendChild(this.BodyRect);
 			this.Resize();
 		}
@@ -259,8 +279,8 @@ module AssureNote {
 
 		Resize(): void {
 			//super.Resize();
-			this.BodyRect.setAttribute("width", this.GetWidth.toString());
-			this.BodyRect.setAttribute("height", this.GetHeight.toString());
+			this.BodyRect.setAttribute("width", this.GetWidth().toString());
+			this.BodyRect.setAttribute("height", this.GetHeight().toString());
 		}
 
 		//SetColor(key: string) {
@@ -288,14 +308,15 @@ module AssureNote {
 	}
 
 	export class GSNStrategyShape extends GSNShape {
-		BodyPolygon: SVGUseElement;
+		BodyPolygon: SVGPolygonElement;
 		delta: number = 20;
 
 		Render(): void {
             super.Render();
-			this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
-			//this.BodyPolygon.setAttribute("class", this.ColorClassName);
-			this.BodyPolygon.setAttribute("href", "strategy-master");
+			this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
+			//this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
+			this.BodyPolygon.setAttribute("class", this.ColorClassName);
+			//this.BodyPolygon.setAttribute("xlink:href", "#strategy-master");
 			this.ShapeGroup.appendChild(this.BodyPolygon);
 			this.Resize();
 		}
@@ -329,20 +350,25 @@ module AssureNote {
 	}
 
 	export class GSNEvidenceShape extends GSNShape {
-		BodyEllipse: SVGUseElement;
+		//BodyEllipse: SVGUseElement;
+		BodyEllipse: SVGEllipseElement;
 
 		Render(): void {
 			super.Render();
-			this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
-			//this.BodyEllipse.setAttribute("class", this.ColorClassName);
-			this.BodyEllipse.setAttribute("href", "evidence-master");
+			this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
+			//this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
+			this.BodyEllipse.setAttribute("class", this.ColorClassName);
+			//this.BodyEllipse.setAttribute("xlink:href", "#evidence-master");
 			this.ShapeGroup.appendChild(this.BodyEllipse);
 			this.Resize();
 		}
 
         Resize(): void {
-			this.BodyEllipse.setAttribute("width", this.GetWidth().toString());
-			this.BodyEllipse.setAttribute("height", this.GetHeight().toString());
+			this.BodyEllipse.setAttribute("cx", (this.GetWidth()/ 2).toString());
+			this.BodyEllipse.setAttribute("cy", (this.GetHeight() / 2).toString());
+			this.BodyEllipse.setAttribute("rx", (this.GetWidth()/ 2).toString());
+			this.BodyEllipse.setAttribute("ry", (this.GetHeight() / 2).toString());
+
 		}
 
 	}
@@ -352,4 +378,11 @@ module AssureNote {
 
 $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();
+	var node = new AssureNote.GSNNode(new AssureNote.GSNDoc(), null, 1, AssureNote.GSNType.Strategy, "G1", []);
+	var nodeview = new AssureNote.NodeView(node);
+	nodeview.Render();
+	var ele = nodeview.Shape.GetSVG();
+
+	document.getElementById("svg-node").appendChild(ele);
+	$("#editor-wrapper").hide();
 });

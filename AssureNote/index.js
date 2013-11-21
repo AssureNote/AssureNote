@@ -30,7 +30,13 @@ var AssureNote;
     AssureNote.GSNDoc = GSNDoc;
 
     var GSNNode = (function () {
-        function GSNNode() {
+        function GSNNode(BaseDoc, ParentNode, GoalLevel, NodeType, LabelNumber, HistoryTriple) {
+            this.BaseDoc = BaseDoc;
+            this.ParentNode = ParentNode;
+            this.GoalLevel = GoalLevel;
+            this.NodeType = NodeType;
+            this.LabelNumber = LabelNumber;
+            this.HistoryTriple = HistoryTriple;
         }
         return GSNNode;
     })();
@@ -78,7 +84,8 @@ var AssureNote;
     AssureNote.ColorStyle = ColorStyle;
 
     var NodeView = (function () {
-        function NodeView() {
+        function NodeView(Model) {
+            this.Model = Model;
             this.Shape = null;
         }
         NodeView.prototype.GetShape = function () {
@@ -101,6 +108,14 @@ var AssureNote;
             }
             return this.Parent.GetGy() + this.OffsetGy;
         };
+
+        NodeView.prototype.GetNodeType = function () {
+            return this.Model.NodeType;
+        };
+
+        NodeView.prototype.Render = function () {
+            this.GetShape().Render();
+        };
         return NodeView;
     })();
     AssureNote.NodeView = NodeView;
@@ -108,6 +123,7 @@ var AssureNote;
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
+            this.ColorClassName = AssureNote.Color.Default;
             this.Content = null;
         }
         GSNShape.CreateArrowPath = function () {
@@ -122,10 +138,16 @@ var AssureNote;
         };
 
         GSNShape.prototype.GetWidth = function () {
+            if (this.Width == null) {
+                this.Width = 250;
+            }
             return this.Width;
         };
 
         GSNShape.prototype.GetHeight = function () {
+            if (this.Height == null) {
+                this.Height = 100;
+            }
             return this.Height;
         };
 
@@ -236,12 +258,14 @@ var AssureNote;
         }
         GSNGoalShape.prototype.Render = function () {
             _super.prototype.Render.call(this);
-            this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("use");
-            this.BodyRect.setAttribute("href", "goal-master");
+            this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
 
-            //this.BodyRect.setAttribute("class", this.ColorClassName);
-            this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("use");
-            this.UndevelopedSymbol.setAttribute("href", "#UndevelopdSymbol");
+            //this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
+            //this.BodyRect.setAttribute("xlink:href", "#goal-masterhoge");
+            this.BodyRect.setAttribute("class", this.ColorClassName);
+
+            //this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
+            //this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
             this.ShapeGroup.appendChild(this.BodyRect);
             this.Resize();
         };
@@ -273,8 +297,8 @@ var AssureNote;
 
         GSNContextShape.prototype.Resize = function () {
             //super.Resize();
-            this.BodyRect.setAttribute("width", this.GetWidth.toString());
-            this.BodyRect.setAttribute("height", this.GetHeight.toString());
+            this.BodyRect.setAttribute("width", this.GetWidth().toString());
+            this.BodyRect.setAttribute("height", this.GetHeight().toString());
         };
         return GSNContextShape;
     })(GSNShape);
@@ -288,10 +312,12 @@ var AssureNote;
         }
         GSNStrategyShape.prototype.Render = function () {
             _super.prototype.Render.call(this);
-            this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("use");
+            this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
 
-            //this.BodyPolygon.setAttribute("class", this.ColorClassName);
-            this.BodyPolygon.setAttribute("href", "strategy-master");
+            //this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
+            this.BodyPolygon.setAttribute("class", this.ColorClassName);
+
+            //this.BodyPolygon.setAttribute("xlink:href", "#strategy-master");
             this.ShapeGroup.appendChild(this.BodyPolygon);
             this.Resize();
         };
@@ -331,17 +357,21 @@ var AssureNote;
         }
         GSNEvidenceShape.prototype.Render = function () {
             _super.prototype.Render.call(this);
-            this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("use");
+            this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
 
-            //this.BodyEllipse.setAttribute("class", this.ColorClassName);
-            this.BodyEllipse.setAttribute("href", "evidence-master");
+            //this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
+            this.BodyEllipse.setAttribute("class", this.ColorClassName);
+
+            //this.BodyEllipse.setAttribute("xlink:href", "#evidence-master");
             this.ShapeGroup.appendChild(this.BodyEllipse);
             this.Resize();
         };
 
         GSNEvidenceShape.prototype.Resize = function () {
-            this.BodyEllipse.setAttribute("width", this.GetWidth().toString());
-            this.BodyEllipse.setAttribute("height", this.GetHeight().toString());
+            this.BodyEllipse.setAttribute("cx", (this.GetWidth() / 2).toString());
+            this.BodyEllipse.setAttribute("cy", (this.GetHeight() / 2).toString());
+            this.BodyEllipse.setAttribute("rx", (this.GetWidth() / 2).toString());
+            this.BodyEllipse.setAttribute("ry", (this.GetHeight() / 2).toString());
         };
         return GSNEvidenceShape;
     })(GSNShape);
@@ -350,5 +380,12 @@ var AssureNote;
 
 $(function () {
     var AssureNoteApp = new AssureNote.AssureNoteApp();
+    var node = new AssureNote.GSNNode(new AssureNote.GSNDoc(), null, 1, AssureNote.GSNType.Strategy, "G1", []);
+    var nodeview = new AssureNote.NodeView(node);
+    nodeview.Render();
+    var ele = nodeview.Shape.GetSVG();
+
+    document.getElementById("svg-node").appendChild(ele);
+    $("#editor-wrapper").hide();
 });
 //# sourceMappingURL=index.js.map
