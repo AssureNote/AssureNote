@@ -19,6 +19,7 @@ document.createSVGElement = function (name) {
 /* VIEW (MVC) */
 var AssureNote;
 (function (AssureNote) {
+    //Deprecated
     var HTMLDoc = (function () {
         function HTMLDoc() {
             this.Width = 0;

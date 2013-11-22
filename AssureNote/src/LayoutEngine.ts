@@ -9,7 +9,7 @@ module AssureNote {
 		}
 
 		//FIXME Rename
-		Do(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
+		DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
 			//TODO
 		}
 	}
@@ -20,7 +20,7 @@ module AssureNote {
 		}
 
 		//FIXME Rename
-		Do(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
+		DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
 			var Viewer = new CaseViewer(this.AssureNoteApp.Case, this.AssureNoteApp.OldPluginManager, new ServerAPI("", "", ""), PictgramPanel.ViewPort);
 			Viewer.Draw();
 			var TopView = Viewer.ViewMap[Viewer.ElementTop.Label];
@@ -43,8 +43,6 @@ module AssureNote {
 		}
 
 		Layout(ThisNode: NodeView, Shape: GSNShape): void {
-			Shape.Width = 0;
-			Shape.Height = 0;
 			if (ThisNode.IsVisible) {
 				var ParentWidth = DefaultWidth;
 				var ParentHeight = this.GetHeight(ThisNode);

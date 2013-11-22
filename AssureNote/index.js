@@ -30,7 +30,13 @@ var AssureNote;
     AssureNote.GSNDoc = GSNDoc;
 
     var GSNNode = (function () {
-        function GSNNode() {
+        function GSNNode(BaseDoc, ParentNode, GoalLevel, NodeType, LabelNumber, HistoryTriple) {
+            this.BaseDoc = BaseDoc;
+            this.ParentNode = ParentNode;
+            this.GoalLevel = GoalLevel;
+            this.NodeType = NodeType;
+            this.LabelNumber = LabelNumber;
+            this.HistoryTriple = HistoryTriple;
         }
         return GSNNode;
     })();
@@ -78,7 +84,8 @@ var AssureNote;
     AssureNote.ColorStyle = ColorStyle;
 
     var NodeView = (function () {
-        function NodeView() {
+        function NodeView(Model) {
+            this.Model = Model;
             this.Shape = null;
         }
         NodeView.prototype.GetShape = function () {
@@ -92,14 +99,22 @@ var AssureNote;
             if (this.Parent == null) {
                 return this.OffsetGx;
             }
-            return this.GetGx() + this.OffsetGx;
+            return this.Parent.GetGx() + this.OffsetGx;
         };
 
         NodeView.prototype.GetGy = function () {
             if (this.Parent == null) {
                 return this.OffsetGy;
             }
-            return this.GetGy() + this.OffsetGy;
+            return this.Parent.GetGy() + this.OffsetGy;
+        };
+
+        NodeView.prototype.GetNodeType = function () {
+            return this.Model.NodeType;
+        };
+
+        NodeView.prototype.Render = function () {
+            this.GetShape().Render();
         };
         return NodeView;
     })();
@@ -108,10 +123,34 @@ var AssureNote;
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
-            this.Width = 0;
-            this.Height = 0;
+            this.ColorClassName = AssureNote.Color.Default;
             this.Content = null;
         }
+        GSNShape.CreateArrowPath = function () {
+            if (!GSNShape.ArrowPathMaster) {
+                GSNShape.ArrowPathMaster = AssureNote.AssureNoteUtils.CreateSVGElement("path");
+                GSNShape.ArrowPathMaster.setAttribute("marker-end", "url(#Triangle-black)");
+                GSNShape.ArrowPathMaster.setAttribute("fill", "none");
+                GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
+                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+            }
+            return GSNShape.ArrowPathMaster.cloneNode();
+        };
+
+        GSNShape.prototype.GetWidth = function () {
+            if (this.Width == null) {
+                this.Width = 250;
+            }
+            return this.Width;
+        };
+
+        GSNShape.prototype.GetHeight = function () {
+            if (this.Height == null) {
+                this.Height = 100;
+            }
+            return this.Height;
+        };
+
         GSNShape.prototype.Resize = function (LayoutEngine) {
             //this.Width = HTMLDoc.Width;
             //this.Height = HTMLDoc.Height;
@@ -145,17 +184,16 @@ var AssureNote;
                     div.style.left = x + "px";
                     div.style.top = y + "px";
                 }
+                var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
+                mat.e = x;
+                mat.f = y;
             }
         };
 
         GSNShape.prototype.Render = function () {
-            this.ShapeGroup = document.createSVGElement("g");
+            this.ShapeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
-            this.ArrowPath = document.createSVGElement("path");
-            this.ArrowPath.setAttribute("marker-end", "url(#Triangle-black)");
-            this.ArrowPath.setAttribute("fill", "none");
-            this.ArrowPath.setAttribute("stroke", "gray");
-            this.ArrowPath.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+            this.ArrowPath = GSNShape.CreateArrowPath();
         };
 
         GSNShape.prototype.GetSVG = function () {
@@ -208,6 +246,7 @@ var AssureNote;
                     return new AssureNote.Point(0, 0);
             }
         };
+        GSNShape.ArrowPathMaster = null;
         return GSNShape;
     })();
     AssureNote.GSNShape = GSNShape;
@@ -219,10 +258,14 @@ var AssureNote;
         }
         GSNGoalShape.prototype.Render = function () {
             _super.prototype.Render.call(this);
-            this.BodyRect = document.createSVGElement("rect");
+            this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
+
+            //this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
+            //this.BodyRect.setAttribute("xlink:href", "#goal-masterhoge");
             this.BodyRect.setAttribute("class", this.ColorClassName);
-            this.UndevelopedSymbol = document.createSVGElement("use");
-            this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
+
+            //this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
+            //this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
             this.ShapeGroup.appendChild(this.BodyRect);
             this.Resize();
         };
@@ -243,7 +286,7 @@ var AssureNote;
         }
         GSNContextShape.prototype.Render = function () {
             _super.prototype.Render.call(this);
-            this.BodyRect = document.createSVGElement("rect");
+            this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.BodyRect.setAttribute("class", this.ColorClassName);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
             this.BodyRect.setAttribute("rx", "10");
@@ -254,30 +297,8 @@ var AssureNote;
 
         GSNContextShape.prototype.Resize = function () {
             //super.Resize();
-            this.BodyRect.setAttribute("width", this.Width.toString());
-            this.BodyRect.setAttribute("height", this.Height.toString());
-        };
-
-        GSNContextShape.prototype.SetColor = function (key) {
-            this.BodyRect.setAttribute("class", key);
-        };
-
-        GSNContextShape.prototype.GetColor = function () {
-            return this.BodyRect.getAttribute("class");
-        };
-
-        GSNContextShape.prototype.EnableHighlight = function () {
-            var CurrentColor = this.GetColor();
-            if (!CurrentColor.match(/-highlight/)) {
-                this.BodyRect.removeAttribute("class");
-                this.BodyRect.setAttribute("class", CurrentColor + "-highlight");
-            }
-        };
-
-        GSNContextShape.prototype.DisableHighlight = function () {
-            var CurrentColor = this.GetColor();
-            this.BodyRect.removeAttribute("class");
-            this.BodyRect.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
+            this.BodyRect.setAttribute("width", this.GetWidth().toString());
+            this.BodyRect.setAttribute("height", this.GetHeight().toString());
         };
         return GSNContextShape;
     })(GSNShape);
@@ -291,34 +312,38 @@ var AssureNote;
         }
         GSNStrategyShape.prototype.Render = function () {
             _super.prototype.Render.call(this);
-            this.BodyPolygon = document.createSVGElement("polygon");
+            this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
+
+            //this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
             this.BodyPolygon.setAttribute("class", this.ColorClassName);
+
+            //this.BodyPolygon.setAttribute("xlink:href", "#strategy-master");
             this.ShapeGroup.appendChild(this.BodyPolygon);
             this.Resize();
         };
 
         GSNStrategyShape.prototype.Resize = function () {
-            this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + this.Width + ",0 " + (this.Width - this.delta) + "," + this.Height + " 0," + this.Height);
+            var w = this.GetWidth();
+            var h = this.GetHeight();
+            this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + w + ",0 " + (w - this.delta) + "," + h + " 0," + h);
         };
 
-        GSNStrategyShape.prototype.SetColor = function (key) {
-            this.BodyPolygon.setAttribute("class", key);
-        };
-
-        GSNStrategyShape.prototype.GetColor = function () {
-            return this.BodyPolygon.getAttribute("class");
-        };
-
+        //SetColor(key: string) {
+        //	this.BodyPolygon.setAttribute("class", key);
+        //}
+        //GetColor() {
+        //	return this.BodyPolygon.getAttribute("class");
+        //}
         GSNStrategyShape.prototype.GetConnectorPosition = function (Dir) {
             switch (Dir) {
                 case AssureNote.Direction.Right:
-                    return new AssureNote.Point(this.Width - this.delta / 2, this.Height / 2);
+                    return new AssureNote.Point(this.GetWidth() - this.delta / 2, this.GetHeight() / 2);
                 case AssureNote.Direction.Left:
-                    return new AssureNote.Point(this.delta / 2, this.Height / 2);
+                    return new AssureNote.Point(this.delta / 2, this.GetHeight() / 2);
                 case AssureNote.Direction.Top:
-                    return new AssureNote.Point(this.Width / 2, 0);
+                    return new AssureNote.Point(this.GetWidth() / 2, 0);
                 case AssureNote.Direction.Bottom:
-                    return new AssureNote.Point(this.Width / 2, this.Height);
+                    return new AssureNote.Point(this.GetWidth() / 2, this.GetHeight());
             }
         };
         return GSNStrategyShape;
@@ -332,17 +357,21 @@ var AssureNote;
         }
         GSNEvidenceShape.prototype.Render = function () {
             _super.prototype.Render.call(this);
-            this.BodyEllipse = document.createSVGElement("ellipse");
+            this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
+
+            //this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
             this.BodyEllipse.setAttribute("class", this.ColorClassName);
+
+            //this.BodyEllipse.setAttribute("xlink:href", "#evidence-master");
             this.ShapeGroup.appendChild(this.BodyEllipse);
             this.Resize();
         };
 
         GSNEvidenceShape.prototype.Resize = function () {
-            this.BodyEllipse.setAttribute("cx", (this.Width / 2).toString());
-            this.BodyEllipse.setAttribute("cy", (this.Height / 2).toString());
-            this.BodyEllipse.setAttribute("rx", (this.Width / 2).toString());
-            this.BodyEllipse.setAttribute("ry", (this.Height / 2).toString());
+            this.BodyEllipse.setAttribute("cx", (this.GetWidth() / 2).toString());
+            this.BodyEllipse.setAttribute("cy", (this.GetHeight() / 2).toString());
+            this.BodyEllipse.setAttribute("rx", (this.GetWidth() / 2).toString());
+            this.BodyEllipse.setAttribute("ry", (this.GetHeight() / 2).toString());
         };
         return GSNEvidenceShape;
     })(GSNShape);
@@ -351,5 +380,12 @@ var AssureNote;
 
 $(function () {
     var AssureNoteApp = new AssureNote.AssureNoteApp();
+    var node = new AssureNote.GSNNode(new AssureNote.GSNDoc(), null, 1, AssureNote.GSNType.Strategy, "G1", []);
+    var nodeview = new AssureNote.NodeView(node);
+    nodeview.Render();
+    var ele = nodeview.Shape.GetSVG();
+
+    document.getElementById("svg-node").appendChild(ele);
+    $("#editor-wrapper").hide();
 });
 //# sourceMappingURL=index.js.map

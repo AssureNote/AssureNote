@@ -23,7 +23,7 @@ module AssureNote {
 
 		export function CreateGSNShape(NodeView: NodeView): GSNShape {
 
-			switch (NodeView.Model.GSNType) {
+			switch (NodeView.GetNodeType()) {
 				case GSNType.Goal:
 					return new GSNGoalShape(NodeView);
 				case GSNType.Context:
@@ -33,7 +33,22 @@ module AssureNote {
 				case GSNType.Evidence:
 					return new GSNEvidenceShape(NodeView);
 			}
-		}
+        }
+
+        export function CreateSVGElement(name: string): SVGElement;
+        export function CreateSVGElement(name: "path"): SVGPathElement;
+        export function CreateSVGElement(name: "g"): SVGGElement;
+        export function CreateSVGElement(name: "rect"): SVGRectElement;
+        export function CreateSVGElement(name: "ellipse"): SVGEllipseElement;
+        export function CreateSVGElement(name: "circle"): SVGCircleElement;
+        export function CreateSVGElement(name: "polygon"): SVGPolygonElement;
+        export function CreateSVGElement(name: "polyline"): SVGPolylineElement;
+        export function CreateSVGElement(name: "use"): SVGUseElement;
+        export function CreateSVGElement(name: "defs"): SVGDefsElement;
+        export function CreateSVGElement(name: "marker"): SVGMarkerElement;
+        export function CreateSVGElement(name: string): SVGElement {
+            return <SVGElement>document.createElementNS('http://www.w3.org/2000/svg', name);
+        }
 
 	}
 
@@ -82,16 +97,18 @@ module AssureNote {
 					var Contents: string = (<any>event.target).result;
 					var Name: string = Files[0].name;
 					// ---Deprecated--
-					var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
+					//var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
 					
-					var casedecoder = new CaseDecoder();
-					var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
-					Case0.SetElementTop(root);
-					this.Case = Case0;
+					//var casedecoder = new CaseDecoder();
+					//var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
+					//Case0.SetElementTop(root);
+					//this.Case = Case0;
+					//this.PictgramPanel.Draw(root.Label, 0, 0);
 					//---
-					//var MasterRecord = new GSNRecord();
-					//MasterRecord.Parse(Contents);	
-					this.PictgramPanel.Draw(root.Label, 0, 0);
+					var MasterRecord = new GSNRecord();
+					MasterRecord.Parse(Contents);
+					this.PictgramPanel.Draw("TODO", 0, 0);
+
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

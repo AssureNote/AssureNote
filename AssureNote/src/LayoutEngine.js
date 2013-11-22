@@ -15,7 +15,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         //FIXME Rename
-        LayoutEngine.prototype.Do = function (PictgramPanel, Label, wx, wy) {
+        LayoutEngine.prototype.DoLayout = function (PictgramPanel, Label, wx, wy) {
             //TODO
         };
         return LayoutEngine;
@@ -29,7 +29,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         //FIXME Rename
-        OldLayoutEngine.prototype.Do = function (PictgramPanel, Label, wx, wy) {
+        OldLayoutEngine.prototype.DoLayout = function (PictgramPanel, Label, wx, wy) {
             var Viewer = new AssureNote.CaseViewer(this.AssureNoteApp.Case, this.AssureNoteApp.OldPluginManager, new AssureNote.ServerAPI("", "", ""), PictgramPanel.ViewPort);
             Viewer.Draw();
             var TopView = Viewer.ViewMap[Viewer.ElementTop.Label];
@@ -53,8 +53,6 @@ var AssureNote;
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode, Shape) {
-            Shape.Width = 0;
-            Shape.Height = 0;
             if (ThisNode.IsVisible) {
                 var ParentWidth = AssureNote.DefaultWidth;
                 var ParentHeight = this.GetHeight(ThisNode);

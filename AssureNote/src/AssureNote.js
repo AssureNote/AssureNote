@@ -22,7 +22,7 @@ var AssureNote;
         AssureNoteUtils.GetNodePosition = GetNodePosition;
 
         function CreateGSNShape(NodeView) {
-            switch (NodeView.Model.GSNType) {
+            switch (NodeView.GetNodeType()) {
                 case AssureNote.GSNType.Goal:
                     return new AssureNote.GSNGoalShape(NodeView);
                 case AssureNote.GSNType.Context:
@@ -34,6 +34,11 @@ var AssureNote;
             }
         }
         AssureNoteUtils.CreateGSNShape = CreateGSNShape;
+
+        function CreateSVGElement(name) {
+            return document.createElementNS('http://www.w3.org/2000/svg', name);
+        }
+        AssureNoteUtils.CreateSVGElement = CreateSVGElement;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
@@ -73,17 +78,16 @@ var AssureNote;
                     var Name = Files[0].name;
 
                     // ---Deprecated--
-                    var Case0 = new AssureNote.Case(Name, "{}", Contents, 0, 0, new AssureNote.OldPlugInManager(""));
-
-                    var casedecoder = new AssureNote.CaseDecoder();
-                    var root = casedecoder.ParseASN(Case0, Contents, null);
-                    Case0.SetElementTop(root);
-                    _this.Case = Case0;
-
+                    //var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
+                    //var casedecoder = new CaseDecoder();
+                    //var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
+                    //Case0.SetElementTop(root);
+                    //this.Case = Case0;
+                    //this.PictgramPanel.Draw(root.Label, 0, 0);
                     //---
-                    //var MasterRecord = new GSNRecord();
-                    //MasterRecord.Parse(Contents);
-                    _this.PictgramPanel.Draw(root.Label, 0, 0);
+                    var MasterRecord = new AssureNote.GSNRecord();
+                    MasterRecord.Parse(Contents);
+                    _this.PictgramPanel.Draw("TODO", 0, 0);
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
