@@ -18,6 +18,10 @@ var AssureNote;
         }
         GSNRecord.prototype.Parse = function (file) {
         };
+
+        GSNRecord.prototype.GetEditingDoc = function () {
+            return new GSNDoc();
+        };
         return GSNRecord;
     })();
     AssureNote.GSNRecord = GSNRecord;
@@ -25,6 +29,13 @@ var AssureNote;
     var GSNDoc = (function () {
         function GSNDoc() {
         }
+        GSNDoc.prototype.GetNode = function (Label) {
+            return this.NodeMap[Label];
+        };
+
+        GSNDoc.prototype.GetKeys = function () {
+            return Object.keys(this.NodeMap);
+        };
         return GSNDoc;
     })();
     AssureNote.GSNDoc = GSNDoc;
@@ -38,6 +49,9 @@ var AssureNote;
             this.LabelNumber = LabelNumber;
             this.HistoryTriple = HistoryTriple;
         }
+        GSNNode.prototype.GetLabel = function () {
+            return "G" + this.LabelNumber;
+        };
         return GSNNode;
     })();
     AssureNote.GSNNode = GSNNode;
@@ -83,6 +97,40 @@ var AssureNote;
     })();
     AssureNote.ColorStyle = ColorStyle;
 
+    var GSNView = (function () {
+        function GSNView() {
+            this.ViewMap = {};
+        }
+        GSNView.prototype.CreateViewAll = function (Doc) {
+            var Keys = Doc.GetKeys();
+            for (var i = 0; i < Keys.length; i++) {
+                this.ViewMap[Keys[i]] = new NodeView(Doc.GetNode(Keys[i]));
+            }
+        };
+
+        GSNView.prototype.CreateView = function (Node) {
+            if (this.ViewMap[Node.LabelNumber] != null) {
+                return false;
+            }
+            this.ViewMap[Node.LabelNumber] = new NodeView(Node);
+            return true;
+        };
+
+        GSNView.prototype.UpdateView = function (Node) {
+            if (this.ViewMap[Node.LabelNumber] == null) {
+                return false;
+            }
+            this.ViewMap[Node.LabelNumber].Update(Node);
+            return true;
+        };
+
+        GSNView.prototype.Clear = function () {
+            this.ViewMap = {};
+        };
+        return GSNView;
+    })();
+    AssureNote.GSNView = GSNView;
+
     var NodeView = (function () {
         function NodeView(Model) {
             this.Model = Model;
@@ -115,6 +163,12 @@ var AssureNote;
 
         NodeView.prototype.Render = function () {
             this.GetShape().Render();
+        };
+
+        NodeView.prototype.Update = function (Model) {
+            //TODO
+            this.Model = Model;
+            throw "Update is under construction.";
         };
         return NodeView;
     })();

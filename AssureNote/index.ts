@@ -13,13 +13,31 @@ module AssureNote {
         }
 		Parse(file: string): void {
 		}
+
+		GetEditingDoc(): GSNDoc {
+			return new GSNDoc();
+		}
 	}
 
 	export class GSNDoc {
+		NodeMap: { [index: string]: GSNNode }
+
+		public GetNode(Label: string) {
+			return this.NodeMap[Label];
+		}
+
+		public GetKeys(): string[]{
+			return Object.keys(this.NodeMap);
+		}
+
 	}
 
 	export class GSNNode {
-		constructor(public BaseDoc: AssureNote.GSNDoc, public ParentNode: GSNNode, public GoalLevel: number, public NodeType: GSNType, public LabelNumber: String, public HistoryTriple?: History[]) {
+		constructor(public BaseDoc: AssureNote.GSNDoc, public ParentNode: GSNNode, public GoalLevel: number, public NodeType: GSNType, public LabelNumber: string, public HistoryTriple?: History[]) {
+		}
+
+		public GetLabel(): string {
+			return  "G" + this.LabelNumber;
 		}
 	}
 
@@ -50,6 +68,41 @@ module AssureNote {
 
 	export class ColorStyle {
 
+	}
+
+	export class GSNView {
+		ViewMap: { [index: string]: NodeView };
+
+		constructor() {
+			this.ViewMap = {};
+		}
+
+		CreateViewAll(Doc: GSNDoc): void {
+			var Keys = Doc.GetKeys();
+			for (var i = 0; i < Keys.length; i++) {
+				this.ViewMap[Keys[i]] = new NodeView(Doc.GetNode(Keys[i]));
+			}
+		}
+
+		CreateView(Node: GSNNode): boolean {
+			if (this.ViewMap[Node.LabelNumber] != null) {
+				return false;
+			}
+			this.ViewMap[Node.LabelNumber] = new NodeView(Node);
+			return true;
+		}
+
+		UpdateView(Node: GSNNode): boolean {
+			if (this.ViewMap[Node.LabelNumber] == null) {
+				return false;
+			}
+			this.ViewMap[Node.LabelNumber].Update(Node);
+			return true;
+		}
+
+		Clear(): void {
+			this.ViewMap = {};
+		}
 	}
 
 	export class NodeView {
@@ -97,6 +150,12 @@ module AssureNote {
 
 		Render(): void {
 			this.GetShape().Render();
+		}
+
+		Update(Model: GSNNode) {
+			//TODO
+			this.Model = Model;
+			throw "Update is under construction.";
 		}
 	}
 

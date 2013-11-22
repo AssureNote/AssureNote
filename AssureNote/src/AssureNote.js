@@ -85,6 +85,7 @@ var AssureNote;
                     //this.Case = Case0;
                     //this.PictgramPanel.Draw(root.Label, 0, 0);
                     //---
+                    //FIXME
                     var MasterRecord = new AssureNote.GSNRecord();
                     MasterRecord.Parse(Contents);
                     _this.PictgramPanel.Draw("TODO", 0, 0);
