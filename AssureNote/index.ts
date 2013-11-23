@@ -45,26 +45,26 @@ module AssureNote {
 		Goal, Context, Strategy, Evidence, Undefined
 	}
 
-	export class Navigator {
-		CurrentDoc: GSNDoc;// Convert to caseview
-		FocusedLabel: string;
-		FocusedWx: number;
-		FocusedWy: number;
+	//export class Navigator {
+	//	CurrentDoc: GSNDoc;// Convert to caseview
+	//	FocusedLabel: string;
+	//	FocusedWx: number;
+	//	FocusedWy: number;
 
-		Display(Label: string, Wx: number, Wy: number): void {
-			//TODO
-		}
+	//	Display(Label: string, Wx: number, Wy: number): void {
+	//		//TODO
+	//	}
 
-		Redraw(): void {
-			this.Display(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
-		}
+	//	Redraw(): void {
+	//		this.Display(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
+	//	}
 
-		NavigateUp(): void { }
-		NavigateDown(): void { }
-		NavigateLeft(): void { }
-		NavigateRight(): void { }
-		NavigateHome(): void { }
-	}
+	//	NavigateUp(): void { }
+	//	NavigateDown(): void { }
+	//	NavigateLeft(): void { }
+	//	NavigateRight(): void { }
+	//	NavigateHome(): void { }
+	//}
 
 	export class ColorStyle {
 

@@ -10,6 +10,12 @@ module AssureNote {
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
+		GSNView: GSNView;
+
+		CurrentDoc: GSNDoc;// Convert to caseview
+		FocusedLabel: string;
+		FocusedWx: number;
+		FocusedWy: number;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));
@@ -80,10 +86,23 @@ module AssureNote {
 			this.LayoutEngine.DoLayout(this, Label, wx, wy);
 		}
 
+		Redraw(): void {
+			this.Draw(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
+		}
+
+
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
 			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
 			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNRecord.GetEditingDoc(), Label);
 		}
+
+		//TODO
+		NavigateUp(): void { }
+		NavigateDown(): void { }
+		NavigateLeft(): void { }
+		NavigateRight(): void { }
+		NavigateHome(): void { }
+
 	}
 
 	export class PluginPanel {

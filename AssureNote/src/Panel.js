@@ -65,9 +65,25 @@ var AssureNote;
             this.LayoutEngine.DoLayout(this, Label, wx, wy);
         };
 
+        PictgramPanel.prototype.Redraw = function () {
+            this.Draw(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
+        };
+
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
             var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
             Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNRecord.GetEditingDoc(), Label);
+        };
+
+        //TODO
+        PictgramPanel.prototype.NavigateUp = function () {
+        };
+        PictgramPanel.prototype.NavigateDown = function () {
+        };
+        PictgramPanel.prototype.NavigateLeft = function () {
+        };
+        PictgramPanel.prototype.NavigateRight = function () {
+        };
+        PictgramPanel.prototype.NavigateHome = function () {
         };
         return PictgramPanel;
     })();

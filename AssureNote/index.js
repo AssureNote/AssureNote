@@ -65,31 +65,23 @@ var AssureNote;
     })(AssureNote.GSNType || (AssureNote.GSNType = {}));
     var GSNType = AssureNote.GSNType;
 
-    var Navigator = (function () {
-        function Navigator() {
-        }
-        Navigator.prototype.Display = function (Label, Wx, Wy) {
-            //TODO
-        };
-
-        Navigator.prototype.Redraw = function () {
-            this.Display(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
-        };
-
-        Navigator.prototype.NavigateUp = function () {
-        };
-        Navigator.prototype.NavigateDown = function () {
-        };
-        Navigator.prototype.NavigateLeft = function () {
-        };
-        Navigator.prototype.NavigateRight = function () {
-        };
-        Navigator.prototype.NavigateHome = function () {
-        };
-        return Navigator;
-    })();
-    AssureNote.Navigator = Navigator;
-
+    //export class Navigator {
+    //	CurrentDoc: GSNDoc;// Convert to caseview
+    //	FocusedLabel: string;
+    //	FocusedWx: number;
+    //	FocusedWy: number;
+    //	Display(Label: string, Wx: number, Wy: number): void {
+    //		//TODO
+    //	}
+    //	Redraw(): void {
+    //		this.Display(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
+    //	}
+    //	NavigateUp(): void { }
+    //	NavigateDown(): void { }
+    //	NavigateLeft(): void { }
+    //	NavigateRight(): void { }
+    //	NavigateHome(): void { }
+    //}
     var ColorStyle = (function () {
         function ColorStyle() {
         }
