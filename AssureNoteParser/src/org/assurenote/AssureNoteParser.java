@@ -32,6 +32,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -226,9 +227,15 @@ class History {
 		this.Author = Author;
 		this.Role = Role;
 		this.Date = Date;
+		/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		if (Date == null) {
-			/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 			this.Date = Format.format(new Date());
+		} else {
+			try {
+				this.Date = Format.format(Format.parse(Date));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		this.Process = Process;
 		this.Doc = Doc;
