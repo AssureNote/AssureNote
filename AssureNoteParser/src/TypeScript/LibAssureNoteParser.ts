@@ -13,6 +13,51 @@ class StringBuilder {
 	}
 }
 
+class SimpleDateFormat {
+	constructor(format: string) {
+		// Support format string, or is it needless?
+	}
+
+	fillZero(digit : number) : string {
+		if (digit < 10) {
+			return '0'+digit;
+		} else {
+			return ''+digit;
+		}
+	}
+
+	parse(date: string) : Date {
+		return new Date(date);
+	}
+
+	formatTimezone(timezoneOffset: number) : string {
+		var res = '';
+		var timezoneInHours = timezoneOffset / -60;
+		if (Math.abs(timezoneInHours) < 10) {
+			res = '0' + timezoneInHours + '00';
+		} else {
+			res = timezoneInHours + '00';
+		}
+
+		if (timezoneInHours > 0) {
+			return '+' + res;
+		} else {
+			return '-' + res;
+		}
+	}
+
+	format(date: Date) : string {
+		var y       : string = this.fillZero(date.getFullYear());
+		var m       : string = this.fillZero(date.getMonth()+1);
+		var d       : string = this.fillZero(date.getDate());
+		var hr      : string = this.fillZero(date.getHours());
+		var min     : string = this.fillZero(date.getMinutes());
+		var sec     : string = this.fillZero(date.getSeconds());
+		var timezone: string = this.formatTimezone(date.getTimezoneOffset());
+		return y + '-' + m + '-' + d + 'T' + hr + ':' + min + ':' + sec + timezone;
+	}
+}
+
 class HashMap <string, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
@@ -165,12 +210,26 @@ Object.defineProperty(Object.prototype, "InstanceOf", {
 });
 
 interface String {
+        compareTo(anotherString: string): number;
         startsWith(key: string): boolean;
         endsWith(key: string): boolean;
         lastIndexOf(ch: number) : number;
         indexOf(ch: number) : number;
         substring(BeginIdx : number, EndIdx : number) : string;
 }
+
+Object.defineProperty(String.prototype, "compareTo", {
+        enumerable : false,
+        value : function(anotherString) {
+                if (this < anotherString) {
+                        return -1;
+                } else if (this > anotherString) {
+                        return 1;
+                } else {
+                        return 0;
+                }
+        }
+});
 
 Object.defineProperty(String.prototype, "startsWith", {
         enumerable : false,
