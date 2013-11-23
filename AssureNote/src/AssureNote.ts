@@ -23,7 +23,7 @@ module AssureNote {
 
 		export function CreateGSNShape(NodeView: NodeView): GSNShape {
 
-			switch (NodeView.Model.GSNType) {
+			switch (NodeView.GetNodeType()) {
 				case GSNType.Goal:
 					return new GSNGoalShape(NodeView);
 				case GSNType.Context:
@@ -97,16 +97,18 @@ module AssureNote {
 					var Contents: string = (<any>event.target).result;
 					var Name: string = Files[0].name;
 					// ---Deprecated--
-					var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
+					//var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
 					
-					var casedecoder = new CaseDecoder();
-					var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
-					Case0.SetElementTop(root);
-					this.Case = Case0;
+					//var casedecoder = new CaseDecoder();
+					//var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
+					//Case0.SetElementTop(root);
+					//this.Case = Case0;
+					//this.PictgramPanel.Draw(root.Label, 0, 0);
 					//---
-					//var MasterRecord = new GSNRecord();
-					//MasterRecord.Parse(Contents);	
-					this.PictgramPanel.Draw(root.Label, 0, 0);
+					var MasterRecord = new GSNRecord();
+					MasterRecord.Parse(Contents);
+					this.PictgramPanel.Draw("TODO", 0, 0);
+
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

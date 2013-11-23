@@ -77,7 +77,7 @@ module AssureNote {
 		}
 
 		Draw(Label: string, wx: number, wy: number): void {
-			this.LayoutEngine.Do(this, Label, wx, wy);
+			this.LayoutEngine.DoLayout(this, Label, wx, wy);
 		}
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
