@@ -1,7 +1,5 @@
 use File::Find;
 
-print "var InputFiles : string[] = [];\n";
-
 sub process{
         my $name = $_;
         my $path = $File::Find::name;
@@ -19,7 +17,7 @@ sub process{
         $text =~ s/\f/\\f/g;
         $text =~ s/\r/\\r/g;
         $text =~ s/"/\\"/g;
-        print "GreenTeaLibraries.push(\"$text\");\n";
+		print "Lib.Input.push(\"$text\");\n";
 }
 
 find(\&process, @ARGV[0]);

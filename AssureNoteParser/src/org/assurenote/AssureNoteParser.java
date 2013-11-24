@@ -230,7 +230,8 @@ class GSNHistory {
 		this.Date = Date;
 		/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		if (Date == null) {
-			this.Date = Format.format(new Date());
+			/*local*/Date d = new Date();
+			this.Date = Format.format(d);
 		} else {
 			try {
 				this.Date = Format.format(Format.parse(Date));

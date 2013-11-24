@@ -10,8 +10,8 @@ source="${source} AssureNoteParser"
 target="AssureNoteParser"
 #
 libs=""
-libs="${libs} ${build}/lib/md5.js"
 libs="${libs} ${build}LibAssureNoteParser.ts"
+libs="${libs} ${build}/lib/md5.js"
 
 ts=""
 for s in ${source}; do
@@ -21,5 +21,10 @@ done
 
 cat ${ts} ${libs} > ${build}${target}.ts
 rm ${ts}
+
+if [ $# -ne 0 ]; then
+    perl src/TypeScript/PackInputFiles.pl $@ >> ${build}${target}.ts
+fi
+
 
 tsc ${build}${target}.ts
