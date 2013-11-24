@@ -129,8 +129,13 @@ class Lib {
 	static EqualsDigest(digest1: string, digest2: string) : boolean {
 		return null;
 	}
+
 	static ReadFile(file: string) : string {
 		return "";
+	}
+
+	static parseInt(numText: string) : number {
+		return Number(numText);
 	}
 }
 
