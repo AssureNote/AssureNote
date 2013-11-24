@@ -2,6 +2,12 @@
 declare function md5(str: string) : void;
 declare function unescape(str: string) : string;
 
+/* FIXME this class is never used */
+class PdfConverter {
+	constructor () {}
+	static main(args: string[]) {}
+}
+
 class StringBuilder {
 	str : string;
 	constructor() {
