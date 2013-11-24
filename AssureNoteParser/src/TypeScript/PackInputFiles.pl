@@ -21,3 +21,4 @@ sub process{
 }
 
 find(\&process, @ARGV[0]);
+print "AssureNoteParser.ts_merge();";

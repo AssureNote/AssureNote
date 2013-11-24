@@ -1,5 +1,4 @@
 /* lib/md5.js */
-declare function md5(str: string) : void;
 declare function unescape(str: string) : string;
 
 /* FIXME this class is never used */
@@ -108,17 +107,20 @@ class HashMap <string, V>{
 }
 
 class MessageDigest {
-	stringDigest: string;
+	digestString: string;
 	constructor() {
-		this.stringDigest = null;
+		this.digestString = null;
 	}
 
 	digest() : string {
-		return this.stringDigest;
+		return this.digestString;
 	}
 }
 
 class Lib {
+	/* To be set on lib/md5.js */
+	md5 : (str: string) => string;
+
 	/* Static Fields */
 	static Input: string[] = [];
 	static EmptyNodeList = new Array<GSNNode>();
@@ -127,14 +129,15 @@ class Lib {
 
 	/* Methods */
 	static GetMD5() : MessageDigest {
-		return null;
+		return new MessageDigest();
 	}
 
 	static UpdateMD5(md: MessageDigest, text: string) : void {
+		md.digestString = this.md5(text);
 	}
 
 	static EqualsDigest(digest1: string, digest2: string) : boolean {
-		return null;
+		return digest1 == digest2;
 	}
 
 	static ReadFile(file: string) : string {
