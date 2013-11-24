@@ -22,8 +22,6 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
 
-// LangBase is a language-dependent code used in GreenTea.java
-
 //ifdef JAVA
 package org.assurenote;
 
@@ -32,6 +30,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +44,7 @@ class Lib {
 	public final static ArrayList<GSNNode> EmptyNodeList = new ArrayList<GSNNode>();
 	public final static String LineFeed = "\n";
 	public final static String VersionDelim = "*=====";
+	public final static String Input[] = {};
 
 	static MessageDigest GetMD5() {
 		try {
@@ -100,6 +100,9 @@ class Lib {
 			System.exit(1);
 		}
 		return sb.toString();
+	}
+	public static int parseInt(String numText) {
+		return Integer.parseInt(numText);
 	}
 		
 }
@@ -213,7 +216,7 @@ enum GSNType {
 	Goal, Context, Strategy, Evidence, Undefined
 }
 
-class History {
+class GSNHistory {
 	/*field*/int Rev;
 	/*field*/String Author;
 	/*field*/String Role;
@@ -221,14 +224,21 @@ class History {
 	/*field*/String Process;
 	/*field*/GSNDoc Doc;
 
-	History/*constructor*/(int Rev, String Author, String Role, String Date, String Process, GSNDoc Doc) {
+	GSNHistory/*constructor*/(int Rev, String Author, String Role, String DateString, String Process, GSNDoc Doc) {
 		this.Rev = Rev;
 		this.Author = Author;
 		this.Role = Role;
-		this.Date = Date;
-		if (Date == null) {
-			/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-			this.Date = Format.format(new Date());
+		this.Date = DateString;
+		/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		if (DateString == null) {
+			/*local*/Date d = new Date();
+			this.Date = Format.format(d);
+		} else {
+			try {
+				this.Date = Format.format(Format.parse(DateString));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		this.Process = Process;
 		this.Doc = Doc;
@@ -238,11 +248,11 @@ class History {
 		return this.Date + ";" + this.Author + ";" + this.Role + ";" + this.Process;
 	}
 
-	public boolean EqualsHistory(History aHistory) {
+	public boolean EqualsHistory(GSNHistory aHistory) {
 		return (this.Date.equals(aHistory.Date) && this.Author.equals(aHistory.Author));
 	}
 	
-	public int CompareDate(History aHistory) {
+	public int CompareDate(GSNHistory aHistory) {
 		return (this.Date.compareTo(aHistory.Date));
 	}
 
@@ -252,7 +262,7 @@ class WikiSyntax {
 
 	static int ParseInt(String NumText, int DefVal) {
 		try {
-			return Integer.parseInt(NumText);
+			return Lib.parseInt(NumText);
 		} catch (Exception e) {
 		}
 		return DefVal;
@@ -303,15 +313,15 @@ class WikiSyntax {
 
 	static String FormatNodeType(GSNType NodeType) {
 		switch (NodeType) {
-		case Goal:
+		case /*enum(GSNType)*/Goal:
 			return "G";
-		case Context:
+		case /*enum(GSNType)*/Context:
 			return "C";
-		case Strategy:
+		case /*enum(GSNType)*/Strategy:
 			return "S";
-		case Evidence:
+		case /*enum(GSNType)*/Evidence:
 			return "E";
-		case Undefined:
+		case /*enum(GSNType)*/Undefined:
 		}
 		return "U";
 	}
@@ -343,12 +353,12 @@ class WikiSyntax {
 		return null;
 	}
 
-	public static History[] ParseHistory(String LabelLine, GSNDoc BaseDoc) {
+	public static GSNHistory[] ParseHistory(String LabelLine, GSNDoc BaseDoc) {
 		if(BaseDoc != null) {
 			/*local*/int Loc = LabelLine.indexOf("#");
 			try {
 				if (Loc != -1) {
-					/*local*/History[] HistoryTriple = new History[2];
+					/*local*/GSNHistory[] HistoryTriple = new GSNHistory[2];
 					/*local*/String RevText = LabelLine.substring(Loc + 1).trim();
 					/*local*/String RevSet[] = RevText.split(":");
 					HistoryTriple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1)); // Created
@@ -383,15 +393,17 @@ class TagUtils {
 
 	static void FormatTag(HashMap<String, String> TagMap, StringWriter Writer) {
 		if (TagMap != null) {
-			for (/*local*/String Key : TagMap.keySet()) {
+			/*local*/String[] keyArray = (/*cast*/String[])TagMap.keySet().toArray();
+			for (/*local*/int i = 0; i < keyArray.length; i++) {
+				/*local*/String Key = keyArray[i];
 				Writer.println(Key + ":: " + TagMap.get(Key));
 			}
 		}
 	}
 
-	static void FormatHistoryTag(ArrayList<History> HistoryList, StringWriter Writer) {
+	static void FormatHistoryTag(ArrayList<GSNHistory> HistoryList, StringWriter Writer) {
 		for (/*local*/int i = 0; i < HistoryList.size(); i++) {
-			/*local*/History History = HistoryList.get(i);
+			/*local*/GSNHistory History = HistoryList.get(i);
 			if (History != null) {
 				Writer.println("#" + i + "::" + History);
 			}
@@ -425,15 +437,15 @@ class GSNNode {
 	/*field*/String  LabelNumber; /* e.g, G1 G1.1 */
 	/*field*/int     SectionCount;
 	
-	/*field*/History Created;
-	/*field*/History LastModified;
+	/*field*/GSNHistory Created;
+	/*field*/GSNHistory LastModified;
 	
 	/*field*/String  NodeDoc;
 	/*field*/boolean HasTag;
 	/*field*/byte[]  Digest;
 	/*field*/HashMap<String, String> TagMap;
 
-	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, int GoalLevel, GSNType NodeType, String LabelNumber, History[] HistoryTriple) {
+	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, int GoalLevel, GSNType NodeType, String LabelNumber, GSNHistory[] HistoryTriple) {
 		this.BaseDoc = BaseDoc;
 		this.ParentNode = ParentNode;
 		this.GoalLevel = GoalLevel;
@@ -471,7 +483,8 @@ class GSNNode {
 		if(BaseDoc != null) {
 			BaseDoc.UncheckAddNode(NewNode);
 		}
-		for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.Duplicate(BaseDoc, NewNode);
 		}
 		return NewNode;
@@ -496,7 +509,8 @@ class GSNNode {
 
 	public void Remap(HashMap<String, GSNNode> NodeMap) {
 		NodeMap.put(this.GetLabel(), this);
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.Remap(NodeMap);
 		}
 	}
@@ -514,7 +528,8 @@ class GSNNode {
 		if(NewNumber != null) {
 			this.LabelNumber = NewNumber;
 		}
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.ReplaceLabels(LabelMap);
 		}
 	}
@@ -528,7 +543,8 @@ class GSNNode {
 		/*local*/int LineCount = 0;
 		/*local*/StringWriter Writer = new StringWriter();
 		/*local*/MessageDigest md = Lib.GetMD5();
-		for (/*local*/String Line : LineList) {
+		for (/*local*/int i = 0; i < LineList.size(); i++) {
+			/*local*/String Line = LineList.get(i);
 			/*local*/int Loc = Line.indexOf("::");
 			if (Loc > 0) {
 				this.HasTag = true;
@@ -559,7 +575,8 @@ class GSNNode {
 	ArrayList<GSNNode> GetNodeHistoryList() {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
 		/*local*/GSNNode LastNode = null;
-		for(/*local*/History NodeHistory : this.BaseDoc.Record.HistoryList) {
+		for(/*local*/int i = 0; i < this.BaseDoc.Record.HistoryList.size(); i++) {
+			/*local*/GSNHistory NodeHistory = this.BaseDoc.Record.HistoryList.get(i);
 			if(NodeHistory.Doc != null) {
 				/*local*/GSNNode Node = NodeHistory.Doc.GetNode(this.GetLabel());
 				if(Node != null) {
@@ -584,7 +601,8 @@ class GSNNode {
 	}
 
 	boolean HasSubNode(GSNType NodeType) {
-		for(/*local*/GSNNode Node: this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			if (Node.NodeType == NodeType) {
 				return true;
 			}
@@ -656,7 +674,8 @@ class GSNNode {
 		} else {
 			Writer.newline();
 		}
-		for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.FormatNode(RefMap, Writer);
 		}
 	}
@@ -674,7 +693,8 @@ class GSNNode {
 			Writer.newline();
 		}
 		if (this.NonNullSubNodeList() != null) {
-			for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+			for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+				/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 				Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
 			}
 		}
@@ -708,7 +728,8 @@ class GSNNode {
 		if(Label.equals(this.GetLabel())) {
 			return true;
 		}
-		for(/*local*/GSNNode SubNode : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode SubNode = this.NonNullSubNodeList().get(i);
 			if(SubNode.HasSubNodeLabel(Label)) return true;
 		}
 		return false;
@@ -740,7 +761,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(/*local*/GSNNode SubNode : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode SubNode = this.NonNullSubNodeList().get(i);
 			this.MergeSubNode(SubNode, LabelMap);
 		}
 	}
@@ -748,7 +770,8 @@ class GSNNode {
 	// Merge
 	boolean IsNewerTree(int ModifiedRev) {
 		if (ModifiedRev <= this.LastModified.Rev) {
-			for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+			for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+				/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 				if (!Node.IsNewerTree(ModifiedRev)) {
 					return false;
 				}
@@ -759,7 +782,8 @@ class GSNNode {
 	}
 
 	void ListSubGoalNode(ArrayList<GSNNode> BufferList) {
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			if(Node.IsGoal()) {
 				BufferList.add(Node);
 			}
@@ -770,7 +794,8 @@ class GSNNode {
 	}
 
 	void ListSectionNode(ArrayList<GSNNode> BufferList) {
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			if(!Node.IsGoal()) {
 				BufferList.add(Node);
 			}
@@ -790,7 +815,8 @@ class GSNNode {
 		/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
 		this.ListSectionNode(BufferList);
 		/*local*/int SectionCount = 1;
-		for(/*local*/GSNNode SectionNode : BufferList) {
+		for(/*local*/int i = 0; i < BufferList.size(); i++) {
+			/*local*/GSNNode SectionNode = BufferList.get(i);
 			OldLabel = SectionNode.GetLabel();
 			SectionNode.LabelNumber = this.LabelNumber + "." + SectionCount;
 			if(!OldLabel.equals(SectionNode.GetLabel())) {
@@ -801,7 +827,8 @@ class GSNNode {
 		BufferList.clear();
 		this.ListSubGoalNode(BufferList);
 		/*local*/int NextCount = NextGoalCount + BufferList.size();
-		for(/*local*/GSNNode GoalNode : BufferList) {
+		for(/*local*/int i = 0; i < BufferList.size(); i++) {
+			/*local*/GSNNode GoalNode = BufferList.get(i);
 			NextCount = GoalNode.RenumberGoal(NextGoalCount, NextCount, LabelMap);
 			NextGoalCount += 1;
 		}
@@ -815,7 +842,7 @@ class GSNDoc {
 	/*field*/GSNNode   TopGoal;
 	/*field*/HashMap<String, GSNNode> NodeMap;
 	/*field*/HashMap<String, String> DocTagMap;
-	/*field*/History   DocHistory;
+	/*field*/GSNHistory   DocHistory;
 	/*field*/int GoalCount;
 
 	GSNDoc/*constructor*/(GSNRecord Record) {
@@ -841,7 +868,9 @@ class GSNDoc {
 	HashMap<String, String> DuplicateTagMap(HashMap<String, String> TagMap) {
 		if (TagMap != null) {
 			/*local*/HashMap<String, String> NewMap = new HashMap<String, String>();
-			for (/*local*/String Key : TagMap.keySet()) {
+			/*local*/String[] keyArray = (/*cast*/String[])TagMap.keySet().toArray();
+			for(/*local*/int i = 0; i < keyArray.length; i++) {
+				/*local*/String Key = keyArray[i];
 				NewMap.put(Key, TagMap.get(Key));
 			}
 			return NewMap;
@@ -944,24 +973,25 @@ class GSNDoc {
 
 
 class GSNRecord {
-	/*field*/ArrayList<History> HistoryList;
+	/*field*/ArrayList<GSNHistory> HistoryList;
 	/*field*/GSNDoc             EditingDoc;
 
 	GSNRecord/*constructor*/() {
-		this.HistoryList = new ArrayList<History>();
+		this.HistoryList = new ArrayList<GSNHistory>();
 		this.EditingDoc = null;
 	}
 
 	GSNRecord Duplicate() {
 		/*local*/GSNRecord NewRecord = new GSNRecord();
-		for(/*local*/History Item : this.HistoryList) {
+		for(/*local*/int i = 0; i < this.HistoryList.size(); i++) {
+			/*local*/GSNHistory Item = this.HistoryList.get(i);
 			NewRecord.HistoryList.add(Item);
 		}
 		NewRecord.EditingDoc = this.EditingDoc;
 		return NewRecord;
 	}
 	
-	History GetHistory(int Rev) {
+	GSNHistory GetHistory(int Rev) {
 		if (Rev < this.HistoryList.size()) {
 			return this.HistoryList.get(Rev);
 		}
@@ -969,22 +999,22 @@ class GSNRecord {
 	}
 
 	GSNDoc GetHistoryDoc(int Rev) {
-		/*local*/History history = this.GetHistory(Rev);
+		/*local*/GSNHistory history = this.GetHistory(Rev);
 		if(history != null) {
 			return history.Doc;
 		}
 		return null;
 	}
 	
-	History NewHistory(String Author, String Role, String Date, String Process, GSNDoc Doc) {
-		/*local*/History History = new History(this.HistoryList.size(), Author, Role, Date, Process, Doc);
+	GSNHistory NewHistory(String Author, String Role, String Date, String Process, GSNDoc Doc) {
+		/*local*/GSNHistory History = new GSNHistory(this.HistoryList.size(), Author, Role, Date, Process, Doc);
 		this.HistoryList.add(History);
 		return History;
 	}
 
 	void AddHistory(int Rev, String Author, String Role, String Date, String Process, GSNDoc Doc) {
 		if(Rev >= 0) {
-			/*local*/History History = new History(Rev, Author, Role, Date, Process, Doc);
+			/*local*/GSNHistory History = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
 			while (!(Rev < this.HistoryList.size())) {
 				this.HistoryList.add(null);
 			}
@@ -1043,8 +1073,8 @@ class GSNRecord {
 	public void Merge(GSNRecord NewRecord) {
 		/*local*/int CommonHistory = -1;
 		for (/*local*/int Rev = 0; Rev < this.HistoryList.size(); Rev++) {
-			/*local*/History MasterHistory = this.GetHistory(Rev);
-			/*local*/History NewHistory = NewRecord.GetHistory(Rev);
+			/*local*/GSNHistory MasterHistory = this.GetHistory(Rev);
+			/*local*/GSNHistory NewHistory = NewRecord.GetHistory(Rev);
 			if (NewHistory != null && MasterHistory.EqualsHistory(MasterHistory)) {
 				CommonHistory = Rev;
 				continue;
@@ -1075,7 +1105,7 @@ class GSNRecord {
 
 	public void MergeAsReplaceTopGoal(GSNRecord NewRecord) {
 		for(/*local*/int i = 0; i < NewRecord.HistoryList.size(); i++) {
-			/*local*/History NewHistory = NewRecord.HistoryList.get(i);
+			/*local*/GSNHistory NewHistory = NewRecord.HistoryList.get(i);
 			/*local*/GSNDoc Doc = NewHistory != null ? NewHistory.Doc : null;
 			if(Doc != null) {
 				this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
@@ -1088,8 +1118,8 @@ class GSNRecord {
 	public void MergeAsIncrementalAddition(int Rev1, GSNRecord Record1, int Rev2, GSNRecord Record2) {
 		/*local*/HashMap<String, String> LabelMap = new HashMap<String,String>();
 		while(Rev1 < Record1.HistoryList.size() && Rev2 < Record2.HistoryList.size()) {
-			/*local*/History History1 = Record1.GetHistory(Rev1);
-			/*local*/History History2 = Record2.GetHistory(Rev2);
+			/*local*/GSNHistory History1 = Record1.GetHistory(Rev1);
+			/*local*/GSNHistory History2 = Record2.GetHistory(Rev2);
 			if(History1 == null || History1.Doc == null) {
 				if(Rev1 < Record1.HistoryList.size()) {
 					Rev1++; continue;
@@ -1262,7 +1292,7 @@ class ParserContext {
 			RefNode = RefMap.get(RefKey);
 		}
 		/*local*/GSNNode ParentNode = null;
-		/*local*/History[] HistoryTriple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
+		/*local*/GSNHistory[] HistoryTriple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
 		/*local*/int Level = WikiSyntax.ParseGoalLevel(LabelLine);
 		if (NodeType == GSNType.Goal) {
 			ParentNode = this.GetParentNodeOfGoal(Level);
@@ -1359,7 +1389,24 @@ public class AssureNoteParser {
 		/*local*/StringWriter Writer = new StringWriter();
 		MasterRecord.FormatRecord(Writer);
 		System.out.println(Writer.toString());
-		System.exit(0);
+	}
+	
+	public final static void ts_merge() {
+		/*local*/String MasterFile = (Lib.Input.length > 0) ? Lib.Input[0] : null;
+		/*local*/String BranchFile = (Lib.Input.length > 1) ? Lib.Input[1] : null;
+		/*local*/GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(MasterFile);
+		if(BranchFile != null) {
+			/*local*/GSNRecord BranchRecord = new GSNRecord();
+			BranchRecord.Parse(Lib.ReadFile(BranchFile));
+			MasterRecord.Merge(BranchRecord);
+		}
+		else {
+			MasterRecord.RenumberAll();
+		}
+		/*local*/StringWriter Writer = new StringWriter();
+		MasterRecord.FormatRecord(Writer);
+		System.out.println(Writer.toString());
 	}
 
 	public final static void main(String[] argv) {

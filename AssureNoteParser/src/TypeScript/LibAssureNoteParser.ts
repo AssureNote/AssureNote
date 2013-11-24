@@ -1,3 +1,12 @@
+/* lib/md5.js */
+declare function unescape(str: string) : string;
+
+/* FIXME this class is never used */
+class PdfConverter {
+	constructor () {}
+	static main(args: string[]) {}
+}
+
 class StringBuilder {
 	str : string;
 	constructor() {
@@ -10,6 +19,63 @@ class StringBuilder {
 
 	toString() : string {
 		return this.str;
+	}
+}
+
+class Character {
+	static isDigit(c: number) : boolean {
+		/* '0' ~ '9' */
+		return 48 <= c && c <= 57;
+	}
+
+	static isWhitespace(c: number) : boolean {
+		/* '\t' '\n' '\f' '\r' ' ' */
+		return c == 9 || c == 10 || c == 12 || c == 13 || c == 32;;
+	}
+}
+
+class SimpleDateFormat {
+	constructor(format: string) {
+		// Support format string, or is it needless?
+	}
+
+	fillZero(digit : number) : string {
+		if (digit < 10) {
+			return '0'+digit;
+		} else {
+			return ''+digit;
+		}
+	}
+
+	parse(date: string) : Date {
+		return new Date(date);
+	}
+
+	formatTimezone(timezoneOffset: number) : string {
+		var res = '';
+		var timezoneInHours = timezoneOffset / -60;
+		if (Math.abs(timezoneInHours) < 10) {
+			res = '0' + Math.abs(timezoneInHours) + '00';
+		} else {
+			res = Math.abs(timezoneInHours) + '00';
+		}
+
+		if (timezoneInHours > 0) {
+			return '+' + res;
+		} else {
+			return '-' + res;
+		}
+	}
+
+	format(date: Date) : string {
+		var y       : string = this.fillZero(date.getFullYear());
+		var m       : string = this.fillZero(date.getMonth()+1);
+		var d       : string = this.fillZero(date.getDate());
+		var hr      : string = this.fillZero(date.getHours());
+		var min     : string = this.fillZero(date.getMinutes());
+		var sec     : string = this.fillZero(date.getSeconds());
+		var timezone: string = this.formatTimezone(date.getTimezoneOffset());
+		return y + '-' + m + '-' + d + 'T' + hr + ':' + min + ':' + sec + timezone;
 	}
 }
 
@@ -38,31 +104,56 @@ class HashMap <string, V>{
 	keySet() : string[] {
 		return Object.keys(this.hash);
 	}
+
+	toArray() : V[] {
+		var res: V[] = [];
+		for (var key in Object.keys(this.hash)) {
+			res.push(this.hash[key]);
+		}
+		return res;
+	}
 }
 
 class MessageDigest {
-	constructor() {}
+	digestString: string;
+	constructor() {
+		this.digestString = null;
+	}
+
+	digest() : string {
+		return this.digestString;
+	}
 }
 
 class Lib {
+	/* To be set on lib/md5.js */
+	md5 : (str: string) => string;
+
 	/* Static Fields */
+	static Input: string[] = [];
 	static EmptyNodeList = new Array<GSNNode>();
 	static LineFeed : string = "\n";
 	static VersionDelim : string = "*=====";
 
 	/* Methods */
 	static GetMD5() : MessageDigest {
-		return null;
+		return new MessageDigest();
 	}
 
 	static UpdateMD5(md: MessageDigest, text: string) : void {
+		md.digestString = this.md5(text);
 	}
 
-	static EqualsDigest(digest1: any/*byte[]*/, digest2: any/*byte[]*/) : boolean {
-		return null;
+	static EqualsDigest(digest1: string, digest2: string) : boolean {
+		return digest1 == digest2;
 	}
+
 	static ReadFile(file: string) : string {
 		return "";
+	}
+
+	static parseInt(numText: string) : number {
+		return Number(numText);
 	}
 }
 
@@ -165,12 +256,26 @@ Object.defineProperty(Object.prototype, "InstanceOf", {
 });
 
 interface String {
+        compareTo(anotherString: string): number;
         startsWith(key: string): boolean;
         endsWith(key: string): boolean;
         lastIndexOf(ch: number) : number;
         indexOf(ch: number) : number;
         substring(BeginIdx : number, EndIdx : number) : string;
 }
+
+Object.defineProperty(String.prototype, "compareTo", {
+        enumerable : false,
+        value : function(anotherString) {
+                if (this < anotherString) {
+                        return -1;
+                } else if (this > anotherString) {
+                        return 1;
+                } else {
+                        return 0;
+                }
+        }
+});
 
 Object.defineProperty(String.prototype, "startsWith", {
         enumerable : false,

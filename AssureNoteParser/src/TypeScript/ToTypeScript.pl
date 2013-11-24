@@ -52,6 +52,7 @@ $src =~ s/\/\*constructor\*\//#Constructor#/g;
 $src =~ s/\/\*local\*\//#Local#/g;
 $src =~ s/\/\*field\*\//#Field#/g;
 $src =~ s/\/\*cast\*\//#Cast#/g;
+$src =~ s/\/\*enum\(($Type)\)\*\//#enum($1)#/g;
 $src =~ s/\/\*BeginArray\*\//#BeginArray#/g;
 $src =~ s/\/\*EndArray\*\//#EndArray#/g;
 
@@ -97,6 +98,8 @@ $src =~ s/($Attr*)($Sym)#Constructor#\((.*?)\)/constructor(#params#$3)/g;
 $src =~ s/new\s+($Type)\[(.+)\]/new Array<$1>($2)/g;
 # Casts
 $src =~ s/\(#Cast#($Type)\)/<$1>/g;
+# enum
+$src =~ s/#enum\((.*?)\)#/$1./g;
 # Array literals.
 $src =~ s/#BeginArray#{/\[/g;
 $src =~ s/#EndArray#}/\]/g;
@@ -122,6 +125,7 @@ $src =~ s/\bnew\s+Array<.*?>\s*\(Arrays.asList\((.*?)\)\)/$1/g;
 $src =~ s/\bArrays.asList\b//g;
 $src =~ s/\.toArray\(\)//g;
 $src =~ s/\b(\d+)L\b/$1/g;
+$src =~ s/byte\[\]/string/g;
 
 $src =~ s/\bfinal\b//g;
 $src =~ s/\bprotected\b//g;
