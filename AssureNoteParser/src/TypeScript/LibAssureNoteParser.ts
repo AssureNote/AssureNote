@@ -1,3 +1,7 @@
+/* lib/md5.js */
+declare function md5(str: string) : void;
+declare function unescape(str: string) : string;
+
 class StringBuilder {
 	str : string;
 	constructor() {
@@ -34,9 +38,9 @@ class SimpleDateFormat {
 		var res = '';
 		var timezoneInHours = timezoneOffset / -60;
 		if (Math.abs(timezoneInHours) < 10) {
-			res = '0' + timezoneInHours + '00';
+			res = '0' + Math.abs(timezoneInHours) + '00';
 		} else {
-			res = timezoneInHours + '00';
+			res = Math.abs(timezoneInHours) + '00';
 		}
 
 		if (timezoneInHours > 0) {
@@ -86,7 +90,14 @@ class HashMap <string, V>{
 }
 
 class MessageDigest {
-	constructor() {}
+	stringDigest: string;
+	constructor() {
+		this.stringDigest = null;
+	}
+
+	digest() : string {
+		return this.stringDigest;
+	}
 }
 
 class Lib {

@@ -10,6 +10,7 @@ source="${source} AssureNoteParser"
 target="AssureNoteParser"
 #
 libs=""
+libs="${libs} ${build}/lib/md5.js"
 libs="${libs} ${build}LibAssureNoteParser.ts"
 
 ts=""
