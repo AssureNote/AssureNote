@@ -120,7 +120,7 @@ class MessageDigest {
 
 class Lib {
 	/* Static Fields */
-	static Input: string[];
+	static Input: string[] = [];
 	static EmptyNodeList = new Array<GSNNode>();
 	static LineFeed : string = "\n";
 	static VersionDelim : string = "*=====";

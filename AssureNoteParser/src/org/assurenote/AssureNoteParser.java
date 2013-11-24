@@ -44,6 +44,7 @@ class Lib {
 	public final static ArrayList<GSNNode> EmptyNodeList = new ArrayList<GSNNode>();
 	public final static String LineFeed = "\n";
 	public final static String VersionDelim = "*=====";
+	public final static String Input[] = {};
 
 	static MessageDigest GetMD5() {
 		try {
@@ -1357,6 +1358,24 @@ public class AssureNoteParser {
 	public final static void merge(String MasterFile, String BranchFile) {
 		/*local*/GSNRecord MasterRecord = new GSNRecord();
 		MasterRecord.Parse(Lib.ReadFile(MasterFile));
+		if(BranchFile != null) {
+			/*local*/GSNRecord BranchRecord = new GSNRecord();
+			BranchRecord.Parse(Lib.ReadFile(BranchFile));
+			MasterRecord.Merge(BranchRecord);
+		}
+		else {
+			MasterRecord.RenumberAll();
+		}
+		/*local*/StringWriter Writer = new StringWriter();
+		MasterRecord.FormatRecord(Writer);
+		System.out.println(Writer.toString());
+	}
+	
+	public final static void ts_merge() {
+		/*local*/String MasterFile = (Lib.Input.length > 0) ? Lib.Input[0] : null;
+		/*local*/String BranchFile = (Lib.Input.length > 1) ? Lib.Input[1] : null;
+		/*local*/GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(MasterFile);
 		if(BranchFile != null) {
 			/*local*/GSNRecord BranchRecord = new GSNRecord();
 			BranchRecord.Parse(Lib.ReadFile(BranchFile));
