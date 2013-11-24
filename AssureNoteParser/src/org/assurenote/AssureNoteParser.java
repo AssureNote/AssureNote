@@ -223,18 +223,18 @@ class GSNHistory {
 	/*field*/String Process;
 	/*field*/GSNDoc Doc;
 
-	GSNHistory/*constructor*/(int Rev, String Author, String Role, String Date, String Process, GSNDoc Doc) {
+	GSNHistory/*constructor*/(int Rev, String Author, String Role, String DateString, String Process, GSNDoc Doc) {
 		this.Rev = Rev;
 		this.Author = Author;
 		this.Role = Role;
-		this.Date = Date;
+		this.Date = DateString;
 		/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-		if (Date == null) {
+		if (DateString == null) {
 			/*local*/Date d = new Date();
 			this.Date = Format.format(d);
 		} else {
 			try {
-				this.Date = Format.format(Format.parse(Date));
+				this.Date = Format.format(Format.parse(DateString));
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
