@@ -104,6 +104,14 @@ class HashMap <string, V>{
 	keySet() : string[] {
 		return Object.keys(this.hash);
 	}
+
+	toArray() : V[] {
+		var res: V[] = [];
+		for (var key in Object.keys(this.hash)) {
+			res.push(this.hash[key]);
+		}
+		return res;
+	}
 }
 
 class MessageDigest {

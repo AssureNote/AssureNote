@@ -393,7 +393,9 @@ class TagUtils {
 
 	static void FormatTag(HashMap<String, String> TagMap, StringWriter Writer) {
 		if (TagMap != null) {
-			for (/*local*/String Key : TagMap.keySet()) {
+			/*local*/String[] keyArray = (/*cast*/String[])TagMap.keySet().toArray();
+			for (/*local*/int i = 0; i < keyArray.length; i++) {
+				/*local*/String Key = keyArray[i];
 				Writer.println(Key + ":: " + TagMap.get(Key));
 			}
 		}
@@ -481,7 +483,8 @@ class GSNNode {
 		if(BaseDoc != null) {
 			BaseDoc.UncheckAddNode(NewNode);
 		}
-		for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.Duplicate(BaseDoc, NewNode);
 		}
 		return NewNode;
@@ -506,7 +509,8 @@ class GSNNode {
 
 	public void Remap(HashMap<String, GSNNode> NodeMap) {
 		NodeMap.put(this.GetLabel(), this);
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.Remap(NodeMap);
 		}
 	}
@@ -524,7 +528,8 @@ class GSNNode {
 		if(NewNumber != null) {
 			this.LabelNumber = NewNumber;
 		}
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.ReplaceLabels(LabelMap);
 		}
 	}
@@ -538,7 +543,8 @@ class GSNNode {
 		/*local*/int LineCount = 0;
 		/*local*/StringWriter Writer = new StringWriter();
 		/*local*/MessageDigest md = Lib.GetMD5();
-		for (/*local*/String Line : LineList) {
+		for (/*local*/int i = 0; i < LineList.size(); i++) {
+			/*local*/String Line = LineList.get(i);
 			/*local*/int Loc = Line.indexOf("::");
 			if (Loc > 0) {
 				this.HasTag = true;
@@ -569,7 +575,8 @@ class GSNNode {
 	ArrayList<GSNNode> GetNodeHistoryList() {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
 		/*local*/GSNNode LastNode = null;
-		for(/*local*/GSNHistory NodeHistory : this.BaseDoc.Record.HistoryList) {
+		for(/*local*/int i = 0; i < this.BaseDoc.Record.HistoryList.size(); i++) {
+			/*local*/GSNHistory NodeHistory = this.BaseDoc.Record.HistoryList.get(i);
 			if(NodeHistory.Doc != null) {
 				/*local*/GSNNode Node = NodeHistory.Doc.GetNode(this.GetLabel());
 				if(Node != null) {
@@ -594,7 +601,8 @@ class GSNNode {
 	}
 
 	boolean HasSubNode(GSNType NodeType) {
-		for(/*local*/GSNNode Node: this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			if (Node.NodeType == NodeType) {
 				return true;
 			}
@@ -666,7 +674,8 @@ class GSNNode {
 		} else {
 			Writer.newline();
 		}
-		for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.FormatNode(RefMap, Writer);
 		}
 	}
@@ -684,7 +693,8 @@ class GSNNode {
 			Writer.newline();
 		}
 		if (this.NonNullSubNodeList() != null) {
-			for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+			for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+				/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 				Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
 			}
 		}
@@ -718,7 +728,8 @@ class GSNNode {
 		if(Label.equals(this.GetLabel())) {
 			return true;
 		}
-		for(/*local*/GSNNode SubNode : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode SubNode = this.NonNullSubNodeList().get(i);
 			if(SubNode.HasSubNodeLabel(Label)) return true;
 		}
 		return false;
@@ -750,7 +761,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(/*local*/GSNNode SubNode : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode SubNode = this.NonNullSubNodeList().get(i);
 			this.MergeSubNode(SubNode, LabelMap);
 		}
 	}
@@ -758,7 +770,8 @@ class GSNNode {
 	// Merge
 	boolean IsNewerTree(int ModifiedRev) {
 		if (ModifiedRev <= this.LastModified.Rev) {
-			for (/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+			for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+				/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 				if (!Node.IsNewerTree(ModifiedRev)) {
 					return false;
 				}
@@ -769,7 +782,8 @@ class GSNNode {
 	}
 
 	void ListSubGoalNode(ArrayList<GSNNode> BufferList) {
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			if(Node.IsGoal()) {
 				BufferList.add(Node);
 			}
@@ -780,7 +794,8 @@ class GSNNode {
 	}
 
 	void ListSectionNode(ArrayList<GSNNode> BufferList) {
-		for(/*local*/GSNNode Node : this.NonNullSubNodeList()) {
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			if(!Node.IsGoal()) {
 				BufferList.add(Node);
 			}
@@ -800,7 +815,8 @@ class GSNNode {
 		/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
 		this.ListSectionNode(BufferList);
 		/*local*/int SectionCount = 1;
-		for(/*local*/GSNNode SectionNode : BufferList) {
+		for(/*local*/int i = 0; i < BufferList.size(); i++) {
+			/*local*/GSNNode SectionNode = BufferList.get(i);
 			OldLabel = SectionNode.GetLabel();
 			SectionNode.LabelNumber = this.LabelNumber + "." + SectionCount;
 			if(!OldLabel.equals(SectionNode.GetLabel())) {
@@ -811,7 +827,8 @@ class GSNNode {
 		BufferList.clear();
 		this.ListSubGoalNode(BufferList);
 		/*local*/int NextCount = NextGoalCount + BufferList.size();
-		for(/*local*/GSNNode GoalNode : BufferList) {
+		for(/*local*/int i = 0; i < BufferList.size(); i++) {
+			/*local*/GSNNode GoalNode = BufferList.get(i);
 			NextCount = GoalNode.RenumberGoal(NextGoalCount, NextCount, LabelMap);
 			NextGoalCount += 1;
 		}
@@ -851,7 +868,9 @@ class GSNDoc {
 	HashMap<String, String> DuplicateTagMap(HashMap<String, String> TagMap) {
 		if (TagMap != null) {
 			/*local*/HashMap<String, String> NewMap = new HashMap<String, String>();
-			for (/*local*/String Key : TagMap.keySet()) {
+			/*local*/String[] keyArray = (/*cast*/String[])TagMap.keySet().toArray();
+			for(/*local*/int i = 0; i < keyArray.length; i++) {
+				/*local*/String Key = keyArray[i];
 				NewMap.put(Key, TagMap.get(Key));
 			}
 			return NewMap;
@@ -964,7 +983,8 @@ class GSNRecord {
 
 	GSNRecord Duplicate() {
 		/*local*/GSNRecord NewRecord = new GSNRecord();
-		for(/*local*/GSNHistory Item : this.HistoryList) {
+		for(/*local*/int i = 0; i < this.HistoryList.size(); i++) {
+			/*local*/GSNHistory Item = this.HistoryList.get(i);
 			NewRecord.HistoryList.add(Item);
 		}
 		NewRecord.EditingDoc = this.EditingDoc;
