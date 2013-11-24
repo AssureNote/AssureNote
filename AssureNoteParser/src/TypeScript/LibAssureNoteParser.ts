@@ -17,6 +17,18 @@ class StringBuilder {
 	}
 }
 
+class Character {
+	static isDigit(c: number) : boolean {
+		/* '0' ~ '9' */
+		return 48 <= c && c <= 57;
+	}
+
+	static isWhitespace(c: number) : boolean {
+		/* '\t' '\n' '\f' '\r' ' ' */
+		return c == 9 || c == 10 || c == 12 || c == 13 || c == 32;;
+	}
+}
+
 class SimpleDateFormat {
 	constructor(format: string) {
 		// Support format string, or is it needless?
@@ -114,7 +126,7 @@ class Lib {
 	static UpdateMD5(md: MessageDigest, text: string) : void {
 	}
 
-	static EqualsDigest(digest1: any/*byte[]*/, digest2: any/*byte[]*/) : boolean {
+	static EqualsDigest(digest1: string, digest2: string) : boolean {
 		return null;
 	}
 	static ReadFile(file: string) : string {

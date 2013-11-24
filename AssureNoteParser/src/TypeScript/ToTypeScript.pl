@@ -125,6 +125,7 @@ $src =~ s/\bnew\s+Array<.*?>\s*\(Arrays.asList\((.*?)\)\)/$1/g;
 $src =~ s/\bArrays.asList\b//g;
 $src =~ s/\.toArray\(\)//g;
 $src =~ s/\b(\d+)L\b/$1/g;
+$src =~ s/byte\[\]/string/g;
 
 $src =~ s/\bfinal\b//g;
 $src =~ s/\bprotected\b//g;
