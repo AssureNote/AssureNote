@@ -1,6 +1,7 @@
 ///<reference path='src/Api.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
 ///<reference path='src/AssureNote.ts'/>
+///<reference path='src/AssureNoteParser.ts'/>
 ///<reference path='src/Panel.ts'/>
 ///<reference path='src/LayoutEngine.ts'/>
 ///<reference path='src/PluginManager.ts'/>
@@ -8,42 +9,42 @@
 
 module AssureNote {
 
-    export class GSNRecord {
-        constructor() {
-        }
-		Parse(file: string): void {
-		}
+    //export class GSNRecord {
+    //    constructor() {
+    //    }
+	//	Parse(file: string): void {
+	//	}
 
-		GetEditingDoc(): GSNDoc {
-			return new GSNDoc();
-		}
-	}
+	//	GetEditingDoc(): GSNDoc {
+	//		return new GSNDoc();
+	//	}
+	//}
 
-	export class GSNDoc {
-		NodeMap: { [index: string]: GSNNode }
+	//export class GSNDoc {
+	//	NodeMap: { [index: string]: GSNNode }
 
-		public GetNode(Label: string) {
-			return this.NodeMap[Label];
-		}
+	//	public GetNode(Label: string) {
+	//		return this.NodeMap[Label];
+	//	}
 
-		public GetKeys(): string[]{
-			return Object.keys(this.NodeMap);
-		}
+	//	public GetKeys(): string[]{
+	//		return Object.keys(this.NodeMap);
+	//	}
 
-	}
+	//}
 
-	export class GSNNode {
-		constructor(public BaseDoc: AssureNote.GSNDoc, public ParentNode: GSNNode, public GoalLevel: number, public NodeType: GSNType, public LabelNumber: string, public HistoryTriple?: History[]) {
-		}
+	//export class GSNNode {
+	//	constructor(public BaseDoc: AssureNote.GSNDoc, public ParentNode: GSNNode, public GoalLevel: number, public NodeType: GSNType, public LabelNumber: string, public HistoryTriple?: History[]) {
+	//	}
 
-		public GetLabel(): string {
-			return  "G" + this.LabelNumber;
-		}
-	}
+	//	public GetLabel(): string {
+	//		return  "G" + this.LabelNumber;
+	//	}
+	//}
 
-	export enum GSNType {
-		Goal, Context, Strategy, Evidence, Undefined
-	}
+	//export enum GSNType {
+	//	Goal, Context, Strategy, Evidence, Undefined
+	//}
 
 	//export class Navigator {
 	//	CurrentDoc: GSNDoc;// Convert to caseview
@@ -70,17 +71,36 @@ module AssureNote {
 
 	}
 
-	export class GSNView {
+	export class GSNViewer {
 		ViewMap: { [index: string]: NodeView };
 
-		constructor() {
+		constructor(public AssureNoteApp: AssureNoteApp) {
 			this.ViewMap = {};
 		}
 
 		CreateViewAll(Doc: GSNDoc): void {
-			var Keys = Doc.GetKeys();
+			var Keys = Doc.NodeMap.keySet();
 			for (var i = 0; i < Keys.length; i++) {
 				this.ViewMap[Keys[i]] = new NodeView(Doc.GetNode(Keys[i]));
+			}
+			if (Doc.TopGoal == null) {
+				this.AssureNoteApp.DebugP("Parse Error");
+			}
+			this.InsertRelative(this.ViewMap[Doc.TopGoal.GetLabel()]);
+		}
+
+		private InsertRelative(NodeView: NodeView): void {
+			if (NodeView == null) {
+				return;
+			}
+			var Children = NodeView.Model.SubNodeList;
+			if (Children == null) {
+				return;
+			}
+			for (var i = 0; i < Children.length; i++) {
+				var ChildView = this.ViewMap[Children[i].GetLabel()];
+				NodeView.AppendChild(ChildView);
+				this.InsertRelative(ChildView);
 			}
 		}
 
@@ -103,28 +123,49 @@ module AssureNote {
 		Clear(): void {
 			this.ViewMap = {};
 		}
+
+		GetKeyList(): string[]{
+			return Object.keys(this.ViewMap);
+		}
+
+		GetNode(Label: string): NodeView {
+			return this.ViewMap[Label];
+		}
 	}
 
 	export class NodeView {
 		//Model: GSNNode;
 		IsVisible: boolean;
 		Label: string;
+		NodeDoc: string;
 		OffsetGx: number;
 		OffsetGy: number;
 		private Width: number;
 		private Height: number;
 		Color: ColorStyle;
 		Parent: NodeView;
-		Left: NodeView[];
-		Right: NodeView[];
-		Children: NodeView[];
+		Left: NodeView[] = [];
+		Right: NodeView[] = [];
+		Children: NodeView[] = [];
 		Shape: GSNShape = null;
 
 		constructor(public Model: GSNNode) {
+			this.Label = Model.GetLabel();
+			this.NodeDoc = Model.NodeDoc;
+		}
+
+		private AppendParent(Parent: NodeView): void {
+			this.Parent = Parent;
+		}
+
+		AppendChild(Child: NodeView): void {
+			this.Children.push(Child);
+			Child.AppendParent(this);
 		}
 
 		GetShape(): GSNShape {
 			if (this.Shape == null) {
+				this.IsVisible = true;
 				this.Shape = AssureNoteUtils.CreateGSNShape(this);
 			}
 			return this.Shape;
@@ -148,14 +189,21 @@ module AssureNote {
 			return this.Model.NodeType;
 		}
 
-		Render(): void {
-			this.GetShape().Render();
+		Render(DivFrag: DocumentFragment, SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment): void {
+			var Shape = this.GetShape();
+			Shape.Render();
+			Shape.CreateSVG(SvgNodeFrag, SvgConnectionFrag);
+			Shape.CreateHtmlContent(DivFrag);
 		}
 
 		Update(Model: GSNNode) {
 			//TODO
 			this.Model = Model;
 			throw "Update is under construction.";
+		}
+
+		Resize(LayoutEngine: SimpleLayoutEngine) {
+			this.GetShape().Resize(LayoutEngine);
 		}
 	}
 
@@ -209,21 +257,28 @@ module AssureNote {
 			this.NodeView.OffsetGy = LevelMargin;
 		}
 
-		CreateHtmlContent(Content: HTMLElement): void {
+		CreateHtmlContent(Content: DocumentFragment): void {
 			if (this.NodeView.IsVisible) {
 				var div = document.createElement("div");
 				div.style.position = "absolute";
 				div.id = this.NodeView.Label;
 
 				var h4 = document.createElement("h4");
-				h4.innerText = this.NodeView.Label; //TODO
+				h4.innerText = this.NodeView.Label;
 
 				var p = document.createElement("p");
-				p.innerText = this.NodeView.Label; //TODO
+				p.innerText = this.NodeView.NodeDoc;
 
 				div.appendChild(h4);
 				div.appendChild(p);
 				Content.appendChild(div);
+			}
+		}
+
+		CreateSVG(SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment) {
+			SvgNodeFrag.appendChild(this.ShapeGroup);
+			if (this.ArrowPath != null) {
+				SvgConnectionFrag.appendChild(this.ArrowPath);
 			}
 		}
 
@@ -244,14 +299,6 @@ module AssureNote {
             this.ShapeGroup = AssureNoteUtils.CreateSVGElement("g");
 			this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ArrowPath = GSNShape.CreateArrowPath();
-		}
-
-		GetSVG(): SVGGElement {
-			return this.ShapeGroup;
-		}
-
-		GetSVGPath(): SVGPathElement {
-			return this.ArrowPath;
 		}
 
 		SetArrowPosition(p1: Point, p2: Point, dir: Direction) {

@@ -45,11 +45,18 @@ var AssureNote;
     AssureNote.LevelMargin = 32;
     AssureNote.TreeMargin = 12;
 
-    var SimpleLayoutEngine = (function () {
-        function SimpleLayoutEngine() {
+    var SimpleLayoutEngine = (function (_super) {
+        __extends(SimpleLayoutEngine, _super);
+        function SimpleLayoutEngine(AssureNoteApp) {
+            _super.call(this, AssureNoteApp);
+            this.AssureNoteApp = AssureNoteApp;
         }
         SimpleLayoutEngine.prototype.GetHeight = function (Node) {
             return 72;
+        };
+
+        SimpleLayoutEngine.prototype.DoLayout = function (PictgramPanel, Label, wx, wy) {
+            var NodeView = this.AssureNoteApp.GSNView.GetNode(Label);
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode, Shape) {
@@ -114,7 +121,7 @@ var AssureNote;
             }
         };
         return SimpleLayoutEngine;
-    })();
+    })(LayoutEngine);
     AssureNote.SimpleLayoutEngine = SimpleLayoutEngine;
 
     //Deperecated

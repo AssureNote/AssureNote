@@ -54,6 +54,7 @@
     <TypeScriptCompile Include="d.ts\jquery.d.ts" />
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
     <TypeScriptCompile Include="index.ts" />
+    <TypeScriptCompile Include="src\AssureNoteParser.ts" />
     <TypeScriptCompile Include="src\CaseDecoder.ts" />
     <TypeScriptCompile Include="src\CaseEncoder.ts" />
     <TypeScriptCompile Include="src\CaseModel.ts" />

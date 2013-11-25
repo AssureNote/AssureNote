@@ -1,6 +1,7 @@
 ///<reference path='src/Api.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
 ///<reference path='src/AssureNote.ts'/>
+///<reference path='src/AssureNoteParser.ts'/>
 ///<reference path='src/Panel.ts'/>
 ///<reference path='src/LayoutEngine.ts'/>
 ///<reference path='src/PluginManager.ts'/>
@@ -13,58 +14,34 @@ var __extends = this.__extends || function (d, b) {
 };
 var AssureNote;
 (function (AssureNote) {
-    var GSNRecord = (function () {
-        function GSNRecord() {
-        }
-        GSNRecord.prototype.Parse = function (file) {
-        };
-
-        GSNRecord.prototype.GetEditingDoc = function () {
-            return new GSNDoc();
-        };
-        return GSNRecord;
-    })();
-    AssureNote.GSNRecord = GSNRecord;
-
-    var GSNDoc = (function () {
-        function GSNDoc() {
-        }
-        GSNDoc.prototype.GetNode = function (Label) {
-            return this.NodeMap[Label];
-        };
-
-        GSNDoc.prototype.GetKeys = function () {
-            return Object.keys(this.NodeMap);
-        };
-        return GSNDoc;
-    })();
-    AssureNote.GSNDoc = GSNDoc;
-
-    var GSNNode = (function () {
-        function GSNNode(BaseDoc, ParentNode, GoalLevel, NodeType, LabelNumber, HistoryTriple) {
-            this.BaseDoc = BaseDoc;
-            this.ParentNode = ParentNode;
-            this.GoalLevel = GoalLevel;
-            this.NodeType = NodeType;
-            this.LabelNumber = LabelNumber;
-            this.HistoryTriple = HistoryTriple;
-        }
-        GSNNode.prototype.GetLabel = function () {
-            return "G" + this.LabelNumber;
-        };
-        return GSNNode;
-    })();
-    AssureNote.GSNNode = GSNNode;
-
-    (function (GSNType) {
-        GSNType[GSNType["Goal"] = 0] = "Goal";
-        GSNType[GSNType["Context"] = 1] = "Context";
-        GSNType[GSNType["Strategy"] = 2] = "Strategy";
-        GSNType[GSNType["Evidence"] = 3] = "Evidence";
-        GSNType[GSNType["Undefined"] = 4] = "Undefined";
-    })(AssureNote.GSNType || (AssureNote.GSNType = {}));
-    var GSNType = AssureNote.GSNType;
-
+    //export class GSNRecord {
+    //    constructor() {
+    //    }
+    //	Parse(file: string): void {
+    //	}
+    //	GetEditingDoc(): GSNDoc {
+    //		return new GSNDoc();
+    //	}
+    //}
+    //export class GSNDoc {
+    //	NodeMap: { [index: string]: GSNNode }
+    //	public GetNode(Label: string) {
+    //		return this.NodeMap[Label];
+    //	}
+    //	public GetKeys(): string[]{
+    //		return Object.keys(this.NodeMap);
+    //	}
+    //}
+    //export class GSNNode {
+    //	constructor(public BaseDoc: AssureNote.GSNDoc, public ParentNode: GSNNode, public GoalLevel: number, public NodeType: GSNType, public LabelNumber: string, public HistoryTriple?: History[]) {
+    //	}
+    //	public GetLabel(): string {
+    //		return  "G" + this.LabelNumber;
+    //	}
+    //}
+    //export enum GSNType {
+    //	Goal, Context, Strategy, Evidence, Undefined
+    //}
     //export class Navigator {
     //	CurrentDoc: GSNDoc;// Convert to caseview
     //	FocusedLabel: string;
@@ -89,18 +66,38 @@ var AssureNote;
     })();
     AssureNote.ColorStyle = ColorStyle;
 
-    var GSNView = (function () {
-        function GSNView() {
+    var GSNViewer = (function () {
+        function GSNViewer(AssureNoteApp) {
+            this.AssureNoteApp = AssureNoteApp;
             this.ViewMap = {};
         }
-        GSNView.prototype.CreateViewAll = function (Doc) {
-            var Keys = Doc.GetKeys();
+        GSNViewer.prototype.CreateViewAll = function (Doc) {
+            var Keys = Doc.NodeMap.keySet();
             for (var i = 0; i < Keys.length; i++) {
                 this.ViewMap[Keys[i]] = new NodeView(Doc.GetNode(Keys[i]));
             }
+            if (Doc.TopGoal == null) {
+                this.AssureNoteApp.DebugP("Parse Error");
+            }
+            this.InsertRelative(this.ViewMap[Doc.TopGoal.GetLabel()]);
         };
 
-        GSNView.prototype.CreateView = function (Node) {
+        GSNViewer.prototype.InsertRelative = function (NodeView) {
+            if (NodeView == null) {
+                return;
+            }
+            var Children = NodeView.Model.SubNodeList;
+            if (Children == null) {
+                return;
+            }
+            for (var i = 0; i < Children.length; i++) {
+                var ChildView = this.ViewMap[Children[i].GetLabel()];
+                NodeView.AppendChild(ChildView);
+                this.InsertRelative(ChildView);
+            }
+        };
+
+        GSNViewer.prototype.CreateView = function (Node) {
             if (this.ViewMap[Node.LabelNumber] != null) {
                 return false;
             }
@@ -108,7 +105,7 @@ var AssureNote;
             return true;
         };
 
-        GSNView.prototype.UpdateView = function (Node) {
+        GSNViewer.prototype.UpdateView = function (Node) {
             if (this.ViewMap[Node.LabelNumber] == null) {
                 return false;
             }
@@ -116,20 +113,43 @@ var AssureNote;
             return true;
         };
 
-        GSNView.prototype.Clear = function () {
+        GSNViewer.prototype.Clear = function () {
             this.ViewMap = {};
         };
-        return GSNView;
+
+        GSNViewer.prototype.GetKeyList = function () {
+            return Object.keys(this.ViewMap);
+        };
+
+        GSNViewer.prototype.GetNode = function (Label) {
+            return this.ViewMap[Label];
+        };
+        return GSNViewer;
     })();
-    AssureNote.GSNView = GSNView;
+    AssureNote.GSNViewer = GSNViewer;
 
     var NodeView = (function () {
         function NodeView(Model) {
             this.Model = Model;
+            this.Left = [];
+            this.Right = [];
+            this.Children = [];
             this.Shape = null;
+            this.Label = Model.GetLabel();
+            this.NodeDoc = Model.NodeDoc;
         }
+        NodeView.prototype.AppendParent = function (Parent) {
+            this.Parent = Parent;
+        };
+
+        NodeView.prototype.AppendChild = function (Child) {
+            this.Children.push(Child);
+            Child.AppendParent(this);
+        };
+
         NodeView.prototype.GetShape = function () {
             if (this.Shape == null) {
+                this.IsVisible = true;
                 this.Shape = AssureNote.AssureNoteUtils.CreateGSNShape(this);
             }
             return this.Shape;
@@ -153,14 +173,21 @@ var AssureNote;
             return this.Model.NodeType;
         };
 
-        NodeView.prototype.Render = function () {
-            this.GetShape().Render();
+        NodeView.prototype.Render = function (DivFrag, SvgNodeFrag, SvgConnectionFrag) {
+            var Shape = this.GetShape();
+            Shape.Render();
+            Shape.CreateSVG(SvgNodeFrag, SvgConnectionFrag);
+            Shape.CreateHtmlContent(DivFrag);
         };
 
         NodeView.prototype.Update = function (Model) {
             //TODO
             this.Model = Model;
             throw "Update is under construction.";
+        };
+
+        NodeView.prototype.Resize = function (LayoutEngine) {
+            this.GetShape().Resize(LayoutEngine);
         };
         return NodeView;
     })();
@@ -215,11 +242,18 @@ var AssureNote;
                 h4.innerText = this.NodeView.Label;
 
                 var p = document.createElement("p");
-                p.innerText = this.NodeView.Label;
+                p.innerText = this.NodeView.NodeDoc;
 
                 div.appendChild(h4);
                 div.appendChild(p);
                 Content.appendChild(div);
+            }
+        };
+
+        GSNShape.prototype.CreateSVG = function (SvgNodeFrag, SvgConnectionFrag) {
+            SvgNodeFrag.appendChild(this.ShapeGroup);
+            if (this.ArrowPath != null) {
+                SvgConnectionFrag.appendChild(this.ArrowPath);
             }
         };
 
@@ -240,14 +274,6 @@ var AssureNote;
             this.ShapeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ArrowPath = GSNShape.CreateArrowPath();
-        };
-
-        GSNShape.prototype.GetSVG = function () {
-            return this.ShapeGroup;
-        };
-
-        GSNShape.prototype.GetSVGPath = function () {
-            return this.ArrowPath;
         };
 
         GSNShape.prototype.SetArrowPosition = function (p1, p2, dir) {

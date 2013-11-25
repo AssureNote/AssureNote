@@ -10,7 +10,7 @@ module AssureNote {
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
-		GSNView: GSNView;
+		GSNView: GSNViewer;
 
 		CurrentDoc: GSNDoc;// Convert to caseview
 		FocusedLabel: string;
@@ -23,16 +23,20 @@ module AssureNote {
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
-			this.LayoutEngine = new OldLayoutEngine(this.AssureNoteApp);
+			this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);//new OldLayoutEngine(this.AssureNoteApp);
 
 			this.ContentLayer.onclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
-				this.AssureNoteApp.DebugP(Label);
+				this.AssureNoteApp.DebugP("click:"+Label);
 				return false;
 			};
 
 			this.ContentLayer.ondblclick = (ev: MouseEvent) => {
+				var Label: string = AssureNoteUtils.GetNodeLabel(event);
+				this.AssureNoteApp.DebugP("double click:" + Label);
+				return false;
 			};
+
 			var CmdLine = new CommandLine();
 			document.onkeydown = (ev: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
@@ -53,7 +57,9 @@ module AssureNote {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
-				if (AssureNoteUtils.GetNodeLabel(event)) {
+				var Label = AssureNoteUtils.GetNodeLabel(event);
+				if (Label) {
+					this.AssureNoteApp.DebugP("mouseover:"+Label);
 				}
 			};
 
@@ -83,6 +89,20 @@ module AssureNote {
 		}
 
 		Draw(Label: string, wx: number, wy: number): void {
+			var DivFrag = document.createDocumentFragment();
+			var SvgNodeFrag = document.createDocumentFragment();
+			var SvgConnectionFrag = document.createDocumentFragment();
+
+			var list = this.AssureNoteApp.GSNView.GetKeyList();
+			for (var i = 0; i < list.length; i++) {
+				var View = this.AssureNoteApp.GSNView.GetNode(list[i]);
+				View.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
+				View.Resize(<SimpleLayoutEngine>this.LayoutEngine);
+			}
+			this.ContentLayer.appendChild(DivFrag);
+			this.SVGLayer.appendChild(SvgConnectionFrag);
+			this.SVGLayer.appendChild(SvgNodeFrag);
+
 			this.LayoutEngine.DoLayout(this, Label, wx, wy);
 		}
 
@@ -90,10 +110,9 @@ module AssureNote {
 			this.Draw(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
 		}
 
-
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
 			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNRecord.GetEditingDoc(), Label);
+			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.MasterRecord.GetLatestDoc(), Label);
 		}
 
 		//TODO

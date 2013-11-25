@@ -34,12 +34,18 @@ module AssureNote {
 	export var LevelMargin = 32;
 	export var TreeMargin = 12;
 
-	export class SimpleLayoutEngine {
-		constructor() {
+	export class SimpleLayoutEngine extends LayoutEngine {
+		constructor(public AssureNoteApp: AssureNoteApp) {
+			super(AssureNoteApp);
 		}
 
 		GetHeight(Node: NodeView): number {
 			return 72; // todo
+		}
+
+		DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
+			var NodeView = this.AssureNoteApp.GSNView.GetNode(Label);
+
 		}
 
 		Layout(ThisNode: NodeView, Shape: GSNShape): void {

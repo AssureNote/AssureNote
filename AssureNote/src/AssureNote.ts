@@ -57,7 +57,9 @@ module AssureNote {
 		PictgramPanel: PictgramPanel;
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
-		GSNRecord: GSNRecord;
+		MasterRecord: GSNRecord;
+		GSNView: GSNViewer;
+
 
 		Case: Case; //Deprecated
 		OldPluginManager: OldPlugInManager; //Deprecated
@@ -68,7 +70,7 @@ module AssureNote {
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
-			this.GSNRecord = new GSNRecord();
+			//this.GSNRecord = new GSNRecord();
 		}
 
 		DebugP(Message: string): void {
@@ -106,10 +108,12 @@ module AssureNote {
 					//this.PictgramPanel.Draw(root.Label, 0, 0);
 					//---
 					//FIXME
-					var MasterRecord = new GSNRecord();
-					MasterRecord.Parse(Contents);
-					this.PictgramPanel.Draw("TODO", 0, 0);
-
+					this.MasterRecord = new GSNRecord();
+					this.MasterRecord.Parse(Contents);
+					this.GSNView = new GSNViewer(this);
+					var LatestDoc = this.MasterRecord.GetLatestDoc();
+					this.GSNView.CreateViewAll(LatestDoc);
+					this.PictgramPanel.Draw(LatestDoc.TopGoal.GetLabel(), 0, 0);
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}
