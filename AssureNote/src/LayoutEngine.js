@@ -57,6 +57,8 @@ var AssureNote;
 
         SimpleLayoutEngine.prototype.SetAbsolutePosition = function (NodeView, wx, wy) {
             NodeView.Shape.SetPosition(wx, wy);
+
+            //NodeView.Shape.SetArrowPosition(
             var Children = NodeView.Children;
             if (Children == null) {
                 return;
@@ -80,11 +82,12 @@ var AssureNote;
                 var ParentHeight = this.GetHeight(ThisNode);
                 if (ThisNode.Left != null) {
                     var OffsetGyLeft = 0;
-                    for (var Node in ThisNode.Left) {
+                    for (var i = 0; i < ThisNode.Left.length; i++) {
+                        var Node = ThisNode.Left[i];
                         if (Node.IsVisible) {
                             Node.OffsetGx = -(AssureNote.DefaultWidth + AssureNote.DefaultMargin);
                             Node.OffsetGy = OffsetGyLeft;
-                            OffsetGyLeft + (Node.GetHeight() + AssureNote.ContextMargin);
+                            OffsetGyLeft + (Node.GetShape().GetHeight() + AssureNote.ContextMargin);
                         }
                     }
                     if (OffsetGyLeft > 0) {
@@ -96,11 +99,12 @@ var AssureNote;
                 }
                 if (ThisNode.Right != null) {
                     var OffsetGyRight = 0;
-                    for (var Node in ThisNode.Right) {
+                    for (var i = 0; i < ThisNode.Right.length; i++) {
+                        var Node = ThisNode.Right[i];
                         if (Node.IsVisible) {
                             Node.OffsetGx = +(AssureNote.DefaultWidth + AssureNote.DefaultMargin);
                             Node.OffsetGy = OffsetGyRight;
-                            OffsetGyRight + (Node.GetHeight() + AssureNote.ContextMargin);
+                            OffsetGyRight + (Node.Shape.GetHeight() + AssureNote.ContextMargin);
                         }
                     }
                     if (OffsetGyRight > 0) {
@@ -114,7 +118,8 @@ var AssureNote;
                 ParentHeight += AssureNote.LevelMargin;
                 Shape.Height = ParentHeight;
                 if (ThisNode.Children != null) {
-                    for (var Node in ThisNode.Children) {
+                    for (var i = 0; i < ThisNode.Children.length; i++) {
+                        var Node = ThisNode.Children[i];
                         if (Node.IsVisible) {
                             var SubShape = Node.GetShape();
                             this.Layout(Node, SubShape);
@@ -126,7 +131,8 @@ var AssureNote;
                             }
                         }
                     }
-                    for (var Node in ThisNode.Children) {
+                    for (var i = 0; i < ThisNode.Children.length; i++) {
+                        var Node = ThisNode.Children[i];
                         if (Node.IsVisible) {
                             Node.OffsetGx -= (ChildrenWidth / 2);
                         }

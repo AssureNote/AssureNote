@@ -45,6 +45,7 @@ module AssureNote {
 
 		private SetAbsolutePosition(NodeView: NodeView, wx: number, wy: number): void {
 			NodeView.Shape.SetPosition(wx, wy);//NodeView.Shape.Width, NodeView.Shape.Height);
+			//NodeView.Shape.SetArrowPosition(
 			var Children = NodeView.Children;
 			if (Children == null) {
 				return;
@@ -68,11 +69,12 @@ module AssureNote {
 				var ParentHeight = this.GetHeight(ThisNode);
 				if (ThisNode.Left != null) {
 					var OffsetGyLeft = 0;
-					for (var Node in ThisNode.Left) {
+					for (var i = 0; i < ThisNode.Left.length; i++) {
+						var Node = ThisNode.Left[i];
 						if (Node.IsVisible) {
 							Node.OffsetGx = - (DefaultWidth + DefaultMargin);
 							Node.OffsetGy = OffsetGyLeft;
-							OffsetGyLeft + (Node.GetHeight() + ContextMargin);
+							OffsetGyLeft + (Node.GetShape().GetHeight() + ContextMargin);
 						}
 					}
 					if (OffsetGyLeft > 0) {
@@ -84,11 +86,12 @@ module AssureNote {
 				}
 				if (ThisNode.Right != null) {
 					var OffsetGyRight = 0;
-					for (var Node in ThisNode.Right) {
+					for (var i = 0; i < ThisNode.Right.length; i++) {
+						var Node = ThisNode.Right[i];
 						if (Node.IsVisible) {
 							Node.OffsetGx = + (DefaultWidth + DefaultMargin);
 							Node.OffsetGy = OffsetGyRight;
-							OffsetGyRight + (Node.GetHeight() + ContextMargin);
+							OffsetGyRight + (Node.Shape.GetHeight() + ContextMargin);
 						}
 					}
 					if (OffsetGyRight > 0) {
@@ -102,7 +105,8 @@ module AssureNote {
 				ParentHeight += LevelMargin;
 				Shape.Height = ParentHeight;
 				if (ThisNode.Children != null) {
-					for (var Node in ThisNode.Children) {
+					for (var i = 0; i < ThisNode.Children.length; i++) {
+						var Node = ThisNode.Children[i];
 						if (Node.IsVisible) {
 							var SubShape = Node.GetShape();
 							this.Layout(Node, SubShape);
@@ -114,7 +118,8 @@ module AssureNote {
 							}
 						}
 					}
-					for (var Node in ThisNode.Children) {
+					for (var i = 0; i < ThisNode.Children.length; i++) {
+						var Node = ThisNode.Children[i];
 						if (Node.IsVisible) {
 							Node.OffsetGx -= (ChildrenWidth / 2);  //centering
 						}
