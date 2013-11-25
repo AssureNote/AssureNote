@@ -14,51 +14,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var AssureNote;
 (function (AssureNote) {
-    //export class GSNRecord {
-    //    constructor() {
-    //    }
-    //	Parse(file: string): void {
-    //	}
-    //	GetEditingDoc(): GSNDoc {
-    //		return new GSNDoc();
-    //	}
-    //}
-    //export class GSNDoc {
-    //	NodeMap: { [index: string]: GSNNode }
-    //	public GetNode(Label: string) {
-    //		return this.NodeMap[Label];
-    //	}
-    //	public GetKeys(): string[]{
-    //		return Object.keys(this.NodeMap);
-    //	}
-    //}
-    //export class GSNNode {
-    //	constructor(public BaseDoc: AssureNote.GSNDoc, public ParentNode: GSNNode, public GoalLevel: number, public NodeType: GSNType, public LabelNumber: string, public HistoryTriple?: History[]) {
-    //	}
-    //	public GetLabel(): string {
-    //		return  "G" + this.LabelNumber;
-    //	}
-    //}
-    //export enum GSNType {
-    //	Goal, Context, Strategy, Evidence, Undefined
-    //}
-    //export class Navigator {
-    //	CurrentDoc: GSNDoc;// Convert to caseview
-    //	FocusedLabel: string;
-    //	FocusedWx: number;
-    //	FocusedWy: number;
-    //	Display(Label: string, Wx: number, Wy: number): void {
-    //		//TODO
-    //	}
-    //	Redraw(): void {
-    //		this.Display(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
-    //	}
-    //	NavigateUp(): void { }
-    //	NavigateDown(): void { }
-    //	NavigateLeft(): void { }
-    //	NavigateRight(): void { }
-    //	NavigateHome(): void { }
-    //}
     var ColorStyle = (function () {
         function ColorStyle() {
         }
