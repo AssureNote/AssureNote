@@ -52,11 +52,26 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         SimpleLayoutEngine.prototype.GetHeight = function (Node) {
-            return 72;
+            return 72 + Node.Shape.Height;
+        };
+
+        SimpleLayoutEngine.prototype.SetAbsolutePosition = function (NodeView, wx, wy) {
+            NodeView.Shape.SetPosition(wx, wy);
+            var Children = NodeView.Children;
+            if (Children == null) {
+                return;
+            }
+            var x = wx;
+            var y = wy + NodeView.Shape.Height;
+            for (var i = 0; i < Children.length; i++) {
+                this.SetAbsolutePosition(Children[i], x, y);
+                x += Children[i].Shape.Width;
+            }
         };
 
         SimpleLayoutEngine.prototype.DoLayout = function (PictgramPanel, Label, wx, wy) {
             var NodeView = this.AssureNoteApp.GSNView.GetNode(Label);
+            this.SetAbsolutePosition(NodeView, wx, wy);
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode, Shape) {

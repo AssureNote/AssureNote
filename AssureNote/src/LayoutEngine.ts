@@ -40,12 +40,26 @@ module AssureNote {
 		}
 
 		GetHeight(Node: NodeView): number {
-			return 72; // todo
+			return 72 + Node.Shape.Height; // todo
+		}
+
+		private SetAbsolutePosition(NodeView: NodeView, wx: number, wy: number): void {
+			NodeView.Shape.SetPosition(wx, wy);//NodeView.Shape.Width, NodeView.Shape.Height);
+			var Children = NodeView.Children;
+			if (Children == null) {
+				return;
+			}
+			var x = wx;
+			var y = wy + NodeView.Shape.Height;
+			for (var i = 0; i < Children.length; i++) {
+				this.SetAbsolutePosition(Children[i], x, y);
+				x += Children[i].Shape.Width;
+			}
 		}
 
 		DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
 			var NodeView = this.AssureNoteApp.GSNView.GetNode(Label);
-
+			this.SetAbsolutePosition(NodeView, wx, wy);
 		}
 
 		Layout(ThisNode: NodeView, Shape: GSNShape): void {
