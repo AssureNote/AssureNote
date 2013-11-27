@@ -144,6 +144,17 @@ var AssureNote;
         NodeView.prototype.Resize = function (LayoutEngine) {
             this.GetShape().Resize(LayoutEngine);
         };
+
+        NodeView.prototype.GetAbsoluteConnectorPosition = function (Dir) {
+            var p = this.Shape.GetConnectorPosition(Dir);
+            p.x += this.Width;
+            p.y += this.Height;
+            return p;
+        };
+
+        NodeView.prototype.SetArrowPosition = function (p1, p2, dir) {
+            this.Shape.SetArrowPosition(p1, p2, dir);
+        };
         return NodeView;
     })();
     AssureNote.NodeView = NodeView;
@@ -182,9 +193,27 @@ var AssureNote;
         GSNShape.prototype.Resize = function (LayoutEngine) {
             //this.Width = HTMLDoc.Width;
             //this.Height = HTMLDoc.Height;
-            LayoutEngine.Layout(this.NodeView, this);
+            //LayoutEngine.Layout(this.NodeView, this);
             this.NodeView.OffsetGx = this.Width / 2;
             this.NodeView.OffsetGy = AssureNote.LevelMargin;
+        };
+
+        GSNShape.prototype.UpdateWidth = function () {
+            switch (this.NodeView.Model.NodeType) {
+                case AssureNote.GSNType.Goal:
+                    this.Content.className = "node node-goal";
+                    break;
+                case AssureNote.GSNType.Context:
+                    this.Content.className = "node node-context";
+                    break;
+                case AssureNote.GSNType.Strategy:
+                    this.Content.className = "node node-strategy";
+                    break;
+                case AssureNote.GSNType.Evidence:
+                default:
+                    this.Content.className = "node node-evidence";
+                    break;
+            }
         };
 
         GSNShape.prototype.CreateHtmlContent = function (Content) {
@@ -202,6 +231,8 @@ var AssureNote;
                 div.appendChild(h4);
                 div.appendChild(p);
                 Content.appendChild(div);
+                this.Content = div;
+                this.UpdateWidth();
             }
         };
 

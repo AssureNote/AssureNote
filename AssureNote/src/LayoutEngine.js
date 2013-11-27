@@ -102,7 +102,7 @@ var AssureNote;
                     for (var i = 0; i < ThisNode.Right.length; i++) {
                         var Node = ThisNode.Right[i];
                         if (Node.IsVisible) {
-                            Node.OffsetGx = +(AssureNote.DefaultWidth + AssureNote.DefaultMargin);
+                            Node.OffsetGx += (AssureNote.DefaultWidth + AssureNote.DefaultMargin);
                             Node.OffsetGy = OffsetGyRight;
                             OffsetGyRight + (Node.Shape.GetHeight() + AssureNote.ContextMargin);
                         }

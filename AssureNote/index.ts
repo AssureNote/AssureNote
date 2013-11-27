@@ -147,6 +147,18 @@ module AssureNote {
 		Resize(LayoutEngine: SimpleLayoutEngine) {
 			this.GetShape().Resize(LayoutEngine);
 		}
+
+		GetAbsoluteConnectorPosition(Dir: Direction): Point {
+			var p = this.Shape.GetConnectorPosition(Dir);
+			p.x += this.Width;
+			p.y += this.Height;
+			return p;
+		}
+
+		SetArrowPosition(p1: Point, p2: Point, dir: Direction) {
+			this.Shape.SetArrowPosition(p1, p2, dir);
+		}
+
 	}
 
 	export class GSNShape {
@@ -194,9 +206,27 @@ module AssureNote {
 			//this.Width = HTMLDoc.Width;
 			//this.Height = HTMLDoc.Height;
 
-			LayoutEngine.Layout(this.NodeView, this);
+			//LayoutEngine.Layout(this.NodeView, this);
 			this.NodeView.OffsetGx = this.Width / 2;
 			this.NodeView.OffsetGy = LevelMargin;
+		}
+
+		UpdateWidth() {
+			switch (this.NodeView.Model.NodeType) {
+				case GSNType.Goal:
+					this.Content.className = "node node-goal";
+					break;
+				case GSNType.Context:
+					this.Content.className = "node node-context";
+					break;
+				case GSNType.Strategy:
+					this.Content.className = "node node-strategy";
+					break;
+				case GSNType.Evidence:
+				default:
+					this.Content.className = "node node-evidence";
+					break;
+			}
 		}
 
 		CreateHtmlContent(Content: DocumentFragment): void {
@@ -214,6 +244,8 @@ module AssureNote {
 				div.appendChild(h4);
 				div.appendChild(p);
 				Content.appendChild(div);
+				this.Content = div;
+				this.UpdateWidth();
 			}
 		}
 

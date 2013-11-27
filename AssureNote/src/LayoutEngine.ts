@@ -89,7 +89,7 @@ module AssureNote {
 					for (var i = 0; i < ThisNode.Right.length; i++) {
 						var Node = ThisNode.Right[i];
 						if (Node.IsVisible) {
-							Node.OffsetGx = + (DefaultWidth + DefaultMargin);
+							Node.OffsetGx += (DefaultWidth + DefaultMargin);
 							Node.OffsetGy = OffsetGyRight;
 							OffsetGyRight + (Node.Shape.GetHeight() + ContextMargin);
 						}
