@@ -45,10 +45,20 @@ var AssureNote;
             if (Children == null) {
                 return;
             }
+            var ContextCounter = 0;
             for (var i = 0; i < Children.length; i++) {
-                var ChildView = this.ViewMap[Children[i].GetLabel()];
-                NodeView.AppendChild(ChildView);
-                this.InsertRelative(ChildView);
+                var SubNodeView = this.ViewMap[Children[i].GetLabel()];
+                if (SubNodeView.Model.NodeType == AssureNote.GSNType.Context) {
+                    if (ContextCounter % 2 == 0) {
+                        NodeView.AppendRightNode(SubNodeView);
+                    } else {
+                        NodeView.AppendLeftNode(SubNodeView);
+                    }
+                    ContextCounter++;
+                } else {
+                    NodeView.AppendChild(SubNodeView);
+                }
+                this.InsertRelative(SubNodeView);
             }
         };
 
@@ -100,6 +110,16 @@ var AssureNote;
         NodeView.prototype.AppendChild = function (Child) {
             this.Children.push(Child);
             Child.AppendParent(this);
+        };
+
+        NodeView.prototype.AppendLeftNode = function (Node) {
+            this.Left.push(Node);
+            Node.AppendParent(this);
+        };
+
+        NodeView.prototype.AppendRightNode = function (Node) {
+            this.Right.push(Node);
+            Node.AppendParent(this);
         };
 
         NodeView.prototype.GetShape = function () {

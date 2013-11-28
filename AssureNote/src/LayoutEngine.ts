@@ -40,7 +40,7 @@ module AssureNote {
 		}
 
 		GetHeight(Node: NodeView): number {
-			return 72 + Node.Shape.Height; // todo
+			return 72; // todo
 		}
 
 		private SetAbsolutePosition(NodeView: NodeView, wx: number, wy: number): void {
@@ -60,6 +60,7 @@ module AssureNote {
 
 		DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
 			var NodeView = this.AssureNoteApp.GSNView.GetNode(Label);
+			this.Layout(NodeView, NodeView.Shape);
 			this.SetAbsolutePosition(NodeView, wx, wy);
 		}
 

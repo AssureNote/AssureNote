@@ -52,7 +52,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         SimpleLayoutEngine.prototype.GetHeight = function (Node) {
-            return 72 + Node.Shape.Height;
+            return 72;
         };
 
         SimpleLayoutEngine.prototype.SetAbsolutePosition = function (NodeView, wx, wy) {
@@ -73,6 +73,7 @@ var AssureNote;
 
         SimpleLayoutEngine.prototype.DoLayout = function (PictgramPanel, Label, wx, wy) {
             var NodeView = this.AssureNoteApp.GSNView.GetNode(Label);
+            this.Layout(NodeView, NodeView.Shape);
             this.SetAbsolutePosition(NodeView, wx, wy);
         };
 
