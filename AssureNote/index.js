@@ -21,88 +21,75 @@ var AssureNote;
     })();
     AssureNote.ColorStyle = ColorStyle;
 
-    var GSNViewer = (function () {
-        function GSNViewer(AssureNoteApp) {
-            this.AssureNoteApp = AssureNoteApp;
-            this.ViewMap = {};
-        }
-        GSNViewer.prototype.CreateViewAll = function (Doc) {
-            var Keys = Doc.NodeMap.keySet();
-            for (var i = 0; i < Keys.length; i++) {
-                this.ViewMap[Keys[i]] = new NodeView(Doc.GetNode(Keys[i]));
-            }
-            if (Doc.TopGoal == null) {
-                this.AssureNoteApp.DebugP("Parse Error");
-            }
-            this.InsertRelative(this.ViewMap[Doc.TopGoal.GetLabel()]);
-        };
-
-        GSNViewer.prototype.InsertRelative = function (NodeView) {
-            if (NodeView == null) {
-                return;
-            }
-            var Children = NodeView.Model.SubNodeList;
-            if (Children == null) {
-                return;
-            }
-            var ContextCounter = 0;
-            for (var i = 0; i < Children.length; i++) {
-                var SubNodeView = this.ViewMap[Children[i].GetLabel()];
-                if (SubNodeView.Model.NodeType == AssureNote.GSNType.Context) {
-                    if (ContextCounter % 2 == 0) {
-                        NodeView.AppendRightNode(SubNodeView);
-                    } else {
-                        NodeView.AppendLeftNode(SubNodeView);
-                    }
-                    ContextCounter++;
-                } else {
-                    NodeView.AppendChild(SubNodeView);
-                }
-                this.InsertRelative(SubNodeView);
-            }
-        };
-
-        GSNViewer.prototype.CreateView = function (Node) {
-            if (this.ViewMap[Node.LabelNumber] != null) {
-                return false;
-            }
-            this.ViewMap[Node.LabelNumber] = new NodeView(Node);
-            return true;
-        };
-
-        GSNViewer.prototype.UpdateView = function (Node) {
-            if (this.ViewMap[Node.LabelNumber] == null) {
-                return false;
-            }
-            this.ViewMap[Node.LabelNumber].Update(Node);
-            return true;
-        };
-
-        GSNViewer.prototype.Clear = function () {
-            this.ViewMap = {};
-        };
-
-        GSNViewer.prototype.GetKeyList = function () {
-            return Object.keys(this.ViewMap);
-        };
-
-        GSNViewer.prototype.GetNode = function (Label) {
-            return this.ViewMap[Label];
-        };
-        return GSNViewer;
-    })();
-    AssureNote.GSNViewer = GSNViewer;
-
+    //export class AssureNoteViewer {
+    //	constructor(public AssureNoteApp: AssureNoteApp) {
+    //		this.ViewMap = {};
+    //	}
+    //	SetGSNView(NodeTree: NodeView): void {
+    //		this.ViewMap = {};
+    //	}
+    //	CreateView(Node: GSNNode): boolean {
+    //		if (this.ViewMap[Node.LabelNumber] != null) {
+    //			return false;
+    //		}
+    //		this.ViewMap[Node.LabelNumber] = new NodeView(Node);
+    //		return true;
+    //	}
+    //	UpdateView(Node: GSNNode): boolean {
+    //		if (this.ViewMap[Node.LabelNumber] == null) {
+    //			return false;
+    //		}
+    //		this.ViewMap[Node.LabelNumber].Update(Node);
+    //		return true;
+    //	}
+    //	Clear(): void {
+    //		this.ViewMap = {};
+    //	}
+    //	GetKeyList(): string[]{
+    //		return Object.keys(this.ViewMap);
+    //	}
+    //	GetNode(Label: string): NodeView {
+    //		return this.ViewMap[Label];
+    //	}
+    //}
     var NodeView = (function () {
-        function NodeView(Model) {
+        function NodeView(Model, IsRecursive) {
             this.Model = Model;
+            this.ParentX = 60;
+            this.ParentY = 300;
             this.Left = [];
             this.Right = [];
             this.Children = [];
             this.Shape = null;
             this.Label = Model.GetLabel();
             this.NodeDoc = Model.NodeDoc;
+            this.IsVisible = true;
+            if (IsRecursive && Model.SubNodeList != null) {
+                for (var i = 0; i < Model.SubNodeList.length; i++) {
+                    var SubNode = Model.SubNodeList[i];
+                    var SubView = new NodeView(SubNode, IsRecursive);
+                    if (SubNode.NodeType == AssureNote.GSNType.Context) {
+                        // Layout Engine allowed to move a node left-side
+                        this.AppendRightNode(SubView);
+                    } else {
+                        this.AppendChild(SubView);
+                    }
+                }
+            }
         }
+        NodeView.prototype.UpdateViewMap = function (ViewMap) {
+            ViewMap[this.Label] = this;
+            for (var i = 0; i < this.Left.length; i++) {
+                this.Left[i].UpdateViewMap(ViewMap);
+            }
+            for (var i = 0; i < this.Right.length; i++) {
+                this.Right[i].UpdateViewMap(ViewMap);
+            }
+            for (var i = 0; i < this.Children.length; i++) {
+                this.Children[i].UpdateViewMap(ViewMap);
+            }
+        };
+
         NodeView.prototype.AppendParent = function (Parent) {
             this.Parent = Parent;
         };
@@ -124,24 +111,23 @@ var AssureNote;
 
         NodeView.prototype.GetShape = function () {
             if (this.Shape == null) {
-                this.IsVisible = true;
                 this.Shape = AssureNote.AssureNoteUtils.CreateGSNShape(this);
             }
             return this.Shape;
         };
 
-        NodeView.prototype.GetGx = function () {
+        NodeView.prototype.GetDocumentWx = function (wx) {
             if (this.Parent == null) {
-                return this.OffsetGx;
+                return wx + this.ParentX;
             }
-            return this.Parent.GetGx() + this.OffsetGx;
+            return this.Parent.GetDocumentWx(wx) + this.ParentX;
         };
 
-        NodeView.prototype.GetGy = function () {
+        NodeView.prototype.GetDocumentWy = function (wy) {
             if (this.Parent == null) {
-                return this.OffsetGy;
+                return wy + this.ParentY;
             }
-            return this.Parent.GetGy() + this.OffsetGy;
+            return this.Parent.GetDocumentWy(wy) + this.ParentY;
         };
 
         NodeView.prototype.GetNodeType = function () {
@@ -161,19 +147,40 @@ var AssureNote;
             throw "Update is under construction.";
         };
 
-        NodeView.prototype.Resize = function (LayoutEngine) {
-            this.GetShape().Resize(LayoutEngine);
+        NodeView.prototype.Resize = function () {
+            //this.GetShape().Resize();
         };
 
         NodeView.prototype.GetAbsoluteConnectorPosition = function (Dir) {
             var p = this.Shape.GetConnectorPosition(Dir);
-            p.x += this.Width;
-            p.y += this.Height;
+            p.x += this.GetShape().GetNodeWidth();
+            p.y += this.GetShape().GetNodeHeight();
             return p;
         };
 
         NodeView.prototype.SetArrowPosition = function (p1, p2, dir) {
             this.Shape.SetArrowPosition(p1, p2, dir);
+        };
+
+        NodeView.prototype.SetDocumentPosition = function (wx, wy) {
+            if (this.IsVisible) {
+                AssureNote.AssureNoteApp.Assert((this.Shape != null));
+                this.Shape.SetPosition(this.GetDocumentWx(wx), this.GetDocumentWy(wy));
+                for (var i = 0; i < this.Children.length; i++) {
+                    var SubNode = this.Children[i];
+                    SubNode.SetDocumentPosition(wx, wy);
+                }
+
+                for (var i = 0; i < this.Right.length; i++) {
+                    var SubNode = this.Right[i];
+                    SubNode.SetDocumentPosition(wx, wy);
+                }
+
+                for (var i = 0; i < this.Left.length; i++) {
+                    var SubNode = this.Left[i];
+                    SubNode.SetDocumentPosition(wx, wy);
+                }
+            }
         };
         return NodeView;
     })();
@@ -184,6 +191,10 @@ var AssureNote;
             this.NodeView = NodeView;
             this.ColorClassName = AssureNote.Color.Default;
             this.Content = null;
+            this.NodeWidth = 250;
+            this.NodeHeight = 100;
+            this.TreeWidth = 0;
+            this.TreeHeight = 0;
         }
         GSNShape.CreateArrowPath = function () {
             if (!GSNShape.ArrowPathMaster) {
@@ -196,28 +207,44 @@ var AssureNote;
             return GSNShape.ArrowPathMaster.cloneNode();
         };
 
-        GSNShape.prototype.GetWidth = function () {
-            if (this.Width == null) {
-                this.Width = 250;
+        GSNShape.prototype.SetTreeSize = function (Width, Height) {
+            this.TreeWidth = Width;
+            this.TreeHeight = Height;
+            //			if (this.NodeHeight == 0) {
+            //				this.TreeWidth = Width;
+            //				this.NodeHeight = Height;
+            //			}
+        };
+
+        GSNShape.prototype.GetNodeWidth = function () {
+            return 250;
+        };
+
+        GSNShape.prototype.GetNodeHeight = function () {
+            return 100;
+        };
+
+        GSNShape.prototype.GetTreeWidth = function () {
+            if (this.TreeWidth == 0) {
+                this.TreeWidth = 250;
             }
-            return this.Width;
+            return this.TreeWidth;
         };
 
-        GSNShape.prototype.GetHeight = function () {
-            if (this.Height == null) {
-                this.Height = 100;
+        GSNShape.prototype.GetTreeHeight = function () {
+            if (this.TreeHeight == 0) {
+                this.TreeHeight = 100;
             }
-            return this.Height;
+            return this.TreeHeight;
         };
 
-        GSNShape.prototype.Resize = function (LayoutEngine) {
-            //this.Width = HTMLDoc.Width;
-            //this.Height = HTMLDoc.Height;
-            //LayoutEngine.Layout(this.NodeView, this);
-            this.NodeView.OffsetGx = this.Width / 2;
-            this.NodeView.OffsetGy = AssureNote.LevelMargin;
-        };
-
+        //Resize(): void {
+        //	//this.Width = HTMLDoc.Width;
+        //	//this.Height = HTMLDoc.Height;
+        //	//LayoutEngine.Layout(this.NodeView, this);
+        //	this.NodeView.OffsetGx = this.Width / 2;
+        //	this.NodeView.OffsetGy = LevelMargin;
+        //}
         GSNShape.prototype.UpdateWidth = function () {
             switch (this.NodeView.Model.NodeType) {
                 case AssureNote.GSNType.Goal:
@@ -313,13 +340,13 @@ var AssureNote;
         GSNShape.prototype.GetConnectorPosition = function (Dir) {
             switch (Dir) {
                 case AssureNote.Direction.Right:
-                    return new AssureNote.Point(this.Width, this.Height / 2);
+                    return new AssureNote.Point(this.GetNodeWidth(), this.GetNodeHeight() / 2);
                 case AssureNote.Direction.Left:
-                    return new AssureNote.Point(0, this.Height / 2);
+                    return new AssureNote.Point(0, this.GetNodeHeight() / 2);
                 case AssureNote.Direction.Top:
-                    return new AssureNote.Point(this.Width / 2, 0);
+                    return new AssureNote.Point(this.GetNodeWidth() / 2, 0);
                 case AssureNote.Direction.Bottom:
-                    return new AssureNote.Point(this.Width / 2, this.Height);
+                    return new AssureNote.Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
                 default:
                     return new AssureNote.Point(0, 0);
             }
@@ -350,8 +377,8 @@ var AssureNote;
 
         GSNGoalShape.prototype.Resize = function () {
             //super.Resize(CaseViewer, NodeModel, HTMLDoc);
-            this.BodyRect.setAttribute("width", this.GetWidth().toString());
-            this.BodyRect.setAttribute("height", this.GetHeight().toString());
+            this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
+            this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
         };
         return GSNGoalShape;
     })(GSNShape);
@@ -375,8 +402,8 @@ var AssureNote;
 
         GSNContextShape.prototype.Resize = function () {
             //super.Resize();
-            this.BodyRect.setAttribute("width", this.GetWidth().toString());
-            this.BodyRect.setAttribute("height", this.GetHeight().toString());
+            this.BodyRect.setAttribute("width", this.GetTreeWidth().toString());
+            this.BodyRect.setAttribute("height", this.GetTreeHeight().toString());
         };
         return GSNContextShape;
     })(GSNShape);
@@ -401,8 +428,8 @@ var AssureNote;
         };
 
         GSNStrategyShape.prototype.Resize = function () {
-            var w = this.GetWidth();
-            var h = this.GetHeight();
+            var w = this.GetNodeWidth();
+            var h = this.GetNodeHeight();
             this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + w + ",0 " + (w - this.delta) + "," + h + " 0," + h);
         };
 
@@ -415,13 +442,13 @@ var AssureNote;
         GSNStrategyShape.prototype.GetConnectorPosition = function (Dir) {
             switch (Dir) {
                 case AssureNote.Direction.Right:
-                    return new AssureNote.Point(this.GetWidth() - this.delta / 2, this.GetHeight() / 2);
+                    return new AssureNote.Point(this.GetNodeWidth() - this.delta / 2, this.GetNodeHeight() / 2);
                 case AssureNote.Direction.Left:
-                    return new AssureNote.Point(this.delta / 2, this.GetHeight() / 2);
+                    return new AssureNote.Point(this.delta / 2, this.GetNodeHeight() / 2);
                 case AssureNote.Direction.Top:
-                    return new AssureNote.Point(this.GetWidth() / 2, 0);
+                    return new AssureNote.Point(this.GetNodeWidth() / 2, 0);
                 case AssureNote.Direction.Bottom:
-                    return new AssureNote.Point(this.GetWidth() / 2, this.GetHeight());
+                    return new AssureNote.Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
             }
         };
         return GSNStrategyShape;
@@ -446,10 +473,10 @@ var AssureNote;
         };
 
         GSNEvidenceShape.prototype.Resize = function () {
-            this.BodyEllipse.setAttribute("cx", (this.GetWidth() / 2).toString());
-            this.BodyEllipse.setAttribute("cy", (this.GetHeight() / 2).toString());
-            this.BodyEllipse.setAttribute("rx", (this.GetWidth() / 2).toString());
-            this.BodyEllipse.setAttribute("ry", (this.GetHeight() / 2).toString());
+            this.BodyEllipse.setAttribute("cx", (this.GetNodeWidth() / 2).toString());
+            this.BodyEllipse.setAttribute("cy", (this.GetNodeHeight() / 2).toString());
+            this.BodyEllipse.setAttribute("rx", (this.GetNodeWidth() / 2).toString());
+            this.BodyEllipse.setAttribute("ry", (this.GetNodeHeight() / 2).toString());
         };
         return GSNEvidenceShape;
     })(GSNShape);

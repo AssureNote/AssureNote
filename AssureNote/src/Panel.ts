@@ -10,7 +10,9 @@ module AssureNote {
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
-		GSNView: GSNViewer;
+		//GSNView: AssureNoteViewer;
+		ViewMap: { [index: string]: NodeView };
+		MasterView: NodeView;
 
 		CurrentDoc: GSNDoc;// Convert to caseview
 		FocusedLabel: string;
@@ -83,27 +85,31 @@ module AssureNote {
 				});
 		}
 
+		SetView(NodeView: NodeView): void {
+			this.MasterView = NodeView;
+			this.ViewMap = {};
+			this.MasterView.UpdateViewMap(this.ViewMap);
+		}
 
 		DisplayPictgram(): void {
 			this.AssureNoteApp.PluginPanel.Clear();
 		}
 
 		Draw(Label: string, wx: number, wy: number): void {
-			var DivFrag = document.createDocumentFragment();
-			var SvgNodeFrag = document.createDocumentFragment();
-			var SvgConnectionFrag = document.createDocumentFragment();
-
-			var list = this.AssureNoteApp.GSNView.GetKeyList();
-			for (var i = 0; i < list.length; i++) {
-				var View = this.AssureNoteApp.GSNView.GetNode(list[i]);
-				View.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
-				View.Resize(<SimpleLayoutEngine>this.LayoutEngine);
+			if (wx == null) {
+				wx = 100; //FIXME
 			}
-			this.ContentLayer.appendChild(DivFrag);
-			this.SVGLayer.appendChild(SvgConnectionFrag);
-			this.SVGLayer.appendChild(SvgNodeFrag);
+			if (wy == null) {
+				wy = 100; //FIXME
+			}
 
-			this.LayoutEngine.DoLayout(this, Label, wx, wy);
+			var TargetView = this.ViewMap[Label];
+			if (TargetView == null) {
+				TargetView = this.MasterView;
+			}
+
+			this.LayoutEngine.DoLayout(this, TargetView, wx, wy);
+			TargetView.SetDocumentPosition(wx, wy);
 		}
 
 		Redraw(): void {

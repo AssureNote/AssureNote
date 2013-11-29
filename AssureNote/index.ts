@@ -13,87 +13,55 @@ module AssureNote {
 		//TODO
 	}
 
-	export class GSNViewer {
-		ViewMap: { [index: string]: NodeView };
+	//export class AssureNoteViewer {
+	
+	//	constructor(public AssureNoteApp: AssureNoteApp) {
+	//		this.ViewMap = {};
+	//	}
 
-		constructor(public AssureNoteApp: AssureNoteApp) {
-			this.ViewMap = {};
-		}
+	//	SetGSNView(NodeTree: NodeView): void {
+	//		this.ViewMap = {};
 
-		CreateViewAll(Doc: GSNDoc): void {
-			var Keys = Doc.NodeMap.keySet();
-			for (var i = 0; i < Keys.length; i++) {
-				this.ViewMap[Keys[i]] = new NodeView(Doc.GetNode(Keys[i]));
-			}
-			if (Doc.TopGoal == null) {
-				this.AssureNoteApp.DebugP("Parse Error");
-			}
-			this.InsertRelative(this.ViewMap[Doc.TopGoal.GetLabel()]);
-		}
+	//	}
 
-		private InsertRelative(NodeView: NodeView): void {
-			if (NodeView == null) {
-				return;
-			}
-			var Children = NodeView.Model.SubNodeList;
-			if (Children == null) {
-				return;
-			}
-			var ContextCounter = 0;
-			for (var i = 0; i < Children.length; i++) {
-				var SubNodeView = this.ViewMap[Children[i].GetLabel()];
-				if (SubNodeView.Model.NodeType == GSNType.Context) {
-					if (ContextCounter % 2 == 0) {
-						NodeView.AppendRightNode(SubNodeView);
-					} else {
-						NodeView.AppendLeftNode(SubNodeView);
-					}
-					ContextCounter++;
-				} else {
-					NodeView.AppendChild(SubNodeView);
-				}
-				this.InsertRelative(SubNodeView);
-			}
-		}
+	//	CreateView(Node: GSNNode): boolean {
+	//		if (this.ViewMap[Node.LabelNumber] != null) {
+	//			return false;
+	//		}
+	//		this.ViewMap[Node.LabelNumber] = new NodeView(Node);
+	//		return true;
+	//	}
 
-		CreateView(Node: GSNNode): boolean {
-			if (this.ViewMap[Node.LabelNumber] != null) {
-				return false;
-			}
-			this.ViewMap[Node.LabelNumber] = new NodeView(Node);
-			return true;
-		}
+	//	UpdateView(Node: GSNNode): boolean {
+	//		if (this.ViewMap[Node.LabelNumber] == null) {
+	//			return false;
+	//		}
+	//		this.ViewMap[Node.LabelNumber].Update(Node);
+	//		return true;
+	//	}
 
-		UpdateView(Node: GSNNode): boolean {
-			if (this.ViewMap[Node.LabelNumber] == null) {
-				return false;
-			}
-			this.ViewMap[Node.LabelNumber].Update(Node);
-			return true;
-		}
+	//	Clear(): void {
+	//		this.ViewMap = {};
+	//	}
 
-		Clear(): void {
-			this.ViewMap = {};
-		}
+	//	GetKeyList(): string[]{
+	//		return Object.keys(this.ViewMap);
+	//	}
 
-		GetKeyList(): string[]{
-			return Object.keys(this.ViewMap);
-		}
-
-		GetNode(Label: string): NodeView {
-			return this.ViewMap[Label];
-		}
-	}
+	//	GetNode(Label: string): NodeView {
+	//		return this.ViewMap[Label];
+	//	}
+	//}
 
 	export class NodeView {
 		//Model: GSNNode;
 		IsVisible: boolean;
 		Label: string;
 		NodeDoc: string;
-		OffsetGx: number;
-		OffsetGy: number;
-		private Width: number;
-		private Height: number;
+		ParentX: number = 60;
+		ParentY: number = 300;
+		//private Width: number;
+		//private Height: number;
 		Color: ColorStyle;
 		Parent: NodeView;
 		Left: NodeView[] = [];
@@ -101,9 +69,35 @@ module AssureNote {
 		Children: NodeView[] = [];
 		Shape: GSNShape = null;
 
-		constructor(public Model: GSNNode) {
+		constructor(public Model: GSNNode, IsRecursive: boolean) {
 			this.Label = Model.GetLabel();
 			this.NodeDoc = Model.NodeDoc;
+			this.IsVisible = true;
+			if (IsRecursive && Model.SubNodeList != null) {
+				for (var i = 0; i < Model.SubNodeList.length; i++) {
+					var SubNode = Model.SubNodeList[i];
+					var SubView = new NodeView(SubNode, IsRecursive);
+					if (SubNode.NodeType == GSNType.Context) {
+						// Layout Engine allowed to move a node left-side
+						this.AppendRightNode(SubView);
+					} else {
+						this.AppendChild(SubView);
+					}
+				}
+			}
+		}
+
+		UpdateViewMap(ViewMap: { [index: string]: NodeView }) : void {
+			ViewMap[this.Label] = this;
+			for (var i = 0; i < this.Left.length; i++) {
+				this.Left[i].UpdateViewMap(ViewMap);
+			}
+			for (var i = 0; i < this.Right.length; i++) {
+				this.Right[i].UpdateViewMap(ViewMap);
+			}
+			for (var i = 0; i < this.Children.length; i++) {
+				this.Children[i].UpdateViewMap(ViewMap);
+			}
 		}
 
 		private AppendParent(Parent: NodeView): void {
@@ -127,24 +121,23 @@ module AssureNote {
 
 		GetShape(): GSNShape {
 			if (this.Shape == null) {
-				this.IsVisible = true;
 				this.Shape = AssureNoteUtils.CreateGSNShape(this);
 			}
 			return this.Shape;
 		}
 
-		GetGx(): number {
+		GetDocumentWx(wx: number): number {
 			if (this.Parent == null) {
-				return this.OffsetGx;
+				return wx + this.ParentX;
 			}
-			return this.Parent.GetGx() + this.OffsetGx;
+			return this.Parent.GetDocumentWx(wx) + this.ParentX;
 		}
 
-		GetGy(): number {
+		GetDocumentWy(wy: number): number {
 			if (this.Parent == null) {
-				return this.OffsetGy;
+				return wy + this.ParentY;
 			}
-			return this.Parent.GetGy() + this.OffsetGy;
+			return this.Parent.GetDocumentWy(wy) + this.ParentY;
 		}
 
 		GetNodeType(): GSNType {
@@ -164,14 +157,14 @@ module AssureNote {
 			throw "Update is under construction.";
 		}
 
-		Resize(LayoutEngine: SimpleLayoutEngine) {
-			this.GetShape().Resize(LayoutEngine);
+		Resize() {
+			//this.GetShape().Resize();
 		}
 
 		GetAbsoluteConnectorPosition(Dir: Direction): Point {
 			var p = this.Shape.GetConnectorPosition(Dir);
-			p.x += this.Width;
-			p.y += this.Height;
+			p.x += this.GetShape().GetNodeWidth();
+			p.y += this.GetShape().GetNodeHeight();
 			return p;
 		}
 
@@ -179,6 +172,26 @@ module AssureNote {
 			this.Shape.SetArrowPosition(p1, p2, dir);
 		}
 
+		SetDocumentPosition(wx: number, wy: number): void {
+			if (this.IsVisible) {
+				AssureNoteApp.Assert((this.Shape != null));
+				this.Shape.SetPosition(this.GetDocumentWx(wx), this.GetDocumentWy(wy));
+				for (var i = 0; i < this.Children.length; i++) {
+					var SubNode = this.Children[i];
+					SubNode.SetDocumentPosition(wx, wy);
+				}
+
+				for (var i = 0; i < this.Right.length; i++) {
+					var SubNode = this.Right[i];
+					SubNode.SetDocumentPosition(wx, wy);
+				}
+
+				for (var i = 0; i < this.Left.length; i++) {
+					var SubNode = this.Left[i];
+					SubNode.SetDocumentPosition(wx, wy);
+				}
+			}
+		}
 	}
 
 	export class GSNShape {
@@ -188,12 +201,16 @@ module AssureNote {
 		ColorClassName: string = Color.Default;
 		private NodeWidth: number;
         private NodeHeight: number;
-        public Width: number;
-        public Height: number;
+        private TreeWidth: number;
+        private TreeHeight: number;
         private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
 			this.Content = null;
+			this.NodeWidth = 250;
+			this.NodeHeight = 100;
+			this.TreeWidth = 0;
+			this.TreeHeight = 0;
 		}
 
         private static CreateArrowPath(): SVGPathElement {
@@ -207,29 +224,45 @@ module AssureNote {
             return <SVGPathElement>GSNShape.ArrowPathMaster.cloneNode();
         }
 
-		GetWidth(): number {
-			if (this.Width == null) {
-				this.Width = 250; //FIXME
-			}
-            return this.Width;
-        }
-
-
-		GetHeight(): number {
-			if (this.Height == null) {
-				this.Height = 100; //FIXME
-			}
-			return this.Height;
-        }
-
-		Resize(LayoutEngine: SimpleLayoutEngine): void {
-			//this.Width = HTMLDoc.Width;
-			//this.Height = HTMLDoc.Height;
-
-			//LayoutEngine.Layout(this.NodeView, this);
-			this.NodeView.OffsetGx = this.Width / 2;
-			this.NodeView.OffsetGy = LevelMargin;
+		SetTreeSize(Width : number, Height: number): void {
+			this.TreeWidth = Width;
+			this.TreeHeight = Height;
+//			if (this.NodeHeight == 0) {
+//				this.TreeWidth = Width;
+//				this.NodeHeight = Height;
+//			}
 		}
+
+		GetNodeWidth(): number {
+			return 250; //FIXME
+		}
+
+		GetNodeHeight(): number {
+			return 100; //FIXME
+		}
+
+		GetTreeWidth(): number {
+			if (this.TreeWidth == 0) {
+				this.TreeWidth = 250; //FIXME
+			}
+            return this.TreeWidth;
+        }
+
+		GetTreeHeight(): number {
+			if (this.TreeHeight == 0) {
+				this.TreeHeight = 100; //FIXME
+			}
+			return this.TreeHeight;
+        }
+
+		//Resize(): void {
+		//	//this.Width = HTMLDoc.Width;
+		//	//this.Height = HTMLDoc.Height;
+
+		//	//LayoutEngine.Layout(this.NodeView, this);
+		//	this.NodeView.OffsetGx = this.Width / 2;
+		//	this.NodeView.OffsetGy = LevelMargin;
+		//}
 
 		UpdateWidth() {
 			switch (this.NodeView.Model.NodeType) {
@@ -326,13 +359,13 @@ module AssureNote {
 		GetConnectorPosition(Dir: Direction): Point {
 			switch (Dir) {
 				case Direction.Right:
-					return new Point(this.Width, this.Height / 2);
+					return new Point(this.GetNodeWidth(), this.GetNodeHeight() / 2);
 				case Direction.Left:
-					return new Point(0, this.Height / 2);
+					return new Point(0, this.GetNodeHeight() / 2);
 				case Direction.Top:
-					return new Point(this.Width / 2, 0);
+					return new Point(this.GetNodeWidth() / 2, 0);
 				case Direction.Bottom:
-					return new Point(this.Width / 2, this.Height);
+					return new Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
 				default:
 					return new Point(0, 0);
 			}
@@ -357,8 +390,8 @@ module AssureNote {
 
 		Resize(): void {
 			//super.Resize(CaseViewer, NodeModel, HTMLDoc);
-			this.BodyRect.setAttribute("width", this.GetWidth().toString());
-			this.BodyRect.setAttribute("height", this.GetHeight().toString());
+			this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
+			this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
 		}
 
 	}
@@ -379,8 +412,8 @@ module AssureNote {
 
 		Resize(): void {
 			//super.Resize();
-			this.BodyRect.setAttribute("width", this.GetWidth().toString());
-			this.BodyRect.setAttribute("height", this.GetHeight().toString());
+			this.BodyRect.setAttribute("width", this.GetTreeWidth().toString());
+			this.BodyRect.setAttribute("height", this.GetTreeHeight().toString());
 		}
 
 		//SetColor(key: string) {
@@ -422,8 +455,8 @@ module AssureNote {
 		}
 
         Resize(): void {
-            var w: number = this.GetWidth();
-            var h: number = this.GetHeight();
+            var w: number = this.GetNodeWidth();
+            var h: number = this.GetNodeHeight();
             this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + w + ",0 " + (w - this.delta) + "," + h + " 0," + h);
 		}
 
@@ -438,13 +471,13 @@ module AssureNote {
 		GetConnectorPosition(Dir: Direction): Point {
 			switch (Dir) {
 				case Direction.Right:
-					return new Point(this.GetWidth() - this.delta / 2, this.GetHeight() / 2);
+					return new Point(this.GetNodeWidth() - this.delta / 2, this.GetNodeHeight() / 2);
 				case Direction.Left:
-					return new Point(this.delta / 2, this.GetHeight() / 2);
+					return new Point(this.delta / 2, this.GetNodeHeight() / 2);
 				case Direction.Top:
-					return new Point(this.GetWidth() / 2, 0);
+					return new Point(this.GetNodeWidth() / 2, 0);
 				case Direction.Bottom:
-					return new Point(this.GetWidth() / 2, this.GetHeight());
+					return new Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
 			}
 		}
 	}
@@ -464,10 +497,10 @@ module AssureNote {
 		}
 
         Resize(): void {
-			this.BodyEllipse.setAttribute("cx", (this.GetWidth()/ 2).toString());
-			this.BodyEllipse.setAttribute("cy", (this.GetHeight() / 2).toString());
-			this.BodyEllipse.setAttribute("rx", (this.GetWidth()/ 2).toString());
-			this.BodyEllipse.setAttribute("ry", (this.GetHeight() / 2).toString());
+			this.BodyEllipse.setAttribute("cx", (this.GetNodeWidth()/ 2).toString());
+			this.BodyEllipse.setAttribute("cy", (this.GetNodeHeight() / 2).toString());
+			this.BodyEllipse.setAttribute("rx", (this.GetNodeWidth()/ 2).toString());
+			this.BodyEllipse.setAttribute("ry", (this.GetNodeHeight() / 2).toString());
 
 		}
 

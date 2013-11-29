@@ -63,26 +63,31 @@ var AssureNote;
                 }
             });
         }
+        PictgramPanel.prototype.SetView = function (NodeView) {
+            this.MasterView = NodeView;
+            this.ViewMap = {};
+            this.MasterView.UpdateViewMap(this.ViewMap);
+        };
+
         PictgramPanel.prototype.DisplayPictgram = function () {
             this.AssureNoteApp.PluginPanel.Clear();
         };
 
         PictgramPanel.prototype.Draw = function (Label, wx, wy) {
-            var DivFrag = document.createDocumentFragment();
-            var SvgNodeFrag = document.createDocumentFragment();
-            var SvgConnectionFrag = document.createDocumentFragment();
-
-            var list = this.AssureNoteApp.GSNView.GetKeyList();
-            for (var i = 0; i < list.length; i++) {
-                var View = this.AssureNoteApp.GSNView.GetNode(list[i]);
-                View.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
-                View.Resize(this.LayoutEngine);
+            if (wx == null) {
+                wx = 100;
             }
-            this.ContentLayer.appendChild(DivFrag);
-            this.SVGLayer.appendChild(SvgConnectionFrag);
-            this.SVGLayer.appendChild(SvgNodeFrag);
+            if (wy == null) {
+                wy = 100;
+            }
 
-            this.LayoutEngine.DoLayout(this, Label, wx, wy);
+            var TargetView = this.ViewMap[Label];
+            if (TargetView == null) {
+                TargetView = this.MasterView;
+            }
+
+            this.LayoutEngine.DoLayout(this, TargetView, wx, wy);
+            TargetView.SetDocumentPosition(wx, wy);
         };
 
         PictgramPanel.prototype.Redraw = function () {

@@ -22,7 +22,6 @@ module AssureNote {
 		}
 
 		export function CreateGSNShape(NodeView: NodeView): GSNShape {
-
 			switch (NodeView.GetNodeType()) {
 				case GSNType.Goal:
 					return new GSNGoalShape(NodeView);
@@ -58,7 +57,7 @@ module AssureNote {
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
 		MasterRecord: GSNRecord;
-		GSNView: GSNViewer;
+		//Viewer: AssureNoteViewer;
 
 
 		Case: Case; //Deprecated
@@ -75,6 +74,12 @@ module AssureNote {
 
 		DebugP(Message: string): void {
 			console.log(Message);
+		}
+
+		static Assert(b: boolean, message?: string): void {
+			if (b == false) {
+				console.log("Assert: " + message);
+			}
 		}
 
 		ExecCommand(CommandLine: string): void {
@@ -110,10 +115,12 @@ module AssureNote {
 					//FIXME
 					this.MasterRecord = new GSNRecord();
 					this.MasterRecord.Parse(Contents);
-					this.GSNView = new GSNViewer(this);
+					//this.Viewer = new AssureNoteViewer(this);
 					var LatestDoc = this.MasterRecord.GetLatestDoc();
-					this.GSNView.CreateViewAll(LatestDoc);
-					this.PictgramPanel.Draw(LatestDoc.TopGoal.GetLabel(), 0, 0);
+					//this.Viewer.Set(LatestDoc);
+					var TopGoalNode = LatestDoc.TopGoal;
+					this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
+					this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

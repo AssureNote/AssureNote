@@ -55,6 +55,12 @@ var AssureNote;
             console.log(Message);
         };
 
+        AssureNoteApp.Assert = function (b, message) {
+            if (b == false) {
+                console.log("Assert: " + message);
+            }
+        };
+
         AssureNoteApp.prototype.ExecCommand = function (CommandLine) {
             var ParsedCommand = new AssureNote.CommandParser(CommandLine);
             var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
@@ -88,10 +94,14 @@ var AssureNote;
                     //FIXME
                     _this.MasterRecord = new AssureNote.GSNRecord();
                     _this.MasterRecord.Parse(Contents);
-                    _this.GSNView = new AssureNote.GSNViewer(_this);
+
+                    //this.Viewer = new AssureNoteViewer(this);
                     var LatestDoc = _this.MasterRecord.GetLatestDoc();
-                    _this.GSNView.CreateViewAll(LatestDoc);
-                    _this.PictgramPanel.Draw(LatestDoc.TopGoal.GetLabel(), 0, 0);
+
+                    //this.Viewer.Set(LatestDoc);
+                    var TopGoalNode = LatestDoc.TopGoal;
+                    _this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
+                    _this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
