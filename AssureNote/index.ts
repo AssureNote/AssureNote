@@ -478,11 +478,4 @@ module AssureNote {
 
 $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();
-	//var node = new AssureNote.GSNNode(new AssureNote.GSNDoc(), null, 1, AssureNote.GSNType.Strategy, "G1", []);
-	//var nodeview = new AssureNote.NodeView(node);
-	//nodeview.Render();
-	//var ele = nodeview.Shape.GetSVG();
-
-	//document.getElementById("svg-node").appendChild(ele);
-	//$("#editor-wrapper").hide();
 });
