@@ -43,6 +43,21 @@ module AssureNote {
 			return 72; // todo
 		}
 
+	//var ChildView = this.ViewMap[Element.Children[i].Label];
+	//if (ContextIndex == i) {
+	//	var p1 = ParentView.GetAbsoluteConnectorPosition(Direction.Right);
+	//	var p2 = ChildView.GetAbsoluteConnectorPosition(Direction.Left);
+	//	var y = Math.min(p1.y, p2.y);
+	//	p1.y = y;
+	//	p2.y = y;
+	//	ChildView.SetArrowPosition(p1, p2, Direction.Left);
+	//	ChildView.IsArrowWhite = true;
+	//} else {
+	//	var p1 = ParentView.GetAbsoluteConnectorPosition(Direction.Bottom);
+	//	var p2 = ChildView.GetAbsoluteConnectorPosition(Direction.Top);
+	//	ChildView.SetArrowPosition(p1, p2, Direction.Bottom);
+	//			}
+
 		private SetAbsolutePosition(NodeView: NodeView, wx: number, wy: number): void {
 			NodeView.Shape.SetPosition(wx, wy);//NodeView.Shape.Width, NodeView.Shape.Height);
 			//NodeView.Shape.SetArrowPosition(
@@ -55,6 +70,9 @@ module AssureNote {
 			for (var i = 0; i < Children.length; i++) {
 				this.SetAbsolutePosition(Children[i], x, y);
 				x += Children[i].Shape.Width;
+				var p1 = NodeView.GetAbsoluteConnectorPosition(Direction.Bottom);
+				var p2 = Children[i].GetAbsoluteConnectorPosition(Direction.Top);
+				Children[i].SetArrowPosition(p1, p2, Direction.Bottom);
 			}
 		}
 
