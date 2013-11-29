@@ -55,24 +55,8 @@ var AssureNote;
             return 72;
         };
 
-        //var ChildView = this.ViewMap[Element.Children[i].Label];
-        //if (ContextIndex == i) {
-        //	var p1 = ParentView.GetAbsoluteConnectorPosition(Direction.Right);
-        //	var p2 = ChildView.GetAbsoluteConnectorPosition(Direction.Left);
-        //	var y = Math.min(p1.y, p2.y);
-        //	p1.y = y;
-        //	p2.y = y;
-        //	ChildView.SetArrowPosition(p1, p2, Direction.Left);
-        //	ChildView.IsArrowWhite = true;
-        //} else {
-        //	var p1 = ParentView.GetAbsoluteConnectorPosition(Direction.Bottom);
-        //	var p2 = ChildView.GetAbsoluteConnectorPosition(Direction.Top);
-        //	ChildView.SetArrowPosition(p1, p2, Direction.Bottom);
-        //			}
         SimpleLayoutEngine.prototype.SetAbsolutePosition = function (NodeView, wx, wy) {
             NodeView.Shape.SetPosition(wx, wy);
-
-            //NodeView.Shape.SetArrowPosition(
             var Children = NodeView.Children;
             if (Children == null) {
                 return;
