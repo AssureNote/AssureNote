@@ -49,10 +49,17 @@ var AssureNote;
             this.PluginManager = new AssureNote.PluginManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
-            this.GSNRecord = new AssureNote.GSNRecord();
+            //this.GSNRecord = new GSNRecord();
         }
         AssureNoteApp.prototype.DebugP = function (Message) {
             console.log(Message);
+        };
+
+        AssureNoteApp.Assert = function (b, message) {
+            if (b == false) {
+                console.log("Assert: " + message);
+                throw "Assert: " + message;
+            }
         };
 
         AssureNoteApp.prototype.ExecCommand = function (CommandLine) {
@@ -85,9 +92,17 @@ var AssureNote;
                     //this.Case = Case0;
                     //this.PictgramPanel.Draw(root.Label, 0, 0);
                     //---
-                    var MasterRecord = new AssureNote.GSNRecord();
-                    MasterRecord.Parse(Contents);
-                    _this.PictgramPanel.Draw("TODO", 0, 0);
+                    //FIXME
+                    _this.MasterRecord = new AssureNote.GSNRecord();
+                    _this.MasterRecord.Parse(Contents);
+
+                    //this.Viewer = new AssureNoteViewer(this);
+                    var LatestDoc = _this.MasterRecord.GetLatestDoc();
+
+                    //this.Viewer.Set(LatestDoc);
+                    var TopGoalNode = LatestDoc.TopGoal;
+                    _this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
+                    _this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }

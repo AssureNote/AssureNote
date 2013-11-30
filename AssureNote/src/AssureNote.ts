@@ -22,7 +22,6 @@ module AssureNote {
 		}
 
 		export function CreateGSNShape(NodeView: NodeView): GSNShape {
-
 			switch (NodeView.GetNodeType()) {
 				case GSNType.Goal:
 					return new GSNGoalShape(NodeView);
@@ -57,7 +56,9 @@ module AssureNote {
 		PictgramPanel: PictgramPanel;
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
-		GSNRecord: GSNRecord;
+		MasterRecord: GSNRecord;
+		//Viewer: AssureNoteViewer;
+
 
 		Case: Case; //Deprecated
 		OldPluginManager: OldPlugInManager; //Deprecated
@@ -68,11 +69,18 @@ module AssureNote {
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
-			this.GSNRecord = new GSNRecord();
+			//this.GSNRecord = new GSNRecord();
 		}
 
 		DebugP(Message: string): void {
 			console.log(Message);
+		}
+
+		static Assert(b: boolean, message?: string): void {
+			if (b == false) {
+				console.log("Assert: " + message);
+				throw "Assert: " + message;
+			}
 		}
 
 		ExecCommand(CommandLine: string): void {
@@ -105,10 +113,15 @@ module AssureNote {
 					//this.Case = Case0;
 					//this.PictgramPanel.Draw(root.Label, 0, 0);
 					//---
-					var MasterRecord = new GSNRecord();
-					MasterRecord.Parse(Contents);
-					this.PictgramPanel.Draw("TODO", 0, 0);
-
+					//FIXME
+					this.MasterRecord = new GSNRecord();
+					this.MasterRecord.Parse(Contents);
+					//this.Viewer = new AssureNoteViewer(this);
+					var LatestDoc = this.MasterRecord.GetLatestDoc();
+					//this.Viewer.Set(LatestDoc);
+					var TopGoalNode = LatestDoc.TopGoal;
+					this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
+					this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

@@ -9,16 +9,20 @@ var AssureNote;
             this.ContentLayer = (document.getElementById("content-layer"));
             this.ControlLayer = (document.getElementById("control-layer"));
             this.ViewPort = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
-            this.LayoutEngine = new AssureNote.OldLayoutEngine(this.AssureNoteApp);
+            this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
             this.ContentLayer.onclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
-                _this.AssureNoteApp.DebugP(Label);
+                _this.AssureNoteApp.DebugP("click:" + Label);
                 return false;
             };
 
             this.ContentLayer.ondblclick = function (ev) {
+                var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
+                _this.AssureNoteApp.DebugP("double click:" + Label);
+                return false;
             };
+
             var CmdLine = new AssureNote.CommandLine();
             document.onkeydown = function (ev) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
@@ -38,7 +42,9 @@ var AssureNote;
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
-                if (AssureNote.AssureNoteUtils.GetNodeLabel(event)) {
+                var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
+                if (Label) {
+                    _this.AssureNoteApp.DebugP("mouseover:" + Label);
                 }
             };
 
@@ -57,17 +63,52 @@ var AssureNote;
                 }
             });
         }
+        PictgramPanel.prototype.SetView = function (NodeView) {
+            this.MasterView = NodeView;
+            this.ViewMap = {};
+            this.MasterView.UpdateViewMap(this.ViewMap);
+        };
+
         PictgramPanel.prototype.DisplayPictgram = function () {
             this.AssureNoteApp.PluginPanel.Clear();
         };
 
         PictgramPanel.prototype.Draw = function (Label, wx, wy) {
-            this.LayoutEngine.DoLayout(this, Label, wx, wy);
+            if (wx == null) {
+                wx = 100;
+            }
+            if (wy == null) {
+                wy = 100;
+            }
+
+            var TargetView = this.ViewMap[Label];
+            if (TargetView == null) {
+                TargetView = this.MasterView;
+            }
+
+            this.LayoutEngine.DoLayout(this, TargetView, wx, wy);
+            TargetView.SetDocumentPosition(wx, wy);
+        };
+
+        PictgramPanel.prototype.Redraw = function () {
+            this.Draw(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
         };
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
             var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.GSNRecord, Label);
+            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.MasterRecord.GetLatestDoc(), Label);
+        };
+
+        //TODO
+        PictgramPanel.prototype.NavigateUp = function () {
+        };
+        PictgramPanel.prototype.NavigateDown = function () {
+        };
+        PictgramPanel.prototype.NavigateLeft = function () {
+        };
+        PictgramPanel.prototype.NavigateRight = function () {
+        };
+        PictgramPanel.prototype.NavigateHome = function () {
         };
         return PictgramPanel;
     })();

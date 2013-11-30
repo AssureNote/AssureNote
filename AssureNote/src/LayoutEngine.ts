@@ -9,98 +9,136 @@ module AssureNote {
 		}
 
 		//FIXME Rename
-		DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
+		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView, wx: number, wy: number) {
 			//TODO
 		}
 	}
 
-	export class OldLayoutEngine extends LayoutEngine {
-		constructor(public AssureNoteApp: AssureNoteApp) {
-			super(AssureNoteApp);
-		}
+	//export class OldLayoutEngine extends LayoutEngine {
+	//	constructor(public AssureNoteApp: AssureNoteApp) {
+	//		super(AssureNoteApp);
+	//	}
 
-		//FIXME Rename
-		DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
-			var Viewer = new CaseViewer(this.AssureNoteApp.Case, this.AssureNoteApp.OldPluginManager, new ServerAPI("", "", ""), PictgramPanel.ViewPort);
-			Viewer.Draw();
-			var TopView = Viewer.ViewMap[Viewer.ElementTop.Label];
-			Viewer.Screen.SetCaseCenter(TopView.AbsX, TopView.AbsY, TopView.HTMLDoc);
-		}
-	}
+	//	//FIXME Rename
+	//	DoLayout(PictgramPanel: PictgramPanel, Label: string, wx: number, wy: number) {
+	//		var Viewer = new CaseViewer(this.AssureNoteApp.Case, this.AssureNoteApp.OldPluginManager, new ServerAPI("", "", ""), PictgramPanel.ViewPort);
+	//		Viewer.Draw();
+	//		var TopView = Viewer.ViewMap[Viewer.ElementTop.Label];
+	//		Viewer.Screen.SetCaseCenter(TopView.AbsX, TopView.AbsY, TopView.HTMLDoc);
+	//	}
+	//}
 
-	export var DefaultWidth = 96;
 	export var DefaultMargin = 32;
 	export var ContextMargin = 10;
 	export var LevelMargin = 32;
 	export var TreeMargin = 12;
 
-	export class SimpleLayoutEngine {
-		constructor() {
+	export class SimpleLayoutEngine extends LayoutEngine {
+		constructor(public AssureNoteApp: AssureNoteApp) {
+			super(AssureNoteApp);
 		}
 
-		GetHeight(Node: NodeView): number {
-			return 72; // todo
+		GetNodeWidth(Node: NodeView): number {
+			return Node.GetShape().GetNodeWidth();
 		}
 
-		Layout(ThisNode: NodeView, Shape: GSNShape): void {
+		GetNodeHeight(Node: NodeView): number {
+			return Node.GetShape().GetNodeHeight();
+		}
+
+		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView, wx: number, wy: number) {
+			this.Layout(NodeView);
+
+			var DivFrag = document.createDocumentFragment();
+			var SvgNodeFrag = document.createDocumentFragment();
+			var SvgConnectionFrag = document.createDocumentFragment();
+
+			var list = Object.keys(PictgramPanel.ViewMap);
+			for (var i = 0; i < list.length; i++) {
+				var View = PictgramPanel.ViewMap[list[i]];
+				View.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
+				//View.Resize();
+			}
+
+			PictgramPanel.ContentLayer.appendChild(DivFrag);
+			PictgramPanel.SVGLayer.appendChild(SvgConnectionFrag);
+			PictgramPanel.SVGLayer.appendChild(SvgNodeFrag);
+
+		}
+
+		Layout(ThisNode: NodeView): void {
 			if (ThisNode.IsVisible) {
-				var ParentWidth = DefaultWidth;
-				var ParentHeight = this.GetHeight(ThisNode);
+				var Shape = ThisNode.GetShape();
+				var TreeWidth = this.GetNodeWidth(ThisNode);
+				var TreeHeight = this.GetNodeHeight(ThisNode);
 				if (ThisNode.Left != null) {
-					var OffsetGyLeft = 0;
-					for (var Node in ThisNode.Left) {
-						if (Node.IsVisible) {
-							Node.OffsetGx = - (DefaultWidth + DefaultMargin);
-							Node.OffsetGy = OffsetGyLeft;
-							OffsetGyLeft + (Node.GetHeight() + ContextMargin);
+					var OffsetX = 0;
+					var OffsetY = 0;
+					for (var i = 0; i < ThisNode.Left.length; i++) {
+						var SubNode = ThisNode.Left[i];
+						if (SubNode.IsVisible) {
+							SubNode.ParentX = -(this.GetNodeWidth(SubNode) + DefaultMargin);
+							SubNode.ParentY = OffsetY;
+							if (OffsetX > (this.GetNodeWidth(SubNode) + DefaultMargin)) {
+								OffsetX = (this.GetNodeWidth(SubNode) + DefaultMargin);
+							}
+							OffsetY += (this.GetNodeHeight(SubNode) + ContextMargin);
 						}
 					}
-					if (OffsetGyLeft > 0) {
-						ParentWidth += (DefaultWidth + DefaultMargin);
-						if (OffsetGyLeft > ParentHeight) {
-							ParentHeight = OffsetGyLeft;
+					if (OffsetY > 0) {
+						TreeWidth += OffsetX;
+						if (OffsetY > TreeHeight) {
+							TreeHeight = OffsetY;
 						}
 					}
 				}
 				if (ThisNode.Right != null) {
-					var OffsetGyRight = 0;
-					for (var Node in ThisNode.Right) {
-						if (Node.IsVisible) {
-							Node.OffsetGx = + (DefaultWidth + DefaultMargin);
-							Node.OffsetGy = OffsetGyRight;
-							OffsetGyRight + (Node.GetHeight() + ContextMargin);
+					var OffsetX = 0;
+					var OffsetY = 0;
+					for (var i = 0; i < ThisNode.Right.length; i++) {
+						var SubNode = ThisNode.Right[i];
+						if (SubNode.IsVisible) {
+							SubNode.ParentX = (this.GetNodeWidth(ThisNode) + DefaultMargin);
+							SubNode.ParentY = OffsetY;
+							if (OffsetX > (this.GetNodeWidth(SubNode) + DefaultMargin)) {
+								OffsetX = (this.GetNodeWidth(SubNode) + DefaultMargin);
+							}
+							OffsetY += (this.GetNodeHeight(SubNode) + ContextMargin);
 						}
 					}
-					if (OffsetGyRight > 0) {
-						ParentWidth += (DefaultWidth + DefaultMargin);
-						if (OffsetGyRight > ParentHeight) {
-							ParentHeight = OffsetGyRight;
+					if (OffsetY > 0) {
+						TreeWidth += OffsetX;
+						if (OffsetY > TreeHeight) {
+							TreeHeight = OffsetY;
 						}
 					}
 				}
+				TreeHeight += LevelMargin;
 				var ChildrenWidth = 0;
-				ParentHeight += LevelMargin;
-				Shape.Height = ParentHeight;
+				var ChildrenHeight = 0;
 				if (ThisNode.Children != null) {
-					for (var Node in ThisNode.Children) {
-						if (Node.IsVisible) {
-							var SubShape = Node.GetShape();
-							this.Layout(Node, SubShape);
-							Node.OffsetGx = ChildrenWidth;
-							Node.OffsetGy = ParentHeight;
-							ChildrenWidth += (SubShape.Width + TreeMargin);
-							if (ParentHeight + SubShape.Height > Shape.Height) {
-								Shape.Height = ParentHeight + SubShape.Height;
+					for (var i = 0; i < ThisNode.Children.length; i++) {
+						var SubNode = ThisNode.Children[i];
+						if (SubNode.IsVisible) {
+							this.Layout(SubNode);
+							var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
+							var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
+							SubNode.ParentX = ChildrenWidth;
+							SubNode.ParentY = TreeHeight;
+							ChildrenWidth += ChildTreeWidth + TreeMargin;
+							if (ChildTreeHeight > ChildrenHeight) {
+								ChildrenHeight = ChildTreeHeight;
 							}
 						}
 					}
-					for (var Node in ThisNode.Children) {
-						if (Node.IsVisible) {
-							Node.OffsetGx -= (ChildrenWidth / 2);  //centering
-						}
-					}
+					//for (var i = 0; i < ThisNode.Children.length; i++) {
+					//	var SubNode = ThisNode.Children[i];
+					//	if (SubNode.IsVisible) {
+					//		SubNode.ParentX -= (ChildrenWidth / 2);  //centering
+					//	}
+					//}
 				}
-				Shape.Width = (ChildrenWidth > ParentWidth) ? ChildrenWidth : ParentWidth;
+				Shape.SetTreeSize((ChildrenWidth > TreeWidth) ? ChildrenWidth : TreeWidth, TreeHeight + ChildrenHeight);
 			}
 		}
 
@@ -203,7 +241,6 @@ module AssureNote {
 					var p2 = ChildView.GetAbsoluteConnectorPosition(Direction.Top);
 					ChildView.SetArrowPosition(p1, p2, Direction.Bottom);
 				}
-
 			}
 		}
 
