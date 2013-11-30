@@ -58,6 +58,7 @@ var AssureNote;
         AssureNoteApp.Assert = function (b, message) {
             if (b == false) {
                 console.log("Assert: " + message);
+                throw "Assert: " + message;
             }
         };
 

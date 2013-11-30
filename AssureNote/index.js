@@ -21,37 +21,6 @@ var AssureNote;
     })();
     AssureNote.ColorStyle = ColorStyle;
 
-    //export class AssureNoteViewer {
-    //	constructor(public AssureNoteApp: AssureNoteApp) {
-    //		this.ViewMap = {};
-    //	}
-    //	SetGSNView(NodeTree: NodeView): void {
-    //		this.ViewMap = {};
-    //	}
-    //	CreateView(Node: GSNNode): boolean {
-    //		if (this.ViewMap[Node.LabelNumber] != null) {
-    //			return false;
-    //		}
-    //		this.ViewMap[Node.LabelNumber] = new NodeView(Node);
-    //		return true;
-    //	}
-    //	UpdateView(Node: GSNNode): boolean {
-    //		if (this.ViewMap[Node.LabelNumber] == null) {
-    //			return false;
-    //		}
-    //		this.ViewMap[Node.LabelNumber].Update(Node);
-    //		return true;
-    //	}
-    //	Clear(): void {
-    //		this.ViewMap = {};
-    //	}
-    //	GetKeyList(): string[]{
-    //		return Object.keys(this.ViewMap);
-    //	}
-    //	GetNode(Label: string): NodeView {
-    //		return this.ViewMap[Label];
-    //	}
-    //}
     var NodeView = (function () {
         function NodeView(Model, IsRecursive) {
             this.Model = Model;
@@ -151,10 +120,11 @@ var AssureNote;
             //this.GetShape().Resize();
         };
 
-        NodeView.prototype.GetAbsoluteConnectorPosition = function (Dir) {
+        NodeView.prototype.GetDocumentConnectorPosition = function (Dir, wx, wy) {
             var p = this.Shape.GetConnectorPosition(Dir);
-            p.x += this.GetShape().GetNodeWidth();
-            p.y += this.GetShape().GetNodeHeight();
+
+            p.x += this.GetDocumentWx(wx);
+            p.y += this.GetDocumentWy(wy);
             return p;
         };
 
@@ -169,16 +139,25 @@ var AssureNote;
                 for (var i = 0; i < this.Children.length; i++) {
                     var SubNode = this.Children[i];
                     SubNode.SetDocumentPosition(wx, wy);
+                    var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Bottom, wx, wy);
+                    var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Top, wx, wy);
+                    SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Bottom);
                 }
 
                 for (var i = 0; i < this.Right.length; i++) {
                     var SubNode = this.Right[i];
                     SubNode.SetDocumentPosition(wx, wy);
+                    var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Right, wx, wy);
+                    var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Left, wx, wy);
+                    SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Left);
                 }
 
                 for (var i = 0; i < this.Left.length; i++) {
                     var SubNode = this.Left[i];
                     SubNode.SetDocumentPosition(wx, wy);
+                    var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Left, wx, wy);
+                    var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Right, wx, wy);
+                    SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Right);
                 }
             }
         };

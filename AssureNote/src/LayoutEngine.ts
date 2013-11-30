@@ -241,7 +241,6 @@ module AssureNote {
 					var p2 = ChildView.GetAbsoluteConnectorPosition(Direction.Top);
 					ChildView.SetArrowPosition(p1, p2, Direction.Bottom);
 				}
-
 			}
 		}
 

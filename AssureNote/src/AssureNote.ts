@@ -79,6 +79,7 @@ module AssureNote {
 		static Assert(b: boolean, message?: string): void {
 			if (b == false) {
 				console.log("Assert: " + message);
+				throw "Assert: " + message;
 			}
 		}
 
