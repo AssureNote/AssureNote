@@ -17,8 +17,8 @@ module AssureNote {
 		IsVisible: boolean;
 		Label: string;
 		NodeDoc: string;
-		ParentX: number = 60;
-		ParentY: number = 300;
+		ParentX: number = 0;
+		ParentY: number = 0;
 		//private Width: number;
 		//private Height: number;
 		Color: ColorStyle;
@@ -483,4 +483,13 @@ module AssureNote {
 
 $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();
+
+	var Menu: AssureNote.SideMenuContent[] = [];
+	Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", (ev: Event) => {
+		var Writer = new StringWriter();
+		AssureNoteApp.MasterRecord.FormatRecord(Writer);
+		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), "downlaod.wgsn");
+	}));
+	AssureNote.SideMenu.Create(Menu);
+
 });

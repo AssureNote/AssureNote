@@ -24,8 +24,8 @@ var AssureNote;
     var NodeView = (function () {
         function NodeView(Model, IsRecursive) {
             this.Model = Model;
-            this.ParentX = 60;
-            this.ParentY = 300;
+            this.ParentX = 0;
+            this.ParentY = 0;
             this.Left = [];
             this.Right = [];
             this.Children = [];
@@ -464,5 +464,13 @@ var AssureNote;
 
 $(function () {
     var AssureNoteApp = new AssureNote.AssureNoteApp();
+
+    var Menu = [];
+    Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", function (ev) {
+        var Writer = new StringWriter();
+        AssureNoteApp.MasterRecord.FormatRecord(Writer);
+        AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), "downlaod.wgsn");
+    }));
+    AssureNote.SideMenu.Create(Menu);
 });
 //# sourceMappingURL=index.js.map

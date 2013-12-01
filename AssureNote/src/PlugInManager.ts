@@ -1,7 +1,7 @@
 /// <reference path="CaseModel.ts" />
 /// <reference path="CaseViewer.ts" />
 /// <reference path="Api.ts" />
-/// <reference path="SideMenuModel.ts" />
+/// <reference path="SideMenu.ts" />
 
 module AssureNote {
 
@@ -217,10 +217,10 @@ module AssureNote {
 			return true;
 		}
 
-		AddMenu(caseViewer: CaseViewer, Case0: Case, serverApi: ServerAPI) : SideMenuModel {
+		AddMenu(caseViewer: CaseViewer, Case0: Case, serverApi: ServerAPI) : SideMenuContent {
 			return null;
 		}
-		AddMenus(caseViewer: CaseViewer, Case0: Case, serverApi: ServerAPI) : SideMenuModel[] {
+		AddMenus(caseViewer: CaseViewer, Case0: Case, serverApi: ServerAPI) : SideMenuContent[] {
 			return null;
 		}
 	}
@@ -410,7 +410,7 @@ module AssureNote {
 
 
 		CreateSideMenu(caseViewer: CaseViewer, Case0: Case, serverApi: ServerAPI): void {
-			var SideMenuContents: SideMenuModel[] = [];
+			var SideMenuContents: SideMenuContent[] = [];
 			for(var key in this.SideMenuPlugInMap) {
 				var plugin: SideMenuPlugIn = this.SideMenuPlugInMap[key];
 				if(plugin.IsEnabled(caseViewer, Case0, serverApi)) {
