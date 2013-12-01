@@ -27,8 +27,12 @@
 		</div>
 		<div id="fixed-controll-layer" style="width: 0px; height: 0px; position: absolute;">
 			<a href="/" class="logo-fixed"><img id="logo" src="images/logo.png" alt="AssureNote" /></a>
+			<script id="menu-template" type="text/x-jquery-tmpl">
+				<li id="${id}"><a href="${href}"><span class="glyphicon ${icon}"></span>&nbsp; ${value}</a></li>
+			</script>
 			<div class="menu sidebar-nav-fixed bs-sidebar hidden-print affix-top">
 				<ul id="drop-menu" class="nav bs-sidenav">
+
 					<!--<li class="line dropdown">
 						<a href="#" data-toggle="dropdown" class="dropdown-toggle">
 							<span class="glyphicon glyphicon-user"></span>

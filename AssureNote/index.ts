@@ -488,7 +488,7 @@ $(() => {
 	Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", (ev: Event) => {
 		var Writer = new StringWriter();
 		AssureNoteApp.MasterRecord.FormatRecord(Writer);
-		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), "downlaod.wgsn");
+		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), "downlaod.wgsn"); //FIXME file name
 	}));
 	AssureNote.SideMenu.Create(Menu);
 

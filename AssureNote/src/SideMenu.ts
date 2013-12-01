@@ -1,3 +1,5 @@
+/// <reference path="../d.ts/jquery_plugins.d.ts" />
+
 module AssureNote {
 
 	export class SideMenuContent {
@@ -11,9 +13,9 @@ module AssureNote {
 		}
 
 		static Create(models: SideMenuContent[]) {
+			$("#menu-template").tmpl(models).appendTo("#drop-menu");
 			for(var i: number = 0; i < models.length; i++) {
-				var model:SideMenuContent = models[i];
-				$("#drop-menu").prepend($('<li id="'+model.id+'"><a href="'+model.href+'"><span class="glyphicon '+model.icon+'"></span>&nbsp; '+model.value+'</a></li>'));
+				var model: SideMenuContent = models[i];
 				$("#"+model.id).click(model.callback);
 			}
 		}

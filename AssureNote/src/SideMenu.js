@@ -1,3 +1,4 @@
+/// <reference path="../d.ts/jquery_plugins.d.ts" />
 var AssureNote;
 (function (AssureNote) {
     var SideMenuContent = (function () {
@@ -16,9 +17,9 @@ var AssureNote;
         function SideMenu() {
         }
         SideMenu.Create = function (models) {
+            $("#menu-template").tmpl(models).appendTo("#drop-menu");
             for (var i = 0; i < models.length; i++) {
                 var model = models[i];
-                $("#drop-menu").prepend($('<li id="' + model.id + '"><a href="' + model.href + '"><span class="glyphicon ' + model.icon + '"></span>&nbsp; ' + model.value + '</a></li>'));
                 $("#" + model.id).click(model.callback);
             }
         };
