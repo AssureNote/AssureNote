@@ -123,7 +123,6 @@ var AssureNote;
                 mode: "text/x-asn",
                 lineWrapping: true
             });
-            this.Editor.setSize("300px", "200px");
             $('#editor-wrapper').css({ display: 'none', opacity: '1.0' });
         }
         PluginPanel.prototype.Clear = function () {

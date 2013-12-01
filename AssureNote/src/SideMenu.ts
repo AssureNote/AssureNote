@@ -15,7 +15,7 @@ module AssureNote {
 		static Create(models: SideMenuContent[]) {
 			$("#menu-template").tmpl(models).appendTo("#drop-menu");
 			for(var i: number = 0; i < models.length; i++) {
-				var model: SideMenuContent = models[i];
+				var model = models[i];
 				$("#"+model.id).click(model.callback);
 			}
 		}
