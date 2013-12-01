@@ -24,8 +24,8 @@ var AssureNote;
     var NodeView = (function () {
         function NodeView(Model, IsRecursive) {
             this.Model = Model;
-            this.ParentX = 60;
-            this.ParentY = 300;
+            this.RelativeX = 60;
+            this.RelativeY = 300;
             this.Left = [];
             this.Right = [];
             this.Children = [];
@@ -87,16 +87,16 @@ var AssureNote;
 
         NodeView.prototype.GetDocumentWx = function (wx) {
             if (this.Parent == null) {
-                return wx + this.ParentX;
+                return wx + this.RelativeX;
             }
-            return this.Parent.GetDocumentWx(wx) + this.ParentX;
+            return this.Parent.GetDocumentWx(wx) + this.RelativeX;
         };
 
         NodeView.prototype.GetDocumentWy = function (wy) {
             if (this.Parent == null) {
-                return wy + this.ParentY;
+                return wy + this.RelativeY;
             }
-            return this.Parent.GetDocumentWy(wy) + this.ParentY;
+            return this.Parent.GetDocumentWy(wy) + this.RelativeY;
         };
 
         NodeView.prototype.GetNodeType = function () {
@@ -165,6 +165,20 @@ var AssureNote;
     })();
     AssureNote.NodeView = NodeView;
 
+    var Rect = (function () {
+        function Rect(X, Y, Width, Height) {
+            this.X = X;
+            this.Y = Y;
+            this.Width = Width;
+            this.Height = Height;
+        }
+        Rect.prototype.toString = function () {
+            return "(" + [this.X, this.Y, this.Width, this.Height].join(", ") + ")";
+        };
+        return Rect;
+    })();
+    AssureNote.Rect = Rect;
+
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
@@ -172,8 +186,7 @@ var AssureNote;
             this.Content = null;
             this.NodeWidth = 250;
             this.NodeHeight = 100;
-            this.TreeWidth = 0;
-            this.TreeHeight = 0;
+            this.TreeBoundingBox = new Rect(0, 0, 0, 0);
         }
         GSNShape.CreateArrowPath = function () {
             if (!GSNShape.ArrowPathMaster) {
@@ -187,8 +200,8 @@ var AssureNote;
         };
 
         GSNShape.prototype.SetTreeSize = function (Width, Height) {
-            this.TreeWidth = Width;
-            this.TreeHeight = Height;
+            this.TreeBoundingBox.Width = Width;
+            this.TreeBoundingBox.Height = Height;
             //			if (this.NodeHeight == 0) {
             //				this.TreeWidth = Width;
             //				this.NodeHeight = Height;
@@ -204,17 +217,30 @@ var AssureNote;
         };
 
         GSNShape.prototype.GetTreeWidth = function () {
-            if (this.TreeWidth == 0) {
-                this.TreeWidth = 250;
+            if (this.TreeBoundingBox.Width == 0) {
+                this.TreeBoundingBox.Width = 250;
             }
-            return this.TreeWidth;
+            return this.TreeBoundingBox.Width;
         };
 
         GSNShape.prototype.GetTreeHeight = function () {
-            if (this.TreeHeight == 0) {
-                this.TreeHeight = 100;
+            if (this.TreeBoundingBox.Height == 0) {
+                this.TreeBoundingBox.Height = 100;
             }
-            return this.TreeHeight;
+            return this.TreeBoundingBox.Height;
+        };
+
+        GSNShape.prototype.GetTreeLeftX = function () {
+            return this.TreeBoundingBox.X;
+        };
+
+        GSNShape.prototype.GetTreeUpperY = function () {
+            return this.TreeBoundingBox.Y;
+        };
+
+        GSNShape.prototype.SetTreeUpperLeft = function (X, Y) {
+            this.TreeBoundingBox.X = X;
+            this.TreeBoundingBox.Y = Y;
         };
 
         //Resize(): void {

@@ -17,10 +17,8 @@ module AssureNote {
 		IsVisible: boolean;
 		Label: string;
 		NodeDoc: string;
-		ParentX: number = 60;
-		ParentY: number = 300;
-		//private Width: number;
-		//private Height: number;
+		RelativeX: number = 60;  // relative x from parent node
+        RelativeY: number = 300; // relative y from parent node
 		Color: ColorStyle;
 		Parent: NodeView;
 		Left: NodeView[] = [];
@@ -90,16 +88,16 @@ module AssureNote {
 
 		GetDocumentWx(wx: number): number {
 			if (this.Parent == null) {
-				return wx + this.ParentX;
+				return wx + this.RelativeX;
 			}
-			return this.Parent.GetDocumentWx(wx) + this.ParentX;
+			return this.Parent.GetDocumentWx(wx) + this.RelativeX;
 		}
 
 		GetDocumentWy(wy: number): number {
 			if (this.Parent == null) {
-				return wy + this.ParentY;
+				return wy + this.RelativeY;
 			}
-			return this.Parent.GetDocumentWy(wy) + this.ParentY;
+			return this.Parent.GetDocumentWy(wy) + this.RelativeY;
 		}
 
 		GetNodeType(): GSNType {
@@ -164,7 +162,15 @@ module AssureNote {
 				}
 			}
 		}
-	}
+    }
+
+    export class Rect {
+        constructor(public X: number, public Y: number, public Width: number, public Height: number) {
+        }
+        toString(): string {
+            return "(" + [this.X, this.Y, this.Width, this.Height].join(", ") + ")";
+        }
+    }
 
 	export class GSNShape {
 		ShapeGroup: SVGGElement;
@@ -173,16 +179,16 @@ module AssureNote {
 		ColorClassName: string = Color.Default;
 		private NodeWidth: number;
         private NodeHeight: number;
-        private TreeWidth: number;
-        private TreeHeight: number;
+        private TreeBoundingBox: Rect;
+        //private TreeWidth: number; // Width of the bounding box contains all subnodes (left nodes, right nodes and children)
+        //private TreeHeight: number;
         private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
 			this.Content = null;
 			this.NodeWidth = 250;
-			this.NodeHeight = 100;
-			this.TreeWidth = 0;
-			this.TreeHeight = 0;
+            this.NodeHeight = 100;
+            this.TreeBoundingBox = new Rect(0, 0, 0, 0);
 		}
 
         private static CreateArrowPath(): SVGPathElement {
@@ -197,8 +203,8 @@ module AssureNote {
         }
 
 		SetTreeSize(Width : number, Height: number): void {
-			this.TreeWidth = Width;
-			this.TreeHeight = Height;
+            this.TreeBoundingBox.Width = Width;
+            this.TreeBoundingBox.Height = Height;
 //			if (this.NodeHeight == 0) {
 //				this.TreeWidth = Width;
 //				this.NodeHeight = Height;
@@ -214,17 +220,30 @@ module AssureNote {
 		}
 
 		GetTreeWidth(): number {
-			if (this.TreeWidth == 0) {
-				this.TreeWidth = 250; //FIXME
+            if (this.TreeBoundingBox.Width == 0) {
+                this.TreeBoundingBox.Width = 250; //FIXME
 			}
-            return this.TreeWidth;
+            return this.TreeBoundingBox.Width;
         }
 
 		GetTreeHeight(): number {
-			if (this.TreeHeight == 0) {
-				this.TreeHeight = 100; //FIXME
+            if (this.TreeBoundingBox.Height == 0) {
+                this.TreeBoundingBox.Height = 100; //FIXME
 			}
-			return this.TreeHeight;
+            return this.TreeBoundingBox.Height;
+        }
+
+        GetTreeLeftX(): number {
+            return this.TreeBoundingBox.X;
+        }
+
+        GetTreeUpperY(): number {
+            return this.TreeBoundingBox.Y;
+        }
+
+        SetTreeUpperLeft(X: number, Y: number): void {
+            this.TreeBoundingBox.X = X;
+            this.TreeBoundingBox.Y = Y;
         }
 
 		//Resize(): void {
