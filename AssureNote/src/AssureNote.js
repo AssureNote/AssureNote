@@ -23,13 +23,13 @@ var AssureNote;
 
         function CreateGSNShape(NodeView) {
             switch (NodeView.GetNodeType()) {
-                case AssureNote.GSNType.Goal:
+                case GSNType.Goal:
                     return new AssureNote.GSNGoalShape(NodeView);
-                case AssureNote.GSNType.Context:
+                case GSNType.Context:
                     return new AssureNote.GSNContextShape(NodeView);
-                case AssureNote.GSNType.Strategy:
+                case GSNType.Strategy:
                     return new AssureNote.GSNStrategyShape(NodeView);
-                case AssureNote.GSNType.Evidence:
+                case GSNType.Evidence:
                     return new AssureNote.GSNEvidenceShape(NodeView);
             }
         }
@@ -93,7 +93,7 @@ var AssureNote;
                     //this.PictgramPanel.Draw(root.Label, 0, 0);
                     //---
                     //FIXME
-                    _this.MasterRecord = new AssureNote.GSNRecord();
+                    _this.MasterRecord = new GSNRecord();
                     _this.MasterRecord.Parse(Contents);
 
                     //this.Viewer = new AssureNoteViewer(this);

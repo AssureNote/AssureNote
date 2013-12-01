@@ -37,7 +37,7 @@ var AssureNote;
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
                     var SubView = new NodeView(SubNode, IsRecursive);
-                    if (SubNode.NodeType == AssureNote.GSNType.Context) {
+                    if (SubNode.NodeType == GSNType.Context) {
                         // Layout Engine allowed to move a node left-side
                         this.AppendRightNode(SubView);
                     } else {
@@ -226,16 +226,16 @@ var AssureNote;
         //}
         GSNShape.prototype.UpdateWidth = function () {
             switch (this.NodeView.Model.NodeType) {
-                case AssureNote.GSNType.Goal:
+                case GSNType.Goal:
                     this.Content.className = "node node-goal";
                     break;
-                case AssureNote.GSNType.Context:
+                case GSNType.Context:
                     this.Content.className = "node node-context";
                     break;
-                case AssureNote.GSNType.Strategy:
+                case GSNType.Strategy:
                     this.Content.className = "node node-strategy";
                     break;
-                case AssureNote.GSNType.Evidence:
+                case GSNType.Evidence:
                 default:
                     this.Content.className = "node node-evidence";
                     break;
