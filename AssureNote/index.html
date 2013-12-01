@@ -27,9 +27,13 @@
 		</div>
 		<div id="fixed-controll-layer" style="width: 0px; height: 0px; position: absolute;">
 			<a href="/" class="logo-fixed"><img id="logo" src="images/logo.png" alt="AssureNote" /></a>
+			<script id="menu-template" type="text/x-jquery-tmpl">
+				<li id="${id}"><a href="${href}"><span class="glyphicon ${icon}"></span>&nbsp; ${value}</a></li>
+			</script>
 			<div class="menu sidebar-nav-fixed bs-sidebar hidden-print affix-top">
 				<ul id="drop-menu" class="nav bs-sidenav">
-					<li class="line dropdown">
+
+					<!--<li class="line dropdown">
 						<a href="#" data-toggle="dropdown" class="dropdown-toggle">
 							<span class="glyphicon glyphicon-user"></span>
 							&nbsp; Sign In
@@ -45,7 +49,7 @@
 								<input type="submit" style="margin-bottom: 15px; clear: left; width: 100%; height: 32px; font-size: 13px;" value="Sign in" href="/auth/facebook" class="btn btn-primary">
 							</form>
 						</div>
-					</li>
+					</li>-->
 				</ul>
 			</div>
 			<input type="text" class="form-control" id="command-line" style="width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large" />
@@ -79,6 +83,7 @@
 	<script type="text/javascript" src="lib/jquery.cookie.js"></script>
 	<script type="text/javascript" src="lib/pointer.min.js"></script>
 	<script type="text/javascript" src="lib/codemirror.js"></script>
+	<script type="text/javascript" src="lib/FileSaver.js"></script>
 	<script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
 
 	<script type="text/javascript" src="lib/ASNParser.js"></script>
@@ -96,7 +101,7 @@
 	<script type="text/javascript" src="src/EditorUtil.js"></script>
 	<script type="text/javascript" src="src/Api.js"></script>
 	<script type="text/javascript" src="src/PluginManager.js"></script>
-	<script type="text/javascript" src="src/SideMenuModel.js"></script>
+	<script type="text/javascript" src="src/SideMenu.js"></script>
 	<script type="text/javascript" src="index.js"></script>
 </body>
 </html>

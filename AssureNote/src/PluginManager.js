@@ -1,7 +1,7 @@
 /// <reference path="CaseModel.ts" />
 /// <reference path="CaseViewer.ts" />
 /// <reference path="Api.ts" />
-/// <reference path="SideMenuModel.ts" />
+/// <reference path="SideMenu.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

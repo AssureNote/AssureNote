@@ -1,7 +1,14 @@
 ///<reference path='PluginManager.ts'/>
+///<reference path='SideMenu.ts'/>
 var AssureNote;
 (function (AssureNote) {
     (function (AssureNoteUtils) {
+        function SaveAs(ContentString, FileName) {
+            var blob = new Blob([ContentString], { type: 'text/plain; charset=UTF-8' });
+            saveAs(blob, FileName);
+        }
+        AssureNoteUtils.SaveAs = SaveAs;
+
         function GetNodeLabel(event) {
             var element = event.srcElement;
             while (element != null) {
@@ -23,13 +30,13 @@ var AssureNote;
 
         function CreateGSNShape(NodeView) {
             switch (NodeView.GetNodeType()) {
-                case AssureNote.GSNType.Goal:
+                case GSNType.Goal:
                     return new AssureNote.GSNGoalShape(NodeView);
-                case AssureNote.GSNType.Context:
+                case GSNType.Context:
                     return new AssureNote.GSNContextShape(NodeView);
-                case AssureNote.GSNType.Strategy:
+                case GSNType.Strategy:
                     return new AssureNote.GSNStrategyShape(NodeView);
-                case AssureNote.GSNType.Evidence:
+                case GSNType.Evidence:
                     return new AssureNote.GSNEvidenceShape(NodeView);
             }
         }
@@ -92,15 +99,12 @@ var AssureNote;
                     //this.Case = Case0;
                     //this.PictgramPanel.Draw(root.Label, 0, 0);
                     //---
-                    //FIXME
-                    _this.MasterRecord = new AssureNote.GSNRecord();
+                    _this.MasterRecord = new GSNRecord();
                     _this.MasterRecord.Parse(Contents);
 
-                    //this.Viewer = new AssureNoteViewer(this);
                     var LatestDoc = _this.MasterRecord.GetLatestDoc();
-
-                    //this.Viewer.Set(LatestDoc);
                     var TopGoalNode = LatestDoc.TopGoal;
+
                     _this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
                     _this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
                 };

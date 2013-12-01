@@ -1,8 +1,16 @@
 ///<reference path='PluginManager.ts'/>
+///<reference path='SideMenu.ts'/>
+
+declare function saveAs(data: Blob, filename: String): void;
 
 module AssureNote {
 
 	export module AssureNoteUtils {
+
+		export function SaveAs(ContentString: string, FileName: string): void {
+			var blob = new Blob([ContentString], { type: 'text/plain; charset=UTF-8' }); 
+			saveAs(blob, FileName);
+		}
 
 		export function GetNodeLabel(event: Event): string {
 			var element = <HTMLElement>event.srcElement;
@@ -113,13 +121,12 @@ module AssureNote {
 					//this.Case = Case0;
 					//this.PictgramPanel.Draw(root.Label, 0, 0);
 					//---
-					//FIXME
 					this.MasterRecord = new GSNRecord();
 					this.MasterRecord.Parse(Contents);
-					//this.Viewer = new AssureNoteViewer(this);
+
 					var LatestDoc = this.MasterRecord.GetLatestDoc();
-					//this.Viewer.Set(LatestDoc);
 					var TopGoalNode = LatestDoc.TopGoal;
+
 					this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
 					this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
 				};

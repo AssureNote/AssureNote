@@ -17,8 +17,8 @@ module AssureNote {
 		IsVisible: boolean;
 		Label: string;
 		NodeDoc: string;
-		RelativeX: number = 60;  // relative x from parent node
-        RelativeY: number = 300; // relative y from parent node
+		RelativeX: number = 0; // relative x from parent node
+        RelativeY: number = 0; // relative y from parent node
 		Color: ColorStyle;
 		Parent: NodeView;
 		Left: NodeView[] = [];
@@ -502,4 +502,13 @@ module AssureNote {
 
 $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();
+
+	var Menu: AssureNote.SideMenuContent[] = [];
+	Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", (ev: Event) => {
+		var Writer = new StringWriter();
+		AssureNoteApp.MasterRecord.FormatRecord(Writer);
+		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), "downlaod.wgsn"); //FIXME file name
+	}));
+	AssureNote.SideMenu.Create(Menu);
+
 });

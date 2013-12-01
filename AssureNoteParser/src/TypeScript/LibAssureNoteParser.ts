@@ -127,7 +127,7 @@ class MessageDigest {
 
 class Lib {
 	/* To be set on lib/md5.js */
-	md5 : (str: string) => string;
+	static md5 : (str: string) => string;
 
 	/* Static Fields */
 	static Input: string[] = [];
@@ -141,7 +141,7 @@ class Lib {
 	}
 
 	static UpdateMD5(md: MessageDigest, text: string) : void {
-		md.digestString = this.md5(text);
+		md.digestString = Lib.md5(text);
 	}
 
 	static EqualsDigest(digest1: string, digest2: string) : boolean {
