@@ -259,21 +259,7 @@ module AssureNote {
         }
 
 		UpdateHtmlClass() {
-			switch (this.NodeView.Model.NodeType) {
-				case GSNType.Goal:
-					this.Content.className = "node node-goal";
-					break;
-				case GSNType.Context:
-					this.Content.className = "node node-context";
-					break;
-				case GSNType.Strategy:
-					this.Content.className = "node node-strategy";
-					break;
-				case GSNType.Evidence:
-				default:
-					this.Content.className = "node node-evidence";
-					break;
-			}
+			this.Content.className = "node";
 		}
 
 		private PrerenderHTMLContent(): void {
@@ -397,7 +383,11 @@ module AssureNote {
 			//super.Resize(CaseViewer, NodeModel, HTMLDoc);
 			this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
 			this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
-		}
+        }
+
+        UpdateHtmlClass() {
+            this.Content.className = "node node-goal";
+        }
 
 	}
 
@@ -420,27 +410,9 @@ module AssureNote {
             this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
 		}
 
-		//SetColor(key: string) {
-		//	this.BodyRect.setAttribute("class", key);
-		//}
-
-		//GetColor() {
-		//	return this.BodyRect.getAttribute("class");
-		//}
-
-		//EnableHighlight() {
-		//	var CurrentColor: string = this.GetColor();
-		//	if (!CurrentColor.match(/-highlight/)) {
-		//		this.BodyRect.removeAttribute("class");
-		//		this.BodyRect.setAttribute("class", CurrentColor + "-highlight");
-		//	}
-		//}
-
-		//DisableHighlight() {
-		//	var CurrentColor: string = this.GetColor();
-		//	this.BodyRect.removeAttribute("class");
-		//	this.BodyRect.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-		//}
+        UpdateHtmlClass() {
+            this.Content.className = "node node-context";
+        }
 
 	}
 
@@ -464,13 +436,9 @@ module AssureNote {
             this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + w + ",0 " + (w - this.delta) + "," + h + " 0," + h);
 		}
 
-		//SetColor(key: string) {
-		//	this.BodyPolygon.setAttribute("class", key);
-		//}
-
-		//GetColor() {
-		//	return this.BodyPolygon.getAttribute("class");
-		//}
+        UpdateHtmlClass() {
+            this.Content.className = "node node-strategy";
+        }
 
 		GetConnectorPosition(Dir: Direction): Point {
 			switch (Dir) {
@@ -483,7 +451,9 @@ module AssureNote {
 				case Direction.Bottom:
 					return new Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
 			}
-		}
+        }
+
+
 	}
 
 	export class GSNEvidenceShape extends GSNShape {
@@ -505,8 +475,11 @@ module AssureNote {
 			this.BodyEllipse.setAttribute("cy", (this.GetNodeHeight() / 2).toString());
 			this.BodyEllipse.setAttribute("rx", (this.GetNodeWidth()/ 2).toString());
 			this.BodyEllipse.setAttribute("ry", (this.GetNodeHeight() / 2).toString());
-		}
+        }
 
+        UpdateHtmlClass() {
+            this.Content.className = "node node-evidence";
+        }
 	}
 
 
