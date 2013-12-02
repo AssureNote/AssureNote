@@ -3,7 +3,7 @@
 ///<reference path='src/AssureNoteParser.ts'/>
 ///<reference path='src/Panel.ts'/>
 ///<reference path='src/LayoutEngine.ts'/>
-///<reference path='src/CaseViewer.ts'/>
+///<reference path='src/Viewport.ts'/>
 
 module AssureNote {
 

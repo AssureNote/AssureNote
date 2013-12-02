@@ -3,7 +3,7 @@
 ///<reference path='src/AssureNoteParser.ts'/>
 ///<reference path='src/Panel.ts'/>
 ///<reference path='src/LayoutEngine.ts'/>
-///<reference path='src/CaseViewer.ts'/>
+///<reference path='src/Viewport.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

@@ -275,4 +275,4 @@ var AssureNote;
     })();
     AssureNote.ViewportManager = ViewportManager;
 })(AssureNote || (AssureNote = {}));
-//# sourceMappingURL=CaseViewer.js.map
+//# sourceMappingURL=Viewport.js.map
