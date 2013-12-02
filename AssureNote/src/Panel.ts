@@ -10,9 +10,9 @@ module AssureNote {
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
-		//GSNView: AssureNoteViewer;
 		ViewMap: { [index: string]: NodeView };
 		MasterView: NodeView;
+		CmdLine: CommandLine;
 
 		CurrentDoc: GSNDoc;// Convert to caseview
 		FocusedLabel: string;
@@ -25,7 +25,7 @@ module AssureNote {
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
-			this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);//new OldLayoutEngine(this.AssureNoteApp);
+			this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
 			this.ContentLayer.onclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
@@ -39,22 +39,23 @@ module AssureNote {
 				return false;
 			};
 
-			var CmdLine = new CommandLine();
+			this.CmdLine = new CommandLine();
 			document.onkeydown = (ev: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
 
 				if (ev.keyCode == 186/*:*/) {
-					CmdLine.Show();
+					this.CmdLine.Show();
 				}
-				else if (ev.keyCode == 13/*Enter*/ && CmdLine.IsEnable()) {
-					this.AssureNoteApp.ExecCommand(CmdLine.GetValue());
-					CmdLine.Hide();
-					CmdLine.Clear();
+				else if (ev.keyCode == 13/*Enter*/ && this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
+					this.AssureNoteApp.ExecCommand(this.CmdLine.GetValue());
+					this.CmdLine.Hide();
+					this.CmdLine.Clear();
 					return false;
 				}
 			};
+
 			this.ContentLayer.onmouseover = (event: MouseEvent) => {
 				if (this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
@@ -140,7 +141,6 @@ module AssureNote {
 				mode: "text/x-asn",
 				lineWrapping: true,
 			});
-			this.Editor.setSize("300px", "200px"); //FIXME
 			$('#editor-wrapper').css({ display: 'none', opacity: '1.0' });
 		}
 

@@ -41,7 +41,9 @@
     <Content Include="lib\bootstrap\js\bootstrap.min.js" />
     <Content Include="lib\codemirror.css" />
     <Content Include="lib\codemirror.js" />
+    <Content Include="lib\FileSaver.js" />
     <Content Include="lib\jquery.cookie.js" />
+    <Content Include="lib\jquery.jqdock.min.js" />
     <Content Include="lib\jquery.min.js" />
     <Content Include="lib\jquery.svg.css" />
     <Content Include="lib\jquery.svg.min.js" />
@@ -52,23 +54,27 @@
   <ItemGroup>
     <TypeScriptCompile Include="d.ts\ASNParser.d.ts" />
     <TypeScriptCompile Include="d.ts\jquery.d.ts" />
+    <TypeScriptCompile Include="d.ts\jquery_plugins.d.ts" />
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
     <TypeScriptCompile Include="index.ts" />
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
-    <TypeScriptCompile Include="src\CaseDecoder.ts" />
-    <TypeScriptCompile Include="src\CaseEncoder.ts" />
-    <TypeScriptCompile Include="src\CaseModel.ts" />
-    <TypeScriptCompile Include="src\CaseViewer.ts" />
-    <TypeScriptCompile Include="src\ColorMap.ts" />
-    <TypeScriptCompile Include="src\CommitModel.ts" />
-    <TypeScriptCompile Include="src\EditorUtil.ts" />
+    <TypeScriptCompile Include="src\old\CaseDecoder.ts" />
+    <TypeScriptCompile Include="src\old\CaseEncoder.ts" />
+    <TypeScriptCompile Include="src\old\CaseModel.ts" />
+    <TypeScriptCompile Include="src\Viewport.ts" />
+    <TypeScriptCompile Include="src\old\CaseViewer.ts" />
+    <TypeScriptCompile Include="src\old\ColorMap.ts" />
+    <TypeScriptCompile Include="src\old\CommitModel.ts" />
+    <TypeScriptCompile Include="src\old\EditorUtil.ts" />
     <TypeScriptCompile Include="src\AssureNote.ts" />
     <TypeScriptCompile Include="src\CommandLine.ts" />
     <TypeScriptCompile Include="src\LayoutEngine.ts" />
+    <TypeScriptCompile Include="src\old\OldLayoutEngine.ts" />
     <TypeScriptCompile Include="src\Panel.ts" />
-    <TypeScriptCompile Include="src\PluginManager.ts" />
-    <TypeScriptCompile Include="src\Api.ts" />
-    <TypeScriptCompile Include="src\SideMenuModel.ts" />
+    <TypeScriptCompile Include="src\old\PluginManager.ts" />
+    <TypeScriptCompile Include="src\old\Api.ts" />
+    <TypeScriptCompile Include="src\Plugin.ts" />
+    <TypeScriptCompile Include="src\SideMenu.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.eot" />

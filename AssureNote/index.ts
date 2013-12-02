@@ -1,35 +1,31 @@
-///<reference path='src/Api.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
 ///<reference path='src/AssureNote.ts'/>
 ///<reference path='src/AssureNoteParser.ts'/>
 ///<reference path='src/Panel.ts'/>
 ///<reference path='src/LayoutEngine.ts'/>
-///<reference path='src/PluginManager.ts'/>
-///<reference path='src/CaseViewer.ts'/>
+///<reference path='src/Viewport.ts'/>
 
 module AssureNote {
 
 	export class ColorStyle {
-		//TODO
+		static Default: string = "assureit-default";
+		static ToDo: string = "assureit-todo";
+		static Searched: string = "assureit-search";
+		static Danger: string = "assureit-danger";
 	}
 
 	export class NodeView {
 		IsVisible: boolean;
 		Label: string;
 		NodeDoc: string;
-		ParentX: number = 60;
-		ParentY: number = 300;
-		//private Width: number;
-		//private Height: number;
+		RelativeX: number = 0; // relative x from parent node
+        RelativeY: number = 0; // relative y from parent node
 		Color: ColorStyle;
 		Parent: NodeView;
-		Left: NodeView[] = [];
-		Right: NodeView[] = [];
-		Children: NodeView[] = [];
+		Left: NodeView[] = null;
+		Right: NodeView[] = null;
+		Children: NodeView[] = null;
 		Shape: GSNShape = null;
-
-		private ConnectorStartPoint: Direction;
-		private ConnectorEndPoint: Direction;
 
 		constructor(public Model: GSNNode, IsRecursive: boolean) {
 			this.Label = Model.GetLabel();
@@ -50,35 +46,46 @@ module AssureNote {
 		}
 
 		UpdateViewMap(ViewMap: { [index: string]: NodeView }) : void {
-			ViewMap[this.Label] = this;
-			for (var i = 0; i < this.Left.length; i++) {
-				this.Left[i].UpdateViewMap(ViewMap);
-			}
-			for (var i = 0; i < this.Right.length; i++) {
-				this.Right[i].UpdateViewMap(ViewMap);
-			}
-			for (var i = 0; i < this.Children.length; i++) {
-				this.Children[i].UpdateViewMap(ViewMap);
-			}
+            ViewMap[this.Label] = this;
+            if (this.Left != null) {
+                for (var i = 0; i < this.Left.length; i++) {
+                    this.Left[i].UpdateViewMap(ViewMap);
+                }
+            }
+            if (this.Right != null) {
+                for (var i = 0; i < this.Right.length; i++) {
+                    this.Right[i].UpdateViewMap(ViewMap);
+                }
+            }
+            if (this.Children != null) {
+                for (var i = 0; i < this.Children.length; i++) {
+                    this.Children[i].UpdateViewMap(ViewMap);
+                }
+            }
 		}
 
-		private AppendParent(Parent: NodeView): void {
-			this.Parent = Parent;
+        AppendChild(SubNode: NodeView): void {
+            if (this.Children == null) {
+                this.Children = [];
+            }
+            this.Children.push(SubNode);
+            SubNode.Parent = this;
 		}
 
-		AppendChild(Child: NodeView): void {
-			this.Children.push(Child);
-			Child.AppendParent(this);
+        AppendLeftNode(SubNode: NodeView): void {
+            if (this.Left == null) {
+                this.Left = [];
+            }
+			this.Left.push(SubNode);
+            SubNode.Parent = this;
 		}
 
-		AppendLeftNode(Node: NodeView): void {
-			this.Left.push(Node);
-			Node.AppendParent(this);
-		}
-
-		AppendRightNode(Node: NodeView): void {
-			this.Right.push(Node);
-			Node.AppendParent(this);
+        AppendRightNode(SubNode: NodeView): void {
+            if (this.Right == null) {
+                this.Right = [];
+            }
+			this.Right.push(SubNode);
+            SubNode.Parent = this;
 		}
 
 		GetShape(): GSNShape {
@@ -90,27 +97,28 @@ module AssureNote {
 
 		GetDocumentWx(wx: number): number {
 			if (this.Parent == null) {
-				return wx + this.ParentX;
+				return wx + this.RelativeX;
 			}
-			return this.Parent.GetDocumentWx(wx) + this.ParentX;
+			return this.Parent.GetDocumentWx(wx) + this.RelativeX;
 		}
 
 		GetDocumentWy(wy: number): number {
 			if (this.Parent == null) {
-				return wy + this.ParentY;
+				return wy + this.RelativeY;
 			}
-			return this.Parent.GetDocumentWy(wy) + this.ParentY;
+			return this.Parent.GetDocumentWy(wy) + this.RelativeY;
 		}
 
 		GetNodeType(): GSNType {
 			return this.Model.NodeType;
-		}
+        }
+
+        CreateElement(): void {
+
+        }
 
 		Render(DivFrag: DocumentFragment, SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment): void {
-			var Shape = this.GetShape();
-			Shape.Render();
-			Shape.CreateSVG(SvgNodeFrag, SvgConnectionFrag);
-			Shape.CreateHtmlContent(DivFrag);
+            this.Shape.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
 		}
 
 		Update(Model: GSNNode) {
@@ -119,8 +127,9 @@ module AssureNote {
 			throw "Update is under construction.";
 		}
 
+        //deprecated
 		Resize() {
-			//this.GetShape().Resize();
+			//this.Shape.Resize();
 		}
 
 		GetDocumentConnectorPosition(Dir: Direction, wx: number, wy: number): Point {
@@ -138,51 +147,61 @@ module AssureNote {
 		SetDocumentPosition(wx: number, wy: number): void {
 			if (this.IsVisible) {
 				AssureNoteApp.Assert((this.Shape != null));
-				this.Shape.SetPosition(this.GetDocumentWx(wx), this.GetDocumentWy(wy));
-				for (var i = 0; i < this.Children.length; i++) {
-					var SubNode = this.Children[i];
-					SubNode.SetDocumentPosition(wx, wy);
-					var P1 = this.GetDocumentConnectorPosition(Direction.Bottom, wx, wy);
-					var P2 = SubNode.GetDocumentConnectorPosition(Direction.Top, wx, wy);
-					SubNode.SetArrowPosition(P1, P2, Direction.Bottom);
-				}
-
-				for (var i = 0; i < this.Right.length; i++) {
-					var SubNode = this.Right[i];
-					SubNode.SetDocumentPosition(wx, wy);
-					var P1 = this.GetDocumentConnectorPosition(Direction.Right, wx, wy);
-					var P2 = SubNode.GetDocumentConnectorPosition(Direction.Left, wx, wy);
-					SubNode.SetArrowPosition(P1, P2, Direction.Left);
-				}
-
-				for (var i = 0; i < this.Left.length; i++) {
-					var SubNode = this.Left[i];
-					SubNode.SetDocumentPosition(wx, wy);
-					var P1 = this.GetDocumentConnectorPosition(Direction.Left, wx, wy);
-					var P2 = SubNode.GetDocumentConnectorPosition(Direction.Right, wx, wy);
-					SubNode.SetArrowPosition(P1, P2, Direction.Right);
-				}
+                this.Shape.SetPosition(this.GetDocumentWx(wx), this.GetDocumentWy(wy));
+                if (this.Children != null) {
+                    for (var i = 0; i < this.Children.length; i++) {
+                        var SubNode = this.Children[i];
+                        SubNode.SetDocumentPosition(wx, wy);
+                        var P1 = this.GetDocumentConnectorPosition(Direction.Bottom, wx, wy);
+                        var P2 = SubNode.GetDocumentConnectorPosition(Direction.Top, wx, wy);
+                        SubNode.SetArrowPosition(P1, P2, Direction.Bottom);
+                    }
+                }
+                if (this.Right != null) {
+                    for (var i = 0; i < this.Right.length; i++) {
+                        var SubNode = this.Right[i];
+                        SubNode.SetDocumentPosition(wx, wy);
+                        var P1 = this.GetDocumentConnectorPosition(Direction.Right, wx, wy);
+                        var P2 = SubNode.GetDocumentConnectorPosition(Direction.Left, wx, wy);
+                        SubNode.SetArrowPosition(P1, P2, Direction.Left);
+                    }
+                }
+                if (this.Left != null) {
+                    for (var i = 0; i < this.Left.length; i++) {
+                        var SubNode = this.Left[i];
+                        SubNode.SetDocumentPosition(wx, wy);
+                        var P1 = this.GetDocumentConnectorPosition(Direction.Left, wx, wy);
+                        var P2 = SubNode.GetDocumentConnectorPosition(Direction.Right, wx, wy);
+                        SubNode.SetArrowPosition(P1, P2, Direction.Right);
+                    }
+                }
 			}
 		}
-	}
+    }
+
+    export class Rect {
+        constructor(public X: number, public Y: number, public Width: number, public Height: number) {
+        }
+        toString(): string {
+            return "(" + [this.X, this.Y, this.Width, this.Height].join(", ") + ")";
+        }
+    }
 
 	export class GSNShape {
 		ShapeGroup: SVGGElement;
 		ArrowPath: SVGPathElement;
 		Content: HTMLElement;
-		ColorClassName: string = Color.Default;
+		ColorClassName: string = ColorStyle.Default;
 		private NodeWidth: number;
         private NodeHeight: number;
-        private TreeWidth: number;
-        private TreeHeight: number;
+        private TreeBoundingBox: Rect;
         private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
 			this.Content = null;
 			this.NodeWidth = 250;
-			this.NodeHeight = 100;
-			this.TreeWidth = 0;
-			this.TreeHeight = 0;
+            this.NodeHeight = 0;
+            this.TreeBoundingBox = new Rect(0, 0, 0, 0);
 		}
 
         private static CreateArrowPath(): SVGPathElement {
@@ -192,72 +211,64 @@ module AssureNote {
                 GSNShape.ArrowPathMaster.setAttribute("fill", "none");
                 GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
                 GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-            }
+				GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+			}
             return <SVGPathElement>GSNShape.ArrowPathMaster.cloneNode();
         }
 
 		SetTreeSize(Width : number, Height: number): void {
-			this.TreeWidth = Width;
-			this.TreeHeight = Height;
-//			if (this.NodeHeight == 0) {
-//				this.TreeWidth = Width;
-//				this.NodeHeight = Height;
-//			}
+            this.TreeBoundingBox.Width = Width;
+            this.TreeBoundingBox.Height = Height;
 		}
 
 		GetNodeWidth(): number {
-			return 250; //FIXME
+            return this.NodeWidth;
 		}
 
-		GetNodeHeight(): number {
-			return 100; //FIXME
+        GetNodeHeight(): number {
+            if (this.NodeHeight == 0) {
+                this.NodeHeight = this.Content.clientHeight;
+            }
+            return this.NodeHeight;
 		}
 
 		GetTreeWidth(): number {
-			if (this.TreeWidth == 0) {
-				this.TreeWidth = 250; //FIXME
+            if (this.TreeBoundingBox.Width == 0) {
+                this.TreeBoundingBox.Width = 250; //FIXME
 			}
-            return this.TreeWidth;
+            return this.TreeBoundingBox.Width;
         }
 
 		GetTreeHeight(): number {
-			if (this.TreeHeight == 0) {
-				this.TreeHeight = 100; //FIXME
+            if (this.TreeBoundingBox.Height == 0) {
+                this.TreeBoundingBox.Height = 100; //FIXME
 			}
-			return this.TreeHeight;
+            return this.TreeBoundingBox.Height;
         }
 
-		//Resize(): void {
-		//	//this.Width = HTMLDoc.Width;
-		//	//this.Height = HTMLDoc.Height;
+        GetTreeLeftX(): number {
+            return this.TreeBoundingBox.X;
+        }
 
-		//	//LayoutEngine.Layout(this.NodeView, this);
-		//	this.NodeView.OffsetGx = this.Width / 2;
-		//	this.NodeView.OffsetGy = LevelMargin;
-		//}
+        GetTreeUpperY(): number {
+            return this.TreeBoundingBox.Y;
+        }
 
-		UpdateWidth() {
-			switch (this.NodeView.Model.NodeType) {
-				case GSNType.Goal:
-					this.Content.className = "node node-goal";
-					break;
-				case GSNType.Context:
-					this.Content.className = "node node-context";
-					break;
-				case GSNType.Strategy:
-					this.Content.className = "node node-strategy";
-					break;
-				case GSNType.Evidence:
-				default:
-					this.Content.className = "node node-evidence";
-					break;
-			}
+        SetTreeUpperLeft(X: number, Y: number): void {
+            this.TreeBoundingBox.X = X;
+            this.TreeBoundingBox.Y = Y;
+        }
+
+		UpdateHtmlClass() {
+			this.Content.className = "node";
 		}
 
-		CreateHtmlContent(Content: DocumentFragment): void {
-			if (this.NodeView.IsVisible) {
+		private PrerenderHTMLContent(): void {
+            if (this.Content == null) {
 				var div = document.createElement("div");
-				div.style.position = "absolute";
+                this.Content = div;
+
+                div.style.position = "absolute";
 				div.id = this.NodeView.Label;
 
 				var h4 = document.createElement("h4");
@@ -266,24 +277,33 @@ module AssureNote {
 				var p = document.createElement("p");
 				p.innerText = this.NodeView.NodeDoc;
 
+                this.UpdateHtmlClass();
+
 				div.appendChild(h4);
 				div.appendChild(p);
-				Content.appendChild(div);
-				this.Content = div;
-				this.UpdateWidth();
 			}
-		}
+        }
 
-		CreateSVG(SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment) {
-			SvgNodeFrag.appendChild(this.ShapeGroup);
-			if (this.ArrowPath != null) {
-				SvgConnectionFrag.appendChild(this.ArrowPath);
+        PrerenderContent() {
+            this.PrerenderHTMLContent();
+            this.PrerenderSVGContent();
+        }
+
+        Render(HtmlContentFragment: DocumentFragment, SvgNodeFragment: DocumentFragment, SvgConnectionFragment: DocumentFragment): void {
+			SvgNodeFragment.appendChild(this.ShapeGroup);
+			if (this.ArrowPath != null && this.NodeView.Parent != null) {
+				SvgConnectionFragment.appendChild(this.ArrowPath);
 			}
-		}
+            HtmlContentFragment.appendChild(this.Content);
+            this.Resize();
+        }
 
-		SetPosition(x: number, y: number) {
+        Resize(): void {
+        }
+
+		SetPosition(x: number, y: number): void {
 			if (this.NodeView.IsVisible) {
-				var div = document.getElementById(this.NodeView.Label);
+                var div = this.Content;//document.getElementById(this.NodeView.Label);
 				if (div != null) {
 					div.style.left = x + "px";
 					div.style.top  = y + "px";
@@ -294,7 +314,7 @@ module AssureNote {
 			}
 		}
 
-		Render(): void {
+		PrerenderSVGContent(): void {
             this.ShapeGroup = AssureNoteUtils.CreateSVGElement("g");
 			this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ArrowPath = GSNShape.CreateArrowPath();
@@ -348,8 +368,8 @@ module AssureNote {
 		BodyRect: SVGRectElement;
 		UndevelopedSymbol: SVGUseElement;
 
-		Render(): void {
-			super.Render();
+		PrerenderSVGContent(): void {
+			super.PrerenderSVGContent();
 			this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
             //this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
 			//this.BodyRect.setAttribute("xlink:href", "#goal-masterhoge");
@@ -364,15 +384,19 @@ module AssureNote {
 			//super.Resize(CaseViewer, NodeModel, HTMLDoc);
 			this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
 			this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
-		}
+        }
+
+        UpdateHtmlClass() {
+            this.Content.className = "node node-goal";
+        }
 
 	}
 
 	export class GSNContextShape extends GSNShape {
 		BodyRect: SVGRectElement;
 
-		Render(): void {
-			super.Render();
+		PrerenderSVGContent(): void {
+			super.PrerenderSVGContent();
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
 			this.BodyRect.setAttribute("class", this.ColorClassName);
 			this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
@@ -383,32 +407,13 @@ module AssureNote {
 		}
 
 		Resize(): void {
-			//super.Resize();
-			this.BodyRect.setAttribute("width", this.GetTreeWidth().toString());
-			this.BodyRect.setAttribute("height", this.GetTreeHeight().toString());
+            this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
+            this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
 		}
 
-		//SetColor(key: string) {
-		//	this.BodyRect.setAttribute("class", key);
-		//}
-
-		//GetColor() {
-		//	return this.BodyRect.getAttribute("class");
-		//}
-
-		//EnableHighlight() {
-		//	var CurrentColor: string = this.GetColor();
-		//	if (!CurrentColor.match(/-highlight/)) {
-		//		this.BodyRect.removeAttribute("class");
-		//		this.BodyRect.setAttribute("class", CurrentColor + "-highlight");
-		//	}
-		//}
-
-		//DisableHighlight() {
-		//	var CurrentColor: string = this.GetColor();
-		//	this.BodyRect.removeAttribute("class");
-		//	this.BodyRect.setAttribute("class", CurrentColor.replace(/-highlight/, ""));
-		//}
+        UpdateHtmlClass() {
+            this.Content.className = "node node-context";
+        }
 
 	}
 
@@ -416,8 +421,8 @@ module AssureNote {
 		BodyPolygon: SVGPolygonElement;
 		delta: number = 20;
 
-		Render(): void {
-            super.Render();
+		PrerenderSVGContent(): void {
+            super.PrerenderSVGContent();
 			this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
 			//this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
 			this.BodyPolygon.setAttribute("class", this.ColorClassName);
@@ -432,13 +437,9 @@ module AssureNote {
             this.BodyPolygon.setAttribute("points", "" + this.delta + ",0 " + w + ",0 " + (w - this.delta) + "," + h + " 0," + h);
 		}
 
-		//SetColor(key: string) {
-		//	this.BodyPolygon.setAttribute("class", key);
-		//}
-
-		//GetColor() {
-		//	return this.BodyPolygon.getAttribute("class");
-		//}
+        UpdateHtmlClass() {
+            this.Content.className = "node node-strategy";
+        }
 
 		GetConnectorPosition(Dir: Direction): Point {
 			switch (Dir) {
@@ -451,15 +452,17 @@ module AssureNote {
 				case Direction.Bottom:
 					return new Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
 			}
-		}
+        }
+
+
 	}
 
 	export class GSNEvidenceShape extends GSNShape {
 		//BodyEllipse: SVGUseElement;
 		BodyEllipse: SVGEllipseElement;
 
-		Render(): void {
-			super.Render();
+		PrerenderSVGContent(): void {
+			super.PrerenderSVGContent();
 			this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
 			//this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
 			this.BodyEllipse.setAttribute("class", this.ColorClassName);
@@ -473,9 +476,11 @@ module AssureNote {
 			this.BodyEllipse.setAttribute("cy", (this.GetNodeHeight() / 2).toString());
 			this.BodyEllipse.setAttribute("rx", (this.GetNodeWidth()/ 2).toString());
 			this.BodyEllipse.setAttribute("ry", (this.GetNodeHeight() / 2).toString());
+        }
 
-		}
-
+        UpdateHtmlClass() {
+            this.Content.className = "node node-evidence";
+        }
 	}
 
 
@@ -483,4 +488,13 @@ module AssureNote {
 
 $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();
+
+	var Menu: AssureNote.SideMenuContent[] = [];
+	Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", (ev: Event) => {
+		var Writer = new StringWriter();
+		AssureNoteApp.MasterRecord.FormatRecord(Writer);
+		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), "downlaod.wgsn"); //FIXME file name
+	}));
+	AssureNote.SideMenu.Create(Menu);
+
 });
