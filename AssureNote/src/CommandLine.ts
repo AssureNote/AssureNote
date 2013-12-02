@@ -4,7 +4,7 @@ module AssureNote {
 
 	export class CommandParser {
 		private Method: string;
-		private Args: string[] = [];
+		private Args: string[];
 
 		constructor(line: string) {
 			var s = line.split(" ");
@@ -19,6 +19,9 @@ module AssureNote {
 		}
 
 		GetArgs(): string[]{
+			if (this.Args == null) {
+				this.Args = [];
+			}
 			return this.Args;
 		}
 
@@ -29,12 +32,22 @@ module AssureNote {
 	}
 
 	export class CommandLine {
-		Element: JQuery = $("#command-line");
+		Element: JQuery;
+		IsVisible: boolean;
+		IsEnable: boolean;
 		constructor() {
+			this.Element = $("#command-line");
+			this.IsEnable = true;
+			this.IsVisible = false;
 		}
 
-		IsEnable(): boolean {
-			return this.Element.css("display") == "block";
+		Enable(): void {
+			this.IsEnable = true;
+		}
+
+		Disable(): void {
+			this.IsEnable = false;
+			this.Hide();
 		}
 
 		Clear(): void {
@@ -44,10 +57,12 @@ module AssureNote {
 		Show(): void {
 			this.Element.css("display", "block");
 			this.Element.focus();
+			this.IsVisible = true;
 		}
 
 		Hide(): void {
 			this.Element.css("display","none");
+			this.IsVisible = false;
 		}
 
 		GetValue(): string {

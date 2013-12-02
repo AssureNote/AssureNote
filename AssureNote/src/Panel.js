@@ -23,21 +23,22 @@ var AssureNote;
                 return false;
             };
 
-            var CmdLine = new AssureNote.CommandLine();
+            this.CmdLine = new AssureNote.CommandLine();
             document.onkeydown = function (ev) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return false;
                 }
 
                 if (ev.keyCode == 186) {
-                    CmdLine.Show();
-                } else if (ev.keyCode == 13 && CmdLine.IsEnable()) {
-                    _this.AssureNoteApp.ExecCommand(CmdLine.GetValue());
-                    CmdLine.Hide();
-                    CmdLine.Clear();
+                    _this.CmdLine.Show();
+                } else if (ev.keyCode == 13 && _this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
+                    _this.AssureNoteApp.ExecCommand(_this.CmdLine.GetValue());
+                    _this.CmdLine.Hide();
+                    _this.CmdLine.Clear();
                     return false;
                 }
             };
+
             this.ContentLayer.onmouseover = function (event) {
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;

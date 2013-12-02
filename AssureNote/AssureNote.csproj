@@ -43,6 +43,7 @@
     <Content Include="lib\codemirror.js" />
     <Content Include="lib\FileSaver.js" />
     <Content Include="lib\jquery.cookie.js" />
+    <Content Include="lib\jquery.jqdock.min.js" />
     <Content Include="lib\jquery.min.js" />
     <Content Include="lib\jquery.svg.css" />
     <Content Include="lib\jquery.svg.min.js" />
