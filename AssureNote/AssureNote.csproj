@@ -57,19 +57,22 @@
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
     <TypeScriptCompile Include="index.ts" />
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
-    <TypeScriptCompile Include="src\CaseDecoder.ts" />
-    <TypeScriptCompile Include="src\CaseEncoder.ts" />
-    <TypeScriptCompile Include="src\CaseModel.ts" />
+    <TypeScriptCompile Include="src\old\CaseDecoder.ts" />
+    <TypeScriptCompile Include="src\old\CaseEncoder.ts" />
+    <TypeScriptCompile Include="src\old\CaseModel.ts" />
     <TypeScriptCompile Include="src\CaseViewer.ts" />
-    <TypeScriptCompile Include="src\ColorMap.ts" />
-    <TypeScriptCompile Include="src\CommitModel.ts" />
-    <TypeScriptCompile Include="src\EditorUtil.ts" />
+    <TypeScriptCompile Include="src\old\CaseViewer.ts" />
+    <TypeScriptCompile Include="src\old\ColorMap.ts" />
+    <TypeScriptCompile Include="src\old\CommitModel.ts" />
+    <TypeScriptCompile Include="src\old\EditorUtil.ts" />
     <TypeScriptCompile Include="src\AssureNote.ts" />
     <TypeScriptCompile Include="src\CommandLine.ts" />
     <TypeScriptCompile Include="src\LayoutEngine.ts" />
+    <TypeScriptCompile Include="src\old\OldLayoutEngine.ts" />
     <TypeScriptCompile Include="src\Panel.ts" />
-    <TypeScriptCompile Include="src\PluginManager.ts" />
-    <TypeScriptCompile Include="src\Api.ts" />
+    <TypeScriptCompile Include="src\old\PluginManager.ts" />
+    <TypeScriptCompile Include="src\old\Api.ts" />
+    <TypeScriptCompile Include="src\Plugin.ts" />
     <TypeScriptCompile Include="src\SideMenu.ts" />
   </ItemGroup>
   <ItemGroup>

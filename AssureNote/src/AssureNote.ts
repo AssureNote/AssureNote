@@ -1,4 +1,3 @@
-///<reference path='PluginManager.ts'/>
 ///<reference path='SideMenu.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
@@ -68,12 +67,12 @@ module AssureNote {
 		//Viewer: AssureNoteViewer;
 
 
-		Case: Case; //Deprecated
-		OldPluginManager: OldPlugInManager; //Deprecated
+		//Case: Case; //Deprecated
+		//OldPluginManager: OldPlugInManager; //Deprecated
 
 		constructor() {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
-			this.OldPluginManager = new OldPlugInManager("");
+			//this.OldPluginManager = new OldPlugInManager("");
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);

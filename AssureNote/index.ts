@@ -1,16 +1,17 @@
-///<reference path='src/Api.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
 ///<reference path='src/AssureNote.ts'/>
 ///<reference path='src/AssureNoteParser.ts'/>
 ///<reference path='src/Panel.ts'/>
 ///<reference path='src/LayoutEngine.ts'/>
-///<reference path='src/PluginManager.ts'/>
 ///<reference path='src/CaseViewer.ts'/>
 
 module AssureNote {
 
 	export class ColorStyle {
-		//TODO
+		static Default: string = "assureit-default";
+		static ToDo: string = "assureit-todo";
+		static Searched: string = "assureit-search";
+		static Danger: string = "assureit-danger";
 	}
 
 	export class NodeView {
@@ -173,7 +174,7 @@ module AssureNote {
 		ShapeGroup: SVGGElement;
 		ArrowPath: SVGPathElement;
 		Content: HTMLElement;
-		ColorClassName: string = Color.Default;
+		ColorClassName: string = ColorStyle.Default;
 		private NodeWidth: number;
         private NodeHeight: number;
         private TreeBoundingBox: Rect;

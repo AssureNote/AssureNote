@@ -1,10 +1,8 @@
-///<reference path='src/Api.ts'/>
 ///<reference path='d.ts/jquery.d.ts'/>
 ///<reference path='src/AssureNote.ts'/>
 ///<reference path='src/AssureNoteParser.ts'/>
 ///<reference path='src/Panel.ts'/>
 ///<reference path='src/LayoutEngine.ts'/>
-///<reference path='src/PluginManager.ts'/>
 ///<reference path='src/CaseViewer.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -17,6 +15,10 @@ var AssureNote;
     var ColorStyle = (function () {
         function ColorStyle() {
         }
+        ColorStyle.Default = "assureit-default";
+        ColorStyle.ToDo = "assureit-todo";
+        ColorStyle.Searched = "assureit-search";
+        ColorStyle.Danger = "assureit-danger";
         return ColorStyle;
     })();
     AssureNote.ColorStyle = ColorStyle;
@@ -182,7 +184,7 @@ var AssureNote;
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
-            this.ColorClassName = AssureNote.Color.Default;
+            this.ColorClassName = ColorStyle.Default;
             this.Content = null;
             this.NodeWidth = 250;
             this.NodeHeight = 100;

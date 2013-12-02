@@ -1,4 +1,3 @@
-///<reference path='PluginManager.ts'/>
 ///<reference path='SideMenu.ts'/>
 var AssureNote;
 (function (AssureNote) {
@@ -50,9 +49,12 @@ var AssureNote;
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
     var AssureNoteApp = (function () {
+        //Viewer: AssureNoteViewer;
+        //Case: Case; //Deprecated
+        //OldPluginManager: OldPlugInManager; //Deprecated
         function AssureNoteApp() {
             //var Api = new AssureNote.ServerAPI("http://", "", "");
-            this.OldPluginManager = new AssureNote.OldPlugInManager("");
+            //this.OldPluginManager = new OldPlugInManager("");
             this.PluginManager = new AssureNote.PluginManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
