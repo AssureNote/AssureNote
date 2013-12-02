@@ -195,6 +195,7 @@ var AssureNote;
                 GSNShape.ArrowPathMaster.setAttribute("fill", "none");
                 GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
                 GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
             }
             return GSNShape.ArrowPathMaster.cloneNode();
         };
@@ -288,10 +289,10 @@ var AssureNote;
             }
         };
 
-        GSNShape.prototype.CreateSVG = function (SvgNodeFrag, SvgConnectionFrag) {
-            SvgNodeFrag.appendChild(this.ShapeGroup);
-            if (this.ArrowPath != null) {
-                SvgConnectionFrag.appendChild(this.ArrowPath);
+        GSNShape.prototype.CreateSVG = function (SvgNodeFragment, SvgConnectionFragment) {
+            SvgNodeFragment.appendChild(this.ShapeGroup);
+            if (this.ArrowPath != null && this.NodeView.Parent != null) {
+                SvgConnectionFragment.appendChild(this.ArrowPath);
             }
         };
 

@@ -26,9 +26,6 @@ module AssureNote {
 		Children: NodeView[] = [];
 		Shape: GSNShape = null;
 
-		private ConnectorStartPoint: Direction;
-		private ConnectorEndPoint: Direction;
-
 		constructor(public Model: GSNNode, IsRecursive: boolean) {
 			this.Label = Model.GetLabel();
 			this.NodeDoc = Model.NodeDoc;
@@ -198,7 +195,8 @@ module AssureNote {
                 GSNShape.ArrowPathMaster.setAttribute("fill", "none");
                 GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
                 GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-            }
+				GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+			}
             return <SVGPathElement>GSNShape.ArrowPathMaster.cloneNode();
         }
 
@@ -293,10 +291,10 @@ module AssureNote {
 			}
 		}
 
-		CreateSVG(SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment) {
-			SvgNodeFrag.appendChild(this.ShapeGroup);
-			if (this.ArrowPath != null) {
-				SvgConnectionFrag.appendChild(this.ArrowPath);
+		CreateSVG(SvgNodeFragment: DocumentFragment, SvgConnectionFragment: DocumentFragment) {
+			SvgNodeFragment.appendChild(this.ShapeGroup);
+			if (this.ArrowPath != null && this.NodeView.Parent != null) {
+				SvgConnectionFragment.appendChild(this.ArrowPath);
 			}
 		}
 
