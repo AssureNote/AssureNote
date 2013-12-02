@@ -47,7 +47,6 @@ module AssureNote {
 		}
 
 		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView, wx: number, wy: number) {
-			this.Layout(NodeView);
 
 			var DivFragment = document.createDocumentFragment();
 			var SvgNodeFragment = document.createDocumentFragment();
@@ -55,14 +54,15 @@ module AssureNote {
 
 			var list = Object.keys(PictgramPanel.ViewMap);
 			for (var i = 0; i < list.length; i++) {
-				var View = PictgramPanel.ViewMap[list[i]];
+                var View = PictgramPanel.ViewMap[list[i]];
+                View.GetShape().PrerenderContent();
 				View.Render(DivFragment, SvgNodeFragment, SvgConnectionFragment);
-				//View.Resize();
 			}
 
 			PictgramPanel.ContentLayer.appendChild(DivFragment);
 			PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
 			PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
+            this.Layout(NodeView);
 
 		}
 
@@ -71,6 +71,8 @@ module AssureNote {
                 return;
             }
             var Shape = ThisNode.GetShape();
+            Shape.Resize();
+            //Shape.PrerenderContent();
             var TreeLeftX = 0;
 			var TreeWidth = this.GetNodeWidth(ThisNode);
 			var TreeHeight = this.GetNodeHeight(ThisNode);
@@ -80,6 +82,7 @@ module AssureNote {
 				for (var i = 0; i < ThisNode.Left.length; i++) {
 					var SubNode = ThisNode.Left[i];
 					if (SubNode.IsVisible) {
+                        SubNode.GetShape().Resize();
                         OffsetY += ContextMargin;
 						SubNode.RelativeX = -(this.GetNodeWidth(SubNode) + DefaultMargin);
                         SubNode.RelativeY = OffsetY;
@@ -101,6 +104,7 @@ module AssureNote {
 				for (var i = 0; i < ThisNode.Right.length; i++) {
 					var SubNode = ThisNode.Right[i];
 					if (SubNode.IsVisible) {
+                        SubNode.GetShape().Resize();
                         OffsetY += ContextMargin;
 						SubNode.RelativeX = (this.GetNodeWidth(ThisNode) + DefaultMargin);
 						SubNode.RelativeY = OffsetY;

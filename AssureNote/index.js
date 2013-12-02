@@ -26,9 +26,9 @@ var AssureNote;
             this.Model = Model;
             this.RelativeX = 0;
             this.RelativeY = 0;
-            this.Left = [];
-            this.Right = [];
-            this.Children = [];
+            this.Left = null;
+            this.Right = null;
+            this.Children = null;
             this.Shape = null;
             this.Label = Model.GetLabel();
             this.NodeDoc = Model.NodeDoc;
@@ -48,34 +48,45 @@ var AssureNote;
         }
         NodeView.prototype.UpdateViewMap = function (ViewMap) {
             ViewMap[this.Label] = this;
-            for (var i = 0; i < this.Left.length; i++) {
-                this.Left[i].UpdateViewMap(ViewMap);
+            if (this.Left != null) {
+                for (var i = 0; i < this.Left.length; i++) {
+                    this.Left[i].UpdateViewMap(ViewMap);
+                }
             }
-            for (var i = 0; i < this.Right.length; i++) {
-                this.Right[i].UpdateViewMap(ViewMap);
+            if (this.Right != null) {
+                for (var i = 0; i < this.Right.length; i++) {
+                    this.Right[i].UpdateViewMap(ViewMap);
+                }
             }
-            for (var i = 0; i < this.Children.length; i++) {
-                this.Children[i].UpdateViewMap(ViewMap);
+            if (this.Children != null) {
+                for (var i = 0; i < this.Children.length; i++) {
+                    this.Children[i].UpdateViewMap(ViewMap);
+                }
             }
         };
 
-        NodeView.prototype.AppendParent = function (Parent) {
-            this.Parent = Parent;
+        NodeView.prototype.AppendChild = function (SubNode) {
+            if (this.Children == null) {
+                this.Children = [];
+            }
+            this.Children.push(SubNode);
+            SubNode.Parent = this;
         };
 
-        NodeView.prototype.AppendChild = function (Child) {
-            this.Children.push(Child);
-            Child.AppendParent(this);
+        NodeView.prototype.AppendLeftNode = function (SubNode) {
+            if (this.Left == null) {
+                this.Left = [];
+            }
+            this.Left.push(SubNode);
+            SubNode.Parent = this;
         };
 
-        NodeView.prototype.AppendLeftNode = function (Node) {
-            this.Left.push(Node);
-            Node.AppendParent(this);
-        };
-
-        NodeView.prototype.AppendRightNode = function (Node) {
-            this.Right.push(Node);
-            Node.AppendParent(this);
+        NodeView.prototype.AppendRightNode = function (SubNode) {
+            if (this.Right == null) {
+                this.Right = [];
+            }
+            this.Right.push(SubNode);
+            SubNode.Parent = this;
         };
 
         NodeView.prototype.GetShape = function () {
@@ -103,11 +114,11 @@ var AssureNote;
             return this.Model.NodeType;
         };
 
+        NodeView.prototype.CreateElement = function () {
+        };
+
         NodeView.prototype.Render = function (DivFrag, SvgNodeFrag, SvgConnectionFrag) {
-            var Shape = this.GetShape();
-            Shape.Render();
-            Shape.CreateSVG(SvgNodeFrag, SvgConnectionFrag);
-            Shape.CreateHtmlContent(DivFrag);
+            this.Shape.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
         };
 
         NodeView.prototype.Update = function (Model) {
@@ -116,8 +127,9 @@ var AssureNote;
             throw "Update is under construction.";
         };
 
+        //deprecated
         NodeView.prototype.Resize = function () {
-            //this.GetShape().Resize();
+            //this.Shape.Resize();
         };
 
         NodeView.prototype.GetDocumentConnectorPosition = function (Dir, wx, wy) {
@@ -136,28 +148,32 @@ var AssureNote;
             if (this.IsVisible) {
                 AssureNote.AssureNoteApp.Assert((this.Shape != null));
                 this.Shape.SetPosition(this.GetDocumentWx(wx), this.GetDocumentWy(wy));
-                for (var i = 0; i < this.Children.length; i++) {
-                    var SubNode = this.Children[i];
-                    SubNode.SetDocumentPosition(wx, wy);
-                    var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Bottom, wx, wy);
-                    var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Top, wx, wy);
-                    SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Bottom);
+                if (this.Children != null) {
+                    for (var i = 0; i < this.Children.length; i++) {
+                        var SubNode = this.Children[i];
+                        SubNode.SetDocumentPosition(wx, wy);
+                        var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Bottom, wx, wy);
+                        var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Top, wx, wy);
+                        SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Bottom);
+                    }
                 }
-
-                for (var i = 0; i < this.Right.length; i++) {
-                    var SubNode = this.Right[i];
-                    SubNode.SetDocumentPosition(wx, wy);
-                    var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Right, wx, wy);
-                    var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Left, wx, wy);
-                    SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Left);
+                if (this.Right != null) {
+                    for (var i = 0; i < this.Right.length; i++) {
+                        var SubNode = this.Right[i];
+                        SubNode.SetDocumentPosition(wx, wy);
+                        var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Right, wx, wy);
+                        var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Left, wx, wy);
+                        SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Left);
+                    }
                 }
-
-                for (var i = 0; i < this.Left.length; i++) {
-                    var SubNode = this.Left[i];
-                    SubNode.SetDocumentPosition(wx, wy);
-                    var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Left, wx, wy);
-                    var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Right, wx, wy);
-                    SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Right);
+                if (this.Left != null) {
+                    for (var i = 0; i < this.Left.length; i++) {
+                        var SubNode = this.Left[i];
+                        SubNode.SetDocumentPosition(wx, wy);
+                        var P1 = this.GetDocumentConnectorPosition(AssureNote.Direction.Left, wx, wy);
+                        var P2 = SubNode.GetDocumentConnectorPosition(AssureNote.Direction.Right, wx, wy);
+                        SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Right);
+                    }
                 }
             }
         };
@@ -185,7 +201,7 @@ var AssureNote;
             this.ColorClassName = AssureNote.Color.Default;
             this.Content = null;
             this.NodeWidth = 250;
-            this.NodeHeight = 100;
+            this.NodeHeight = 0;
             this.TreeBoundingBox = new Rect(0, 0, 0, 0);
         }
         GSNShape.CreateArrowPath = function () {
@@ -203,18 +219,17 @@ var AssureNote;
         GSNShape.prototype.SetTreeSize = function (Width, Height) {
             this.TreeBoundingBox.Width = Width;
             this.TreeBoundingBox.Height = Height;
-            //			if (this.NodeHeight == 0) {
-            //				this.TreeWidth = Width;
-            //				this.NodeHeight = Height;
-            //			}
         };
 
         GSNShape.prototype.GetNodeWidth = function () {
-            return 250;
+            return this.NodeWidth;
         };
 
         GSNShape.prototype.GetNodeHeight = function () {
-            return 100;
+            if (this.NodeHeight == 0) {
+                this.NodeHeight = this.Content.clientHeight;
+            }
+            return this.NodeHeight;
         };
 
         GSNShape.prototype.GetTreeWidth = function () {
@@ -244,14 +259,7 @@ var AssureNote;
             this.TreeBoundingBox.Y = Y;
         };
 
-        //Resize(): void {
-        //	//this.Width = HTMLDoc.Width;
-        //	//this.Height = HTMLDoc.Height;
-        //	//LayoutEngine.Layout(this.NodeView, this);
-        //	this.NodeView.OffsetGx = this.Width / 2;
-        //	this.NodeView.OffsetGy = LevelMargin;
-        //}
-        GSNShape.prototype.UpdateWidth = function () {
+        GSNShape.prototype.UpdateHtmlClass = function () {
             switch (this.NodeView.Model.NodeType) {
                 case GSNType.Goal:
                     this.Content.className = "node node-goal";
@@ -269,9 +277,11 @@ var AssureNote;
             }
         };
 
-        GSNShape.prototype.CreateHtmlContent = function (Content) {
-            if (this.NodeView.IsVisible) {
+        GSNShape.prototype.PrerenderHTMLContent = function () {
+            if (this.Content == null) {
                 var div = document.createElement("div");
+                this.Content = div;
+
                 div.style.position = "absolute";
                 div.id = this.NodeView.Label;
 
@@ -281,24 +291,33 @@ var AssureNote;
                 var p = document.createElement("p");
                 p.innerText = this.NodeView.NodeDoc;
 
+                this.UpdateHtmlClass();
+
                 div.appendChild(h4);
                 div.appendChild(p);
-                Content.appendChild(div);
-                this.Content = div;
-                this.UpdateWidth();
             }
         };
 
-        GSNShape.prototype.CreateSVG = function (SvgNodeFragment, SvgConnectionFragment) {
+        GSNShape.prototype.PrerenderContent = function () {
+            this.PrerenderHTMLContent();
+            this.PrerenderSVGContent();
+        };
+
+        GSNShape.prototype.Render = function (HtmlContentFragment, SvgNodeFragment, SvgConnectionFragment) {
             SvgNodeFragment.appendChild(this.ShapeGroup);
             if (this.ArrowPath != null && this.NodeView.Parent != null) {
                 SvgConnectionFragment.appendChild(this.ArrowPath);
             }
+            HtmlContentFragment.appendChild(this.Content);
+            this.Resize();
+        };
+
+        GSNShape.prototype.Resize = function () {
         };
 
         GSNShape.prototype.SetPosition = function (x, y) {
             if (this.NodeView.IsVisible) {
-                var div = document.getElementById(this.NodeView.Label);
+                var div = this.Content;
                 if (div != null) {
                     div.style.left = x + "px";
                     div.style.top = y + "px";
@@ -309,7 +328,7 @@ var AssureNote;
             }
         };
 
-        GSNShape.prototype.Render = function () {
+        GSNShape.prototype.PrerenderSVGContent = function () {
             this.ShapeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ArrowPath = GSNShape.CreateArrowPath();
@@ -367,8 +386,8 @@ var AssureNote;
         function GSNGoalShape() {
             _super.apply(this, arguments);
         }
-        GSNGoalShape.prototype.Render = function () {
-            _super.prototype.Render.call(this);
+        GSNGoalShape.prototype.PrerenderSVGContent = function () {
+            _super.prototype.PrerenderSVGContent.call(this);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
 
             //this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
@@ -395,8 +414,8 @@ var AssureNote;
         function GSNContextShape() {
             _super.apply(this, arguments);
         }
-        GSNContextShape.prototype.Render = function () {
-            _super.prototype.Render.call(this);
+        GSNContextShape.prototype.PrerenderSVGContent = function () {
+            _super.prototype.PrerenderSVGContent.call(this);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.BodyRect.setAttribute("class", this.ColorClassName);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
@@ -407,9 +426,8 @@ var AssureNote;
         };
 
         GSNContextShape.prototype.Resize = function () {
-            //super.Resize();
-            this.BodyRect.setAttribute("width", this.GetTreeWidth().toString());
-            this.BodyRect.setAttribute("height", this.GetTreeHeight().toString());
+            this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
+            this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
         };
         return GSNContextShape;
     })(GSNShape);
@@ -421,8 +439,8 @@ var AssureNote;
             _super.apply(this, arguments);
             this.delta = 20;
         }
-        GSNStrategyShape.prototype.Render = function () {
-            _super.prototype.Render.call(this);
+        GSNStrategyShape.prototype.PrerenderSVGContent = function () {
+            _super.prototype.PrerenderSVGContent.call(this);
             this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
 
             //this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
@@ -466,8 +484,8 @@ var AssureNote;
         function GSNEvidenceShape() {
             _super.apply(this, arguments);
         }
-        GSNEvidenceShape.prototype.Render = function () {
-            _super.prototype.Render.call(this);
+        GSNEvidenceShape.prototype.PrerenderSVGContent = function () {
+            _super.prototype.PrerenderSVGContent.call(this);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
 
             //this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
