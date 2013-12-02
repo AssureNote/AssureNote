@@ -76,14 +76,15 @@ module AssureNote {
 			var TreeHeight = this.GetNodeHeight(ThisNode);
 			if (ThisNode.Left != null) {
 				var OffsetX = 0;
-				var OffsetY = 0;
+                var OffsetY = -ContextMargin;
 				for (var i = 0; i < ThisNode.Left.length; i++) {
 					var SubNode = ThisNode.Left[i];
 					if (SubNode.IsVisible) {
+                        OffsetY += ContextMargin;
 						SubNode.RelativeX = -(this.GetNodeWidth(SubNode) + DefaultMargin);
                         SubNode.RelativeY = OffsetY;
                         OffsetX = Math.max(0, this.GetNodeWidth(SubNode) + DefaultMargin);
-						OffsetY += (this.GetNodeHeight(SubNode) + ContextMargin);
+                        OffsetY += this.GetNodeHeight(SubNode);
 					}
 				}
 				if (OffsetY > 0) {
@@ -96,14 +97,15 @@ module AssureNote {
 			}
 			if (ThisNode.Right != null) {
 				var OffsetX = 0;
-				var OffsetY = 0;
+                var OffsetY = -ContextMargin;
 				for (var i = 0; i < ThisNode.Right.length; i++) {
 					var SubNode = ThisNode.Right[i];
 					if (SubNode.IsVisible) {
+                        OffsetY += ContextMargin;
 						SubNode.RelativeX = (this.GetNodeWidth(ThisNode) + DefaultMargin);
 						SubNode.RelativeY = OffsetY;
                         OffsetX = Math.max(0, DefaultMargin + this.GetNodeWidth(SubNode));
-						OffsetY += (this.GetNodeHeight(SubNode) + ContextMargin);
+						OffsetY += this.GetNodeHeight(SubNode);
 					}
 				}
 				if (OffsetY > 0) {
@@ -115,8 +117,9 @@ module AssureNote {
 			}
 			TreeHeight += LevelMargin;
 			var ChildrenWidth = 0;
-			var ChildrenHeight = 0;
-			if (ThisNode.Children != null) {
+            var ChildrenHeight = 0;
+            var VisibleChildCount = 0;
+            if (ThisNode.Children != null && ThisNode.Children.length > 0) {
 				for (var i = 0; i < ThisNode.Children.length; i++) {
 					var SubNode = ThisNode.Children[i];
 					if (SubNode.IsVisible) {
@@ -127,20 +130,23 @@ module AssureNote {
 						SubNode.RelativeY = TreeHeight;
                         ChildrenWidth += ChildTreeWidth + TreeMargin;
                         ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
+                        VisibleChildCount++;
 					}
                 }
                 ChildrenWidth -= TreeMargin;
+
+                var HeadWidth = VisibleChildCount == 1 ? TreeWidth : this.GetNodeWidth(ThisNode);
                 var Shift = (ChildrenWidth - this.GetNodeWidth(ThisNode)) / 2;
+                TreeLeftX = Math.min(TreeLeftX, -Shift);
                 for (var i = 0; i < ThisNode.Children.length; i++) {
                     var SubNode = ThisNode.Children[i];
                     if (SubNode.IsVisible) {
                         SubNode.RelativeX -= Shift;
                         SubNode.RelativeX += -SubNode.Shape.GetTreeLeftX();
-                        TreeLeftX = Math.min(TreeLeftX, -Shift);
                     }
                 }
             }
-            Shape.SetTreeUpperLeft(Math.min(TreeLeftX), 0);
+            Shape.SetTreeUpperLeft(TreeLeftX, 0);
             Shape.SetTreeSize(Math.max(ChildrenWidth, TreeWidth + -TreeLeftX), TreeHeight + ChildrenHeight);
             console.log(ThisNode.Label + ": " + (<any>ThisNode.Shape).TreeBoundingBox.toString());
 		}
