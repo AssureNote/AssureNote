@@ -38,8 +38,6 @@ var AssureNote;
         };
 
         SimpleLayoutEngine.prototype.DoLayout = function (PictgramPanel, NodeView, wx, wy) {
-            this.Layout(NodeView);
-
             var DivFragment = document.createDocumentFragment();
             var SvgNodeFragment = document.createDocumentFragment();
             var SvgConnectionFragment = document.createDocumentFragment();
@@ -47,13 +45,14 @@ var AssureNote;
             var list = Object.keys(PictgramPanel.ViewMap);
             for (var i = 0; i < list.length; i++) {
                 var View = PictgramPanel.ViewMap[list[i]];
+                View.GetShape().PrerenderContent();
                 View.Render(DivFragment, SvgNodeFragment, SvgConnectionFragment);
-                //View.Resize();
             }
 
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
+            this.Layout(NodeView);
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode) {
@@ -61,6 +60,9 @@ var AssureNote;
                 return;
             }
             var Shape = ThisNode.GetShape();
+            Shape.Resize();
+
+            //Shape.PrerenderContent();
             var TreeLeftX = 0;
             var TreeWidth = this.GetNodeWidth(ThisNode);
             var TreeHeight = this.GetNodeHeight(ThisNode);
@@ -70,6 +72,7 @@ var AssureNote;
                 for (var i = 0; i < ThisNode.Left.length; i++) {
                     var SubNode = ThisNode.Left[i];
                     if (SubNode.IsVisible) {
+                        SubNode.GetShape().Resize();
                         OffsetY += AssureNote.ContextMargin;
                         SubNode.RelativeX = -(this.GetNodeWidth(SubNode) + AssureNote.DefaultMargin);
                         SubNode.RelativeY = OffsetY;
@@ -91,6 +94,7 @@ var AssureNote;
                 for (var i = 0; i < ThisNode.Right.length; i++) {
                     var SubNode = ThisNode.Right[i];
                     if (SubNode.IsVisible) {
+                        SubNode.GetShape().Resize();
                         OffsetY += AssureNote.ContextMargin;
                         SubNode.RelativeX = (this.GetNodeWidth(ThisNode) + AssureNote.DefaultMargin);
                         SubNode.RelativeY = OffsetY;
