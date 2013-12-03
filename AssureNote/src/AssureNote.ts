@@ -105,15 +105,7 @@ module AssureNote {
 				reader.onload = (event) => {
 					var Contents: string = (<any>event.target).result;
 					var Name: string = Files[0].name;
-					// ---Deprecated--
-					//var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
-					
-					//var casedecoder = new CaseDecoder();
-					//var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
-					//Case0.SetElementTop(root);
-					//this.Case = Case0;
-					//this.PictgramPanel.Draw(root.Label, 0, 0);
-					//---
+
 					this.MasterRecord = new GSNRecord();
 					this.MasterRecord.Parse(Contents);
 

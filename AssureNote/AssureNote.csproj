@@ -58,6 +58,7 @@
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
     <TypeScriptCompile Include="index.ts" />
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
+    <TypeScriptCompile Include="src\MenuBar.ts" />
     <TypeScriptCompile Include="src\old\CaseDecoder.ts" />
     <TypeScriptCompile Include="src\old\CaseEncoder.ts" />
     <TypeScriptCompile Include="src\old\CaseModel.ts" />

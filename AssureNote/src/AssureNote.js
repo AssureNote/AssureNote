@@ -89,14 +89,6 @@ var AssureNote;
                     var Contents = (event.target).result;
                     var Name = Files[0].name;
 
-                    // ---Deprecated--
-                    //var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
-                    //var casedecoder = new CaseDecoder();
-                    //var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
-                    //Case0.SetElementTop(root);
-                    //this.Case = Case0;
-                    //this.PictgramPanel.Draw(root.Label, 0, 0);
-                    //---
                     _this.MasterRecord = new GSNRecord();
                     _this.MasterRecord.Parse(Contents);
 

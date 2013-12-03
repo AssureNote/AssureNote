@@ -11,27 +11,41 @@ var AssureNote;
             this.ViewPort = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
+            var Bar = new AssureNote.MenuBar(AssureNoteApp);
             this.ContentLayer.onclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
+                var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("click:" + Label);
+
+                if (!Bar.IsEnable) {
+                    Bar.Create(_this.ViewMap[Label], _this.ControlLayer);
+                }
                 return false;
             };
 
-            this.ContentLayer.ondblclick = function (ev) {
+            //FIXME
+            this.EventMapLayer.onclick = function (event) {
+                if (Bar.IsEnable) {
+                    Bar.Remove();
+                }
+            };
+
+            this.ContentLayer.ondblclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
+                var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("double click:" + Label);
                 return false;
             };
 
             this.CmdLine = new AssureNote.CommandLine();
-            document.onkeydown = function (ev) {
+            document.onkeydown = function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return false;
                 }
 
-                if (ev.keyCode == 186) {
+                if (event.keyCode == 186) {
                     _this.CmdLine.Show();
-                } else if (ev.keyCode == 13 && _this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
+                } else if (event.keyCode == 13 && _this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
                     _this.AssureNoteApp.ExecCommand(_this.CmdLine.GetValue());
                     _this.CmdLine.Hide();
                     _this.CmdLine.Clear();
@@ -40,7 +54,7 @@ var AssureNote;
             };
 
             this.ContentLayer.onmouseover = function (event) {
-                if (_this.AssureNoteApp.PluginPanel.IsVisible) {
+                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);

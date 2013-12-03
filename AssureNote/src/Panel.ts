@@ -27,28 +27,42 @@ module AssureNote {
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
 			this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
+			var Bar = new MenuBar(AssureNoteApp);
 			this.ContentLayer.onclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
-				this.AssureNoteApp.DebugP("click:"+Label);
+				var NodeView = this.ViewMap[Label];
+				this.AssureNoteApp.DebugP("click:" + Label);
+
+				if (!Bar.IsEnable) {
+					Bar.Create(this.ViewMap[Label], this.ControlLayer);
+				}
 				return false;
 			};
 
-			this.ContentLayer.ondblclick = (ev: MouseEvent) => {
+			//FIXME
+			this.EventMapLayer.onclick = (event: MouseEvent) => {
+				if(Bar.IsEnable) {
+					Bar.Remove();
+				}
+			}
+
+			this.ContentLayer.ondblclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
+				var NodeView = this.ViewMap[Label];
 				this.AssureNoteApp.DebugP("double click:" + Label);
 				return false;
 			};
 
 			this.CmdLine = new CommandLine();
-			document.onkeydown = (ev: KeyboardEvent) => {
+			document.onkeydown = (event: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
 
-				if (ev.keyCode == 186/*:*/) {
+				if (event.keyCode == 186/*:*/) {
 					this.CmdLine.Show();
 				}
-				else if (ev.keyCode == 13/*Enter*/ && this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
+				else if (event.keyCode == 13/*Enter*/ && this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
 					this.AssureNoteApp.ExecCommand(this.CmdLine.GetValue());
 					this.CmdLine.Hide();
 					this.CmdLine.Clear();
@@ -57,7 +71,7 @@ module AssureNote {
 			};
 
 			this.ContentLayer.onmouseover = (event: MouseEvent) => {
-				if (this.AssureNoteApp.PluginPanel.IsVisible) {
+				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
 				var Label = AssureNoteUtils.GetNodeLabel(event);
