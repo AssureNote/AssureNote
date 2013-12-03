@@ -64,54 +64,6 @@ module AssureNote {
 				//	default:
 				//		break;
 				//}
-			/*
-			var self = this;
-
-			$('.node').unbind('mouseenter').unbind('mouseleave'); // FIXME: this line may cause other plugin's event handler.
-			var appendMenu = function () {
-				var node = $(this);
-				if (caseViewer.Screen.GetScale() < 1) return; 
-
-				var label: string = node.children('h4').text();
-				//console.log(label);
-				var model: AssureIt.NodeModel = case0.ElementMap[label];
-				var menuBar: MenuBar = new MenuBar(caseViewer, model, case0, node, serverApi, self);
-				menuBar.menu.appendTo($('#layer2'));
-				refresh();
-				menuBar.menu.hover(function () {
-					clearTimeout(self.timeoutId);
-				}, function () {
-						$(menuBar.menu).remove();
-					});
-				self.plugInManager.UseUILayer(self);
-				menuBar.SetEventHandlers();
-
-				self.plugInManager.InvokePlugInMenuBarContents(caseViewer, model, menuBar.menu, serverApi);
-
-				(<any>menuBar.menu).jqDock({
-					align: 'bottom',
-					fadeIn: 200,
-					idle: 1500,
-					size: 45,
-					distance: 60,
-					labels: 'tc',
-					duration: 500,
-					fadeIn: 1000,
-					source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
-					onReady: refresh,
-				});
-				menuBar.menu.click(refresh);
-			}
-		var removeMenu = function () {
-				self.timeoutId = setTimeout(function () {
-				}, 10);
-			};
-			$('.node').hover(appendMenu, removeMenu);
-			$('.node').bind({ 'touchstart': removeMenu, 'touchend': appendMenu });
-		*/
-		}
-
-		AddNode(Type: GSNType): void {
 		}
 
 		Remove(): void {
@@ -119,9 +71,6 @@ module AssureNote {
 			this.Menu = null;
 			this.CurrentView = null;
 			this.IsEnable = false;
-		}
-
-		Center(): void {
 		}
 
 	}

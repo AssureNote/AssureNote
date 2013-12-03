@@ -17,6 +17,9 @@ var AssureNote;
                 var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("click:" + Label);
 
+                if (Bar.IsEnable) {
+                    Bar.Remove();
+                }
                 if (!Bar.IsEnable) {
                     Bar.Create(_this.ViewMap[Label], _this.ControlLayer);
                 }
