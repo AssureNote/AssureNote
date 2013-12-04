@@ -36,8 +36,13 @@ var AssureNote;
             this.InitialY = 0;
             this.CurrentX = 0;
             this.CurrentY = 0;
-            this.MainPointerID = 0;
+            this.Dx = 0;
+            this.Dy = 0;
+            this.MainPointerID = null;
             this.Pointers = [];
+            this.timer = 0;
+            this.ANIMATE_THRESHOLD = 5;
+            this.SPEED_MAX = 100;
         }
         ScrollManager.prototype.SetInitialOffset = function (InitialOffsetX, InitialOffsetY) {
             this.InitialOffsetX = InitialOffsetX;
@@ -47,9 +52,19 @@ var AssureNote;
         ScrollManager.prototype.StartDrag = function (InitialX, InitialY) {
             this.InitialX = InitialX;
             this.InitialY = InitialY;
+            this.CurrentX = InitialX;
+            this.CurrentY = InitialY;
         };
 
         ScrollManager.prototype.UpdateDrag = function (CurrentX, CurrentY) {
+            this.Dx = CurrentX - this.CurrentX;
+            this.Dy = CurrentY - this.CurrentY;
+            var speed = this.Dx * this.Dx + this.Dy + this.Dy;
+            if (speed > this.SPEED_MAX * this.SPEED_MAX) {
+                this.Dx *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
+                this.Dy *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
+            }
+
             this.CurrentX = CurrentX;
             this.CurrentY = CurrentY;
         };
@@ -76,7 +91,14 @@ var AssureNote;
             return this.MainPointerID != null;
         };
 
+        ScrollManager.prototype.StopAnimation = function () {
+            clearInterval(this.timer);
+            this.Dx = 0;
+            this.Dy = 0;
+        };
+
         ScrollManager.prototype.OnPointerEvent = function (e, Screen) {
+            var _this = this;
             this.Pointers = e.getPointerList();
             if (this.Pointers.length > 0) {
                 if (this.IsDragging()) {
@@ -88,12 +110,30 @@ var AssureNote;
                         this.MainPointerID = null;
                     }
                 } else {
+                    this.StopAnimation();
+                    this.timer = null;
                     var mainPointer = this.Pointers[0];
                     this.MainPointerID = mainPointer.identifier;
                     this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
                     this.StartDrag(mainPointer.pageX, mainPointer.pageY);
                 }
             } else {
+                if (this.IsDragging()) {
+                    if (this.timer) {
+                        this.StopAnimation();
+                        this.timer = null;
+                    }
+                    this.timer = setInterval(function () {
+                        if (Math.abs(_this.Dx) < _this.ANIMATE_THRESHOLD && Math.abs(_this.Dy) < _this.ANIMATE_THRESHOLD) {
+                            _this.StopAnimation();
+                        }
+                        _this.CurrentX += _this.Dx;
+                        _this.CurrentY += _this.Dy;
+                        _this.Dx *= 0.95;
+                        _this.Dy *= 0.95;
+                        Screen.SetOffset(_this.CalcOffsetX(), _this.CalcOffsetY());
+                    }, 16);
+                }
                 this.MainPointerID = null;
             }
         };
