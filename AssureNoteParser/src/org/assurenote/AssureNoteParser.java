@@ -280,7 +280,7 @@ class WikiSyntax {
 	static String FormatGoalLevel(int GoalLevel) {
 		/*local*/StringBuilder sb = new StringBuilder();
 		for (/*local*/int i = 0; i < GoalLevel; i++) {
-			sb.append('*');
+			sb.append("*");
 		}
 		return sb.toString();
 	}

@@ -198,7 +198,7 @@ class WikiSyntax {
 	static FormatGoalLevel(GoalLevel: number): string {
 		var sb: StringBuilder = new StringBuilder();
 		for (var i: number = 0; i < GoalLevel; i++) {
-			sb.append(42);
+			sb.append("*");
 		}
 		return sb.toString();
 	}

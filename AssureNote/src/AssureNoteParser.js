@@ -184,7 +184,7 @@ var WikiSyntax = (function () {
     WikiSyntax.FormatGoalLevel = function (GoalLevel) {
         var sb = new StringBuilder();
         for (var i = 0; i < GoalLevel; i++) {
-            sb.append(42);
+            sb.append("*");
         }
         return sb.toString();
     };

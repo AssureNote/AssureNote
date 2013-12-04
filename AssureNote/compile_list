@@ -3,6 +3,7 @@ src/AssureNote.ts
 src/AssureNoteParser.ts
 src/CommandLine.ts
 src/LayoutEngine.ts
+src/MenuBar.ts
 src/Panel.ts
 src/Plugin.ts
 src/SideMenu.ts
