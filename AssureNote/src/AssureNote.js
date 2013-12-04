@@ -67,8 +67,11 @@ var AssureNote;
             }
         };
 
-        AssureNoteApp.prototype.ExecCommand = function (CommandLine) {
-            var ParsedCommand = new AssureNote.CommandParser(CommandLine);
+        AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
+            var Method = ParsedCommand.GetMethod();
+            if (Method == "search") {
+                return;
+            }
             var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
             if (Plugin != null) {
                 Plugin.ExecCommand(this, ParsedCommand.GetArgs());

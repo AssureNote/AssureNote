@@ -46,18 +46,32 @@ var AssureNote;
             };
 
             this.CmdLine = new AssureNote.CommandLine();
+            this.Search = new AssureNote.Search(AssureNoteApp);
             document.onkeydown = function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return false;
                 }
 
-                if (event.keyCode == 186) {
-                    _this.CmdLine.Show();
-                } else if (event.keyCode == 13 && _this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
-                    _this.AssureNoteApp.ExecCommand(_this.CmdLine.GetValue());
-                    _this.CmdLine.Hide();
-                    _this.CmdLine.Clear();
-                    return false;
+                switch (event.keyCode) {
+                    case 186:
+                        _this.CmdLine.Show();
+                        break;
+                    case 191:
+                        _this.CmdLine.Show();
+                        break;
+                    case 13:
+                        if (_this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
+                            var ParsedCommand = new AssureNote.CommandParser();
+                            ParsedCommand.Parse(_this.CmdLine.GetValue());
+                            if (ParsedCommand.GetMethod() == "search") {
+                                _this.Search.Search(_this.MasterView, ParsedCommand.GetArgs()[0]);
+                            }
+                            _this.AssureNoteApp.ExecCommand(ParsedCommand);
+                            _this.CmdLine.Hide();
+                            _this.CmdLine.Clear();
+                            return false;
+                        }
+                        break;
                 }
             };
 

@@ -6,15 +6,28 @@ module AssureNote {
 		private Method: string;
 		private Args: string[];
 
-		constructor(line: string) {
+		constructor() {
+		}
+
+		Parse(line: string): void {
 			var s = line.split(" ");
-			this.Method = s[0].slice(1);
-			if (s.length > 1) {
-				this.Args = s.slice(1);
+			if (s.length > 0) {
+				if (s[0][0].match(/\//) != null) {
+					this.Method = "search";
+					this.Args = [];
+					this.Args.push(line.slice(1));
+					return;
+				} else if (s[0][0].match(/:/) != null) {
+					this.Method = s[0].slice(1);
+					if (s.length > 1) {
+						this.Args = s.slice(1);
+					}
+				}
 			}
 		}
 
 		GetMethod(): string {
+			AssureNoteApp.Assert(this.Method != null);
 			return this.Method;
 		}
 

@@ -84,8 +84,13 @@ module AssureNote {
 			}
 		}
 
-		ExecCommand(CommandLine: string): void {
-			var ParsedCommand = new CommandParser(CommandLine);
+		ExecCommand(ParsedCommand: CommandParser): void {
+
+			var Method = ParsedCommand.GetMethod();
+			if (Method == "search") {
+
+				return;
+			}
 			var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
 			if (Plugin != null) {
 				Plugin.ExecCommand(this, ParsedCommand.GetArgs());

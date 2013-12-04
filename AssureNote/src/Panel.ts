@@ -1,5 +1,6 @@
 ///<reference path='./AssureNote.ts'/>
 ///<reference path='./CommandLine.ts'/>
+///<reference path='./SearchNode.ts'/>
 declare var CodeMirror: any;
 
 module AssureNote {
@@ -13,6 +14,7 @@ module AssureNote {
 		ViewMap: { [index: string]: NodeView };
 		MasterView: NodeView;
 		CmdLine: CommandLine;
+		Search: Search;
 
 		CurrentDoc: GSNDoc;// Convert to caseview
 		FocusedLabel: string;
@@ -62,19 +64,32 @@ module AssureNote {
 			};
 
 			this.CmdLine = new CommandLine();
+			this.Search = new Search(AssureNoteApp);
 			document.onkeydown = (event: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
 				}
 
-				if (event.keyCode == 186/*:*/) {
-					this.CmdLine.Show();
-				}
-				else if (event.keyCode == 13/*Enter*/ && this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
-					this.AssureNoteApp.ExecCommand(this.CmdLine.GetValue());
-					this.CmdLine.Hide();
-					this.CmdLine.Clear();
-					return false;
+				switch (event.keyCode) {
+					case 186: /*:*/
+						this.CmdLine.Show();
+						break;
+					case 191: /*/*/
+						this.CmdLine.Show();
+						break;
+					case 13: /*Enter*/
+						if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
+							var ParsedCommand = new CommandParser();
+							ParsedCommand.Parse(this.CmdLine.GetValue());
+							if (ParsedCommand.GetMethod() == "search") {
+								this.Search.Search(this.MasterView, ParsedCommand.GetArgs()[0]);
+							}
+							this.AssureNoteApp.ExecCommand(ParsedCommand);
+							this.CmdLine.Hide();
+							this.CmdLine.Clear();
+							return false;
+						}
+						break;
 				}
 			};
 
