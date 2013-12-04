@@ -14,20 +14,25 @@ var AssureNote;
             var Bar = new AssureNote.MenuBar(AssureNoteApp);
             this.ContentLayer.onclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
-                var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("click:" + Label);
-
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
-                if (!Bar.IsEnable) {
-                    Bar.Create(_this.ViewMap[Label], _this.ControlLayer);
+                var NodeView = _this.ViewMap[Label];
+                if (NodeView != null) {
+                    _this.FocusedLabel = Label;
+                    if (!Bar.IsEnable) {
+                        Bar.Create(_this.ViewMap[Label], _this.ControlLayer);
+                    }
+                } else {
+                    _this.FocusedLabel = null;
                 }
                 return false;
             };
 
             //FIXME
             this.EventMapLayer.onclick = function (event) {
+                _this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }

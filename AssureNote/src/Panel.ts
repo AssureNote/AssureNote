@@ -30,20 +30,25 @@ module AssureNote {
 			var Bar = new MenuBar(AssureNoteApp);
 			this.ContentLayer.onclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
-				var NodeView = this.ViewMap[Label];
 				this.AssureNoteApp.DebugP("click:" + Label);
-
 				if (Bar.IsEnable) {
 					Bar.Remove();
 				}
-				if (!Bar.IsEnable) {
-					Bar.Create(this.ViewMap[Label], this.ControlLayer);
+				var NodeView = this.ViewMap[Label];
+				if (NodeView != null) {
+					this.FocusedLabel = Label;
+					if (!Bar.IsEnable) {
+						Bar.Create(this.ViewMap[Label], this.ControlLayer);
+					}
+				} else {
+					this.FocusedLabel = null;
 				}
 				return false;
 			};
 
 			//FIXME
 			this.EventMapLayer.onclick = (event: MouseEvent) => {
+				this.FocusedLabel = null;
 				if(Bar.IsEnable) {
 					Bar.Remove();
 				}
