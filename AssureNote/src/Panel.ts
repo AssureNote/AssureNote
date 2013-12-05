@@ -139,23 +139,24 @@ module AssureNote {
 			this.AssureNoteApp.PluginPanel.Clear();
 		}
 
-		Draw(Label: string, wx: number, wy: number): void {
-			if (wx == null) {
-				wx = 100; //FIXME
-			}
+        Draw(Label: string, wx/*window x of the forcused node*/: number, wy/*window y*/: number): void {
+            if (wx == null) {
+                wx = window.innerWidth / 2;
+            }
 			if (wy == null) {
-				wy = 100; //FIXME
+                wy = window.innerHeight / 3;
 			}
 
 			var TargetView = this.ViewMap[Label];
 			if (TargetView == null) {
 				TargetView = this.MasterView;
 			}
-
             this.LayoutEngine.DoLayout(this, TargetView);
             NodeView.SetGlobalPositionCacheEnabled(true);
 			TargetView.UpdateDocumentPosition();
             NodeView.SetGlobalPositionCacheEnabled(false);
+            // Do scroll
+            this.ViewPort.SetOffset(wx - TargetView.GetShape().GetNodeWidth() / 2, wy - TargetView.GetShape().GetNodeHeight() / 2);
 		}
 
 		Redraw(): void {

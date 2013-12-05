@@ -113,21 +113,23 @@ var AssureNote;
 
         PictgramPanel.prototype.Draw = function (Label, wx, wy) {
             if (wx == null) {
-                wx = 100;
+                wx = window.innerWidth / 2;
             }
             if (wy == null) {
-                wy = 100;
+                wy = window.innerHeight / 3;
             }
 
             var TargetView = this.ViewMap[Label];
             if (TargetView == null) {
                 TargetView = this.MasterView;
             }
-
             this.LayoutEngine.DoLayout(this, TargetView);
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
             TargetView.UpdateDocumentPosition();
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
+
+            // Do scroll
+            this.ViewPort.SetOffset(wx - TargetView.GetShape().GetNodeWidth() / 2, wy - TargetView.GetShape().GetNodeHeight() / 2);
         };
 
         PictgramPanel.prototype.Redraw = function () {
