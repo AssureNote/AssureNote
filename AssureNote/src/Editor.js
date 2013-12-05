@@ -1,20 +1,29 @@
 ///<reference path='./Plugin.ts'/>
 var AssureNote;
 (function (AssureNote) {
-    var Editor = (function () {
-        function Editor(AssureNoteApp, selector, EditorPlugin) {
-            this.AssureNoteApp = AssureNoteApp;
+    var EditorUtil = (function () {
+        function EditorUtil(textarea/*codemirror*/ , selector, CSS) {
+            this.textarea = textarea;
             this.selector = selector;
-            this.EditorPlugin = EditorPlugin;
-            $(selector).css({ display: 'none', opacity: '1.0' });
+            this.CSS = CSS;
+            $(this.textarea.getWrapperElement()).css({
+                height: "100%",
+                width: "100%",
+                background: "rgba(255, 255, 255, 0.85)"
+            });
+            $(selector).css(CSS);
+            //$(selector).css({ display: "none" });
         }
-        Editor.prototype.EnableEditor = function () {
+        EditorUtil.prototype.EnableEditorCallback = function () {
+            $(this.selector).css({ display: "block" });
+            return null;
         };
 
-        Editor.prototype.DisableEditor = function () {
+        EditorUtil.prototype.DisableEditorCallback = function () {
+            return null;
         };
-        return Editor;
+        return EditorUtil;
     })();
-    AssureNote.Editor = Editor;
+    AssureNote.EditorUtil = EditorUtil;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Editor.js.map

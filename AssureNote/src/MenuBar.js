@@ -8,6 +8,14 @@ var AssureNote;
             this.Title = Title;
             this.EventHandler = EventHandler;
         }
+        MenuBarButton.prototype.EnableEventHandler = function (MenuBar) {
+            var _this = this;
+            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            $("#" + this.ElementId).click(function (event) {
+                _this.EventHandler(event, MenuBar.CurrentView);
+                MenuBar.Remove();
+            });
+        };
         return MenuBarButton;
     })();
     AssureNote.MenuBarButton = MenuBarButton;
@@ -18,14 +26,9 @@ var AssureNote;
             this.IsEnable = false;
         }
         MenuBar.prototype.CreateButtons = function (Contents) {
-            var _this = this;
             for (var i = 0; i < Contents.length; i++) {
                 var Button = Contents[i];
-                this.Menu.append('<a href="#" ><img id="' + Button.ElementId + '" src="' + Button.ImagePath + '" title="' + Button.Title + '" alt="' + Button.Title + '" /></a>');
-                $("#" + Button.ElementId).click(function (event) {
-                    Button.EventHandler(event, _this.CurrentView);
-                    _this.Remove();
-                });
+                Button.EnableEventHandler(this);
             }
         };
 

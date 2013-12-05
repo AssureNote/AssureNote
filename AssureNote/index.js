@@ -561,7 +561,5 @@ $(function () {
 
     var SamplePlugin = new AssureNote.SamplePlugin();
     AssureNoteApp.PluginManager.SetPlugin("Sample", SamplePlugin);
-    var FullScreenEditorPlugin = new AssureNote.FullScreenEditorPlugin();
-    AssureNoteApp.PluginManager.SetPlugin("FullScreenEditor", FullScreenEditorPlugin);
 });
 //# sourceMappingURL=index.js.map

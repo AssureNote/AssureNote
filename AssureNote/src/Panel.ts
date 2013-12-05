@@ -1,7 +1,11 @@
 ///<reference path='./AssureNote.ts'/>
 ///<reference path='./CommandLine.ts'/>
 ///<reference path='./SearchNode.ts'/>
+///<reference path='./LayoutEngine.ts'/>
 ///<reference path='./Editor.ts'/>
+
+///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
+
 declare var CodeMirror: any;
 
 module AssureNote {
@@ -173,16 +177,18 @@ module AssureNote {
 	}
 
     export class PluginPanel {
-		FullScreenEditor: Editor;
+		FullScreenEditor: Plugin;
 		IsVisible: boolean = true;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
-			var RawEditor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+			var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
 				lineNumbers: false,
 				mode: "text/x-asn",
 				lineWrapping: true,
             });
-            this.FullScreenEditor = new Editor(AssureNoteApp, '#editor-wrapper', new FullScreenEditorPlugin());
+
+            this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
+            AssureNoteApp.PluginManager.SetPlugin("FullScreenEditor", this.FullScreenEditor);
         }
 
 		Clear(): void {

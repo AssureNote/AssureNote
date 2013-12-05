@@ -4,7 +4,15 @@ module AssureNote {
 
 	export class MenuBarButton {
 		constructor(public ElementId: string, public ImagePath: string, public Title: string, public EventHandler: (event: Event, NodeView: NodeView) => void) {
-		}
+        }
+
+        EnableEventHandler(MenuBar: MenuBar) {
+            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            $("#" + this.ElementId).click((event: Event) => {
+                this.EventHandler(event, MenuBar.CurrentView);
+                MenuBar.Remove();
+            });
+        }
 	}
 
 	export class MenuBar {
@@ -19,11 +27,7 @@ module AssureNote {
 		private CreateButtons(Contents: MenuBarButton[]): void {
 			for (var i = 0; i < Contents.length; i++) {
 				var Button = Contents[i];
-				this.Menu.append('<a href="#" ><img id="' + Button.ElementId + '" src="' + Button.ImagePath + '" title="' + Button.Title + '" alt="' + Button.Title + '" /></a>');
-				$("#" + Button.ElementId).click((event: Event) => {
-					Button.EventHandler(event, this.CurrentView);
-					this.Remove();
-				});
+                Button.EnableEventHandler(this);
 			}
 		}
 
