@@ -18,8 +18,8 @@ var AssureNote;
             this.selector = selector;
             this.HasMenuBarButton = true;
             this.HasEditor = true;
-            this.EditorUtil = new AssureNote.EditorUtil(textarea, selector, {
-                position: "absolute",
+            this.EditorUtil = new AssureNote.EditorUtil(AssureNoteApp, textarea, selector, {
+                position: "fixed",
                 top: "5%",
                 left: "5%",
                 width: "90%",
@@ -27,11 +27,7 @@ var AssureNote;
             });
         }
         FullScreenEditorPlugin.prototype.EnableEditor = function (WGSN) {
-            this.textarea.setValue(WGSN);
-            var callback = this.EditorUtil.EnableEditorCallback();
-            if (callback) {
-                callback();
-            }
+            this.EditorUtil.EnableEditor(WGSN);
         };
 
         FullScreenEditorPlugin.prototype.DisableEditor = function () {
@@ -44,7 +40,6 @@ var AssureNote;
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
                 _this.EnableEditor(Writer.toString());
-                console.log(Writer.toString());
             });
         };
         return FullScreenEditorPlugin;

@@ -50,7 +50,7 @@ var AssureNote;
             this.Search = new AssureNote.Search(AssureNoteApp);
             document.onkeydown = function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                    return false;
+                    return;
                 }
 
                 switch (event.keyCode) {
