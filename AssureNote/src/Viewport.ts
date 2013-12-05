@@ -19,7 +19,10 @@ document.createSVGElement = function (name: string): Element {
 module AssureNote {
 
 	export class Point {
-		constructor(public x: number, public y: number) { }
+        constructor(public X: number, public Y: number) { }
+        public Clone(): Point {
+            return new Point(this.X, this.Y);
+        }
 	}
 
 	export enum Direction {

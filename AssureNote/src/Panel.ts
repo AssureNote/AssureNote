@@ -147,8 +147,10 @@ module AssureNote {
 				TargetView = this.MasterView;
 			}
 
-			this.LayoutEngine.DoLayout(this, TargetView, wx, wy);
-			TargetView.SetDocumentPosition(wx, wy);
+            this.LayoutEngine.DoLayout(this, TargetView);
+            NodeView.SetGlobalPositionCacheEnabled(true);
+			TargetView.UpdateDocumentPosition();
+            NodeView.SetGlobalPositionCacheEnabled(false);
 		}
 
 		Redraw(): void {
