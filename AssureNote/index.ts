@@ -5,6 +5,8 @@
 ///<reference path='src/LayoutEngine.ts'/>
 ///<reference path='src/Viewport.ts'/>
 
+///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
+
 module AssureNote {
 
 	export class ColorStyle {
@@ -499,5 +501,7 @@ $(() => {
 
 	var SamplePlugin = new AssureNote.SamplePlugin();
 	AssureNoteApp.PluginManager.SetPlugin("Sample", SamplePlugin);
+	var FullScreenEditorPlugin = new AssureNote.FullScreenEditorPlugin();
+	AssureNoteApp.PluginManager.SetPlugin("FullScreenEditor", FullScreenEditorPlugin);
 
 });
