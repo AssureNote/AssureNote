@@ -10,6 +10,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var ColorStyle = (function () {
@@ -518,5 +519,7 @@ $(function () {
 
     var SamplePlugin = new AssureNote.SamplePlugin();
     AssureNoteApp.PluginManager.SetPlugin("Sample", SamplePlugin);
+    var FullScreenEditorPlugin = new AssureNote.FullScreenEditorPlugin();
+    AssureNoteApp.PluginManager.SetPlugin("FullScreenEditor", FullScreenEditorPlugin);
 });
 //# sourceMappingURL=index.js.map
