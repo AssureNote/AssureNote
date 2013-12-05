@@ -24,6 +24,14 @@ var AssureNote;
             //});
             return null;
         };
+
+        Plugin.prototype.EditorEnableCallback = function () {
+            return null;
+        };
+
+        Plugin.prototype.EditorDisableCallback = function () {
+            return null;
+        };
         return Plugin;
     })();
     AssureNote.Plugin = Plugin;
@@ -42,18 +50,6 @@ var AssureNote;
         return SamplePlugin;
     })(Plugin);
     AssureNote.SamplePlugin = SamplePlugin;
-
-    var EditorPugin = (function (_super) {
-        __extends(EditorPugin, _super);
-        function EditorPugin() {
-            _super.call(this);
-            this.HasEditor = true;
-            this.EnableCallback = null;
-            this.DisableCallback = null;
-        }
-        return EditorPugin;
-    })(Plugin);
-    AssureNote.EditorPugin = EditorPugin;
 
     var PluginManager = (function () {
         function PluginManager(AssureNoteApp) {

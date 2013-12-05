@@ -78,6 +78,7 @@
     <TypeScriptCompile Include="src\old\Api.ts" />
     <TypeScriptCompile Include="src\Plugin.ts" />
     <TypeScriptCompile Include="src\SideMenu.ts" />
+    <TypeScriptCompile Include="plugin\FullScreenEditor\FullScreenEditor.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.eot" />

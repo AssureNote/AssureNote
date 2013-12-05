@@ -156,13 +156,12 @@ var AssureNote;
         function PluginPanel(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
             this.IsVisible = true;
-            var Editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            var RawEditor = CodeMirror.fromTextArea(document.getElementById('editor'), {
                 lineNumbers: false,
                 mode: "text/x-asn",
                 lineWrapping: true
             });
-            this.FullScreenEditor = new Editor(AssureNoteApp, new AssureNote.FullScreenEditorPlugin());
-            $('#editor-wrapper').css({ display: 'none', opacity: '1.0' });
+            this.FullScreenEditor = new AssureNote.Editor(AssureNoteApp, '#editor-wrapper', new AssureNote.FullScreenEditorPlugin());
         }
         PluginPanel.prototype.Clear = function () {
         };

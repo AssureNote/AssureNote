@@ -22,8 +22,17 @@ module AssureNote {
 			//return new MenuBarButton("sample-id", "images/sample.png", "sample", (TargetView: NodeView) => {
 			//});
 			return null;
-		}
-	}
+        }
+
+        EditorEnableCallback(): () => void {
+            return null;
+        }
+
+        EditorDisableCallback(): () => void {
+            return null;
+        }
+    }
+
 
 	export class SamplePlugin extends Plugin {
 		constructor() {
@@ -36,17 +45,6 @@ module AssureNote {
 				alert(TargetView.Label);
 			});
 		}
-    }
-
-    export class EditorPugin extends Plugin {
-        public EnableCallback: () => void;
-        public DisableCallback: () => void;
-        constructor() {
-            super();
-            this.HasEditor = true;
-            this.EnableCallback = null;
-            this.DisableCallback = null;
-        }
     }
 
 	export class PluginManager {

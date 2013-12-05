@@ -13,7 +13,16 @@ var AssureNote;
         function FullScreenEditorPlugin() {
             _super.call(this);
             this.HasMenuBarButton = true;
+            this.HasEditor = true;
         }
+        FullScreenEditorPlugin.prototype.EditorEnableCallback = function () {
+            return null;
+        };
+
+        FullScreenEditorPlugin.prototype.EditorDisableCallback = function () {
+            return null;
+        };
+
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function () {
             return new AssureNote.MenuBarButton("fullscreeneditor", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Writer = new StringWriter();
