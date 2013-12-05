@@ -1,3 +1,4 @@
+///<reference path="../../src/AssureNoteParser.ts" />
 ///<reference path="../../src/Plugin.ts" />
 
 module AssureNote {
@@ -10,7 +11,9 @@ module AssureNote {
 		CreateMenuBarButton(): MenuBarButton {
 			return new MenuBarButton("fullscreeneditor", "images/editor.png", "fullscreeneditor",
 				(event: Event, TargetView: NodeView) => {
-					alert(TargetView.Label);
+					var Writer = new StringWriter();
+					TargetView.Model.FormatSubNode(1, Writer);
+					console.log(Writer.toString());
 			});
 		}
 	}

@@ -1,3 +1,4 @@
+///<reference path="../../src/AssureNoteParser.ts" />
 ///<reference path="../../src/Plugin.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -15,7 +16,9 @@ var AssureNote;
         }
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function () {
             return new AssureNote.MenuBarButton("fullscreeneditor", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
-                alert(TargetView.Label);
+                var Writer = new StringWriter();
+                TargetView.Model.FormatSubNode(1, Writer);
+                console.log(Writer.toString());
             });
         };
         return FullScreenEditorPlugin;

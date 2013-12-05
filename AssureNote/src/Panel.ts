@@ -1,20 +1,21 @@
 ///<reference path='./AssureNote.ts'/>
 ///<reference path='./CommandLine.ts'/>
 ///<reference path='./SearchNode.ts'/>
+///<reference path='./Editor.ts'/>
 declare var CodeMirror: any;
 
 module AssureNote {
 	export class PictgramPanel {
 		LayoutEngine: LayoutEngine;
-		SVGLayer: SVGGElement;
-		EventMapLayer: HTMLDivElement;
+        SVGLayer: SVGGElement;
+        EventMapLayer: HTMLDivElement;
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
 		ViewMap: { [index: string]: NodeView };
 		MasterView: NodeView;
 		CmdLine: CommandLine;
-		Search: Search;
+        Search: Search;
 
 		CurrentDoc: GSNDoc;// Convert to caseview
 		FocusedLabel: string;
@@ -27,7 +28,7 @@ module AssureNote {
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
-			this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
+            this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
 			var Bar = new MenuBar(AssureNoteApp);
 			this.ContentLayer.onclick = (event: MouseEvent) => {
@@ -65,7 +66,7 @@ module AssureNote {
 			};
 
 			this.CmdLine = new CommandLine();
-			this.Search = new Search(AssureNoteApp);
+            this.Search = new Search(AssureNoteApp);
 			document.onkeydown = (event: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return false;
@@ -169,18 +170,21 @@ module AssureNote {
 
 	}
 
-	export class PluginPanel {
-		Editor: any;
+    export class PluginPanel {
+		FullScreenEditor: Editor;
 		IsVisible: boolean = true;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
-			this.Editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+			var Editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
 				lineNumbers: false,
 				mode: "text/x-asn",
 				lineWrapping: true,
-			});
+            });
+            this.FullScreenEditor = new Editor(AssureNoteApp, new FullScreenEditorPlugin());
 			$('#editor-wrapper').css({ display: 'none', opacity: '1.0' });
-		}
+        }
+
+        EnableEditor
 
 		Clear(): void {
 		}

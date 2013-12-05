@@ -4,10 +4,12 @@
 module AssureNote {
 
 	export class Plugin {
-		public HasMenuBarButton: boolean;
+        public HasMenuBarButton: boolean;
+        public HasEditor: boolean;
 
 		constructor() {
-			this.HasMenuBarButton = false;
+            this.HasMenuBarButton = false;
+            this.HasEditor = false;
 		}
 
 		ExecCommand(AssureNote: AssureNoteApp, Args: string[]): void {
@@ -34,14 +36,24 @@ module AssureNote {
 				alert(TargetView.Label);
 			});
 		}
-	}
+    }
 
+    export class EditorPugin extends Plugin {
+        public EnableCallback: () => void;
+        public DisableCallback: () => void;
+        constructor() {
+            super();
+            this.HasEditor = true;
+            this.EnableCallback = null;
+            this.DisableCallback = null;
+        }
+    }
 
 	export class PluginManager {
 		private PluginMap: {[index: string]: Plugin};
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			this.PluginMap = {};
-		}
+        }
 
 		SetPlugin(Name: string, Plugin: Plugin): void {
 			this.PluginMap[Name] = Plugin;

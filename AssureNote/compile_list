@@ -8,5 +8,6 @@ src/Panel.ts
 src/Plugin.ts
 src/SideMenu.ts
 src/Viewport.ts
+src/Editor.ts
 
 plugin/FullScreenEditor/FullScreenEditor.ts
