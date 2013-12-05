@@ -24,6 +24,7 @@ var AssureNote;
                 this.Menu.append('<a href="#" ><img id="' + Button.ElementId + '" src="' + Button.ImagePath + '" title="' + Button.Title + '" alt="' + Button.Title + '" /></a>');
                 $("#" + Button.ElementId).click(function (event) {
                     Button.EventHandler(event, _this.CurrentView);
+                    _this.Remove();
                 });
             }
         };

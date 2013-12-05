@@ -11,6 +11,7 @@ var AssureNote;
     var Plugin = (function () {
         function Plugin() {
             this.HasMenuBarButton = false;
+            this.HasEditor = false;
         }
         Plugin.prototype.ExecCommand = function (AssureNote, Args) {
         };
@@ -41,6 +42,18 @@ var AssureNote;
         return SamplePlugin;
     })(Plugin);
     AssureNote.SamplePlugin = SamplePlugin;
+
+    var EditorPugin = (function (_super) {
+        __extends(EditorPugin, _super);
+        function EditorPugin() {
+            _super.call(this);
+            this.HasEditor = true;
+            this.EnableCallback = null;
+            this.DisableCallback = null;
+        }
+        return EditorPugin;
+    })(Plugin);
+    AssureNote.EditorPugin = EditorPugin;
 
     var PluginManager = (function () {
         function PluginManager(AssureNoteApp) {

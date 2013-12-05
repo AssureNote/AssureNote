@@ -42,6 +42,7 @@ var AssureNote;
                     return;
                 }
                 this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
+                this.AssureNoteApp.DebugP(this.HitNodes);
 
                 if (this.HitNodes.length == 0) {
                     this.SearchWord = "";
