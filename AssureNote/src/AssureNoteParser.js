@@ -1478,7 +1478,7 @@ var Iterator = (function () {
 Object.defineProperty(Array.prototype, "addAll", {
     enumerable: false,
     value: function (obj) {
-        this.concat(obj);
+        Array.prototype.push.apply(this, obj);
     }
 });
 
