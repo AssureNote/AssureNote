@@ -22,6 +22,7 @@ module AssureNote {
 				this.Menu.append('<a href="#" ><img id="' + Button.ElementId + '" src="' + Button.ImagePath + '" title="' + Button.Title + '" alt="' + Button.Title + '" /></a>');
 				$("#" + Button.ElementId).click((event: Event) => {
 					Button.EventHandler(event, this.CurrentView);
+					this.Remove();
 				});
 			}
 		}
