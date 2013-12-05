@@ -70,7 +70,6 @@ module AssureNote {
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
-			//this.GSNRecord = new GSNRecord();
 		}
 
 		DebugP(Message: string): void {

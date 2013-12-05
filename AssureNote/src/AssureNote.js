@@ -54,7 +54,6 @@ var AssureNote;
             this.PluginManager = new AssureNote.PluginManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
-            //this.GSNRecord = new GSNRecord();
         }
         AssureNoteApp.prototype.DebugP = function (Message) {
             console.log(Message);

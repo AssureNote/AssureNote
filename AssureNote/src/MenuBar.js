@@ -1,20 +1,41 @@
 ///<reference path="./AssureNote.ts" />
 var AssureNote;
 (function (AssureNote) {
+    var MenuBarButton = (function () {
+        function MenuBarButton(ElementId, ImagePath, Title, EventHandler) {
+            this.ElementId = ElementId;
+            this.ImagePath = ImagePath;
+            this.Title = Title;
+            this.EventHandler = EventHandler;
+        }
+        return MenuBarButton;
+    })();
+    AssureNote.MenuBarButton = MenuBarButton;
+
     var MenuBar = (function () {
         function MenuBar(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
             this.IsEnable = false;
         }
-        MenuBar.prototype.Create = function (CurrentView, ControlLayer) {
+        MenuBar.prototype.CreateButtons = function (Contents) {
+            var _this = this;
+            for (var i = 0; i < Contents.length; i++) {
+                var Button = Contents[i];
+                this.Menu.append('<a href="#" ><img id="' + Button.ElementId + '" src="' + Button.ImagePath + '" title="' + Button.Title + '" alt="' + Button.Title + '" /></a>');
+                $("#" + Button.ElementId).click(function (event) {
+                    Button.EventHandler(event, _this.CurrentView);
+                });
+            }
+        };
+
+        MenuBar.prototype.Create = function (CurrentView, ControlLayer, Contents) {
             var _this = this;
             this.IsEnable = true;
             this.CurrentView = CurrentView;
             $('#menu').remove();
             this.Menu = $('<div id="menu" style="display: none;"></div>');
-
-            this.Menu.append('<a href="#" ><img id="remove" src="images/remove.png" title="Remove" alt="remove" /></a>');
             this.Menu.appendTo($(ControlLayer));
+            this.CreateButtons(Contents);
 
             var refresh = function () {
                 AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);

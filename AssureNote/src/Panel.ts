@@ -40,7 +40,8 @@ module AssureNote {
 				if (NodeView != null) {
 					this.FocusedLabel = Label;
 					if (!Bar.IsEnable) {
-						Bar.Create(this.ViewMap[Label], this.ControlLayer);
+						var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons();
+						Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
 					}
 				} else {
 					this.FocusedLabel = null;

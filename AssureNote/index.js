@@ -515,5 +515,8 @@ $(function () {
         AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), "downlaod.wgsn");
     }));
     AssureNote.SideMenu.Create(Menu);
+
+    var SamplePlugin = new AssureNote.SamplePlugin();
+    AssureNoteApp.PluginManager.SetPlugin("Sample", SamplePlugin);
 });
 //# sourceMappingURL=index.js.map
