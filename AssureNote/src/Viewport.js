@@ -8,10 +8,13 @@ document.createSVGElement = function (name) {
 var AssureNote;
 (function (AssureNote) {
     var Point = (function () {
-        function Point(x, y) {
-            this.x = x;
-            this.y = y;
+        function Point(X, Y) {
+            this.X = X;
+            this.Y = Y;
         }
+        Point.prototype.Clone = function () {
+            return new Point(this.X, this.Y);
+        };
         return Point;
     })();
     AssureNote.Point = Point;

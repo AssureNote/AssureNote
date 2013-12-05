@@ -124,8 +124,10 @@ var AssureNote;
                 TargetView = this.MasterView;
             }
 
-            this.LayoutEngine.DoLayout(this, TargetView, wx, wy);
-            TargetView.SetDocumentPosition(wx, wy);
+            this.LayoutEngine.DoLayout(this, TargetView);
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
+            TargetView.UpdateDocumentPosition();
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
         };
 
         PictgramPanel.prototype.Redraw = function () {
