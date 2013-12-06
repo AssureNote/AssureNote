@@ -322,10 +322,10 @@ var AssureNote;
                 div.id = this.NodeView.Label;
 
                 var h4 = document.createElement("h4");
-                h4.innerText = this.NodeView.Label;
+                h4.textContent = this.NodeView.Label;
 
                 var p = document.createElement("p");
-                p.innerText = this.NodeView.NodeDoc;
+                p.textContent = this.NodeView.NodeDoc.trim();
 
                 this.UpdateHtmlClass();
 

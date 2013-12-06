@@ -124,9 +124,13 @@ var AssureNote;
                 TargetView = this.MasterView;
             }
             this.LayoutEngine.DoLayout(this, TargetView);
+            this.ContentLayer.style.display = "none";
+            this.SVGLayer.style.display = "none";
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
             TargetView.UpdateDocumentPosition();
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
+            this.ContentLayer.style.display = "";
+            this.SVGLayer.style.display = "";
 
             // Do scroll
             this.ViewPort.SetOffset(wx - TargetView.GetShape().GetNodeWidth() / 2, wy - TargetView.GetShape().GetNodeHeight() / 2);

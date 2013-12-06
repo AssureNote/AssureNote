@@ -43,9 +43,13 @@ module AssureNote {
 
 			PictgramPanel.ContentLayer.appendChild(DivFragment);
 			PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
-			PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
-            this.Layout(NodeView);
+            PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
 
+            for (var i = 0; i < list.length; i++) {
+                var View = PictgramPanel.ViewMap[list[i]];
+                View.GetShape().FitSizeToContent();
+            }
+            this.Layout(NodeView);
 		}
 
 		private Layout(ThisNode: NodeView): void {
