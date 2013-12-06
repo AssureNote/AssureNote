@@ -16,10 +16,10 @@ var AssureNote;
     var ColorStyle = (function () {
         function ColorStyle() {
         }
-        ColorStyle.Default = "assureit-default";
-        ColorStyle.ToDo = "assureit-todo";
-        ColorStyle.Searched = "assureit-search";
-        ColorStyle.Danger = "assureit-danger";
+        ColorStyle.Default = "assurenote-default";
+        ColorStyle.ToDo = "assurenote-todo";
+        ColorStyle.Searched = "assurenote-search";
+        ColorStyle.Danger = "assurenote-danger";
         return ColorStyle;
     })();
     AssureNote.ColorStyle = ColorStyle;
