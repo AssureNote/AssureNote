@@ -10,10 +10,10 @@
 module AssureNote {
 
 	export class ColorStyle {
-		static Default: string = "assureit-default";
-		static ToDo: string = "assureit-todo";
-		static Searched: string = "assureit-search";
-		static Danger: string = "assureit-danger";
+		static Default: string = "assurenote-default";
+		static ToDo: string = "assurenote-todo";
+		static Searched: string = "assurenote-search";
+		static Danger: string = "assurenote-danger";
 	}
 
 	export class NodeView {

@@ -1,8 +1,8 @@
 //module AssureNote {
 //	export var Color = {
-//		Default: "assureit-default",
-//		ToDo: "assureit-todo",
-//		Searched: "assureit-search",
-//		Danger: "assureit-danger"
+//		Default: "assurenote-default",
+//		ToDo: "assurenote-todo",
+//		Searched: "assurenote-search",
+//		Danger: "assurenote-danger"
 //	};
 //}
