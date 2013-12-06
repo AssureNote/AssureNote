@@ -9,10 +9,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var AssureNote;
 (function (AssureNote) {
-    function Xor(a, b) {
-        return (a || b) && !(a && b);
-    }
-
     var FoldingViewSwitchPlugin = (function (_super) {
         __extends(FoldingViewSwitchPlugin, _super);
         function FoldingViewSwitchPlugin(AssureNoteApp) {
@@ -23,10 +19,20 @@ var AssureNote;
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function () {
             var _this = this;
             return new AssureNote.MenuBarButton("folded-id", "images/copy.png", "fold", function (event, TargetView) {
-                TargetView.ForEachVisibleAllSubNodes(function (SubNode) {
-                    SubNode.IsFolded = Xor(SubNode.IsFolded, true);
-                });
-                _this.AssureNoteApp.PictgramPanel.Draw(TargetView.Label, null, null);
+                TargetView.IsFolded = TargetView.IsFolded != true;
+                var TopGoalView = TargetView;
+                while (TopGoalView.Parent != null) {
+                    TopGoalView = TopGoalView.Parent;
+                }
+                var wx0 = TargetView.GetGx();
+                var wy0 = TargetView.GetGy();
+                _this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null);
+                var wx1 = TargetView.GetGx();
+                var wy1 = TargetView.GetGy();
+                var ViewPort = _this.AssureNoteApp.PictgramPanel.ViewPort;
+                var OffX0 = ViewPort.GetOffsetX();
+                var OffY0 = ViewPort.GetOffsetY();
+                _this.AssureNoteApp.PictgramPanel.ViewPort.SetOffset(OffX0 + wx1 - wx0, OffY0 + wy1 - wy0);
             });
         };
         return FoldingViewSwitchPlugin;

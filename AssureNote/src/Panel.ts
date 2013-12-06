@@ -140,14 +140,9 @@ module AssureNote {
 		}
 
         Draw(Label: string, wx/*window x of the forcused node*/: number, wy/*window y*/: number): void {
-            if (wx == null) {
-                wx = window.innerWidth / 2;
-            }
-			if (wy == null) {
-                wy = window.innerHeight / 3;
-			}
+            this.Clear();
+            var TargetView = this.ViewMap[Label];
 
-			var TargetView = this.ViewMap[Label];
 			if (TargetView == null) {
 				TargetView = this.MasterView;
 			}
@@ -160,12 +155,23 @@ module AssureNote {
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             // Do scroll
-            this.ViewPort.SetOffset(wx - TargetView.GetShape().GetNodeWidth() / 2, wy - TargetView.GetShape().GetNodeHeight() / 2);
-		}
+            if (wx != null && wy != null) {
+                this.ViewPort.SetOffset(wx, wy);
+            }
+        }
 
-		Redraw(): void {
-			this.Draw(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
-		}
+        private Clear(): void {
+            this.ContentLayer.style.display = "none";
+            this.SVGLayer.style.display = "none";
+            for (var i = this.ContentLayer.childNodes.length - 1; i >= 0; i--) {
+                this.ContentLayer.removeChild(this.ContentLayer.childNodes[i]);
+            }
+            for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
+                this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
+            }
+            this.ContentLayer.style.display = "";
+            this.SVGLayer.style.display = "";
+        }
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
 			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);

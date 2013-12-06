@@ -204,7 +204,7 @@ var AssureNote;
         };
 
         NodeView.prototype.ForEachVisibleSubNode = function (SubNodes, Action) {
-            if (SubNodes != null) {
+            if (SubNodes != null && !this.IsFolded) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
                         Action(SubNodes[i]);

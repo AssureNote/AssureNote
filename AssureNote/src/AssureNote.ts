@@ -84,7 +84,6 @@ module AssureNote {
 		}
 
 		ExecCommand(ParsedCommand: CommandParser): void {
-
 			var Method = ParsedCommand.GetMethod();
 			if (Method == "search") {
 
@@ -116,8 +115,14 @@ module AssureNote {
 					var LatestDoc = this.MasterRecord.GetLatestDoc();
 					var TopGoalNode = LatestDoc.TopGoal;
 
-					this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
-					this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+                    this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
+
+                    this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+
+                    var Shape = this.PictgramPanel.MasterView.GetShape();
+                    var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
+                    var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+                    this.PictgramPanel.ViewPort.SetOffset(WX, WY);
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

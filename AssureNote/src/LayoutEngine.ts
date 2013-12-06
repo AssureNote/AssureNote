@@ -26,7 +26,19 @@ module AssureNote {
 
 		private GetNodeHeight(Node: NodeView): number {
 			return Node.GetShape().GetNodeHeight();
-		}
+        }
+
+        private Render(ThisNode: NodeView, DivFrag: DocumentFragment, SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment): void {
+            if (ThisNode.IsVisible) {
+                ThisNode.GetShape().PrerenderContent();
+                ThisNode.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
+                if (!ThisNode.IsFolded) {
+                    ThisNode.ForEachVisibleAllSubNodes((SubNode: NodeView) => {
+                        this.Render(SubNode, DivFrag, SvgNodeFrag, SvgConnectionFrag);
+                    });
+                }
+            }
+        }
 
 		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView) {
 
@@ -34,21 +46,12 @@ module AssureNote {
 			var SvgNodeFragment = document.createDocumentFragment();
 			var SvgConnectionFragment = document.createDocumentFragment();
 
-			var list = Object.keys(PictgramPanel.ViewMap);
-			for (var i = 0; i < list.length; i++) {
-                var View = PictgramPanel.ViewMap[list[i]];
-                View.GetShape().PrerenderContent();
-				View.Render(DivFragment, SvgNodeFragment, SvgConnectionFragment);
-			}
+            this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
 
 			PictgramPanel.ContentLayer.appendChild(DivFragment);
 			PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
 
-            for (var i = 0; i < list.length; i++) {
-                var View = PictgramPanel.ViewMap[list[i]];
-                View.GetShape().FitSizeToContent();
-            }
             this.Layout(NodeView);
 		}
 

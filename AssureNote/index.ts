@@ -204,7 +204,7 @@ module AssureNote {
         }
 
         private ForEachVisibleSubNode(SubNodes: NodeView[], Action: (NodeView) => void): void {
-            if (SubNodes != null) {
+            if (SubNodes != null && !this.IsFolded) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
                         Action(SubNodes[i]);
