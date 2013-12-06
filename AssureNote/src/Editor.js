@@ -15,7 +15,8 @@ var AssureNote;
             $(selector).css(CSS);
             $(selector).css({ display: "none" });
         }
-        EditorUtil.prototype.EnableEditor = function (WGSN, Node) {
+        EditorUtil.prototype.EnableEditor = function (WGSN, NodeView) {
+            var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
             this.textarea.setValue(WGSN);
             var self = this;
@@ -28,16 +29,18 @@ var AssureNote;
                 }
             }).on("blur", function (e) {
                 e.stopPropagation();
-                self.DisableEditor(Node);
+                self.DisableEditor(NodeView);
             });
             this.textarea.refresh();
         };
 
-        EditorUtil.prototype.DisableEditor = function (Node) {
+        EditorUtil.prototype.DisableEditor = function (OldNodeView) {
+            var Node = OldNodeView.Model;
             var WGSN = this.textarea.getValue();
 
             var NewNode = Node.ReplaceSubNodeAsText(WGSN);
-            this.AssureNoteApp.PictgramPanel.Draw(NewNode.GetLabel(), null, null);
+            OldNodeView.Update(NewNode, this.AssureNoteApp.PictgramPanel.ViewMap);
+            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Model.GetLabel(), null, null);
 
             this.AssureNoteApp.PluginPanel.IsVisible = true;
             $(this.selector).addClass("animated fadeOutUp");

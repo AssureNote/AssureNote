@@ -31,7 +31,7 @@ var AssureNote;
             return new AssureNote.MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
-                _this.EditorUtil.EnableEditor(Writer.toString(), TargetView.Model);
+                _this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
             });
         };
         return FullScreenEditorPlugin;

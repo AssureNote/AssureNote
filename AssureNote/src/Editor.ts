@@ -12,7 +12,8 @@ module AssureNote {
             $(selector).css({ display: "none" });
         }
 
-        EnableEditor(WGSN: string, Node: GSNNode): void {
+        EnableEditor(WGSN: string, NodeView: NodeView): void {
+            var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
             this.textarea.setValue(WGSN);
             var self = this;
@@ -25,17 +26,18 @@ module AssureNote {
                 }
             }).on("blur", function (e: JQueryEventObject) {
                 e.stopPropagation();
-                self.DisableEditor(Node);
+                self.DisableEditor(NodeView);
             });
             this.textarea.refresh();
         }
 
-        DisableEditor(Node: GSNNode): void {
-
+        DisableEditor(OldNodeView: NodeView): void {
+            var Node: GSNNode = OldNodeView.Model;
             var WGSN: string = this.textarea.getValue();
 
             var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
-            this.AssureNoteApp.PictgramPanel.Draw(NewNode.GetLabel(), null, null);
+            OldNodeView.Update(NewNode, this.AssureNoteApp.PictgramPanel.ViewMap);
+            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Model.GetLabel(), null, null);
 
             this.AssureNoteApp.PluginPanel.IsVisible = true;
             $(this.selector).addClass("animated fadeOutUp");
