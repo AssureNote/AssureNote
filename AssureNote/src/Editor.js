@@ -28,6 +28,10 @@ var AssureNote;
                 }
             }).on("blur", function (e) {
                 e.stopPropagation();
+
+                var wgsn = self.textarea.getValue();
+                console.log(wgsn);
+
                 self.AssureNoteApp.PluginPanel.IsVisible = true;
                 $(self.selector).addClass("animated fadeOutUp");
 

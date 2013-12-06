@@ -25,8 +25,14 @@ module AssureNote {
                 }
             }).on("blur", function (e: JQueryEventObject) {
                 e.stopPropagation();
+
+                var wgsn: string = self.textarea.getValue();
+                console.log(wgsn);
+
+
                 self.AssureNoteApp.PluginPanel.IsVisible = true;
                 $(self.selector).addClass("animated fadeOutUp");
+
                 /* Need to wait a bit for the end of animation */
                 setTimeout(function () {
                     $(self.selector).removeClass();

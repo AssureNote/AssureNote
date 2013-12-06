@@ -5,6 +5,7 @@
 ///<reference path='src/LayoutEngine.ts'/>
 ///<reference path='src/Viewport.ts'/>
 
+///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
 
 module AssureNote {
