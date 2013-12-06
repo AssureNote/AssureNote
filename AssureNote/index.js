@@ -223,6 +223,12 @@ var AssureNote;
         NodeView.prototype.ForEachVisibleLeftNodes = function (Action) {
             this.ForEachVisibleSubNode(this.Left, Action);
         };
+
+        NodeView.prototype.ForEachVisibleAllSubNodes = function (Action) {
+            this.ForEachVisibleSubNode(this.Left, Action);
+            this.ForEachVisibleSubNode(this.Right, Action);
+            this.ForEachVisibleSubNode(this.Children, Action);
+        };
         NodeView.GlobalPositionCache = null;
         return NodeView;
     })();

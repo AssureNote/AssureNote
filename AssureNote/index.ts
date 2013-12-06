@@ -222,6 +222,12 @@ module AssureNote {
         ForEachVisibleLeftNodes(Action: (NodeView) => void): void {
             this.ForEachVisibleSubNode(this.Left, Action);
         }
+
+        ForEachVisibleAllSubNodes(Action: (NodeView) => void): void {
+            this.ForEachVisibleSubNode(this.Left, Action);
+            this.ForEachVisibleSubNode(this.Right, Action);
+            this.ForEachVisibleSubNode(this.Children, Action);
+        }
     }
 
     export class Rect {
