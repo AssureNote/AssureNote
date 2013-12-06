@@ -1,18 +1,25 @@
 ///<reference path='./AssureNote.ts'/>
 ///<reference path='./CommandLine.ts'/>
+///<reference path='./SearchNode.ts'/>
+///<reference path='./LayoutEngine.ts'/>
+///<reference path='./Editor.ts'/>
+
+///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
+
 declare var CodeMirror: any;
 
 module AssureNote {
 	export class PictgramPanel {
 		LayoutEngine: LayoutEngine;
-		SVGLayer: SVGGElement;
-		EventMapLayer: HTMLDivElement;
+        SVGLayer: SVGGElement;
+        EventMapLayer: HTMLDivElement;
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
 		ViewPort: ViewportManager;
 		ViewMap: { [index: string]: NodeView };
 		MasterView: NodeView;
 		CmdLine: CommandLine;
+        Search: Search;
 
 		CurrentDoc: GSNDoc;// Convert to caseview
 		FocusedLabel: string;
@@ -25,39 +32,75 @@ module AssureNote {
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
 			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
-			this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
+            this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
+			var Bar = new MenuBar(AssureNoteApp);
 			this.ContentLayer.onclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
-				this.AssureNoteApp.DebugP("click:"+Label);
+				this.AssureNoteApp.DebugP("click:" + Label);
+				if (Bar.IsEnable) {
+					Bar.Remove();
+				}
+				var NodeView = this.ViewMap[Label];
+				if (NodeView != null) {
+					this.FocusedLabel = Label;
+					if (!Bar.IsEnable) {
+						var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons();
+						Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
+					}
+				} else {
+					this.FocusedLabel = null;
+				}
 				return false;
 			};
 
-			this.ContentLayer.ondblclick = (ev: MouseEvent) => {
+			//FIXME
+			this.EventMapLayer.onclick = (event: MouseEvent) => {
+				this.FocusedLabel = null;
+				if(Bar.IsEnable) {
+					Bar.Remove();
+				}
+			}
+
+			this.ContentLayer.ondblclick = (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
+				var NodeView = this.ViewMap[Label];
 				this.AssureNoteApp.DebugP("double click:" + Label);
 				return false;
 			};
 
 			this.CmdLine = new CommandLine();
-			document.onkeydown = (ev: KeyboardEvent) => {
+            this.Search = new Search(AssureNoteApp);
+			document.onkeydown = (event: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-					return false;
+					return;
 				}
 
-				if (ev.keyCode == 186/*:*/) {
-					this.CmdLine.Show();
-				}
-				else if (ev.keyCode == 13/*Enter*/ && this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
-					this.AssureNoteApp.ExecCommand(this.CmdLine.GetValue());
-					this.CmdLine.Hide();
-					this.CmdLine.Clear();
-					return false;
+				switch (event.keyCode) {
+					case 186: /*:*/
+						this.CmdLine.Show();
+						break;
+					case 191: /*/*/
+						this.CmdLine.Show();
+						break;
+					case 13: /*Enter*/
+						if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
+							var ParsedCommand = new CommandParser();
+							ParsedCommand.Parse(this.CmdLine.GetValue());
+							if (ParsedCommand.GetMethod() == "search") {
+								this.Search.Search(this.MasterView, ParsedCommand.GetArgs()[0]);
+							}
+							this.AssureNoteApp.ExecCommand(ParsedCommand);
+							this.CmdLine.Hide();
+							this.CmdLine.Clear();
+							return false;
+						}
+						break;
 				}
 			};
 
 			this.ContentLayer.onmouseover = (event: MouseEvent) => {
-				if (this.AssureNoteApp.PluginPanel.IsVisible) {
+				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
 				var Label = AssureNoteUtils.GetNodeLabel(event);
@@ -96,26 +139,39 @@ module AssureNote {
 			this.AssureNoteApp.PluginPanel.Clear();
 		}
 
-		Draw(Label: string, wx: number, wy: number): void {
-			if (wx == null) {
-				wx = 100; //FIXME
-			}
-			if (wy == null) {
-				wy = 100; //FIXME
-			}
+        Draw(Label: string, wx/*window x of the forcused node*/: number, wy/*window y*/: number): void {
+            this.Clear();
+            var TargetView = this.ViewMap[Label];
 
-			var TargetView = this.ViewMap[Label];
 			if (TargetView == null) {
 				TargetView = this.MasterView;
 			}
+            this.LayoutEngine.DoLayout(this, TargetView);
+            this.ContentLayer.style.display = "none";
+            this.SVGLayer.style.display = "none";
+            NodeView.SetGlobalPositionCacheEnabled(true);
+			TargetView.UpdateDocumentPosition();
+            NodeView.SetGlobalPositionCacheEnabled(false);
+            this.ContentLayer.style.display = "";
+            this.SVGLayer.style.display = "";
+            // Do scroll
+            if (wx != null && wy != null) {
+                this.ViewPort.SetOffset(wx, wy);
+            }
+        }
 
-			this.LayoutEngine.DoLayout(this, TargetView, wx, wy);
-			TargetView.SetDocumentPosition(wx, wy);
-		}
-
-		Redraw(): void {
-			this.Draw(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
-		}
+        private Clear(): void {
+            this.ContentLayer.style.display = "none";
+            this.SVGLayer.style.display = "none";
+            for (var i = this.ContentLayer.childNodes.length - 1; i >= 0; i--) {
+                this.ContentLayer.removeChild(this.ContentLayer.childNodes[i]);
+            }
+            for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
+                this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
+            }
+            this.ContentLayer.style.display = "";
+            this.SVGLayer.style.display = "";
+        }
 
 		DisplayPluginPanel(PluginName: string, Label?: string): void {
 			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
@@ -131,18 +187,20 @@ module AssureNote {
 
 	}
 
-	export class PluginPanel {
-		Editor: any;
+    export class PluginPanel {
+		FullScreenEditor: Plugin;
 		IsVisible: boolean = true;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
-			this.Editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+			var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
 				lineNumbers: false,
 				mode: "text/x-asn",
 				lineWrapping: true,
-			});
-			$('#editor-wrapper').css({ display: 'none', opacity: '1.0' });
-		}
+            });
+
+            this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
+            AssureNoteApp.PluginManager.SetPlugin("FullScreenEditor", this.FullScreenEditor);
+        }
 
 		Clear(): void {
 		}

@@ -3,14 +3,13 @@
 <head>
 	<!-- for mobile browser-->
 	<meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no" />
-	<title>Assure-It</title>
+	<title>AssureNote</title>
 	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="lib//animate-custom.css" />
 	<link rel="stylesheet" href="lib/codemirror.css" />
 
 	
 	<link rel="stylesheet" href="css/dcase-node.css" />
-<!--	<link rel="stylesheet" href="plugins/ColorTheme/css/default.css" />
-	<link rel="stylesheet" href="lib/animate-custom.css" />-->
 	<link rel="stylesheet" href="css/sidemenu.css" />
 	<link rel="stylesheet" href="css/historymenu.css" />
 	<link rel="stylesheet" href="css/index.css" />
@@ -23,33 +22,15 @@
 		</svg>
 		<div id="eventmap-layer" style="width: 100%; height: 100%; position: absolute;"></div>
 		<div id="content-layer" style="width: 0px; height: 0px; position: absolute;"></div>
-		<div id="controll-layer" style="width: 0px; height: 0px; position: absolute;">
+		<div id="control-layer" style="width: 0px; height: 0px; position: absolute;">
 		</div>
-		<div id="fixed-controll-layer" style="width: 0px; height: 0px; position: absolute;">
+		<div id="fixed-control-layer" style="width: 0px; height: 0px; position: absolute;">
 			<a href="/" class="logo-fixed"><img id="logo" src="images/logo.png" alt="AssureNote" /></a>
 			<script id="menu-template" type="text/x-jquery-tmpl">
 				<li id="${id}"><a href="${href}"><span class="glyphicon ${icon}"></span>&nbsp; ${value}</a></li>
 			</script>
 			<div class="menu sidebar-nav-fixed bs-sidebar hidden-print affix-top">
 				<ul id="drop-menu" class="nav bs-sidenav">
-
-					<!--<li class="line dropdown">
-						<a href="#" data-toggle="dropdown" class="dropdown-toggle">
-							<span class="glyphicon glyphicon-user"></span>
-							&nbsp; Sign In
-							<strong class="caret"></strong>
-						</a>
-						<div style="padding: 15px; padding-bottom: 0px;" class="dropdown-menu">
-							<form id="sign-in-form" action="/auth/twitter" class="navbar-formjright">
-								Sign in with Twitter
-								<input type="submit" style="margin-bottom: 15px; clear: left; width: 100%; height: 32px; font-size: 13px;" value="Sign in" href="/auth/twitter" class="btn btn-primary">
-							</form>
-							<form id="sign-in-form" action="/auth/facebook" class="navbar-formjright">
-								Sign in with Facebook
-								<input type="submit" style="margin-bottom: 15px; clear: left; width: 100%; height: 32px; font-size: 13px;" value="Sign in" href="/auth/facebook" class="btn btn-primary">
-							</form>
-						</div>
-					</li>-->
 				</ul>
 			</div>
 			<input type="text" class="form-control" id="command-line" style="width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large" />
@@ -72,14 +53,15 @@
 			<marker id="Triangle-white" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="15" markerHeight="9" orient="auto">
 				<path d="M 0 0 L 10 5 L 0 10 z" fill="white" stroke="gray"></path>
 			</marker>
-			<polygon id="undevelopd-master" class="assureit-default" fill="none" stroke="#333" stroke-width="1.5" points="0 -20 -20 0 0 20 20 0"></polygon>
-			<rect    id="goal-master"       class="assureit-default" width="1" height="1"></rect>
-			<polygon id="strategy-master"   class="assureit-default" points="0.08,0 1,0 0.92,1 0,1"></polygon>
-			<ellipse id="evidence-master"   class="assureit-default" cx="1" cy="1" rx="0.5" ry="0.5"></ellipse>
+			<polygon id="undevelopd-master" class="assurenote-default" fill="none" stroke="#333" stroke-width="1.5" points="0 -20 -20 0 0 20 20 0"></polygon>
+			<rect    id="goal-master"       class="assurenote-default" width="1" height="1"></rect>
+			<polygon id="strategy-master"   class="assurenote-default" points="0.08,0 1,0 0.92,1 0,1"></polygon>
+			<ellipse id="evidence-master"   class="assurenote-default" cx="1" cy="1" rx="0.5" ry="0.5"></ellipse>
 		</defs>
 	</svg>
 	<script type="text/javascript" src="lib/jquery.min.js"></script>
 	<script type="text/javascript" src="lib/jquery.tmpl.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.jqdock.min.js"></script>
 	<script type="text/javascript" src="lib/jquery.cookie.js"></script>
 	<script type="text/javascript" src="lib/pointer.min.js"></script>
 	<script type="text/javascript" src="lib/codemirror.js"></script>
@@ -94,6 +76,13 @@
 	<script type="text/javascript" src="src/Viewport.js"></script>
 	<script type="text/javascript" src="src/Plugin.js"></script>
 	<script type="text/javascript" src="src/SideMenu.js"></script>
+	<script type="text/javascript" src="src/MenuBar.js"></script>
+	<script type="text/javascript" src="src/SearchNode.js"></script>
+	<script type="text/javascript" src="src/Editor.js"></script>
+
+	<script type="text/javascript" src="plugin/FullScreenEditor/FullScreenEditor.js"></script>
+	<script type="text/javascript" src="plugin/FoldingViewSwitch/FoldingViewSwitch.js"></script>
+
 	<script type="text/javascript" src="index.js"></script>
 </body>
 </html>

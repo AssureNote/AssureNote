@@ -165,12 +165,20 @@ interface Array {
         set(index: number, value: any): void;
         add(obj: any): void;
         add(index: number, obj : any): void;
+        addAll(obj : any): void;
         size(): number;
         clear(): void;
         remove(index: number): any;
         remove(item: any): any;
         iterator(): Iterator<Array>;
 }
+
+Object.defineProperty(Array.prototype, "addAll", {
+        enumerable : false,
+        value : function(obj) {
+			Array.prototype.push.apply(this, obj);
+        }
+});
 
 Object.defineProperty(Array.prototype, "size", {
         enumerable : false,
@@ -262,6 +270,7 @@ interface String {
         lastIndexOf(ch: number) : number;
         indexOf(ch: number) : number;
         substring(BeginIdx : number, EndIdx : number) : string;
+        matches(str : string) : boolean;
 }
 
 Object.defineProperty(String.prototype, "compareTo", {
@@ -295,5 +304,12 @@ Object.defineProperty(String.prototype, "equals", {
         enumerable : false,
         value : function(other) {
                 return (this == other);
+        }
+});
+
+Object.defineProperty(String.prototype, "matches", {
+        enumerable : false,
+        value : function(str) {
+                return this.match(str) != null;
         }
 });

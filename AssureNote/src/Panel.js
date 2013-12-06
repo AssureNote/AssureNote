@@ -11,36 +11,73 @@ var AssureNote;
             this.ViewPort = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
+            var Bar = new AssureNote.MenuBar(AssureNoteApp);
             this.ContentLayer.onclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
                 _this.AssureNoteApp.DebugP("click:" + Label);
+                if (Bar.IsEnable) {
+                    Bar.Remove();
+                }
+                var NodeView = _this.ViewMap[Label];
+                if (NodeView != null) {
+                    _this.FocusedLabel = Label;
+                    if (!Bar.IsEnable) {
+                        var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons();
+                        Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
+                    }
+                } else {
+                    _this.FocusedLabel = null;
+                }
                 return false;
             };
 
-            this.ContentLayer.ondblclick = function (ev) {
+            //FIXME
+            this.EventMapLayer.onclick = function (event) {
+                _this.FocusedLabel = null;
+                if (Bar.IsEnable) {
+                    Bar.Remove();
+                }
+            };
+
+            this.ContentLayer.ondblclick = function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
+                var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("double click:" + Label);
                 return false;
             };
 
             this.CmdLine = new AssureNote.CommandLine();
-            document.onkeydown = function (ev) {
+            this.Search = new AssureNote.Search(AssureNoteApp);
+            document.onkeydown = function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                    return false;
+                    return;
                 }
 
-                if (ev.keyCode == 186) {
-                    _this.CmdLine.Show();
-                } else if (ev.keyCode == 13 && _this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
-                    _this.AssureNoteApp.ExecCommand(_this.CmdLine.GetValue());
-                    _this.CmdLine.Hide();
-                    _this.CmdLine.Clear();
-                    return false;
+                switch (event.keyCode) {
+                    case 186:
+                        _this.CmdLine.Show();
+                        break;
+                    case 191:
+                        _this.CmdLine.Show();
+                        break;
+                    case 13:
+                        if (_this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
+                            var ParsedCommand = new AssureNote.CommandParser();
+                            ParsedCommand.Parse(_this.CmdLine.GetValue());
+                            if (ParsedCommand.GetMethod() == "search") {
+                                _this.Search.Search(_this.MasterView, ParsedCommand.GetArgs()[0]);
+                            }
+                            _this.AssureNoteApp.ExecCommand(ParsedCommand);
+                            _this.CmdLine.Hide();
+                            _this.CmdLine.Clear();
+                            return false;
+                        }
+                        break;
                 }
             };
 
             this.ContentLayer.onmouseover = function (event) {
-                if (_this.AssureNoteApp.PluginPanel.IsVisible) {
+                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
@@ -75,24 +112,37 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Draw = function (Label, wx, wy) {
-            if (wx == null) {
-                wx = 100;
-            }
-            if (wy == null) {
-                wy = 100;
-            }
-
+            this.Clear();
             var TargetView = this.ViewMap[Label];
+
             if (TargetView == null) {
                 TargetView = this.MasterView;
             }
+            this.LayoutEngine.DoLayout(this, TargetView);
+            this.ContentLayer.style.display = "none";
+            this.SVGLayer.style.display = "none";
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
+            TargetView.UpdateDocumentPosition();
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
+            this.ContentLayer.style.display = "";
+            this.SVGLayer.style.display = "";
 
-            this.LayoutEngine.DoLayout(this, TargetView, wx, wy);
-            TargetView.SetDocumentPosition(wx, wy);
+            if (wx != null && wy != null) {
+                this.ViewPort.SetOffset(wx, wy);
+            }
         };
 
-        PictgramPanel.prototype.Redraw = function () {
-            this.Draw(this.FocusedLabel, this.FocusedWx, this.FocusedWy);
+        PictgramPanel.prototype.Clear = function () {
+            this.ContentLayer.style.display = "none";
+            this.SVGLayer.style.display = "none";
+            for (var i = this.ContentLayer.childNodes.length - 1; i >= 0; i--) {
+                this.ContentLayer.removeChild(this.ContentLayer.childNodes[i]);
+            }
+            for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
+                this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
+            }
+            this.ContentLayer.style.display = "";
+            this.SVGLayer.style.display = "";
         };
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
@@ -119,12 +169,14 @@ var AssureNote;
         function PluginPanel(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
             this.IsVisible = true;
-            this.Editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
                 lineNumbers: false,
                 mode: "text/x-asn",
                 lineWrapping: true
             });
-            $('#editor-wrapper').css({ display: 'none', opacity: '1.0' });
+
+            this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
+            AssureNoteApp.PluginManager.SetPlugin("FullScreenEditor", this.FullScreenEditor);
         }
         PluginPanel.prototype.Clear = function () {
         };

@@ -280,7 +280,7 @@ class WikiSyntax {
 	static String FormatGoalLevel(int GoalLevel) {
 		/*local*/StringBuilder sb = new StringBuilder();
 		for (/*local*/int i = 0; i < GoalLevel; i++) {
-			sb.append('*');
+			sb.append("*");
 		}
 		return sb.toString();
 	}
@@ -835,6 +835,18 @@ class GSNNode {
 		return NextCount;
 	}
 	
+	ArrayList<GSNNode> SearchNode(String SearchWord) {
+		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
+		if(this.NodeDoc.matches(SearchWord)) {
+			NodeList.add(this);
+		}
+		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+			NodeList.addAll(Node.SearchNode(SearchWord));
+		}
+		return NodeList;
+	}
+
 }
 
 class GSNDoc {

@@ -71,43 +71,43 @@ h4 {
 	width : 210px;
 }
 
-.assureit-default {
+.assurenote-default {
 	fill: #b4d8df;
 	stroke: none;
 }
 
-.assureit-default-highlight {
+.assurenote-default-highlight {
 	fill: #b4d8df;
 	stroke: orange;
 }
 
-.assureit-todo {
+.assurenote-todo {
 	fill: #FFFFFF;
 	stroke: #000000;
 	stroke-dasharray: 5, 5;
 }
 
-.assureit-todo-highlight {
+.assurenote-todo-highlight {
 	fill: #FFFFFF;
 	stroke: orange
 }
 
-.assureit-search{
+.assurenote-search{
 	fill: #fae9b1;
 	stroke: none;
 }
 
-.assureit-search-highlight{
+.assurenote-search-highlight{
 	fill: #fae9b1;
 	stroke: orange;
 }
 
-.assureit-danger {
+.assurenote-danger {
 	fill: #FFAA7D;
 	stroke: none;
 }
 
-.assureit-danger-highlight {
+.assurenote-danger-highlight {
 	fill: #FFAA7D;
 	stroke: orange;
 }

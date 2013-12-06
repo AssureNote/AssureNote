@@ -184,7 +184,7 @@ var WikiSyntax = (function () {
     WikiSyntax.FormatGoalLevel = function (GoalLevel) {
         var sb = new StringBuilder();
         for (var i = 0; i < GoalLevel; i++) {
-            sb.append(42);
+            sb.append("*");
         }
         return sb.toString();
     };
@@ -724,6 +724,18 @@ var GSNNode = (function () {
             NextGoalCount += 1;
         }
         return NextCount;
+    };
+
+    GSNNode.prototype.SearchNode = function (SearchWord) {
+        var NodeList = new Array();
+        if (this.NodeDoc.matches(SearchWord)) {
+            NodeList.add(this);
+        }
+        for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
+            var Node = this.NonNullSubNodeList().get(i);
+            NodeList.addAll(Node.SearchNode(SearchWord));
+        }
+        return NodeList;
     };
     return GSNNode;
 })();
@@ -1463,6 +1475,13 @@ var Iterator = (function () {
     return Iterator;
 })();
 
+Object.defineProperty(Array.prototype, "addAll", {
+    enumerable: false,
+    value: function (obj) {
+        Array.prototype.push.apply(this, obj);
+    }
+});
+
 Object.defineProperty(Array.prototype, "size", {
     enumerable: false,
     value: function () {
@@ -1574,6 +1593,13 @@ Object.defineProperty(String.prototype, "equals", {
     enumerable: false,
     value: function (other) {
         return (this == other);
+    }
+});
+
+Object.defineProperty(String.prototype, "matches", {
+    enumerable: false,
+    value: function (str) {
+        return this.match(str) != null;
     }
 });
 

@@ -19,7 +19,10 @@ document.createSVGElement = function (name: string): Element {
 module AssureNote {
 
 	export class Point {
-		constructor(public x: number, public y: number) { }
+        constructor(public X: number, public Y: number) { }
+        public Clone(): Point {
+            return new Point(this.X, this.Y);
+        }
 	}
 
 	export enum Direction {
@@ -37,8 +40,14 @@ module AssureNote {
 		InitialY: number = 0;
 		CurrentX: number = 0;
 		CurrentY: number = 0;
-		MainPointerID: number = 0;
+		Dx: number = 0;
+		Dy: number = 0;
+		MainPointerID: number = null;
 		Pointers: Pointer[] = [];
+
+		private timer: number = 0;
+		private ANIMATE_THRESHOLD: number = 5;
+		private SPEED_MAX: number = 100;
 
 		private SetInitialOffset(InitialOffsetX: number, InitialOffsetY: number) {
 			this.InitialOffsetX = InitialOffsetX;
@@ -48,9 +57,19 @@ module AssureNote {
 		private StartDrag(InitialX: number, InitialY: number) {
 			this.InitialX = InitialX;
 			this.InitialY = InitialY;
+			this.CurrentX = InitialX;
+			this.CurrentY = InitialY;
 		}
 
 		private UpdateDrag(CurrentX: number, CurrentY: number) {
+			this.Dx = CurrentX - this.CurrentX;
+			this.Dy = CurrentY - this.CurrentY;
+			var speed = this.Dx * this.Dx + this.Dy + this.Dy;
+			if (speed > this.SPEED_MAX * this.SPEED_MAX) {
+				this.Dx *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
+				this.Dy *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
+			}
+
 			this.CurrentX = CurrentX;
 			this.CurrentY = CurrentY;
 		}
@@ -76,6 +95,12 @@ module AssureNote {
 			return this.MainPointerID != null;
 		}
 
+		private StopAnimation(): void {
+			clearInterval(this.timer);
+			this.Dx = 0;
+			this.Dy = 0;
+		}
+
 		OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
 			this.Pointers = e.getPointerList();
 			if (this.Pointers.length > 0) {
@@ -88,12 +113,30 @@ module AssureNote {
 						this.MainPointerID = null;
 					}
 				} else {
+					this.StopAnimation();
+					this.timer = null;
 					var mainPointer = this.Pointers[0];
 					this.MainPointerID = mainPointer.identifier;
 					this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
 					this.StartDrag(mainPointer.pageX, mainPointer.pageY);
 				}
 			} else {
+				if (this.IsDragging()) {
+					if (this.timer) {
+						this.StopAnimation();
+						this.timer = null;
+					}
+					this.timer = setInterval(() => {
+						if (Math.abs(this.Dx) < this.ANIMATE_THRESHOLD && Math.abs(this.Dy) < this.ANIMATE_THRESHOLD) {
+							this.StopAnimation();
+						}
+						this.CurrentX += this.Dx;
+						this.CurrentY += this.Dy;
+						this.Dx *= 0.95;
+						this.Dy *= 0.95;
+						Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
+					}, 16);
+				}
 				this.MainPointerID = null;
 			}
 		}

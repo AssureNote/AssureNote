@@ -54,7 +54,6 @@ var AssureNote;
             this.PluginManager = new AssureNote.PluginManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
-            //this.GSNRecord = new GSNRecord();
         }
         AssureNoteApp.prototype.DebugP = function (Message) {
             console.log(Message);
@@ -67,8 +66,11 @@ var AssureNote;
             }
         };
 
-        AssureNoteApp.prototype.ExecCommand = function (CommandLine) {
-            var ParsedCommand = new AssureNote.CommandParser(CommandLine);
+        AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
+            var Method = ParsedCommand.GetMethod();
+            if (Method == "search") {
+                return;
+            }
             var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
             if (Plugin != null) {
                 Plugin.ExecCommand(this, ParsedCommand.GetArgs());
@@ -89,14 +91,6 @@ var AssureNote;
                     var Contents = (event.target).result;
                     var Name = Files[0].name;
 
-                    // ---Deprecated--
-                    //var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
-                    //var casedecoder = new CaseDecoder();
-                    //var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
-                    //Case0.SetElementTop(root);
-                    //this.Case = Case0;
-                    //this.PictgramPanel.Draw(root.Label, 0, 0);
-                    //---
                     _this.MasterRecord = new GSNRecord();
                     _this.MasterRecord.Parse(Contents);
 
@@ -104,7 +98,13 @@ var AssureNote;
                     var TopGoalNode = LatestDoc.TopGoal;
 
                     _this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
+
                     _this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+
+                    var Shape = _this.PictgramPanel.MasterView.GetShape();
+                    var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
+                    var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+                    _this.PictgramPanel.ViewPort.SetOffset(WX, WY);
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }

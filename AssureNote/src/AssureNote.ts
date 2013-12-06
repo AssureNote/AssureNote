@@ -70,7 +70,6 @@ module AssureNote {
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
-			//this.GSNRecord = new GSNRecord();
 		}
 
 		DebugP(Message: string): void {
@@ -84,8 +83,12 @@ module AssureNote {
 			}
 		}
 
-		ExecCommand(CommandLine: string): void {
-			var ParsedCommand = new CommandParser(CommandLine);
+		ExecCommand(ParsedCommand: CommandParser): void {
+			var Method = ParsedCommand.GetMethod();
+			if (Method == "search") {
+
+				return;
+			}
 			var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
 			if (Plugin != null) {
 				Plugin.ExecCommand(this, ParsedCommand.GetArgs());
@@ -105,23 +108,21 @@ module AssureNote {
 				reader.onload = (event) => {
 					var Contents: string = (<any>event.target).result;
 					var Name: string = Files[0].name;
-					// ---Deprecated--
-					//var Case0: Case = new Case(Name, "{}", Contents, 0, 0, new OldPlugInManager(""));
-					
-					//var casedecoder = new CaseDecoder();
-					//var root: NodeModel = casedecoder.ParseASN(Case0, Contents, null);
-					//Case0.SetElementTop(root);
-					//this.Case = Case0;
-					//this.PictgramPanel.Draw(root.Label, 0, 0);
-					//---
+
 					this.MasterRecord = new GSNRecord();
 					this.MasterRecord.Parse(Contents);
 
 					var LatestDoc = this.MasterRecord.GetLatestDoc();
 					var TopGoalNode = LatestDoc.TopGoal;
 
-					this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
-					this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+                    this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
+
+                    this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+
+                    var Shape = this.PictgramPanel.MasterView.GetShape();
+                    var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
+                    var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+                    this.PictgramPanel.ViewPort.SetOffset(WX, WY);
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}
