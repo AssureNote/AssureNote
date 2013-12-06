@@ -34,18 +34,18 @@ module AssureNote {
     }
 
 
-	export class SamplePlugin extends Plugin {
-		constructor() {
-			super();
-			this.HasMenuBarButton = true;
-		}
+	//export class SamplePlugin extends Plugin {
+	//	constructor() {
+	//		super();
+	//		this.HasMenuBarButton = true;
+	//	}
 
-		CreateMenuBarButton(): MenuBarButton {
-			return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
-				alert(TargetView.Label);
-			});
-		}
-    }
+	//	CreateMenuBarButton(): MenuBarButton {
+	//		return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
+	//			alert(TargetView.Label);
+	//		});
+	//	}
+    //}
 
 	export class PluginManager {
 		private PluginMap: {[index: string]: Plugin};

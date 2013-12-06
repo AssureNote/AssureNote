@@ -36,6 +36,7 @@ var AssureNote;
             this.Label = Model.GetLabel();
             this.NodeDoc = Model.NodeDoc;
             this.IsVisible = true;
+            this.IsFolded = false;
             if (IsRecursive && Model.SubNodeList != null) {
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
@@ -565,7 +566,7 @@ $(function () {
     }));
     AssureNote.SideMenu.Create(Menu);
 
-    var SamplePlugin = new AssureNote.SamplePlugin();
-    AssureNoteApp.PluginManager.SetPlugin("Sample", SamplePlugin);
+    var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("Fold", FoldPlugin);
 });
 //# sourceMappingURL=index.js.map

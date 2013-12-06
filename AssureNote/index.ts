@@ -18,6 +18,7 @@ module AssureNote {
 
 	export class NodeView {
 		IsVisible: boolean;
+		IsFolded: boolean;
 		Label: string;
 		NodeDoc: string;
 		RelativeX: number = 0; // relative x from parent node
@@ -27,12 +28,13 @@ module AssureNote {
 		Left: NodeView[] = null;
 		Right: NodeView[] = null;
 		Children: NodeView[] = null;
-        Shape: GSNShape = null;
+		Shape: GSNShape = null;
 
 		constructor(public Model: GSNNode, IsRecursive: boolean) {
 			this.Label = Model.GetLabel();
 			this.NodeDoc = Model.NodeDoc;
 			this.IsVisible = true;
+			this.IsFolded = false;
 			if (IsRecursive && Model.SubNodeList != null) {
 				for (var i = 0; i < Model.SubNodeList.length; i++) {
 					var SubNode = Model.SubNodeList[i];
@@ -211,19 +213,19 @@ module AssureNote {
             }
         }
 
-        ForEachVisibleChildren(Action: (NodeView) => void): void {
+        ForEachVisibleChildren(Action: (SubNode: NodeView) => void): void {
             this.ForEachVisibleSubNode(this.Children, Action);
         }
 
-        ForEachVisibleRightNodes(Action: (NodeView) => void): void {
+		ForEachVisibleRightNodes(Action: (SubNode: NodeView) => void): void {
             this.ForEachVisibleSubNode(this.Right, Action);
         }
 
-        ForEachVisibleLeftNodes(Action: (NodeView) => void): void {
+		ForEachVisibleLeftNodes(Action: (SubNode: NodeView) => void): void {
             this.ForEachVisibleSubNode(this.Left, Action);
         }
 
-        ForEachVisibleAllSubNodes(Action: (NodeView) => void): void {
+		ForEachVisibleAllSubNodes(Action: (SubNode: NodeView) => void): void {
             this.ForEachVisibleSubNode(this.Left, Action);
             this.ForEachVisibleSubNode(this.Right, Action);
             this.ForEachVisibleSubNode(this.Children, Action);
@@ -546,6 +548,6 @@ $(() => {
 	}));
 	AssureNote.SideMenu.Create(Menu);
 
-	var SamplePlugin = new AssureNote.SamplePlugin();
-    AssureNoteApp.PluginManager.SetPlugin("Sample", SamplePlugin);
+	var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("Fold", FoldPlugin);
 });

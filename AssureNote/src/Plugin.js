@@ -1,11 +1,5 @@
 ///<reference path="./MenuBar.ts" />
 ///<reference path='../d.ts/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var AssureNote;
 (function (AssureNote) {
     var Plugin = (function () {
@@ -36,21 +30,17 @@ var AssureNote;
     })();
     AssureNote.Plugin = Plugin;
 
-    var SamplePlugin = (function (_super) {
-        __extends(SamplePlugin, _super);
-        function SamplePlugin() {
-            _super.call(this);
-            this.HasMenuBarButton = true;
-        }
-        SamplePlugin.prototype.CreateMenuBarButton = function () {
-            return new AssureNote.MenuBarButton("sample-id", "images/copy.png", "sample", function (event, TargetView) {
-                alert(TargetView.Label);
-            });
-        };
-        return SamplePlugin;
-    })(Plugin);
-    AssureNote.SamplePlugin = SamplePlugin;
-
+    //export class SamplePlugin extends Plugin {
+    //	constructor() {
+    //		super();
+    //		this.HasMenuBarButton = true;
+    //	}
+    //	CreateMenuBarButton(): MenuBarButton {
+    //		return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
+    //			alert(TargetView.Label);
+    //		});
+    //	}
+    //}
     var PluginManager = (function () {
         function PluginManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
