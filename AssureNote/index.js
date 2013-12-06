@@ -173,33 +173,38 @@ var AssureNote;
             this.Label = Model.GetLabel();
 
             for (var i = 0; Model.SubNodeList && i < Model.SubNodeList.length; i++) {
+                var found = false;
                 for (var j = 0; this.Left && j < this.Left.length; j++) {
                     if (Model.SubNodeList[i].GetLabel() == this.Left[j].Model.GetLabel()) {
                         this.Left[j].Update(Model.SubNodeList[i], ViewMap);
+                        found = true;
                         break;
                     }
                 }
                 for (var j = 0; this.Right && j < this.Right.length; j++) {
                     if (Model.SubNodeList[i].GetLabel() == this.Right[j].Model.GetLabel()) {
                         this.Right[j].Update(Model.SubNodeList[i], ViewMap);
+                        found = true;
                         break;
                     }
                 }
                 for (var j = 0; this.Children && j < this.Children.length; j++) {
                     if (Model.SubNodeList[i].GetLabel() == this.Children[j].Model.GetLabel()) {
                         this.Children[j].Update(Model.SubNodeList[i], ViewMap);
+                        found = true;
                         break;
                     }
                 }
 
-                /* New node */
-                var SubView = new NodeView(Model.SubNodeList[i], true);
-                SubView.UpdateViewMap(ViewMap);
-                SubView.Parent = this;
-                if (Model.SubNodeList[i].NodeType == GSNType.Context) {
-                    this.AppendRightNode(SubView);
-                } else {
-                    this.AppendChild(SubView);
+                if (!found) {
+                    var SubView = new NodeView(Model.SubNodeList[i], true);
+                    SubView.UpdateViewMap(ViewMap);
+                    SubView.Parent = this;
+                    if (Model.SubNodeList[i].NodeType == GSNType.Context) {
+                        this.AppendRightNode(SubView);
+                    } else {
+                        this.AppendChild(SubView);
+                    }
                 }
             }
         };
