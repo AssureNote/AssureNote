@@ -9,8 +9,8 @@ module AssureNote {
 			super();
             this.HasMenuBarButton = true;
             this.HasEditor = true;
-            this.EditorUtil = new EditorUtil(textarea, selector, {
-                position: "absolute",
+            this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
+                position: "fixed",
                 top: "5%",
                 left: "5%",
                 width: "90%",
@@ -19,11 +19,7 @@ module AssureNote {
         }
 
         EnableEditor(WGSN: string): void {
-            this.textarea.setValue(WGSN);
-            var callback: () => void = this.EditorUtil.EnableEditorCallback();
-            if (callback) {
-                callback();
-            }
+            this.EditorUtil.EnableEditor(WGSN);
         }
 
         DisableEditor(): void {
@@ -36,7 +32,6 @@ module AssureNote {
 					var Writer = new StringWriter();
 					TargetView.Model.FormatSubNode(1, Writer);
                     this.EnableEditor(Writer.toString());
-                    console.log(Writer.toString());
 			});
 		}
 	}

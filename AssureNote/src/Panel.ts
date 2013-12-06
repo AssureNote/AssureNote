@@ -73,7 +73,7 @@ module AssureNote {
             this.Search = new Search(AssureNoteApp);
 			document.onkeydown = (event: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-					return false;
+					return;
 				}
 
 				switch (event.keyCode) {
