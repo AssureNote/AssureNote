@@ -133,7 +133,7 @@ module AssureNote {
 			this.MasterView = NodeView;
 			this.ViewMap = {};
 			this.MasterView.UpdateViewMap(this.ViewMap);
-		}
+        }
 
 		DisplayPictgram(): void {
 			this.AssureNoteApp.PluginPanel.Clear();

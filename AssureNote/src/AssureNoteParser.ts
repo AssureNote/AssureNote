@@ -617,7 +617,7 @@ class GSNNode {
 		}
 	}
 	
-	ReplaceSubNode(NewNode: GSNNode, LabelMap: HashMap<string,string>): void {
+	ReplaceSubNode(NewNode: GSNNode, LabelMap: HashMap<string,string>): GSNNode {
 		this.MergeSubNode(NewNode, LabelMap);
 		if(this.ParentNode != null) {
 			for(var i: number = 0; i < this.ParentNode.SubNodeList.size(); i++) {
@@ -629,15 +629,17 @@ class GSNNode {
 		else {(NewNode.IsGoal());
 			this.BaseDoc.TopGoal = NewNode;
 		}
+		return NewNode;
 	}
 
-	ReplaceSubNodeAsText(DocText: string): void {
+	ReplaceSubNodeAsText(DocText: string): GSNNode {
 		var Reader: StringReader = new StringReader(DocText);
 		var Parser: ParserContext = new ParserContext(null, this.ParentNode);
 		var NewNode: GSNNode = Parser.ParseNode(Reader, null);
 		if(NewNode != null) {
 			this.ReplaceSubNode(NewNode, null);
 		}
+		return NewNode;
 	}
 	
 	HasSubNodeLabel(Label: string): boolean {

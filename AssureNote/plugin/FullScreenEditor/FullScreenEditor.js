@@ -26,20 +26,12 @@ var AssureNote;
                 height: "90%"
             });
         }
-        FullScreenEditorPlugin.prototype.EnableEditor = function (WGSN) {
-            this.EditorUtil.EnableEditor(WGSN);
-        };
-
-        FullScreenEditorPlugin.prototype.DisableEditor = function () {
-            return null;
-        };
-
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function () {
             var _this = this;
             return new AssureNote.MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
-                _this.EnableEditor(Writer.toString());
+                _this.EditorUtil.EnableEditor(Writer.toString(), TargetView.Model);
             });
         };
         return FullScreenEditorPlugin;

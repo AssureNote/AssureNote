@@ -604,6 +604,7 @@ var GSNNode = (function () {
             (NewNode.IsGoal());
             this.BaseDoc.TopGoal = NewNode;
         }
+        return NewNode;
     };
 
     GSNNode.prototype.ReplaceSubNodeAsText = function (DocText) {
@@ -613,6 +614,7 @@ var GSNNode = (function () {
         if (NewNode != null) {
             this.ReplaceSubNode(NewNode, null);
         }
+        return NewNode;
     };
 
     GSNNode.prototype.HasSubNodeLabel = function (Label) {

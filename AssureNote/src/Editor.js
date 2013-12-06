@@ -15,7 +15,7 @@ var AssureNote;
             $(selector).css(CSS);
             $(selector).css({ display: "none" });
         }
-        EditorUtil.prototype.EnableEditor = function (WGSN) {
+        EditorUtil.prototype.EnableEditor = function (WGSN, Node) {
             this.AssureNoteApp.PluginPanel.IsVisible = false;
             this.textarea.setValue(WGSN);
             var self = this;
@@ -28,23 +28,26 @@ var AssureNote;
                 }
             }).on("blur", function (e) {
                 e.stopPropagation();
-
-                var wgsn = self.textarea.getValue();
-                console.log(wgsn);
-
-                self.AssureNoteApp.PluginPanel.IsVisible = true;
-                $(self.selector).addClass("animated fadeOutUp");
-
-                /* Need to wait a bit for the end of animation */
-                setTimeout(function () {
-                    $(self.selector).removeClass();
-                    $(self.selector).css({ display: "none" });
-                }, 1300);
+                self.DisableEditor(Node);
             });
             this.textarea.refresh();
         };
 
-        EditorUtil.prototype.DisableEditor = function () {
+        EditorUtil.prototype.DisableEditor = function (Node) {
+            var WGSN = this.textarea.getValue();
+
+            var NewNode = Node.ReplaceSubNodeAsText(WGSN);
+            this.AssureNoteApp.PictgramPanel.Draw(NewNode.GetLabel(), null, null);
+
+            this.AssureNoteApp.PluginPanel.IsVisible = true;
+            $(this.selector).addClass("animated fadeOutUp");
+
+            /* Need to wait a bit for the end of animation */
+            var self = this;
+            setTimeout(function () {
+                $(self.selector).removeClass();
+                $(self.selector).css({ display: "none" });
+            }, 1300);
             return null;
         };
         return EditorUtil;
