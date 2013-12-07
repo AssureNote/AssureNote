@@ -617,5 +617,5 @@ $(() => {
 	AssureNote.SideMenu.Create(Menu);
 
 	var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
-    AssureNoteApp.PluginManager.SetPlugin("Fold", FoldPlugin);
+    AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
 });
