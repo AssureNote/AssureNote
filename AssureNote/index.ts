@@ -483,8 +483,8 @@ module AssureNote {
 				this.ModuleRect = AssureNoteUtils.CreateSVGElement("rect");
 				this.ModuleRect.setAttribute("class", this.ColorClassName);
 				this.ModuleRect.setAttribute("width", "80px");
-				this.ModuleRect.setAttribute("height", "10px");
-				this.ModuleRect.setAttribute("y", "-10px");
+				this.ModuleRect.setAttribute("height", "13px");
+				this.ModuleRect.setAttribute("y", "-13px");
 				this.ShapeGroup.appendChild(this.ModuleRect);
 			}
 			if (this.NodeView.Children == null && this.NodeView.IsFolded) {
