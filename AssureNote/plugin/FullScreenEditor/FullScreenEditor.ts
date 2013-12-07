@@ -18,7 +18,7 @@ module AssureNote {
             });
         }
 
-		CreateMenuBarButton(): MenuBarButton {
+		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
 			return new MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor",
 				(event: Event, TargetView: NodeView) => {
 					var Writer = new StringWriter();

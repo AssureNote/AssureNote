@@ -16,8 +16,11 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
             this.HasMenuBarButton = true;
         }
-        FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function () {
+        FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
+            if (NodeView.GetNodeType() != GSNType.Goal) {
+                return null;
+            }
             return new AssureNote.MenuBarButton("folded-id", "images/copy.png", "fold", function (event, TargetView) {
                 TargetView.IsFolded = TargetView.IsFolded != true;
                 var TopGoalView = TargetView;

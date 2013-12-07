@@ -9,7 +9,10 @@ module AssureNote {
 			this.HasMenuBarButton = true;
 		}
 
-		CreateMenuBarButton(): MenuBarButton {
+		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
+			if (NodeView.GetNodeType() != GSNType.Goal) {
+				return null;
+			}
 			return new MenuBarButton("folded-id", "images/copy.png", "fold",
                 (event: Event, TargetView: NodeView) => {
                     TargetView.IsFolded = TargetView.IsFolded != true;

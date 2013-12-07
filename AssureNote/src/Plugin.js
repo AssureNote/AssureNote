@@ -13,7 +13,7 @@ var AssureNote;
         Plugin.prototype.Display = function (PluginPanel, GSNDoc, Label) {
         };
 
-        Plugin.prototype.CreateMenuBarButton = function () {
+        Plugin.prototype.CreateMenuBarButton = function (NodeView) {
             //return new MenuBarButton("sample-id", "images/sample.png", "sample", (TargetView: NodeView) => {
             //});
             return null;
@@ -59,13 +59,16 @@ var AssureNote;
             return this.PluginMap[Name];
         };
 
-        PluginManager.prototype.GetMenuBarButtons = function () {
+        PluginManager.prototype.GetMenuBarButtons = function (TargetView) {
             var _this = this;
             var ret = [];
             $.each(this.PluginMap, function (key, value) {
                 if (value.HasMenuBarButton) {
                     _this.AssureNoteApp.DebugP("Menu: key=" + key);
-                    ret.push(value.CreateMenuBarButton());
+                    var Button = value.CreateMenuBarButton(TargetView);
+                    if (Button != null) {
+                        ret.push(Button);
+                    }
                 }
             });
             return ret;

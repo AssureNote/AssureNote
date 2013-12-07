@@ -26,7 +26,7 @@ var AssureNote;
                 height: "90%"
             });
         }
-        FullScreenEditorPlugin.prototype.CreateMenuBarButton = function () {
+        FullScreenEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
             return new AssureNote.MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Writer = new StringWriter();

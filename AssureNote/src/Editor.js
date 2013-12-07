@@ -2,54 +2,53 @@
 var AssureNote;
 (function (AssureNote) {
     var EditorUtil = (function () {
-        function EditorUtil(AssureNoteApp, textarea/*codemirror*/ , selector, CSS) {
+        function EditorUtil(AssureNoteApp, TextArea/*codemirror*/ , Selector, CSS) {
             this.AssureNoteApp = AssureNoteApp;
-            this.textarea = textarea;
-            this.selector = selector;
+            this.TextArea = TextArea;
+            this.Selector = Selector;
             this.CSS = CSS;
-            $(this.textarea.getWrapperElement()).css({
+            $(this.TextArea.getWrapperElement()).css({
                 height: "100%",
                 width: "100%",
                 background: "rgba(255, 255, 255, 0.85)"
             });
-            $(selector).css(CSS);
-            $(selector).css({ display: "none" });
+            this.Element = $(Selector);
+            this.Element.css(CSS);
+            this.Element.css({ display: "none" });
         }
         EditorUtil.prototype.EnableEditor = function (WGSN, NodeView) {
+            var _this = this;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
-            this.textarea.setValue(WGSN);
-            var self = this;
-            $(this.selector).css({ display: "block" }).on("keydown", function (e) {
-                console.log("editor");
-                console.log(e.keyCode);
+            this.TextArea.setValue(WGSN);
+            this.Element.css({ display: "block" }).on("keydown", function (e) {
                 if (e.keyCode == 27) {
                     e.stopPropagation();
-                    $(self.selector).blur();
+                    $(_this.Selector).blur();
                 }
             }).on("blur", function (e) {
                 e.stopPropagation();
-                self.DisableEditor(NodeView);
+                _this.DisableEditor(NodeView);
             });
-            this.textarea.refresh();
+            this.TextArea.refresh();
         };
 
         EditorUtil.prototype.DisableEditor = function (OldNodeView) {
             var Node = OldNodeView.Model;
-            var WGSN = this.textarea.getValue();
+            var WGSN = this.TextArea.getValue();
 
             var NewNode = Node.ReplaceSubNodeAsText(WGSN);
             OldNodeView.Update(NewNode, this.AssureNoteApp.PictgramPanel.ViewMap);
             this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Model.GetLabel(), null, null);
 
             this.AssureNoteApp.PluginPanel.IsVisible = true;
-            $(this.selector).addClass("animated fadeOutUp");
+            $(this.Selector).addClass("animated fadeOutUp");
 
             /* Need to wait a bit for the end of animation */
             var self = this;
             setTimeout(function () {
-                $(self.selector).removeClass();
-                $(self.selector).css({ display: "none" });
+                $(self.Selector).removeClass();
+                $(self.Selector).css({ display: "none" });
             }, 1300);
             return null;
         };

@@ -18,7 +18,7 @@ module AssureNote {
 		Display(PluginPanel: PluginPanel, GSNDoc: GSNDoc, Label: string): void {
 		}
 
-		CreateMenuBarButton(): MenuBarButton {
+		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
 			//return new MenuBarButton("sample-id", "images/sample.png", "sample", (TargetView: NodeView) => {
 			//});
 			return null;
@@ -66,12 +66,15 @@ module AssureNote {
 			return this.PluginMap[Name];
 		}
 
-		GetMenuBarButtons(): MenuBarButton[]{
+		GetMenuBarButtons(TargetView: NodeView): MenuBarButton[]{
 			var ret: MenuBarButton[] = [];
 			$.each(this.PluginMap, (key, value: Plugin) => {
 				if (value.HasMenuBarButton) {
 					this.AssureNoteApp.DebugP("Menu: key=" + key);
-					ret.push(value.CreateMenuBarButton());
+					var Button = value.CreateMenuBarButton(TargetView);
+					if (Button != null) {
+						ret.push(Button);
+					}
 				}
 			});
 			return ret;
