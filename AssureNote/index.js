@@ -492,7 +492,7 @@ var AssureNote;
                 this.ModuleRect.setAttribute("y", "-10px");
                 this.ShapeGroup.appendChild(this.ModuleRect);
             }
-            if (this.NodeView.Children == null) {
+            if (this.NodeView.Children == null && this.NodeView.IsFolded) {
                 //FIXME use CreateSVGElement("use");
                 this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
                 this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
@@ -505,9 +505,9 @@ var AssureNote;
             //super.Resize(CaseViewer, NodeModel, HTMLDoc);
             this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
             this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
-            if (this.NodeView.Children == null) {
+            if (this.NodeView.Children == null && this.NodeView.IsFolded) {
                 var x = (this.GetNodeWidth() / 2).toString();
-                var y = this.GetTreeHeight().toString();
+                var y = (this.GetNodeHeight() + 20).toString();
                 this.UndevelopedSymbol.setAttribute("transform", "translate(" + x + "," + y + ")");
                 this.UndevelopedSymbol.setAttribute("y", y + "px");
             }
