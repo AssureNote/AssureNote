@@ -33,8 +33,9 @@ module AssureNote {
 				AssureNoteApp.DebugP("no args");
 				return;
 			}
+			var Label = Args[0].toUpperCase();
 			var event = document.createEvent("UIEvents");
-			var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Args[0]];
+			var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
 			if (TargetView != null) {
 				if(TargetView.GetNodeType() != GSNType.Goal) {
 					AssureNoteApp.DebugP("Only type 'Goal' can be allowed to fold.");
@@ -42,7 +43,7 @@ module AssureNote {
 				}
 				this.FoldingAction(event, TargetView);
 			} else {
-				AssureNoteApp.DebugP(Args[0] + " not found.");
+				AssureNoteApp.DebugP(Label + " not found.");
 			}
 		}
 
