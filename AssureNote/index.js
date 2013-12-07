@@ -484,12 +484,33 @@ var AssureNote;
             //this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
             //this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
             this.ShapeGroup.appendChild(this.BodyRect);
+            if (this.NodeView.IsFolded) {
+                this.ModuleRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
+                this.ModuleRect.setAttribute("class", this.ColorClassName);
+                this.ModuleRect.setAttribute("width", "80px");
+                this.ModuleRect.setAttribute("height", "10px");
+                this.ModuleRect.setAttribute("y", "-10px");
+                this.ShapeGroup.appendChild(this.ModuleRect);
+            }
+            if (this.NodeView.Children == null) {
+                //FIXME use CreateSVGElement("use");
+                this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
+                this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
+                this.UndevelopedSymbol.setAttribute("class", this.ColorClassName);
+                this.ShapeGroup.appendChild(this.UndevelopedSymbol);
+            }
         };
 
         GSNGoalShape.prototype.FitSizeToContent = function () {
             //super.Resize(CaseViewer, NodeModel, HTMLDoc);
             this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
             this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
+            if (this.NodeView.Children == null) {
+                var x = (this.GetNodeWidth() / 2).toString();
+                var y = this.GetTreeHeight().toString();
+                this.UndevelopedSymbol.setAttribute("transform", "translate(" + x + "," + y + ")");
+                this.UndevelopedSymbol.setAttribute("y", y + "px");
+            }
         };
 
         GSNGoalShape.prototype.UpdateHtmlClass = function () {
