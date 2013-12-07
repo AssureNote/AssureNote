@@ -5,7 +5,7 @@ module AssureNote {
 		}
 
 		//FIXME Rename
-		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView) {
+		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
 			//TODO
 		}
 	}
@@ -40,7 +40,7 @@ module AssureNote {
             }
         }
 
-		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView) {
+		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
 
 			var DivFragment = document.createDocumentFragment();
 			var SvgNodeFragment = document.createDocumentFragment();

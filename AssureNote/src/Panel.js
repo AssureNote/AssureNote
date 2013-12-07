@@ -101,6 +101,16 @@ var AssureNote;
                 }
             });
         }
+        PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
+            var _this = this;
+            NodeView.ForEachVisibleChildren(function (SubNode) {
+                _this.SetFoldedAllGoalNode(SubNode);
+                if (SubNode.GetNodeType() == GSNType.Goal) {
+                    SubNode.IsFolded = true;
+                }
+            });
+        };
+
         PictgramPanel.prototype.SetView = function (NodeView) {
             this.MasterView = NodeView;
             this.ViewMap = {};

@@ -129,11 +129,20 @@ module AssureNote {
 				});
 		}
 
+		SetFoldedAllGoalNode(NodeView: NodeView): void {
+			NodeView.ForEachVisibleChildren((SubNode: NodeView) => {
+				this.SetFoldedAllGoalNode(SubNode);
+				if (SubNode.GetNodeType() == GSNType.Goal) {
+					SubNode.IsFolded = true;
+				}
+			});
+		}
+
 		SetView(NodeView: NodeView): void {
 			this.MasterView = NodeView;
 			this.ViewMap = {};
 			this.MasterView.UpdateViewMap(this.ViewMap);
-        }
+		}
 
 		DisplayPictgram(): void {
 			this.AssureNoteApp.PluginPanel.Clear();

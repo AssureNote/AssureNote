@@ -50,7 +50,7 @@ module AssureNote {
 			}
 		}
 
-		UpdateViewMap(ViewMap: { [index: string]: NodeView }) : void {
+		UpdateViewMap(ViewMap: { [index: string]: NodeView }): void {
             ViewMap[this.Label] = this;
             if (this.Left != null) {
                 for (var i = 0; i < this.Left.length; i++) {

@@ -98,6 +98,7 @@ var AssureNote;
                     var TopGoalNode = LatestDoc.TopGoal;
 
                     _this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
+                    _this.PictgramPanel.SetFoldedAllGoalNode(_this.PictgramPanel.MasterView);
 
                     _this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
 
