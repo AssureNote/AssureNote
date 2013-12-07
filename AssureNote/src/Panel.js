@@ -105,8 +105,10 @@ var AssureNote;
             var _this = this;
             NodeView.ForEachVisibleChildren(function (SubNode) {
                 _this.SetFoldedAllGoalNode(SubNode);
-                if (SubNode.GetNodeType() == GSNType.Goal) {
-                    SubNode.IsFolded = true;
+                if (SubNode.GetNodeType() == GSNType.Goal && SubNode.Children != null) {
+                    if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != GSNType.Evidence) {
+                        SubNode.IsFolded = true;
+                    }
                 }
             });
         };
