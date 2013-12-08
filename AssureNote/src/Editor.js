@@ -48,6 +48,30 @@ var AssureNote;
             }
         };
 
+        EditorUtil.prototype.CopyNodesInfo = function (OldNodeMap, NewNodeMap, NewDoc) {
+            var NewNodeLabels = Object.keys(NewNodeMap);
+            for (var j = 0; j < NewNodeLabels.length; j++) {
+                var Label = NewNodeLabels[j];
+                var NewNodeModel = NewNodeMap[Label];
+                var OldNodeModel = OldNodeMap[Label];
+                if (OldNodeMap[Label] != null) {
+                    NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
+                    NewNodeModel.Created = OldNodeModel.Created;
+                    NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
+                    if (NewNodeModel.Digest == OldNodeModel.Digest) {
+                        NewNodeModel.LastModified = OldNodeModel.LastModified;
+                    } else {
+                        NewNodeModel.LastModified = NewDoc.DocHistory;
+                    }
+                } else {
+                    NewNodeModel.BaseDoc = NewDoc;
+                    NewNodeModel.Created = NewDoc.DocHistory;
+                    NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel;
+                    NewNodeModel.LastModified = NewDoc.DocHistory;
+                }
+            }
+        };
+
         EditorUtil.prototype.MergeModel = function (OriginNode, NewNode, NewDoc) {
             var OldNodeMap = {};
             this.MakeMap(OriginNode, OldNodeMap);
@@ -60,27 +84,7 @@ var AssureNote;
             for (var i = 0; i < MergeParentNode.SubNodeList.length; i++) {
                 var SubNode = MergeParentNode.SubNodeList[i];
                 if (SubNode.GetLabel() == MergeTopNode.GetLabel()) {
-                    var NewNodeLabels = Object.keys(NewNodeMap);
-                    for (var j = 0; j < NewNodeLabels.length; j++) {
-                        var Label = NewNodeLabels[j];
-                        if (OldNodeMap[Label] != null) {
-                            var NewNodeModel = NewNodeMap[Label];
-                            var OldNodeModel = OldNodeMap[Label];
-                            NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
-                            NewNodeModel.Created = OldNodeModel.Created;
-                            NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
-                            if (NewNodeModel.Digest == OldNodeModel.Digest) {
-                                NewNodeModel.LastModified = OldNodeModel.LastModified;
-                            } else {
-                                NewNodeModel.LastModified = NewDoc.DocHistory;
-                            }
-                        } else {
-                            NewNodeModel.BaseDoc = NewDoc;
-                            NewNodeModel.Created = NewDoc.DocHistory;
-                            NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel;
-                            NewNodeModel.LastModified = NewDoc.DocHistory;
-                        }
-                    }
+                    this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
                     MergeParentNode.SubNodeList[i] = NewNode;
                     NewNode.ParentNode = MergeParentNode;
                     return;
@@ -104,6 +108,12 @@ var AssureNote;
 
             var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
             if (TopGoal.GetLabel() == NewNode.GetLabel()) {
+                var OldNodeMap = {};
+                this.MakeMap(TopGoal, OldNodeMap);
+                var NewNodeMap = {};
+                this.MakeMap(NewNode, NewNodeMap);
+
+                this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
                 this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal = NewNode;
                 TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
             } else {

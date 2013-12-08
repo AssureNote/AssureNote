@@ -49,6 +49,32 @@ module AssureNote {
 			}
 		}
 
+		private CopyNodesInfo(OldNodeMap: { [index: string]: GSNNode },
+			NewNodeMap: { [index: string]: GSNNode }, NewDoc: GSNDoc
+			): void {
+				var NewNodeLabels = Object.keys(NewNodeMap);
+				for (var j = 0; j < NewNodeLabels.length; j++) {
+					var Label = NewNodeLabels[j];
+					var NewNodeModel = NewNodeMap[Label];
+					var OldNodeModel = OldNodeMap[Label];
+					if (OldNodeMap[Label] != null) {
+						NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
+						NewNodeModel.Created = OldNodeModel.Created;
+						NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
+						if (NewNodeModel.Digest == OldNodeModel.Digest) {
+							NewNodeModel.LastModified = OldNodeModel.LastModified;
+						} else {
+							NewNodeModel.LastModified = NewDoc.DocHistory;
+						}
+					} else {
+						NewNodeModel.BaseDoc = NewDoc;
+						NewNodeModel.Created = NewDoc.DocHistory;
+						NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel; //FIXME
+						NewNodeModel.LastModified = NewDoc.DocHistory;
+					}
+				}
+		}
+
 		private MergeModel(OriginNode: GSNNode, NewNode: GSNNode, NewDoc: GSNDoc): void {
 
 			var OldNodeMap = <{ [index: string]: GSNNode }>{};
@@ -62,27 +88,7 @@ module AssureNote {
 			for (var i = 0; i < MergeParentNode.SubNodeList.length; i++) {
 				var SubNode = MergeParentNode.SubNodeList[i];
 				if (SubNode.GetLabel() == MergeTopNode.GetLabel()) {
-					var NewNodeLabels = Object.keys(NewNodeMap);
-					for (var j = 0; j < NewNodeLabels.length; j++) {
-						var Label = NewNodeLabels[j];
-						if (OldNodeMap[Label] != null) {
-							var NewNodeModel = NewNodeMap[Label];
-							var OldNodeModel = OldNodeMap[Label];
-							NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
-							NewNodeModel.Created = OldNodeModel.Created;
-							NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
-							if (NewNodeModel.Digest == OldNodeModel.Digest) {
-								NewNodeModel.LastModified = OldNodeModel.LastModified;
-							} else {
-								NewNodeModel.LastModified = NewDoc.DocHistory;
-							}
-						} else {
-							NewNodeModel.BaseDoc = NewDoc;
-							NewNodeModel.Created = NewDoc.DocHistory;
-							NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel; //FIXME
-							NewNodeModel.LastModified = NewDoc.DocHistory;
-						}
-					}
+					this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
 					MergeParentNode.SubNodeList[i] = NewNode;
 					NewNode.ParentNode = MergeParentNode;
 					return;
@@ -105,6 +111,12 @@ module AssureNote {
 
 			var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
 			if (TopGoal.GetLabel() == NewNode.GetLabel()) {
+				var OldNodeMap = <{ [index: string]: GSNNode }>{};
+				this.MakeMap(TopGoal, OldNodeMap);
+				var NewNodeMap = <{ [index: string]: GSNNode }>{};
+				this.MakeMap(NewNode, NewNodeMap);
+
+				this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
 				this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal = NewNode;
 				TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
 			} else {

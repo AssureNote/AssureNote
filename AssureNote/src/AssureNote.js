@@ -79,6 +79,25 @@ var AssureNote;
             }
         };
 
+        AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
+            this.WGSNName = Name;
+            this.MasterRecord = new GSNRecord();
+            this.MasterRecord.Parse(WGSN);
+
+            var LatestDoc = this.MasterRecord.GetLatestDoc();
+            var TopGoalNode = LatestDoc.TopGoal;
+
+            this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
+            this.PictgramPanel.SetFoldedAllGoalNode(this.PictgramPanel.MasterView);
+
+            this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+
+            var Shape = this.PictgramPanel.MasterView.GetShape();
+            var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
+            var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+            this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+        };
+
         AssureNoteApp.prototype.ProcessDroppedFiles = function (Files) {
             var _this = this;
             if (Files[0]) {
@@ -90,22 +109,7 @@ var AssureNote;
                 reader.onload = function (event) {
                     var Contents = (event.target).result;
                     var Name = Files[0].name;
-
-                    _this.MasterRecord = new GSNRecord();
-                    _this.MasterRecord.Parse(Contents);
-
-                    var LatestDoc = _this.MasterRecord.GetLatestDoc();
-                    var TopGoalNode = LatestDoc.TopGoal;
-
-                    _this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
-                    _this.PictgramPanel.SetFoldedAllGoalNode(_this.PictgramPanel.MasterView);
-
-                    _this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
-
-                    var Shape = _this.PictgramPanel.MasterView.GetShape();
-                    var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
-                    var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
-                    _this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+                    _this.LoadNewWGSN(Name, Contents);
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
