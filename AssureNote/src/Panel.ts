@@ -204,7 +204,7 @@ module AssureNote {
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
-				lineNumbers: false,
+				lineNumbers: true,
 				mode: "text/x-asn",
 				lineWrapping: true,
             });

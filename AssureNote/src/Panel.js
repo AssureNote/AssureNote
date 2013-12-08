@@ -182,7 +182,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
             this.IsVisible = true;
             var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
-                lineNumbers: false,
+                lineNumbers: true,
                 mode: "text/x-asn",
                 lineWrapping: true
             });
