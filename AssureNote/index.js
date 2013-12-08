@@ -621,8 +621,11 @@ var AssureNote;
     AssureNote.GSNEvidenceShape = GSNEvidenceShape;
 })(AssureNote || (AssureNote = {}));
 
+var Debug = {};
+
 $(function () {
     var AssureNoteApp = new AssureNote.AssureNoteApp();
+    Debug.AssureNote = AssureNoteApp;
 
     var Menu = [];
     Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", function (ev) {

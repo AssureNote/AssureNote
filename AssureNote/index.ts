@@ -605,8 +605,11 @@ module AssureNote {
 
 }
 
+var Debug = <any>{};
+
 $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();
+	Debug.AssureNote = AssureNoteApp;
 
 	var Menu: AssureNote.SideMenuContent[] = [];
 	Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", (ev: Event) => {
