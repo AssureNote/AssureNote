@@ -52,13 +52,6 @@ module AssureNote {
 			}
 		}
 
-		private CopyNodeInfo(OriginNode: GSNNode, NewNode: GSNNode): void {
-			OriginNode.Digest = NewNode.Digest;
-			OriginNode.NodeDoc = NewNode.NodeDoc;
-			OriginNode.HasTag = NewNode.HasTag;
-			OriginNode.TagMap = NewNode.TagMap;
-		}
-
 		private MergeModel(OriginNode: GSNNode, NewNode: GSNNode): void {
 			var MergeTopNode = this.FindMergeTopModel(OriginNode, NewNode.GetLabel());
 			var MergeParentNode = MergeTopNode.ParentNode;

@@ -51,13 +51,6 @@ var AssureNote;
             }
         };
 
-        EditorUtil.prototype.CopyNodeInfo = function (OriginNode, NewNode) {
-            OriginNode.Digest = NewNode.Digest;
-            OriginNode.NodeDoc = NewNode.NodeDoc;
-            OriginNode.HasTag = NewNode.HasTag;
-            OriginNode.TagMap = NewNode.TagMap;
-        };
-
         EditorUtil.prototype.MergeModel = function (OriginNode, NewNode) {
             var MergeTopNode = this.FindMergeTopModel(OriginNode, NewNode.GetLabel());
             var MergeParentNode = MergeTopNode.ParentNode;
