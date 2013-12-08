@@ -22,6 +22,8 @@ var AssureNote;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
             this.TextArea.setValue(WGSN);
+            this.Element.off("blur");
+            this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", function (e) {
                 if (e.keyCode == 27) {
                     e.stopPropagation();
@@ -38,27 +40,50 @@ var AssureNote;
             this.TextArea.refresh();
         };
 
-        EditorUtil.prototype.FindMergeTopModel = function (Node, TargetLabel) {
-            if (Node.GetLabel() == TargetLabel) {
-                return Node;
-            }
-            for (var i = 0; i < Node.NonNullSubNodeList().size(); i++) {
+        EditorUtil.prototype.MakeMap = function (Node, NodeMap) {
+            NodeMap[Node.GetLabel()] = Node;
+            for (var i = 0; i < Node.NonNullSubNodeList().length; i++) {
                 var SubNode = Node.NonNullSubNodeList().get(i);
-                var FindNode = this.FindMergeTopModel(SubNode, TargetLabel);
-                if (FindNode != null) {
-                    return FindNode;
-                }
+                this.MakeMap(SubNode, NodeMap);
             }
         };
 
-        EditorUtil.prototype.MergeModel = function (OriginNode, NewNode) {
-            var MergeTopNode = this.FindMergeTopModel(OriginNode, NewNode.GetLabel());
+        EditorUtil.prototype.MergeModel = function (OriginNode, NewNode, NewDoc) {
+            var OldNodeMap = {};
+            this.MakeMap(OriginNode, OldNodeMap);
+            var MergeTopNode = OldNodeMap[NewNode.GetLabel()];
             var MergeParentNode = MergeTopNode.ParentNode;
-            for (var i = 0; i < MergeParentNode.NonNullSubNodeList().size(); i++) {
-                var SubNode = MergeParentNode.NonNullSubNodeList().get(i);
-                if (SubNode.Digest == MergeTopNode.Digest) {
+
+            var NewNodeMap = {};
+            this.MakeMap(NewNode, NewNodeMap);
+
+            for (var i = 0; i < MergeParentNode.SubNodeList.length; i++) {
+                var SubNode = MergeParentNode.SubNodeList[i];
+                if (SubNode.GetLabel() == MergeTopNode.GetLabel()) {
+                    var NewNodeLabels = Object.keys(NewNodeMap);
+                    for (var j = 0; j < NewNodeLabels.length; j++) {
+                        var Label = NewNodeLabels[j];
+                        if (OldNodeMap[Label] != null) {
+                            var NewNodeModel = NewNodeMap[Label];
+                            var OldNodeModel = OldNodeMap[Label];
+                            NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
+                            NewNodeModel.Created = OldNodeModel.Created;
+                            NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
+                            if (NewNodeModel.Digest == OldNodeModel.Digest) {
+                                NewNodeModel.LastModified = OldNodeModel.LastModified;
+                            } else {
+                                NewNodeModel.LastModified = NewDoc.DocHistory;
+                            }
+                        } else {
+                            NewNodeModel.BaseDoc = NewDoc;
+                            NewNodeModel.Created = NewDoc.DocHistory;
+                            NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel;
+                            NewNodeModel.LastModified = NewDoc.DocHistory;
+                        }
+                    }
                     MergeParentNode.SubNodeList[i] = NewNode;
                     NewNode.ParentNode = MergeParentNode;
+                    return;
                 }
             }
         };
@@ -68,17 +93,21 @@ var AssureNote;
             var Node = OldNodeView.Model;
             var WGSN = this.TextArea.getValue();
 
+            //TODO input user name
+            this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
+
             //var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
             var Reader = new StringReader(WGSN);
+            var NewDoc = this.AssureNoteApp.MasterRecord.EditingDoc;
             var Parser = new ParserContext(null, null);
             var NewNode = Parser.ParseNode(Reader, null);
-            this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
+
             var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
             if (TopGoal.GetLabel() == NewNode.GetLabel()) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal = NewNode;
                 TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
             } else {
-                this.MergeModel(TopGoal, NewNode);
+                this.MergeModel(TopGoal, NewNode, NewDoc);
             }
 
             //OldNodeView.Update(TopGoal, this.AssureNoteApp.PictgramPanel.ViewMap);
