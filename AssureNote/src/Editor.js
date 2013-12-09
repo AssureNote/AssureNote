@@ -8,7 +8,6 @@ var AssureNote;
             this.TextArea = TextArea;
             this.Selector = Selector;
             this.CSS = CSS;
-            this.StopEventFlag = false;
             $(this.TextArea.getWrapperElement()).css({
                 height: "100%",
                 width: "100%",
@@ -28,13 +27,9 @@ var AssureNote;
             this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", function (e) {
                 _this.TextArea.focus();
-
                 if (e.keyCode == 27) {
                     e.stopPropagation();
-                    if (!_this.StopEventFlag) {
-                        _this.StopEventFlag = true;
-                        _this.Element.blur();
-                    }
+                    _this.Element.blur();
                 }
             }).on("blur", function (e) {
                 e.stopPropagation();
@@ -137,7 +132,7 @@ var AssureNote;
             setTimeout(function () {
                 _this.Element.removeClass();
                 _this.Element.css({ display: "none" });
-                _this.StopEventFlag = false;
+                //this.StopEventFlag = false;
             }, 1300);
             return null;
         };

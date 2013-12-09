@@ -94,6 +94,7 @@ module AssureNote {
 			var BuiltinCommand = this.Commands.GetFunction(Method);
 			if (BuiltinCommand != null) {
 				BuiltinCommand(this, ParsedCommand.GetArgs());
+				return;
 			}
 			var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
 			if (Plugin != null) {
