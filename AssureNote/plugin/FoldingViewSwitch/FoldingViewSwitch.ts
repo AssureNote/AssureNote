@@ -5,18 +5,21 @@
 module AssureNote {
 	export class FoldingViewSwitchPlugin extends Plugin {
 		FoldingAction: (event: Event, TargetView: NodeView) => void;
+		StrategyFoldingFlag: boolean;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			super();
 			this.HasMenuBarButton = true;
+			this.StrategyFoldingFlag = false;
 
 			this.FoldingAction = (event: Event, TargetView: NodeView) => {
 				if (TargetView.GetNodeType() == GSNType.Strategy) {
 					if (TargetView.Children != null) {
+						this.StrategyFoldingFlag = this.StrategyFoldingFlag != true;
 						for (var i = 0; i < TargetView.Children.length; i++) {
 							var SubView = TargetView.Children[i];
 							if (SubView.GetNodeType() == GSNType.Goal) {
-								SubView.IsFolded = true;
+								SubView.IsFolded = this.StrategyFoldingFlag;
 							}
 						}
 					}
