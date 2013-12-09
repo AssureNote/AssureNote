@@ -102,7 +102,7 @@ module AssureNote {
 				}
 			};
 
-			this.FunctionMap["download"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+			this.FunctionMap["w"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
 				var Writer = new StringWriter();
 				AssureNoteApp.MasterRecord.FormatRecord(Writer);
 				if (Args.length > 0) {

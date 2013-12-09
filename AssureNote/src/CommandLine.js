@@ -95,7 +95,7 @@ var AssureNote;
                 }
             };
 
-            this.FunctionMap["download"] = function (AssureNoteApp, Args) {
+            this.FunctionMap["w"] = function (AssureNoteApp, Args) {
                 var Writer = new StringWriter();
                 AssureNoteApp.MasterRecord.FormatRecord(Writer);
                 if (Args.length > 0) {
