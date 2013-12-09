@@ -139,7 +139,7 @@ module AssureNote {
 			this.AssureNoteApp.PluginPanel.Clear();
 		}
 
-        Draw(Label: string, wx/*window x of the forcused node*/: number, wy/*window y*/: number): void {
+        Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number): void {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 

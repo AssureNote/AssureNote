@@ -20,19 +20,15 @@ var AssureNote;
             var _this = this;
             return new AssureNote.MenuBarButton("folded-id", "images/copy.png", "fold", function (event, TargetView) {
                 TargetView.IsFolded = TargetView.IsFolded != true;
-                var TopGoalView = TargetView;
-                while (TopGoalView.Parent != null) {
-                    TopGoalView = TopGoalView.Parent;
-                }
                 var wx0 = TargetView.GetGx();
                 var wy0 = TargetView.GetGy();
-                _this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null);
+                _this.AssureNoteApp.PictgramPanel.Draw();
                 var wx1 = TargetView.GetGx();
                 var wy1 = TargetView.GetGy();
                 var ViewPort = _this.AssureNoteApp.PictgramPanel.ViewPort;
                 var OffX0 = ViewPort.GetOffsetX();
                 var OffY0 = ViewPort.GetOffsetY();
-                _this.AssureNoteApp.PictgramPanel.ViewPort.SetOffset(OffX0 + wx1 - wx0, OffY0 + wy1 - wy0);
+                ViewPort.SetOffset(OffX0 + wx1 - wx0, OffY0 + wy1 - wy0);
             });
         };
         return FoldingViewSwitchPlugin;

@@ -99,7 +99,7 @@ var AssureNote;
 
                     _this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
 
-                    _this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+                    _this.PictgramPanel.Draw();
 
                     var Shape = _this.PictgramPanel.MasterView.GetShape();
                     var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
