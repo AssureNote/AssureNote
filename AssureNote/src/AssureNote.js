@@ -81,9 +81,14 @@ var AssureNote;
             if (Plugin != null) {
                 Plugin.ExecCommand(this, ParsedCommand.GetArgs());
             } else {
-                var Node = this.PictgramPanel.ViewMap[Method.toUpperCase()];
+                var Label = Method.toUpperCase();
+                var Node = this.PictgramPanel.ViewMap[Label];
                 if (Node != null) {
-                    this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetGx(), Node.GetGy(), Node.GetShape().GetNodeWidth(), Node.GetShape().GetNodeHeight());
+                    if ($("#" + Label).length > 0) {
+                        this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetGx(), Node.GetGy(), Node.GetShape().GetNodeWidth(), Node.GetShape().GetNodeHeight());
+                    } else {
+                        this.DebugP("Invisible node " + Label + " Selected.");
+                    }
                     return;
                 }
                 this.DebugP("undefined command: " + ParsedCommand.GetMethod());
