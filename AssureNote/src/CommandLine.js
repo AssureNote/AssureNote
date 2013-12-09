@@ -116,6 +116,20 @@ var AssureNote;
                 unfoldAll(TopView);
                 AssureNoteApp.PictgramPanel.Draw();
             };
+
+            this.FunctionMap["set"] = function (AssureNoteApp, Args) {
+                if (Args.length > 2) {
+                    switch (Args[0]) {
+                        case "color":
+                            var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
+                            if (Node != null) {
+                                console.log(Args);
+                                $("#" + Args[1] + " h4").css("background-color", Args[2]);
+                            }
+                            break;
+                    }
+                }
+            };
         }
         CommandLineBuiltinFunctions.prototype.GetFunction = function (Key) {
             //FIXME
