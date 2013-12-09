@@ -96,11 +96,16 @@ module AssureNote {
 				BuiltinCommand(this, ParsedCommand.GetArgs());
 				return;
 			}
-			var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
+			var Plugin = this.PluginManager.GetCommandPlugin(Method);
 			if (Plugin != null) {
 				Plugin.ExecCommand(this, ParsedCommand.GetArgs());
 			}
 			else {
+				var Node = this.PictgramPanel.ViewMap[Method.toUpperCase()];
+				if (Node != null) {
+					this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetGx(), Node.GetGy(), Node.GetShape().GetNodeWidth(), Node.GetShape().GetNodeHeight());
+					return;
+				}
 				this.DebugP("undefined command: " + ParsedCommand.GetMethod());
 			}
 		}

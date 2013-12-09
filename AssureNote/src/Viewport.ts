@@ -304,22 +304,21 @@ module AssureNote {
 			return Math.min(scaleWidth, scaleHeight);
 		}
 
-		//SetCaseCenter(DCaseX: number, DCaseY: number, HTMLDoc: HTMLDoc): void {
-		//	var NewOffsetX = this.ConvertX(DCaseX, HTMLDoc);
-		//	var NewOffsetY = this.ConvertY(DCaseY, HTMLDoc);
-		//	this.SetOffset(NewOffsetX, NewOffsetY);
-		//}
+		SetCaseCenter(X: number, Y: number, NodeWidth: number, NodeHeight: number): void {
+			var NewOffsetX = this.ConvertX(X, NodeWidth);
+			var NewOffsetY = this.ConvertY(Y, NodeHeight);
+			this.SetOffset(NewOffsetX, NewOffsetY);
+		}
 
-		//ConvertX(DCaseX: number, HTMLDoc: HTMLDoc): number {
-		//	var ConvertedX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + DCaseX)) - HTMLDoc.Width/2;
-		//	return ConvertedX;
+		ConvertX(X: number, NodeWidth: number): number {
+			var ConvertedX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X)) - NodeWidth/2;
+			return ConvertedX;
 
-		//}
+		}
 
-		//ConvertY(DCaseY: number, HTMLDoc: HTMLDoc): number {
-
-		//	var ConvertedY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + DCaseY)) - HTMLDoc.Height/2;
-		//	return ConvertedY;
-		//}
+		ConvertY(Y: number, NodeHeight: number): number {
+			var ConvertedY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y)) - NodeHeight/2;
+			return ConvertedY;
+		}
 	}
 }
