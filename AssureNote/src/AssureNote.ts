@@ -65,12 +65,14 @@ module AssureNote {
 		IsDebugMode: boolean;
 		MasterRecord: GSNRecord;
 		WGSNName: string;
+		Commands: CommandLineBuiltinFunctions;
 
 		constructor() {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
 			this.PluginManager = new PluginManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
 			this.PluginPanel = new PluginPanel(this);
+			this.Commands = new CommandLineBuiltinFunctions();
 		}
 
 		DebugP(Message: string): void {
@@ -87,8 +89,11 @@ module AssureNote {
 		ExecCommand(ParsedCommand: CommandParser): void {
 			var Method = ParsedCommand.GetMethod();
 			if (Method == "search") {
-
 				return;
+			}
+			var BuiltinCommand = this.Commands.GetFunction(Method);
+			if (BuiltinCommand != null) {
+				BuiltinCommand(this, ParsedCommand.GetArgs());
 			}
 			var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
 			if (Plugin != null) {

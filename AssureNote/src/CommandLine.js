@@ -76,5 +76,31 @@ var AssureNote;
         return CommandLine;
     })();
     AssureNote.CommandLine = CommandLine;
+
+    var CommandLineBuiltinFunctions = (function () {
+        function CommandLineBuiltinFunctions() {
+            this.FunctionMap = {};
+
+            this.FunctionMap["new"] = function (AssureNoteApp, Args) {
+                if (Args.length > 0) {
+                    AssureNoteApp.LoadNewWGSN(Args[0], "* G1");
+                } else {
+                    var Name = prompt("Enter the file name");
+                    if (Name != null) {
+                        if (Name == "") {
+                            Name = "default.wgsn";
+                        }
+                        AssureNoteApp.LoadNewWGSN(Name, "* G1");
+                    }
+                }
+            };
+        }
+        CommandLineBuiltinFunctions.prototype.GetFunction = function (Key) {
+            //FIXME
+            return this.FunctionMap[Key];
+        };
+        return CommandLineBuiltinFunctions;
+    })();
+    AssureNote.CommandLineBuiltinFunctions = CommandLineBuiltinFunctions;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=CommandLine.js.map

@@ -83,4 +83,30 @@ module AssureNote {
 		}
 	}
 
+	export class CommandLineBuiltinFunctions {
+		FunctionMap: {[index: string]: (AssureNoteApp: AssureNoteApp, Args: string[]) => void};
+		constructor() {
+			this.FunctionMap = <{ [index: string]: (AssureNoteApp: AssureNoteApp, Args: string[]) => void }>{};
+
+			this.FunctionMap["new"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+				if (Args.length > 0) {
+					AssureNoteApp.LoadNewWGSN(Args[0], "* G1");
+				} else {
+					var Name = prompt("Enter the file name");
+					if (Name != null) {
+						if (Name == "") {
+							Name = "default.wgsn";
+						}
+						AssureNoteApp.LoadNewWGSN(Name, "* G1");
+					}
+				}
+			};
+		}
+
+		GetFunction(Key: string): (AssureNoteApp: AssureNoteApp, Args: string[]) => void {
+			//FIXME
+			return this.FunctionMap[Key];
+		}
+	}
+
 }
