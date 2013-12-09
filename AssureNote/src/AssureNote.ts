@@ -64,6 +64,7 @@ module AssureNote {
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
 		MasterRecord: GSNRecord;
+		WGSNName: string;
 
 		constructor() {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
@@ -98,6 +99,25 @@ module AssureNote {
 			}
 		}
 
+		LoadNewWGSN(Name: string, WGSN: string): void {
+			this.WGSNName = Name;
+			this.MasterRecord = new GSNRecord();
+			this.MasterRecord.Parse(WGSN);
+
+			var LatestDoc = this.MasterRecord.GetLatestDoc();
+			var TopGoalNode = LatestDoc.TopGoal;
+
+			this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
+			this.PictgramPanel.SetFoldedAllGoalNode(this.PictgramPanel.MasterView);
+
+			this.PictgramPanel.Draw();
+
+			var Shape = this.PictgramPanel.MasterView.GetShape();
+			var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
+			var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+			this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+		}
+
 		ProcessDroppedFiles(Files: File[]): void {
 			if (Files[0]) {
 				var reader = new FileReader();
@@ -108,21 +128,7 @@ module AssureNote {
 				reader.onload = (event) => {
 					var Contents: string = (<any>event.target).result;
 					var Name: string = Files[0].name;
-
-					this.MasterRecord = new GSNRecord();
-					this.MasterRecord.Parse(Contents);
-
-					var LatestDoc = this.MasterRecord.GetLatestDoc();
-					var TopGoalNode = LatestDoc.TopGoal;
-
-                    this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
-
-                    this.PictgramPanel.Draw();
-
-                    var Shape = this.PictgramPanel.MasterView.GetShape();
-                    var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
-                    var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
-                    this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+					this.LoadNewWGSN(Name, Contents);
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

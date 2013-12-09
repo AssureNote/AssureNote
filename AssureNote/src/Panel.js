@@ -22,7 +22,7 @@ var AssureNote;
                 if (NodeView != null) {
                     _this.FocusedLabel = Label;
                     if (!Bar.IsEnable) {
-                        var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons();
+                        var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
                         Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
                     }
                 } else {
@@ -101,6 +101,18 @@ var AssureNote;
                 }
             });
         }
+        PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
+            var _this = this;
+            NodeView.ForEachVisibleChildren(function (SubNode) {
+                _this.SetFoldedAllGoalNode(SubNode);
+                if (SubNode.GetNodeType() == GSNType.Goal && SubNode.Children != null) {
+                    if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != GSNType.Evidence) {
+                        SubNode.IsFolded = true;
+                    }
+                }
+            });
+        };
+
         PictgramPanel.prototype.SetView = function (NodeView) {
             this.MasterView = NodeView;
             this.ViewMap = {};
@@ -170,7 +182,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
             this.IsVisible = true;
             var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
-                lineNumbers: false,
+                lineNumbers: true,
                 mode: "text/x-asn",
                 lineWrapping: true
             });

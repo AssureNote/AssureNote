@@ -45,7 +45,7 @@ module AssureNote {
 				if (NodeView != null) {
 					this.FocusedLabel = Label;
 					if (!Bar.IsEnable) {
-						var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons();
+						var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
 						Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
 					}
 				} else {
@@ -129,6 +129,17 @@ module AssureNote {
 				});
 		}
 
+		SetFoldedAllGoalNode(NodeView: NodeView): void {
+			NodeView.ForEachVisibleChildren((SubNode: NodeView) => {
+				this.SetFoldedAllGoalNode(SubNode);
+				if (SubNode.GetNodeType() == GSNType.Goal && SubNode.Children != null) {
+					if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != GSNType.Evidence) {
+						SubNode.IsFolded = true;
+					}
+				}
+			});
+		}
+
 		SetView(NodeView: NodeView): void {
 			this.MasterView = NodeView;
 			this.ViewMap = {};
@@ -193,7 +204,7 @@ module AssureNote {
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
-				lineNumbers: false,
+				lineNumbers: true,
 				mode: "text/x-asn",
 				lineWrapping: true,
             });

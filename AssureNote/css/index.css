@@ -72,12 +72,14 @@ h4 {
 }
 
 .assurenote-default {
-	fill: #b4d8df;
-	stroke: none;
+	fill: #ffffff;
+	filli: #b4d8df;
+	stroke: black;
+	stroke-width: 2;
 }
 
 .assurenote-default-highlight {
-	fill: #b4d8df;
+	/*fill: #b4d8df;*/
 	stroke: orange;
 }
 

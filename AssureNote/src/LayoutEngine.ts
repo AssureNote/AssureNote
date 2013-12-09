@@ -5,14 +5,14 @@ module AssureNote {
 		}
 
 		//FIXME Rename
-		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView) {
+		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
 			//TODO
 		}
 	}
 
 	export var DefaultMargin = 32;
 	export var ContextMargin = 10;
-	export var LevelMargin = 32;
+	export var LevelMargin = 64;
 	export var TreeMargin = 12;
 
 	export class SimpleLayoutEngine extends LayoutEngine {
@@ -40,7 +40,7 @@ module AssureNote {
             }
         }
 
-		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView) {
+		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
 
 			var DivFragment = document.createDocumentFragment();
 			var SvgNodeFragment = document.createDocumentFragment();

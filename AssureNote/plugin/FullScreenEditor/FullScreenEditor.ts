@@ -18,20 +18,12 @@ module AssureNote {
             });
         }
 
-        EnableEditor(WGSN: string): void {
-            this.EditorUtil.EnableEditor(WGSN);
-        }
-
-        DisableEditor(): void {
-            return null;
-        }
-
-		CreateMenuBarButton(): MenuBarButton {
+		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
 			return new MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor",
 				(event: Event, TargetView: NodeView) => {
 					var Writer = new StringWriter();
 					TargetView.Model.FormatSubNode(1, Writer);
-                    this.EnableEditor(Writer.toString());
+                    this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
 			});
 		}
 	}

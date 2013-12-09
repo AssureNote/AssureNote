@@ -13,7 +13,10 @@
 			<classpath path="ext/itextpdf-5.4.4.jar" />
 			<classpath path="ext/itext-xtra-5.4.4.jar" />
 			<classpath path="ext/itext-pdfa-5.4.4.jar" />
+			<classpath path="ext/itext-asian.jar" />
 			<include name="**/*.java" />
+			<classpath path="ext/itextpdf-5.4.4.jar" />
+			<classpath path="ext/itext-asian.jar" />
 		</javac>
 	</target>
 

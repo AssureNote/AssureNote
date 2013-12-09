@@ -50,13 +50,12 @@ module AssureNote {
 
 			(<any>this.Menu).jqDock({
 				align: 'bottom',
-				fadeIn: 200,
 				idle: 1500,
 				size: 45,
 				distance: 60,
 				labels: 'tc',
-				duration: 500,
-				fadeIn: 1000,
+				duration: 200,
+				fadeIn: 400,
 				source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
 				onReady: refresh,
 			});

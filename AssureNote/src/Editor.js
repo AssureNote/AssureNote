@@ -2,45 +2,139 @@
 var AssureNote;
 (function (AssureNote) {
     var EditorUtil = (function () {
-        function EditorUtil(AssureNoteApp, textarea/*codemirror*/ , selector, CSS) {
+        function EditorUtil(AssureNoteApp, TextArea/*codemirror*/ , Selector, CSS) {
             this.AssureNoteApp = AssureNoteApp;
-            this.textarea = textarea;
-            this.selector = selector;
+            this.TextArea = TextArea;
+            this.Selector = Selector;
             this.CSS = CSS;
-            $(this.textarea.getWrapperElement()).css({
+            this.StopEventFlag = false;
+            $(this.TextArea.getWrapperElement()).css({
                 height: "100%",
                 width: "100%",
                 background: "rgba(255, 255, 255, 0.85)"
             });
-            $(selector).css(CSS);
-            $(selector).css({ display: "none" });
+            this.Element = $(Selector);
+            this.Element.css(CSS);
+            this.Element.css({ display: "none" });
         }
-        EditorUtil.prototype.EnableEditor = function (WGSN) {
+        EditorUtil.prototype.EnableEditor = function (WGSN, NodeView) {
+            var _this = this;
+            var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
-            this.textarea.setValue(WGSN);
-            var self = this;
-            $(this.selector).css({ display: "block" }).on("keydown", function (e) {
-                console.log("editor");
-                console.log(e.keyCode);
+            this.TextArea.setValue(WGSN);
+            this.Element.off("blur");
+            this.Element.off("keydown");
+            this.Element.css({ display: "block" }).on("keydown", function (e) {
                 if (e.keyCode == 27) {
                     e.stopPropagation();
-                    $(self.selector).blur();
+                    if (!_this.StopEventFlag) {
+                        _this.StopEventFlag = true;
+                        _this.Element.blur();
+                    }
                 }
             }).on("blur", function (e) {
                 e.stopPropagation();
-                self.AssureNoteApp.PluginPanel.IsVisible = true;
-                $(self.selector).addClass("animated fadeOutUp");
-
-                /* Need to wait a bit for the end of animation */
-                setTimeout(function () {
-                    $(self.selector).removeClass();
-                    $(self.selector).css({ display: "none" });
-                }, 1300);
+                e.preventDefault();
+                _this.DisableEditor(NodeView);
             });
-            this.textarea.refresh();
+            this.TextArea.refresh();
         };
 
-        EditorUtil.prototype.DisableEditor = function () {
+        EditorUtil.prototype.MakeMap = function (Node, NodeMap) {
+            NodeMap[Node.GetLabel()] = Node;
+            for (var i = 0; i < Node.NonNullSubNodeList().length; i++) {
+                var SubNode = Node.NonNullSubNodeList().get(i);
+                this.MakeMap(SubNode, NodeMap);
+            }
+        };
+
+        EditorUtil.prototype.CopyNodesInfo = function (OldNodeMap, NewNodeMap, NewDoc) {
+            var NewNodeLabels = Object.keys(NewNodeMap);
+            for (var j = 0; j < NewNodeLabels.length; j++) {
+                var Label = NewNodeLabels[j];
+                var NewNodeModel = NewNodeMap[Label];
+                var OldNodeModel = OldNodeMap[Label];
+                if (OldNodeMap[Label] != null) {
+                    NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
+                    NewNodeModel.Created = OldNodeModel.Created;
+                    NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
+                    if (NewNodeModel.Digest == OldNodeModel.Digest) {
+                        NewNodeModel.LastModified = OldNodeModel.LastModified;
+                    } else {
+                        NewNodeModel.LastModified = NewDoc.DocHistory;
+                    }
+                } else {
+                    NewNodeModel.BaseDoc = NewDoc;
+                    NewNodeModel.Created = NewDoc.DocHistory;
+
+                    //NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel; //FIXME
+                    NewNodeModel.LastModified = NewDoc.DocHistory;
+                }
+            }
+        };
+
+        EditorUtil.prototype.MergeModel = function (OriginNode, NewNode, NewDoc) {
+            var OldNodeMap = {};
+            this.MakeMap(OriginNode, OldNodeMap);
+            var MergeTopNode = OldNodeMap[NewNode.GetLabel()];
+            var MergeParentNode = MergeTopNode.ParentNode;
+
+            var NewNodeMap = {};
+            this.MakeMap(NewNode, NewNodeMap);
+
+            for (var i = 0; i < MergeParentNode.SubNodeList.length; i++) {
+                var SubNode = MergeParentNode.SubNodeList[i];
+                if (SubNode.GetLabel() == MergeTopNode.GetLabel()) {
+                    this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
+                    MergeParentNode.SubNodeList[i] = NewNode;
+                    NewNode.ParentNode = MergeParentNode;
+                    return;
+                }
+            }
+        };
+
+        EditorUtil.prototype.DisableEditor = function (OldNodeView) {
+            var _this = this;
+            var Node = OldNodeView.Model;
+            var WGSN = this.TextArea.getValue();
+
+            //TODO input user name
+            this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
+
+            //var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
+            var Reader = new StringReader(WGSN);
+            var NewDoc = this.AssureNoteApp.MasterRecord.EditingDoc;
+            var Parser = new ParserContext(null, null);
+            var NewNode = Parser.ParseNode(Reader, null);
+
+            var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
+            if (TopGoal.GetLabel() == NewNode.GetLabel()) {
+                var OldNodeMap = {};
+                this.MakeMap(TopGoal, OldNodeMap);
+                var NewNodeMap = {};
+                this.MakeMap(NewNode, NewNodeMap);
+
+                this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
+                this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal = NewNode;
+                TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
+            } else {
+                this.MergeModel(TopGoal, NewNode, NewDoc);
+            }
+
+            //OldNodeView.Update(TopGoal, this.AssureNoteApp.PictgramPanel.ViewMap);
+            this.AssureNoteApp.PictgramPanel.SetView(new AssureNote.NodeView(TopGoal, true));
+            this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+
+            this.AssureNoteApp.PluginPanel.IsVisible = true;
+            this.AssureNoteApp.MasterRecord.CloseEditor();
+            $(this.Selector).addClass("animated fadeOutUp");
+
+            /* Need to wait a bit for the end of animation */
+            setTimeout(function () {
+                _this.Element.removeClass();
+                _this.Element.css({ display: "none" });
+                _this.StopEventFlag = false;
+            }, 1300);
             return null;
         };
         return EditorUtil;
