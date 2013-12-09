@@ -94,6 +94,16 @@ var AssureNote;
                     }
                 }
             };
+
+            this.FunctionMap["download"] = function (AssureNoteApp, Args) {
+                var Writer = new StringWriter();
+                AssureNoteApp.MasterRecord.FormatRecord(Writer);
+                if (Args.length > 0) {
+                    AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Args[0]);
+                } else {
+                    AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
+                }
+            };
         }
         CommandLineBuiltinFunctions.prototype.GetFunction = function (Key) {
             //FIXME

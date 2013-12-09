@@ -101,6 +101,17 @@ module AssureNote {
 					}
 				}
 			};
+
+			this.FunctionMap["download"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+				var Writer = new StringWriter();
+				AssureNoteApp.MasterRecord.FormatRecord(Writer);
+				if (Args.length > 0) {
+					AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Args[0]);
+				} else {
+					AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
+				}
+			};
+
 		}
 
 		GetFunction(Key: string): (AssureNoteApp: AssureNoteApp, Args: string[]) => void {
