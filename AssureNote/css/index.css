@@ -72,8 +72,8 @@ h4 {
 }
 
 .assurenote-default {
-	fill: #ffffff;
-	filli: #b4d8df;
+	fill: rgba(255, 255, 255, 0.50);
+	/*filli: #b4d8df;*/
 	stroke: black;
 	stroke-width: 2;
 }
@@ -86,7 +86,7 @@ h4 {
 .assurenote-todo {
 	fill: #FFFFFF;
 	stroke: #000000;
-	stroke-dasharray: 5, 5;
+	stroke-dasharray: 5px, 5px;
 }
 
 .assurenote-todo-highlight {
