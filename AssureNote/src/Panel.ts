@@ -3,10 +3,9 @@
 ///<reference path='./SearchNode.ts'/>
 ///<reference path='./LayoutEngine.ts'/>
 ///<reference path='./Editor.ts'/>
+///<reference path='../d.ts/codemirror.d.ts'/>
 
 ///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
-
-declare var CodeMirror: any;
 
 module AssureNote {
 	export class PictgramPanel {
@@ -203,7 +202,7 @@ module AssureNote {
 		IsVisible: boolean = true;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
-			var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
+			var textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('editor'), {
 				lineNumbers: true,
 				mode: "text/x-asn",
 				lineWrapping: true,
