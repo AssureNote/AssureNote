@@ -48,7 +48,9 @@
     <Content Include="lib\jquery.svg.css" />
     <Content Include="lib\jquery.svg.min.js" />
     <Content Include="lib\jquery.tmpl.min.js" />
+    <Content Include="lib\notify.min.js" />
     <Content Include="lib\pointer.min.js" />
+    <Content Include="lib\spin.min.js" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
