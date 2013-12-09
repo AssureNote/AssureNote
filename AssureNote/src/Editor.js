@@ -66,7 +66,8 @@ var AssureNote;
                 } else {
                     NewNodeModel.BaseDoc = NewDoc;
                     NewNodeModel.Created = NewDoc.DocHistory;
-                    NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel;
+
+                    //NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel; //FIXME
                     NewNodeModel.LastModified = NewDoc.DocHistory;
                 }
             }

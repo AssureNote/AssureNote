@@ -69,7 +69,7 @@ module AssureNote {
 					} else {
 						NewNodeModel.BaseDoc = NewDoc;
 						NewNodeModel.Created = NewDoc.DocHistory;
-						NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel; //FIXME
+						//NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel; //FIXME
 						NewNodeModel.LastModified = NewDoc.DocHistory;
 					}
 				}
