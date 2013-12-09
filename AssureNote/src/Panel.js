@@ -1,3 +1,10 @@
+///<reference path='./AssureNote.ts'/>
+///<reference path='./CommandLine.ts'/>
+///<reference path='./SearchNode.ts'/>
+///<reference path='./LayoutEngine.ts'/>
+///<reference path='./Editor.ts'/>
+///<reference path='../d.ts/codemirror.d.ts'/>
+///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var PictgramPanel = (function () {

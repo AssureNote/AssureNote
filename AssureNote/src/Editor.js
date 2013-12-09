@@ -1,8 +1,9 @@
 ///<reference path='./Plugin.ts'/>
+///<reference path='../d.ts/codemirror.d.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var EditorUtil = (function () {
-        function EditorUtil(AssureNoteApp, TextArea/*codemirror*/ , Selector, CSS) {
+        function EditorUtil(AssureNoteApp, TextArea, Selector, CSS) {
             this.AssureNoteApp = AssureNoteApp;
             this.TextArea = TextArea;
             this.Selector = Selector;
@@ -21,10 +22,13 @@ var AssureNote;
             var _this = this;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
-            this.TextArea.setValue(WGSN);
+            (this.TextArea).setValue(WGSN);
+            this.TextArea.focus();
             this.Element.off("blur");
             this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", function (e) {
+                _this.TextArea.focus();
+
                 if (e.keyCode == 27) {
                     e.stopPropagation();
                     if (!_this.StopEventFlag) {
@@ -96,7 +100,7 @@ var AssureNote;
         EditorUtil.prototype.DisableEditor = function (OldNodeView) {
             var _this = this;
             var Node = OldNodeView.Model;
-            var WGSN = this.TextArea.getValue();
+            var WGSN = (this.TextArea).getValue();
 
             //TODO input user name
             this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");

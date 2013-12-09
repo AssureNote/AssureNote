@@ -1,11 +1,12 @@
 ///<reference path='./Plugin.ts'/>
+///<reference path='../d.ts/codemirror.d.ts'/>
 
 module AssureNote {
 	export class EditorUtil {
 		Element: JQuery;
 		StopEventFlag: boolean;
 
-		constructor(public AssureNoteApp: AssureNoteApp, public TextArea: any/*codemirror*/, public Selector: string, public CSS: any) {
+		constructor(public AssureNoteApp: AssureNoteApp, public TextArea: CodeMirror.Editor, public Selector: string, public CSS: any) {
 			this.StopEventFlag = false;
             $(this.TextArea.getWrapperElement()).css({
                 height: "100%",
@@ -20,10 +21,12 @@ module AssureNote {
         EnableEditor(WGSN: string, NodeView: NodeView): void {
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
-			this.TextArea.setValue(WGSN);
+			(<any>this.TextArea).setValue(WGSN);
+			this.TextArea.focus();
 			this.Element.off("blur");
 			this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", (e: JQueryEventObject) => {
+				this.TextArea.focus();
                 //this.AssureNoteApp.DebugP("editor");
                 //this.AssureNoteApp.DebugP(e.keyCode);
                 if (e.keyCode == 27 /* Esc */) {
@@ -98,7 +101,7 @@ module AssureNote {
 
 		DisableEditor(OldNodeView: NodeView): void {
             var Node: GSNNode = OldNodeView.Model;
-            var WGSN: string = this.TextArea.getValue();
+            var WGSN: string = (<any>this.TextArea).getValue();
 
 			//TODO input user name
 			this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");

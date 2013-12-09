@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="d.ts\ASNParser.d.ts" />
+    <TypeScriptCompile Include="d.ts\codemirror.d.ts" />
     <TypeScriptCompile Include="d.ts\jquery.d.ts" />
     <TypeScriptCompile Include="d.ts\jquery_plugins.d.ts" />
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
