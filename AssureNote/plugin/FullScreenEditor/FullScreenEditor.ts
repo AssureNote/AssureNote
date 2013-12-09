@@ -18,6 +18,23 @@ module AssureNote {
             });
         }
 
+		ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
+			if (Args.length < 1) {
+				AssureNoteApp.DebugP("no args");
+				return;
+			}
+			var Label = Args[0].toUpperCase();
+			var event = document.createEvent("UIEvents");
+			var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
+			if (TargetView != null) {
+				var Writer = new StringWriter();
+				TargetView.Model.FormatSubNode(1, Writer);
+				this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
+			} else {
+				AssureNoteApp.DebugP(Label + " not found.");
+			}
+		}
+
 		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
 			return new MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor",
 				(event: Event, TargetView: NodeView) => {
@@ -26,5 +43,6 @@ module AssureNote {
                     this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
 			});
 		}
+
 	}
 }

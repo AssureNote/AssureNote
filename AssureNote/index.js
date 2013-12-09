@@ -628,17 +628,17 @@ $(function () {
     Debug.AssureNote = AssureNoteApp;
 
     var Menu = [];
-    Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", function (ev) {
-        var Writer = new StringWriter();
-        AssureNoteApp.MasterRecord.FormatRecord(Writer);
-        AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
-    }));
 
-    Menu.push(new AssureNote.SideMenuContent("#", "New Case", "new-wgsn", "glyphicon-plus", function (ev) {
-        var Name = prompt("Enter the file name");
-        AssureNoteApp.LoadNewWGSN(Name, "* G1");
-    }));
-
+    //Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", (ev: Event) => {
+    //	var Writer = new StringWriter();
+    //	AssureNoteApp.MasterRecord.FormatRecord(Writer);
+    //	AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
+    //}));
+    //
+    //Menu.push(new AssureNote.SideMenuContent("#", "New Case", "new-wgsn", "glyphicon-plus", (ev: Event) => {
+    //	var Name = prompt("Enter the file name");
+    //	AssureNoteApp.LoadNewWGSN(Name, "* G1");
+    //}));
     AssureNote.SideMenu.Create(Menu);
 
     var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
