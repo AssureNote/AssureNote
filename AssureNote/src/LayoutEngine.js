@@ -20,7 +20,7 @@ var AssureNote;
 
     AssureNote.DefaultMargin = 32;
     AssureNote.ContextMargin = 10;
-    AssureNote.LevelMargin = 32;
+    AssureNote.LevelMargin = 64;
     AssureNote.TreeMargin = 12;
 
     var SimpleLayoutEngine = (function (_super) {

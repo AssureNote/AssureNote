@@ -115,7 +115,7 @@ module AssureNote {
 			this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
 			this.PictgramPanel.SetFoldedAllGoalNode(this.PictgramPanel.MasterView);
 
-			this.PictgramPanel.Draw(TopGoalNode.GetLabel(), null, null);
+			this.PictgramPanel.Draw();
 
 			var Shape = this.PictgramPanel.MasterView.GetShape();
 			var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;

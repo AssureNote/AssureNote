@@ -12,7 +12,7 @@ module AssureNote {
 
 	export var DefaultMargin = 32;
 	export var ContextMargin = 10;
-	export var LevelMargin = 32;
+	export var LevelMargin = 64;
 	export var TreeMargin = 12;
 
 	export class SimpleLayoutEngine extends LayoutEngine {

@@ -428,11 +428,19 @@ module AssureNote {
 			start.y = P1.Y;
 			curve.x = P2.X;
 			curve.y = P2.Y;
-			if (Dir == Direction.Bottom || Dir == Direction.Top) {
-				curve.x1 = (9 * P1.X + P2.X) / 10;
-				curve.y1 = (P1.Y + P2.Y) / 2;
-				curve.x2 = (9 * P2.X + P1.X) / 10;
-				curve.y2 = (P1.Y + P2.Y) / 2;
+            if (Dir == Direction.Bottom || Dir == Direction.Top) {
+                var DiffX = Math.abs(P1.X - P2.X);
+                curve.x1 = (9 * P1.X + P2.X) / 10;
+                curve.y1 = P2.Y;
+                curve.x2 = (9 * P2.X + P1.X) / 10;
+                curve.y2 = P1.Y;
+                if (DiffX > 300) {
+                    curve.x1 = P1.X - 30 * (P1.X - P2.X < 0 ? -1 : 1);
+                    curve.x2 = P2.X + 30 * (P1.X - P2.X < 0 ? -1 : 1);
+                }
+                if (DiffX < 50) {
+                    curve.y1 = curve.y2 = (P1.Y + P2.Y) * 0.5;
+                }
 			} else {
 				curve.x1 = (P1.X + P2.X) / 2;
 				curve.y1 = (9 * P1.Y + P2.Y) / 10;
