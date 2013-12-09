@@ -210,7 +210,7 @@ module AssureNote {
             });
 
             this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
-            AssureNoteApp.PluginManager.SetPlugin("FullScreenEditor", this.FullScreenEditor);
+            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }
 
 		Clear(): void {

@@ -54,6 +54,7 @@ var AssureNote;
             this.PluginManager = new AssureNote.PluginManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
+            this.Commands = new AssureNote.CommandLineBuiltinFunctions();
         }
         AssureNoteApp.prototype.DebugP = function (Message) {
             console.log(Message);
@@ -70,6 +71,10 @@ var AssureNote;
             var Method = ParsedCommand.GetMethod();
             if (Method == "search") {
                 return;
+            }
+            var BuiltinCommand = this.Commands.GetFunction(Method);
+            if (BuiltinCommand != null) {
+                BuiltinCommand(this, ParsedCommand.GetArgs());
             }
             var Plugin = this.PluginManager.GetCommandPlugin(ParsedCommand.GetMethod());
             if (Plugin != null) {
