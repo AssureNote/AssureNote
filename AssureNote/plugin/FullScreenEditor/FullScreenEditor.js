@@ -27,11 +27,12 @@ var AssureNote;
             });
         }
         FullScreenEditorPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
+            var Label;
             if (Args.length < 1) {
-                AssureNoteApp.DebugP("no args");
-                return;
+                Label = AssureNoteApp.MasterRecord.GetLatestDoc().TopGoal.GetLabel();
+            } else {
+                Label = Args[0].toUpperCase();
             }
-            var Label = Args[0].toUpperCase();
             var event = document.createEvent("UIEvents");
             var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {

@@ -112,6 +112,18 @@ module AssureNote {
 				}
 			};
 
+			this.FunctionMap["unfoldAll"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+				var TopView = AssureNoteApp.PictgramPanel.MasterView;
+				var unfoldAll = (TargetView: NodeView) => {
+					TargetView.IsFolded = false;
+					TargetView.ForEachVisibleChildren((SubNode: NodeView) => {
+						unfoldAll(SubNode);
+					});
+				};
+				unfoldAll(TopView);
+				AssureNoteApp.PictgramPanel.Draw();
+			};
+
 		}
 
 		GetFunction(Key: string): (AssureNoteApp: AssureNoteApp, Args: string[]) => void {

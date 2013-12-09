@@ -104,6 +104,18 @@ var AssureNote;
                     AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
                 }
             };
+
+            this.FunctionMap["unfoldAll"] = function (AssureNoteApp, Args) {
+                var TopView = AssureNoteApp.PictgramPanel.MasterView;
+                var unfoldAll = function (TargetView) {
+                    TargetView.IsFolded = false;
+                    TargetView.ForEachVisibleChildren(function (SubNode) {
+                        unfoldAll(SubNode);
+                    });
+                };
+                unfoldAll(TopView);
+                AssureNoteApp.PictgramPanel.Draw();
+            };
         }
         CommandLineBuiltinFunctions.prototype.GetFunction = function (Key) {
             //FIXME
