@@ -18,11 +18,6 @@ var AssureNote;
     })();
     AssureNote.LayoutEngine = LayoutEngine;
 
-    AssureNote.DefaultMargin = 32;
-    AssureNote.ContextMargin = 10;
-    AssureNote.LevelMargin = 64;
-    AssureNote.TreeMargin = 12;
-
     var SimpleLayoutEngine = (function (_super) {
         __extends(SimpleLayoutEngine, _super);
         function SimpleLayoutEngine(AssureNoteApp) {
@@ -76,13 +71,13 @@ var AssureNote;
             var TreeHeight = this.GetNodeHeight(ThisNode);
             if (ThisNode.Left != null) {
                 var OffsetX = 0;
-                var OffsetY = -AssureNote.ContextMargin;
+                var OffsetY = -SimpleLayoutEngine.ContextMargin;
                 ThisNode.ForEachVisibleLeftNodes(function (SubNode) {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += AssureNote.ContextMargin;
-                    SubNode.RelativeX = -(_this.GetNodeWidth(SubNode) + AssureNote.DefaultMargin);
+                    OffsetY += SimpleLayoutEngine.ContextMargin;
+                    SubNode.RelativeX = -(_this.GetNodeWidth(SubNode) + SimpleLayoutEngine.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, _this.GetNodeWidth(SubNode) + AssureNote.DefaultMargin);
+                    OffsetX = Math.max(0, _this.GetNodeWidth(SubNode) + SimpleLayoutEngine.DefaultMargin);
                     OffsetY += _this.GetNodeHeight(SubNode);
                 });
                 if (OffsetY > 0) {
@@ -95,13 +90,13 @@ var AssureNote;
             }
             if (ThisNode.Right != null) {
                 var OffsetX = 0;
-                var OffsetY = -AssureNote.ContextMargin;
+                var OffsetY = -SimpleLayoutEngine.ContextMargin;
                 ThisNode.ForEachVisibleRightNodes(function (SubNode) {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += AssureNote.ContextMargin;
-                    SubNode.RelativeX = (_this.GetNodeWidth(ThisNode) + AssureNote.DefaultMargin);
+                    OffsetY += SimpleLayoutEngine.ContextMargin;
+                    SubNode.RelativeX = (_this.GetNodeWidth(ThisNode) + SimpleLayoutEngine.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, AssureNote.DefaultMargin + _this.GetNodeWidth(SubNode));
+                    OffsetX = Math.max(0, SimpleLayoutEngine.DefaultMargin + _this.GetNodeWidth(SubNode));
                     OffsetY += _this.GetNodeHeight(SubNode);
                 });
                 if (OffsetY > 0) {
@@ -111,7 +106,7 @@ var AssureNote;
                     }
                 }
             }
-            TreeHeight += AssureNote.LevelMargin;
+            TreeHeight += SimpleLayoutEngine.LevelMargin;
             var ChildrenWidth = 0;
             var ChildrenHeight = 0;
             var VisibleChildCount = 0;
@@ -122,11 +117,11 @@ var AssureNote;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     SubNode.RelativeX = ChildrenWidth;
                     SubNode.RelativeY = TreeHeight;
-                    ChildrenWidth += ChildTreeWidth + AssureNote.TreeMargin;
+                    ChildrenWidth += ChildTreeWidth + SimpleLayoutEngine.TreeMargin;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     VisibleChildCount++;
                 });
-                ChildrenWidth -= AssureNote.TreeMargin;
+                ChildrenWidth -= SimpleLayoutEngine.TreeMargin;
 
                 var HeadWidth = VisibleChildCount == 1 ? TreeWidth : this.GetNodeWidth(ThisNode);
                 var Shift = (ChildrenWidth - this.GetNodeWidth(ThisNode)) / 2;
@@ -140,6 +135,10 @@ var AssureNote;
             Shape.SetTreeSize(Math.max(ChildrenWidth, TreeWidth + -TreeLeftX), TreeHeight + ChildrenHeight);
             console.log(ThisNode.Label + ": " + (ThisNode.Shape).TreeBoundingBox.toString());
         };
+        SimpleLayoutEngine.DefaultMargin = 32;
+        SimpleLayoutEngine.ContextMargin = 10;
+        SimpleLayoutEngine.LevelMargin = 64;
+        SimpleLayoutEngine.TreeMargin = 12;
         return SimpleLayoutEngine;
     })(LayoutEngine);
     AssureNote.SimpleLayoutEngine = SimpleLayoutEngine;

@@ -10,13 +10,13 @@ module AssureNote {
 		}
 	}
 
-	export var DefaultMargin = 32;
-	export var ContextMargin = 10;
-	export var LevelMargin = 64;
-	export var TreeMargin = 12;
+    export class SimpleLayoutEngine extends LayoutEngine {
+        static DefaultMargin = 32;
+        static ContextMargin = 10;
+        static LevelMargin = 64;
+        static TreeMargin = 12;
 
-	export class SimpleLayoutEngine extends LayoutEngine {
-		constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(public AssureNoteApp: AssureNoteApp) {
 			super(AssureNoteApp);
 		}
 
@@ -66,13 +66,13 @@ module AssureNote {
 			var TreeHeight = this.GetNodeHeight(ThisNode);
 			if (ThisNode.Left != null) {
 				var OffsetX = 0;
-                var OffsetY = -ContextMargin;
+                var OffsetY = -SimpleLayoutEngine.ContextMargin;
                 ThisNode.ForEachVisibleLeftNodes((SubNode: NodeView) => {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += ContextMargin;
-                    SubNode.RelativeX = -(this.GetNodeWidth(SubNode) + DefaultMargin);
+                    OffsetY += SimpleLayoutEngine.ContextMargin;
+                    SubNode.RelativeX = -(this.GetNodeWidth(SubNode) + SimpleLayoutEngine.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, this.GetNodeWidth(SubNode) + DefaultMargin);
+                    OffsetX = Math.max(0, this.GetNodeWidth(SubNode) + SimpleLayoutEngine.DefaultMargin);
                     OffsetY += this.GetNodeHeight(SubNode);
                 });
 				if (OffsetY > 0) {
@@ -85,13 +85,13 @@ module AssureNote {
 			}
 			if (ThisNode.Right != null) {
 				var OffsetX = 0;
-                var OffsetY = -ContextMargin;
+                var OffsetY = -SimpleLayoutEngine.ContextMargin;
                 ThisNode.ForEachVisibleRightNodes((SubNode: NodeView) => {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += ContextMargin;
-                    SubNode.RelativeX = (this.GetNodeWidth(ThisNode) + DefaultMargin);
+                    OffsetY += SimpleLayoutEngine.ContextMargin;
+                    SubNode.RelativeX = (this.GetNodeWidth(ThisNode) + SimpleLayoutEngine.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, DefaultMargin + this.GetNodeWidth(SubNode));
+                    OffsetX = Math.max(0, SimpleLayoutEngine.DefaultMargin + this.GetNodeWidth(SubNode));
                     OffsetY += this.GetNodeHeight(SubNode);
                 });
 				if (OffsetY > 0) {
@@ -101,7 +101,7 @@ module AssureNote {
 					}
 				}
 			}
-			TreeHeight += LevelMargin;
+            TreeHeight += SimpleLayoutEngine.LevelMargin;
 			var ChildrenWidth = 0;
             var ChildrenHeight = 0;
             var VisibleChildCount = 0;
@@ -112,11 +112,11 @@ module AssureNote {
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     SubNode.RelativeX = ChildrenWidth;
                     SubNode.RelativeY = TreeHeight;
-                    ChildrenWidth += ChildTreeWidth + TreeMargin;
+                    ChildrenWidth += ChildTreeWidth + SimpleLayoutEngine.TreeMargin;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     VisibleChildCount++;
                 });
-                ChildrenWidth -= TreeMargin;
+                ChildrenWidth -= SimpleLayoutEngine.TreeMargin;
 
                 var HeadWidth = VisibleChildCount == 1 ? TreeWidth : this.GetNodeWidth(ThisNode);
                 var Shift = (ChildrenWidth - this.GetNodeWidth(ThisNode)) / 2;
