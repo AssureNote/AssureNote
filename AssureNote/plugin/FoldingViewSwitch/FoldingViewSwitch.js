@@ -16,16 +16,14 @@ var AssureNote;
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             this.HasMenuBarButton = true;
-            this.StrategyFoldingFlag = false;
 
             this.FoldingAction = function (event, TargetView) {
                 if (TargetView.GetNodeType() == GSNType.Strategy) {
                     if (TargetView.Children != null) {
-                        _this.StrategyFoldingFlag = _this.StrategyFoldingFlag != true;
                         for (var i = 0; i < TargetView.Children.length; i++) {
                             var SubView = TargetView.Children[i];
                             if (SubView.GetNodeType() == GSNType.Goal) {
-                                SubView.IsFolded = _this.StrategyFoldingFlag;
+                                SubView.IsFolded = true;
                             }
                         }
                     }
