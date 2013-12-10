@@ -218,34 +218,34 @@ module AssureNote {
 			return P;
 		}
 
-		private SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
-			this.Shape.SetArrowPosition(P1, P2, Dir);
+		private SetArrowPosition(P1: Point, P2: Point, Dir: Direction, Duration?: number) {
+            this.Shape.SetArrowPosition(P1, P2, Dir, Duration);
 		}
 
-        UpdateDocumentPosition(): void {
+        UpdateDocumentPosition(Duration?: number, CSSAnimationBuffer?: string[]): void {
             if (!this.IsVisible) {
                 return
             }
             AssureNoteApp.Assert((this.Shape != null));
             var GlobalPosition = this.GetGlobalPosition();
-            this.Shape.SetPosition(GlobalPosition.X, GlobalPosition.Y);
+            this.Shape.SetPosition(GlobalPosition.X, GlobalPosition.Y, Duration, CSSAnimationBuffer);
+            var P1 = this.GetConnectorPosition(Direction.Bottom, GlobalPosition);
             this.ForEachVisibleChildren((SubNode: NodeView) => {
-                SubNode.UpdateDocumentPosition();
-                var P1 = this.GetConnectorPosition(Direction.Bottom, GlobalPosition);
+                SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
                 var P2 = SubNode.GetConnectorPosition(Direction.Top, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, Direction.Bottom);
+                SubNode.SetArrowPosition(P1, P2, Direction.Bottom, Duration);
             });
+            P1 = this.GetConnectorPosition(Direction.Right, GlobalPosition);
             this.ForEachVisibleRightNodes((SubNode: NodeView) => {
-                SubNode.UpdateDocumentPosition();
-                var P1 = this.GetConnectorPosition(Direction.Right, GlobalPosition);
+                SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
                 var P2 = SubNode.GetConnectorPosition(Direction.Left, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, Direction.Left);
+                SubNode.SetArrowPosition(P1, P2, Direction.Left, Duration);
             });
+            P1 = this.GetConnectorPosition(Direction.Left, GlobalPosition);
             this.ForEachVisibleLeftNodes((SubNode: NodeView) => {
-                SubNode.UpdateDocumentPosition();
-                var P1 = this.GetConnectorPosition(Direction.Left, GlobalPosition);
+                SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
                 var P2 = SubNode.GetConnectorPosition(Direction.Right, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, Direction.Right);
+                SubNode.SetArrowPosition(P1, P2, Direction.Right, Duration);
             });
         }
 
@@ -297,6 +297,7 @@ module AssureNote {
 		private NodeWidth: number;
         private NodeHeight: number;
         private TreeBoundingBox: Rect;
+        private PreviousTreeTopLeft: Point; // for animation
         private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
@@ -357,6 +358,7 @@ module AssureNote {
         }
 
         SetTreeUpperLeft(X: number, Y: number): void {
+            this.PreviousTreeTopLeft = new Point(this.TreeBoundingBox.X, this.TreeBoundingBox.Y);
             this.TreeBoundingBox.X = X;
             this.TreeBoundingBox.Y = Y;
         }
@@ -402,17 +404,36 @@ module AssureNote {
         FitSizeToContent(): void {
         }
 
-		SetPosition(x: number, y: number): void {
+        static CreateCSSAnimationDefinition(Name: string, FromGX: number, FromGY: number): string {
+            return "@-webkit-keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
+        }
+
+        private GX = 0;
+        private GY = 0;
+
+        static CSSAnimationDefinitionCount = 0;
+        static GetCSSAnimationID(): number {
+            return GSNShape.CSSAnimationDefinitionCount++;
+        }
+
+        SetPosition(x: number, y: number, Duration?: number, CSSAnimationBuffer?: string[]): void {
 			if (this.NodeView.IsVisible) {
                 var div = this.Content;//document.getElementById(this.NodeView.Label);
 				if (div != null) {
 					div.style.left = x + "px";
-					div.style.top  = y + "px";
+                    div.style.top = y + "px";
+                    if (Duration > 0) {
+                        var AnimationName: string = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
+                        CSSAnimationBuffer.push(GSNShape.CreateCSSAnimationDefinition(AnimationName, this.GX, this.GY));
+                        this.Content.style["-webkit-animation"] = AnimationName + " " + Duration / 1000 + "s ease-out";
+                    }
                 }
                 var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
 			    mat.e = x;
 			    mat.f = y;
-			}
+            }
+            this.GX = x;
+            this.GY = y;
 		}
 
 		PrerenderSVGContent(): void {
@@ -421,7 +442,7 @@ module AssureNote {
             this.ArrowPath = GSNShape.CreateArrowPath();
 		}
 
-		SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
+		SetArrowPosition(P1: Point, P2: Point, Dir: Direction, Duration?: number) {
 			var start = <SVGPathSegMovetoAbs>this.ArrowPath.pathSegList.getItem(0);
 			var curve = <SVGPathSegCurvetoCubicAbs>this.ArrowPath.pathSegList.getItem(1);
 			start.x = P1.X;
@@ -435,8 +456,8 @@ module AssureNote {
                 curve.x2 = (9 * P2.X + P1.X) / 10;
                 curve.y2 = P1.Y;
                 if (DiffX > 300) {
-                    curve.x1 = P1.X - 30 * (P1.X - P2.X < 0 ? -1 : 1);
-                    curve.x2 = P2.X + 30 * (P1.X - P2.X < 0 ? -1 : 1);
+                    curve.x1 = P1.X - 10 * (P1.X - P2.X < 0 ? -1 : 1);
+                    curve.x2 = P2.X + 10 * (P1.X - P2.X < 0 ? -1 : 1);
                 }
                 if (DiffX < 50) {
                     curve.y1 = curve.y2 = (P1.Y + P2.Y) * 0.5;

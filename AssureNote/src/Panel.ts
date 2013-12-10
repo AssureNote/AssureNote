@@ -149,7 +149,7 @@ module AssureNote {
 			this.AssureNoteApp.PluginPanel.Clear();
 		}
 
-        Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number): void {
+        Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number, Duration?: number): void {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -160,7 +160,22 @@ module AssureNote {
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
             NodeView.SetGlobalPositionCacheEnabled(true);
-			TargetView.UpdateDocumentPosition();
+
+            var CSSAnimationBuffer: string[] = [];
+
+            TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
+
+            var Id = "GSNNodeAnimationDefinition";
+            var StyleElement = document.createElement("style");
+            StyleElement.innerHTML = CSSAnimationBuffer.join("\n");
+            StyleElement.id = Id;
+            StyleElement.type = "text/css"
+            var OldDefinition = document.getElementById(Id);
+            if (OldDefinition) {
+                OldDefinition.parentElement.removeChild(OldDefinition);
+            }
+            document.head.appendChild(StyleElement);
+
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";

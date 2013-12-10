@@ -130,7 +130,7 @@ var AssureNote;
             this.AssureNoteApp.PluginPanel.Clear();
         };
 
-        PictgramPanel.prototype.Draw = function (Label, wx, wy) {
+        PictgramPanel.prototype.Draw = function (Label, wx, wy, Duration) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -141,7 +141,22 @@ var AssureNote;
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
-            TargetView.UpdateDocumentPosition();
+
+            var CSSAnimationBuffer = [];
+
+            TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
+
+            var Id = "GSNNodeAnimationDefinition";
+            var StyleElement = document.createElement("style");
+            StyleElement.innerHTML = CSSAnimationBuffer.join("\n");
+            StyleElement.id = Id;
+            StyleElement.type = "text/css";
+            var OldDefinition = document.getElementById(Id);
+            if (OldDefinition) {
+                OldDefinition.parentElement.removeChild(OldDefinition);
+            }
+            document.head.appendChild(StyleElement);
+
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
