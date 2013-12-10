@@ -189,24 +189,19 @@ class StringReader {
 
 class StringWriter {
 	/*field*/StringBuilder sb;
-
 	StringWriter/*constructor*/() {
 		this.sb = new StringBuilder();
 	}
-
 	void print(String s) {
 		this.sb.append(s);
 	}
-
 	void println(String s) {
 		this.sb.append(s);
 		this.sb.append(Lib.LineFeed);
 	}
-
 	void newline() {
 		this.sb.append(Lib.LineFeed);
 	}
-
 	public String toString() {
 		return this.sb.toString();
 	}
@@ -259,7 +254,6 @@ class GSNHistory {
 }
 
 class WikiSyntax {
-
 	static int ParseInt(String NumText, int DefVal) {
 		try {
 			return Lib.parseInt(NumText);
@@ -267,7 +261,6 @@ class WikiSyntax {
 		}
 		return DefVal;
 	}
-
 	static int ParseGoalLevel(String LabelLine) {
 		/*local*/int GoalLevel = 0;
 		for (/*local*/int i = 0; i < LabelLine.length(); i++) {
@@ -276,7 +269,6 @@ class WikiSyntax {
 		}
 		return GoalLevel;
 	}
-
 	static String FormatGoalLevel(int GoalLevel) {
 		/*local*/StringBuilder sb = new StringBuilder();
 		for (/*local*/int i = 0; i < GoalLevel; i++) {
@@ -284,7 +276,6 @@ class WikiSyntax {
 		}
 		return sb.toString();
 	}
-
 	static GSNType ParseNodeType(String LabelLine) {
 		/*local*/int i;
 		for (i = 0; i < LabelLine.length(); i++) {
@@ -374,11 +365,9 @@ class WikiSyntax {
 		}
 		return null;
 	}
-
 	public static String FormatRefKey(GSNType NodeType, String LabelNumber, String HistoryTriple) {
 		return WikiSyntax.FormatNodeType(NodeType) + LabelNumber + HistoryTriple;
 	}
-
 }
 
 class TagUtils {
@@ -433,7 +422,6 @@ class GSNNode {
 	/*field*/GSNNode ParentNode;
 	/*field*/ArrayList<GSNNode> SubNodeList;
 	/*field*/GSNType NodeType;
-	/*field*/int     _GoalLevel; /* 1: top level */
 	/*field*/String  LabelNumber; /* e.g, G1 G1.1 */
 	/*field*/int     SectionCount;
 	
@@ -445,12 +433,11 @@ class GSNNode {
 	/*field*/byte[]  Digest;
 	/*field*/HashMap<String, String> TagMap;
 
-	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, /*int GoalLevel,*/ GSNType NodeType, String LabelNumber, GSNHistory[] HistoryTriple) {
+	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType, String LabelNumber, GSNHistory[] HistoryTriple) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
-		/*this.GoalLevel   = GoalLevel;*/
 		this.NodeType    = NodeType;
-		this.LabelNumber = LabelNumber;
+		this.LabelNumber = LabelNumber;    // G1.1
 		this.SectionCount = 0;
 		this.SubNodeList = null;
 		if (HistoryTriple != null) {
@@ -515,7 +502,7 @@ class GSNNode {
 		}
 	}
 	
-	int GetGoalLevel() {
+	public int GetGoalLevel() {
 		int GoalCount = 1;
 		GSNNode Node = this.ParentNode;
 		while(Node != null) {
@@ -1240,9 +1227,6 @@ class ParserContext {
 		}
 		if(!Node.IsContext()) {
 			this.LastNonContextNode = Node;			
-		}
-		else {
-			this.LastNonContextNode = null;
 		}
 	}
 	
