@@ -147,7 +147,25 @@ module AssureNote {
 
 		DisplayPictgram(): void {
 			this.AssureNoteApp.PluginPanel.Clear();
-		}
+        }
+
+        private static GSNNodeAnimationDefinitionMaster :HTMLStyleElement;
+
+        private AppendCSSAnimationDefinition(Definitions: string[]) {
+            var Id = "GSNNodeAnimationDefinition";
+            if (PictgramPanel.GSNNodeAnimationDefinitionMaster == null) {
+                PictgramPanel.GSNNodeAnimationDefinitionMaster = document.createElement("style");
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.id = Id;
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.type = "text/css"
+            }
+            var StyleElement = <HTMLStyleElement>PictgramPanel.GSNNodeAnimationDefinitionMaster.cloneNode();
+            StyleElement.innerHTML = Definitions.join("\n");
+            var OldDefinition = document.getElementById(Id);
+            if (OldDefinition) {
+                OldDefinition.parentElement.removeChild(OldDefinition);
+            }
+            document.head.appendChild(StyleElement);
+        }
 
         Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number, Duration?: number): void {
             this.Clear();
@@ -162,19 +180,10 @@ module AssureNote {
             NodeView.SetGlobalPositionCacheEnabled(true);
 
             var CSSAnimationBuffer: string[] = [];
-
             TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
+            this.AppendCSSAnimationDefinition(CSSAnimationBuffer);
 
-            var Id = "GSNNodeAnimationDefinition";
-            var StyleElement = document.createElement("style");
-            StyleElement.innerHTML = CSSAnimationBuffer.join("\n");
-            StyleElement.id = Id;
-            StyleElement.type = "text/css"
-            var OldDefinition = document.getElementById(Id);
-            if (OldDefinition) {
-                OldDefinition.parentElement.removeChild(OldDefinition);
-            }
-            document.head.appendChild(StyleElement);
+            TargetView.ClearAnimationCache();
 
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";

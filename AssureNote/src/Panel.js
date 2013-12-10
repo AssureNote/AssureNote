@@ -130,6 +130,22 @@ var AssureNote;
             this.AssureNoteApp.PluginPanel.Clear();
         };
 
+        PictgramPanel.prototype.AppendCSSAnimationDefinition = function (Definitions) {
+            var Id = "GSNNodeAnimationDefinition";
+            if (PictgramPanel.GSNNodeAnimationDefinitionMaster == null) {
+                PictgramPanel.GSNNodeAnimationDefinitionMaster = document.createElement("style");
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.id = Id;
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.type = "text/css";
+            }
+            var StyleElement = PictgramPanel.GSNNodeAnimationDefinitionMaster.cloneNode();
+            StyleElement.innerHTML = Definitions.join("\n");
+            var OldDefinition = document.getElementById(Id);
+            if (OldDefinition) {
+                OldDefinition.parentElement.removeChild(OldDefinition);
+            }
+            document.head.appendChild(StyleElement);
+        };
+
         PictgramPanel.prototype.Draw = function (Label, wx, wy, Duration) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
@@ -143,19 +159,10 @@ var AssureNote;
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
 
             var CSSAnimationBuffer = [];
-
             TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
+            this.AppendCSSAnimationDefinition(CSSAnimationBuffer);
 
-            var Id = "GSNNodeAnimationDefinition";
-            var StyleElement = document.createElement("style");
-            StyleElement.innerHTML = CSSAnimationBuffer.join("\n");
-            StyleElement.id = Id;
-            StyleElement.type = "text/css";
-            var OldDefinition = document.getElementById(Id);
-            if (OldDefinition) {
-                OldDefinition.parentElement.removeChild(OldDefinition);
-            }
-            document.head.appendChild(StyleElement);
+            TargetView.ClearAnimationCache();
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
