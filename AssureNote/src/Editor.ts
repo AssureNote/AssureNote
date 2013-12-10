@@ -56,7 +56,7 @@ module AssureNote {
 					if (OldNodeMap[Label] != null) {
 						NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
 						NewNodeModel.Created = OldNodeModel.Created;
-						NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
+						//NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
 						if (NewNodeModel.Digest == OldNodeModel.Digest) {
 							NewNodeModel.LastModified = OldNodeModel.LastModified;
 						} else {

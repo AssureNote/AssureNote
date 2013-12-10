@@ -503,8 +503,8 @@ class GSNNode {
 	}
 	
 	public int GetGoalLevel() {
-		int GoalCount = 1;
-		GSNNode Node = this.ParentNode;
+		/*local*/int GoalCount = 1;
+		/*local*/GSNNode Node = this.ParentNode;
 		while(Node != null) {
 			if(Node.IsGoal()) {
 				GoalCount += 1;
@@ -1270,7 +1270,7 @@ class ParserContext {
 //	}
 
 	void SetGoalStackAt(GSNNode Node) {
-		int GoalLevel = Node.GetGoalLevel();
+		/*local*/int GoalLevel = Node.GetGoalLevel();
 //		System.out.println("GoalLevel="+GoalLevel+ ", stack="+this.GoalStackList.size());
 		while (!(GoalLevel - 1 < this.GoalStack.size())) {
 			this.GoalStack.add(null);

@@ -218,34 +218,34 @@ module AssureNote {
 			return P;
 		}
 
-		private SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
-			this.Shape.SetArrowPosition(P1, P2, Dir);
+		private SetArrowPosition(P1: Point, P2: Point, Dir: Direction, Duration?: number) {
+            this.Shape.SetArrowPosition(P1, P2, Dir, Duration);
 		}
 
-        UpdateDocumentPosition(): void {
+        UpdateDocumentPosition(Duration?: number, CSSAnimationBuffer?: string[]): void {
             if (!this.IsVisible) {
                 return
             }
             AssureNoteApp.Assert((this.Shape != null));
             var GlobalPosition = this.GetGlobalPosition();
-            this.Shape.SetPosition(GlobalPosition.X, GlobalPosition.Y);
+            this.Shape.SetPosition(GlobalPosition.X, GlobalPosition.Y, Duration, CSSAnimationBuffer);
+            var P1 = this.GetConnectorPosition(Direction.Bottom, GlobalPosition);
             this.ForEachVisibleChildren((SubNode: NodeView) => {
-                SubNode.UpdateDocumentPosition();
-                var P1 = this.GetConnectorPosition(Direction.Bottom, GlobalPosition);
                 var P2 = SubNode.GetConnectorPosition(Direction.Top, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, Direction.Bottom);
+                SubNode.SetArrowPosition(P1, P2, Direction.Bottom, Duration);
+                SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
             });
+            P1 = this.GetConnectorPosition(Direction.Right, GlobalPosition);
             this.ForEachVisibleRightNodes((SubNode: NodeView) => {
-                SubNode.UpdateDocumentPosition();
-                var P1 = this.GetConnectorPosition(Direction.Right, GlobalPosition);
                 var P2 = SubNode.GetConnectorPosition(Direction.Left, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, Direction.Left);
+                SubNode.SetArrowPosition(P1, P2, Direction.Left, Duration);
+                SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
             });
+            P1 = this.GetConnectorPosition(Direction.Left, GlobalPosition);
             this.ForEachVisibleLeftNodes((SubNode: NodeView) => {
-                SubNode.UpdateDocumentPosition();
-                var P1 = this.GetConnectorPosition(Direction.Left, GlobalPosition);
                 var P2 = SubNode.GetConnectorPosition(Direction.Right, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, Direction.Right);
+                SubNode.SetArrowPosition(P1, P2, Direction.Right, Duration);
+                SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
             });
         }
 
@@ -276,6 +276,36 @@ module AssureNote {
             this.ForEachVisibleSubNode(this.Right, Action);
             this.ForEachVisibleSubNode(this.Children, Action);
         }
+
+        private ForEachSubNode(SubNodes: NodeView[], Action: (NodeView) => void): void {
+            if (SubNodes != null) {
+                for (var i = 0; i < SubNodes.length; i++) {
+                    Action(SubNodes[i]);
+                }
+            }
+        }
+
+        ForEachAllSubNodes(Action: (SubNode: NodeView) => void): void {
+            this.ForEachSubNode(this.Left, Action);
+            this.ForEachSubNode(this.Right, Action);
+            this.ForEachSubNode(this.Children, Action);
+        }
+
+        ClearAnimationCache(Force?: boolean): void {
+            if (Force || !this.IsVisible) {
+                this.GetShape().ClearAnimationCache();
+            }
+            if (Force || this.IsFolded) {
+                this.ForEachAllSubNodes((SubNode: NodeView) => {
+                    SubNode.ClearAnimationCache(true);
+                });
+            }
+            else {
+                this.ForEachAllSubNodes((SubNode: NodeView) => {
+                    SubNode.ClearAnimationCache();
+                });
+            }
+        }
     }
 
     export class Rect {
@@ -297,6 +327,7 @@ module AssureNote {
 		private NodeWidth: number;
         private NodeHeight: number;
         private TreeBoundingBox: Rect;
+        private PreviousTreeTopLeft: Point; // for animation
         private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
@@ -357,6 +388,7 @@ module AssureNote {
         }
 
         SetTreeUpperLeft(X: number, Y: number): void {
+            this.PreviousTreeTopLeft = new Point(this.TreeBoundingBox.X, this.TreeBoundingBox.Y);
             this.TreeBoundingBox.X = X;
             this.TreeBoundingBox.Y = Y;
         }
@@ -402,28 +434,150 @@ module AssureNote {
         FitSizeToContent(): void {
         }
 
-		SetPosition(x: number, y: number): void {
+        static CreateCSSMoveAnimationDefinition(Name: string, FromGX: number, FromGY: number): string {
+            return "@-webkit-keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
+        }
+
+        static CreateCSSFadeInAnimationDefinition(Name: string): string {
+            return "@-webkit-keyframes " + Name + " { 0% { opacity: 0; } }";
+        }
+
+        static CreateSVGMoveAnimateElement(Duration: number, FromGX: number, FromGY: number): SVGElement {
+            var AnimateElement = AssureNoteUtils.CreateSVGElement("animateTransform");
+            AnimateElement.setAttribute("attributeName", "transform");
+            AnimateElement.setAttribute("attributeType", "XML");
+            AnimateElement.setAttribute("type", "translate");
+            AnimateElement.setAttribute("calcMode", "spline");
+            AnimateElement.setAttribute("keyTimes", "0;1");
+            AnimateElement.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+            AnimateElement.setAttribute("restart", "never");
+            AnimateElement.setAttribute("begin", "indefinite");
+            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
+            AnimateElement.setAttribute("repeatCount", "1");
+            AnimateElement.setAttribute("additive", "sum");
+            AnimateElement.setAttribute("from", "" + FromGX + "," + FromGY);
+            AnimateElement.setAttribute("to", "0,0");
+            return AnimateElement;
+        }
+
+        static CreateSVGArrowMoveAnimateElement(Duration: number, OldPath: string, NewPath: string): SVGElement {
+            var AnimateElement = AssureNoteUtils.CreateSVGElement("animate");
+            AnimateElement.setAttribute("attributeName", "d");
+            AnimateElement.setAttribute("attributeType", "XML");
+            AnimateElement.setAttribute("calcMode", "spline");
+            AnimateElement.setAttribute("keyTimes", "0;1");
+            AnimateElement.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+            AnimateElement.setAttribute("restart", "never");
+            AnimateElement.setAttribute("begin", "indefinite");
+            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
+            AnimateElement.setAttribute("repeatCount", "1");
+            if (OldPath) {
+                AnimateElement.setAttribute("from", OldPath);
+                console.log(OldPath);
+            }
+            AnimateElement.setAttribute("to", NewPath);
+            return AnimateElement;
+        }
+
+        static CreateSVGFadeInAnimateElement(Duration: number): SVGElement {
+            var AnimateElement = AssureNoteUtils.CreateSVGElement("animate");
+            AnimateElement.setAttribute("attributeName", "fill-opacity");
+            AnimateElement.setAttribute("attributeType", "XML");
+            AnimateElement.setAttribute("calcMode", "spline");
+            AnimateElement.setAttribute("keyTimes", "0;1");
+            AnimateElement.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+            AnimateElement.setAttribute("restart", "never");
+            AnimateElement.setAttribute("begin", "indefinite");
+            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
+            AnimateElement.setAttribute("repeatCount", "1");
+            AnimateElement.setAttribute("from", "0");
+            AnimateElement.setAttribute("to", "1");
+            return AnimateElement;
+        }
+
+        private GX = null;
+        private GY = null;
+
+        static CSSAnimationDefinitionCount = 0;
+        static GetCSSAnimationID(): number {
+            return GSNShape.CSSAnimationDefinitionCount++;
+        }
+
+        private PreviousAnimateElement: SVGElement = null;
+        private PreviousArrowAnimateElement: SVGElement = null;
+
+        private RemoveAnimateElement(Animate: SVGElement) {
+            if (Animate) {
+                var Parent = Animate.parentNode;
+                if (Parent) {
+                    Parent.removeChild(Animate);
+                }
+            }
+        }
+
+        SetPosition(x: number, y: number, Duration?: number, CSSAnimationBuffer?: string[]): void {
 			if (this.NodeView.IsVisible) {
-                var div = this.Content;//document.getElementById(this.NodeView.Label);
+                var div = this.Content;
 				if (div != null) {
 					div.style.left = x + "px";
-					div.style.top  = y + "px";
+                    div.style.top = y + "px";
+                    if (Duration > 0) {
+                        var AnimationName: string = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
+                        if (this.PreviousAnimateElement) {
+                            this.RemoveAnimateElement(this.PreviousAnimateElement);
+                            this.PreviousAnimateElement = null
+                        }
+                        if (this.GX == null || this.GY == null) {
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition(AnimationName));
+                            this.Content.style["-webkit-animation"] = AnimationName + " " + Duration / 1000 + "s ease-out";
+                            var AnimateElement: any = GSNShape.CreateSVGFadeInAnimateElement(Duration);
+                            this.ShapeGroup.appendChild(AnimateElement);
+                            AnimateElement.beginElement();
+                        } else {
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition(AnimationName, this.GX, this.GY));
+                            this.Content.style["-webkit-animation"] = AnimationName + " " + Duration / 1000 + "s ease-out";
+                            var AnimateElement: any = GSNShape.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
+                            this.ShapeGroup.appendChild(AnimateElement);
+                            AnimateElement.beginElement();
+                        }
+                        this.PreviousAnimateElement = AnimateElement;
+                    }
                 }
                 var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
 			    mat.e = x;
 			    mat.f = y;
-			}
-		}
+            }
+            this.GX = x;
+            this.GY = y;
+        }
+
+        ClearAnimationCache(): void {
+            this.GX = null;
+            this.GY = null;
+            if (this.Content) {
+                this.Content.style["-webkit-animation"] = "";
+            }
+            if (this.PreviousAnimateElement) {
+                this.RemoveAnimateElement(this.PreviousAnimateElement);
+                this.PreviousAnimateElement = null
+            }
+            if (this.PreviousArrowAnimateElement) {
+                this.RemoveAnimateElement(this.PreviousArrowAnimateElement);
+                this.PreviousArrowAnimateElement = null
+            }
+        }
 
 		PrerenderSVGContent(): void {
             this.ShapeGroup = AssureNoteUtils.CreateSVGElement("g");
 			this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ArrowPath = GSNShape.CreateArrowPath();
-		}
+        }
 
-		SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
+        private OldArrowPath: string;
+
+        SetArrowPosition(P1: Point, P2: Point, Dir: Direction, Duration?: number) {
 			var start = <SVGPathSegMovetoAbs>this.ArrowPath.pathSegList.getItem(0);
-			var curve = <SVGPathSegCurvetoCubicAbs>this.ArrowPath.pathSegList.getItem(1);
+            var curve = <SVGPathSegCurvetoCubicAbs>this.ArrowPath.pathSegList.getItem(1);
 			start.x = P1.X;
 			start.y = P1.Y;
 			curve.x = P2.X;
@@ -435,8 +589,8 @@ module AssureNote {
                 curve.x2 = (9 * P2.X + P1.X) / 10;
                 curve.y2 = P1.Y;
                 if (DiffX > 300) {
-                    curve.x1 = P1.X - 30 * (P1.X - P2.X < 0 ? -1 : 1);
-                    curve.x2 = P2.X + 30 * (P1.X - P2.X < 0 ? -1 : 1);
+                    curve.x1 = P1.X - 10 * (P1.X - P2.X < 0 ? -1 : 1);
+                    curve.x2 = P2.X + 10 * (P1.X - P2.X < 0 ? -1 : 1);
                 }
                 if (DiffX < 50) {
                     curve.y1 = curve.y2 = (P1.Y + P2.Y) * 0.5;
@@ -446,7 +600,25 @@ module AssureNote {
 				curve.y1 = (9 * P1.Y + P2.Y) / 10;
 				curve.x2 = (P1.X + P2.X) / 2;
 				curve.y2 = (9 * P2.Y + P1.Y) / 10;
-			}
+            }
+            if (Duration > 0) {
+                
+                var NewPath = this.ArrowPath.getAttribute("d");
+                if (this.PreviousArrowAnimateElement) {
+                    this.RemoveAnimateElement(this.PreviousArrowAnimateElement);
+                    this.PreviousArrowAnimateElement = null
+                }
+                if (this.GX == null || this.GY == null) {
+                    var AnimateElement: any = GSNShape.CreateSVGFadeInAnimateElement(Duration);
+                } else {
+                    var AnimateElement: any = GSNShape.CreateSVGArrowMoveAnimateElement(Duration, this.OldArrowPath, NewPath);
+                }
+
+                this.ArrowPath.appendChild(AnimateElement);
+                AnimateElement.beginElement();
+                this.PreviousArrowAnimateElement = AnimateElement;
+                this.OldArrowPath = NewPath;
+            }
 		}
 
 		SetArrowColorWhite(IsWhite: boolean) {
