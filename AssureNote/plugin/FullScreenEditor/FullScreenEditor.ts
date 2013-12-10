@@ -28,6 +28,10 @@ module AssureNote {
 			var event = document.createEvent("UIEvents");
 			var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
 			if (TargetView != null) {
+				if (TargetView.GetNodeType() == GSNType.Strategy) {
+					AssureNoteApp.DebugP("Strategy " + Label+ " cannot open FullScreenEditor.");
+					return;
+				}
 				var Writer = new StringWriter();
 				TargetView.Model.FormatSubNode(1, Writer);
 				this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
@@ -37,6 +41,9 @@ module AssureNote {
 		}
 
 		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
+			if (NodeView.GetNodeType() == GSNType.Strategy) {
+				return null;
+			}
 			return new MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor",
 				(event: Event, TargetView: NodeView) => {
 					var Writer = new StringWriter();

@@ -66,7 +66,7 @@ var AssureNote;
         };
 
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            if (NodeView.GetNodeType() != GSNType.Goal) {
+            if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
                 return null;
             }
             return new AssureNote.MenuBarButton("folded-id", "images/copy.png", "fold", this.FoldingAction);
