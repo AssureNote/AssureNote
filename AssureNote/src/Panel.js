@@ -134,7 +134,23 @@ var AssureNote;
             this.AssureNoteApp.PluginPanel.Clear();
         };
 
-        PictgramPanel.prototype.Draw = function (Label, wx, wy) {
+        PictgramPanel.prototype.AppendCSSAnimationDefinition = function (Definitions) {
+            var Id = "GSNNodeAnimationDefinition";
+            if (PictgramPanel.GSNNodeAnimationDefinitionMaster == null) {
+                PictgramPanel.GSNNodeAnimationDefinitionMaster = document.createElement("style");
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.id = Id;
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.type = "text/css";
+            }
+            var StyleElement = PictgramPanel.GSNNodeAnimationDefinitionMaster.cloneNode();
+            StyleElement.innerHTML = Definitions.join("\n");
+            var OldDefinition = document.getElementById(Id);
+            if (OldDefinition) {
+                OldDefinition.parentElement.removeChild(OldDefinition);
+            }
+            document.head.appendChild(StyleElement);
+        };
+
+        PictgramPanel.prototype.Draw = function (Label, wx, wy, Duration) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -145,7 +161,13 @@ var AssureNote;
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
-            TargetView.UpdateDocumentPosition();
+
+            var CSSAnimationBuffer = [];
+            TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
+            this.AppendCSSAnimationDefinition(CSSAnimationBuffer);
+
+            TargetView.ClearAnimationCache();
+
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";

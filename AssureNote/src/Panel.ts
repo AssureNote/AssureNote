@@ -151,9 +151,27 @@ module AssureNote {
 
 		DisplayPictgram(): void {
 			this.AssureNoteApp.PluginPanel.Clear();
-		}
+        }
 
-        Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number): void {
+        private static GSNNodeAnimationDefinitionMaster :HTMLStyleElement;
+
+        private AppendCSSAnimationDefinition(Definitions: string[]) {
+            var Id = "GSNNodeAnimationDefinition";
+            if (PictgramPanel.GSNNodeAnimationDefinitionMaster == null) {
+                PictgramPanel.GSNNodeAnimationDefinitionMaster = document.createElement("style");
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.id = Id;
+                PictgramPanel.GSNNodeAnimationDefinitionMaster.type = "text/css"
+            }
+            var StyleElement = <HTMLStyleElement>PictgramPanel.GSNNodeAnimationDefinitionMaster.cloneNode();
+            StyleElement.innerHTML = Definitions.join("\n");
+            var OldDefinition = document.getElementById(Id);
+            if (OldDefinition) {
+                OldDefinition.parentElement.removeChild(OldDefinition);
+            }
+            document.head.appendChild(StyleElement);
+        }
+
+        Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number, Duration?: number): void {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -164,7 +182,13 @@ module AssureNote {
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
             NodeView.SetGlobalPositionCacheEnabled(true);
-			TargetView.UpdateDocumentPosition();
+
+            var CSSAnimationBuffer: string[] = [];
+            TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
+            this.AppendCSSAnimationDefinition(CSSAnimationBuffer);
+
+            TargetView.ClearAnimationCache();
+
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
