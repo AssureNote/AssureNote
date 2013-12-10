@@ -18,6 +18,11 @@ var AssureNote;
     })();
     AssureNote.LayoutEngine = LayoutEngine;
 
+    AssureNote.DefaultMargin = 32;
+    AssureNote.ContextMargin = 10;
+    AssureNote.LevelMargin = 64;
+    AssureNote.TreeMargin = 12;
+
     var SimpleLayoutEngine = (function (_super) {
         __extends(SimpleLayoutEngine, _super);
         function SimpleLayoutEngine(AssureNoteApp) {
@@ -71,13 +76,13 @@ var AssureNote;
             var TreeHeight = this.GetNodeHeight(ThisNode);
             if (ThisNode.Left != null) {
                 var OffsetX = 0;
-                var OffsetY = -SimpleLayoutEngine.ContextMargin;
+                var OffsetY = -AssureNote.ContextMargin;
                 ThisNode.ForEachVisibleLeftNodes(function (SubNode) {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += SimpleLayoutEngine.ContextMargin;
-                    SubNode.RelativeX = -(_this.GetNodeWidth(SubNode) + SimpleLayoutEngine.DefaultMargin);
+                    OffsetY += AssureNote.ContextMargin;
+                    SubNode.RelativeX = -(_this.GetNodeWidth(SubNode) + AssureNote.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, _this.GetNodeWidth(SubNode) + SimpleLayoutEngine.DefaultMargin);
+                    OffsetX = Math.max(0, _this.GetNodeWidth(SubNode) + AssureNote.DefaultMargin);
                     OffsetY += _this.GetNodeHeight(SubNode);
                 });
                 if (OffsetY > 0) {
@@ -90,13 +95,13 @@ var AssureNote;
             }
             if (ThisNode.Right != null) {
                 var OffsetX = 0;
-                var OffsetY = -SimpleLayoutEngine.ContextMargin;
+                var OffsetY = -AssureNote.ContextMargin;
                 ThisNode.ForEachVisibleRightNodes(function (SubNode) {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += SimpleLayoutEngine.ContextMargin;
-                    SubNode.RelativeX = (_this.GetNodeWidth(ThisNode) + SimpleLayoutEngine.DefaultMargin);
+                    OffsetY += AssureNote.ContextMargin;
+                    SubNode.RelativeX = (_this.GetNodeWidth(ThisNode) + AssureNote.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, SimpleLayoutEngine.DefaultMargin + _this.GetNodeWidth(SubNode));
+                    OffsetX = Math.max(0, AssureNote.DefaultMargin + _this.GetNodeWidth(SubNode));
                     OffsetY += _this.GetNodeHeight(SubNode);
                 });
                 if (OffsetY > 0) {
@@ -106,8 +111,12 @@ var AssureNote;
                     }
                 }
             }
+<<<<<<< HEAD
             TreeHeight += SimpleLayoutEngine.LevelMargin;
 
+=======
+            TreeHeight += AssureNote.LevelMargin;
+>>>>>>> parent of e436183... move mergen constants to static field
             var ChildrenWidth = 0;
             var ChildrenHeight = 0;
             var VisibleChildCount = 0;
@@ -118,6 +127,10 @@ var AssureNote;
                     _this.Layout(SubNode);
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     SubNode.RelativeY = TreeHeight;
+<<<<<<< HEAD
+=======
+                    ChildrenWidth += ChildTreeWidth + AssureNote.TreeMargin;
+>>>>>>> parent of e436183... move mergen constants to static field
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     var ChildNodeWidth = SubNode.Shape.GetNodeWidth();
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
@@ -144,7 +157,12 @@ var AssureNote;
                     }
                     VisibleChildCount++;
                 });
+<<<<<<< HEAD
                 ChildrenWidth = Math.max(TopRightX, BottomRightX);
+=======
+                ChildrenWidth -= AssureNote.TreeMargin;
+
+>>>>>>> parent of e436183... move mergen constants to static field
                 var HeadWidth = VisibleChildCount == 1 ? TreeWidth : this.GetNodeWidth(ThisNode);
                 var Shift = (ChildrenWidth - this.GetNodeWidth(ThisNode)) / 2;
                 TreeLeftX = Math.min(TreeLeftX, -Shift);
@@ -219,10 +237,6 @@ var AssureNote;
             Shape.SetTreeSize(Math.max(ChildrenWidth, TreeWidth + -TreeLeftX), TreeHeight + ChildrenHeight);
             console.log(ThisNode.Label + ": " + (ThisNode.Shape).TreeBoundingBox.toString());
         };
-        SimpleLayoutEngine.DefaultMargin = 32;
-        SimpleLayoutEngine.ContextMargin = 10;
-        SimpleLayoutEngine.LevelMargin = 64;
-        SimpleLayoutEngine.TreeMargin = 12;
         return SimpleLayoutEngine;
     })(LayoutEngine);
     AssureNote.SimpleLayoutEngine = SimpleLayoutEngine;
