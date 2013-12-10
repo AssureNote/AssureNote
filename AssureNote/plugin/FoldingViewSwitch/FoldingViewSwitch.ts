@@ -5,13 +5,27 @@
 module AssureNote {
 	export class FoldingViewSwitchPlugin extends Plugin {
 		FoldingAction: (event: Event, TargetView: NodeView) => void;
+		StrategyFoldingFlag: boolean;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			super();
 			this.HasMenuBarButton = true;
+			this.StrategyFoldingFlag = false;
 
 			this.FoldingAction = (event: Event, TargetView: NodeView) => {
-				TargetView.IsFolded = TargetView.IsFolded != true;
+				if (TargetView.GetNodeType() == GSNType.Strategy) {
+					if (TargetView.Children != null) {
+						this.StrategyFoldingFlag = this.StrategyFoldingFlag != true;
+						for (var i = 0; i < TargetView.Children.length; i++) {
+							var SubView = TargetView.Children[i];
+							if (SubView.GetNodeType() == GSNType.Goal) {
+								SubView.IsFolded = this.StrategyFoldingFlag;
+							}
+						}
+					}
+				} else {
+					TargetView.IsFolded = TargetView.IsFolded != true;
+				}
 				var TopGoalView = TargetView;
 				while (TopGoalView.Parent != null) {
 					TopGoalView = TopGoalView.Parent;
@@ -37,8 +51,9 @@ module AssureNote {
 			var event = document.createEvent("UIEvents");
 			var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
 			if (TargetView != null) {
-				if(TargetView.GetNodeType() != GSNType.Goal) {
-					AssureNoteApp.DebugP("Only type 'Goal' can be allowed to fold.");
+				var TargetType = TargetView.GetNodeType();
+				if (TargetType != GSNType.Goal && TargetType != GSNType.Strategy) {
+					AssureNoteApp.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
 					return;
 				}
 				this.FoldingAction(event, TargetView);

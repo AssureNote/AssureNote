@@ -104,6 +104,32 @@ var AssureNote;
                     AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
                 }
             };
+
+            this.FunctionMap["unfoldAll"] = function (AssureNoteApp, Args) {
+                var TopView = AssureNoteApp.PictgramPanel.MasterView;
+                var unfoldAll = function (TargetView) {
+                    TargetView.IsFolded = false;
+                    TargetView.ForEachVisibleChildren(function (SubNode) {
+                        unfoldAll(SubNode);
+                    });
+                };
+                unfoldAll(TopView);
+                AssureNoteApp.PictgramPanel.Draw();
+            };
+
+            this.FunctionMap["set"] = function (AssureNoteApp, Args) {
+                if (Args.length > 2) {
+                    switch (Args[0]) {
+                        case "color":
+                            var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
+                            if (Node != null) {
+                                console.log(Args);
+                                $("#" + Args[1] + " h4").css("background-color", Args[2]);
+                            }
+                            break;
+                    }
+                }
+            };
         }
         CommandLineBuiltinFunctions.prototype.GetFunction = function (Key) {
             //FIXME

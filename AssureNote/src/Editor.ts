@@ -4,10 +4,8 @@
 module AssureNote {
 	export class EditorUtil {
 		Element: JQuery;
-		StopEventFlag: boolean;
 
 		constructor(public AssureNoteApp: AssureNoteApp, public TextArea: CodeMirror.Editor, public Selector: string, public CSS: any) {
-			this.StopEventFlag = false;
             $(this.TextArea.getWrapperElement()).css({
                 height: "100%",
                 width: "100%",
@@ -27,14 +25,9 @@ module AssureNote {
 			this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", (e: JQueryEventObject) => {
 				this.TextArea.focus();
-                //this.AssureNoteApp.DebugP("editor");
-                //this.AssureNoteApp.DebugP(e.keyCode);
                 if (e.keyCode == 27 /* Esc */) {
 					e.stopPropagation();
-					if (!this.StopEventFlag) {
-						this.StopEventFlag = true;
-						this.Element.blur();
-					}
+					this.Element.blur();
                 }
             }).on("blur", (e: JQueryEventObject) => {
 				e.stopPropagation();
@@ -137,7 +130,7 @@ module AssureNote {
             setTimeout(() => {
                 this.Element.removeClass();
 				this.Element.css({ display: "none" });
-				this.StopEventFlag = false;
+				//this.StopEventFlag = false;
             }, 1300);
             return null;
         }
