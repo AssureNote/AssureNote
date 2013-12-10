@@ -472,8 +472,10 @@ var AssureNote;
             AnimateElement.setAttribute("begin", "indefinite");
             AnimateElement.setAttribute("dur", Duration.toString() + "ms");
             AnimateElement.setAttribute("repeatCount", "1");
-
-            //AnimateElement.setAttribute("from", OldPath);
+            if (OldPath) {
+                AnimateElement.setAttribute("from", OldPath);
+                console.log(OldPath);
+            }
             AnimateElement.setAttribute("to", NewPath);
             return AnimateElement;
         };
@@ -498,6 +500,15 @@ var AssureNote;
             return GSNShape.CSSAnimationDefinitionCount++;
         };
 
+        GSNShape.prototype.RemoveAnimateElement = function (Animate) {
+            if (Animate) {
+                var Parent = Animate.parentNode;
+                if (Parent) {
+                    Parent.removeChild(Animate);
+                }
+            }
+        };
+
         GSNShape.prototype.SetPosition = function (x, y, Duration, CSSAnimationBuffer) {
             if (this.NodeView.IsVisible) {
                 var div = this.Content;
@@ -506,7 +517,10 @@ var AssureNote;
                     div.style.top = y + "px";
                     if (Duration > 0) {
                         var AnimationName = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
-
+                        if (this.PreviousAnimateElement) {
+                            this.RemoveAnimateElement(this.PreviousAnimateElement);
+                            this.PreviousAnimateElement = null;
+                        }
                         if (this.GX == null || this.GY == null) {
                             CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition(AnimationName));
                             this.Content.style["-webkit-animation"] = AnimationName + " " + Duration / 1000 + "s ease-out";
@@ -537,14 +551,14 @@ var AssureNote;
             if (this.Content) {
                 this.Content.style["-webkit-animation"] = "";
             }
-            //if (this.PreviousAnimateElement) {
-            //    this.ShapeGroup.removeChild(this.PreviousAnimateElement);
-            //    this.PreviousAnimateElement = null;
-            //}
-            //if (this.PreviousArrowAnimateElement) {
-            //    this.ArrowPath.removeChild(this.PreviousArrowAnimateElement);
-            //    this.PreviousArrowAnimateElement = null;
-            //}
+            if (this.PreviousAnimateElement) {
+                this.RemoveAnimateElement(this.PreviousAnimateElement);
+                this.PreviousAnimateElement = null;
+            }
+            if (this.PreviousArrowAnimateElement) {
+                this.RemoveAnimateElement(this.PreviousArrowAnimateElement);
+                this.PreviousArrowAnimateElement = null;
+            }
         };
 
         GSNShape.prototype.PrerenderSVGContent = function () {
@@ -554,11 +568,6 @@ var AssureNote;
         };
 
         GSNShape.prototype.SetArrowPosition = function (P1, P2, Dir, Duration) {
-            if (Duration > 0) {
-                if (this.GX == null || this.GY == null) {
-                }
-                var OldPath = this.ArrowPath.getAttribute("d");
-            }
             var start = this.ArrowPath.pathSegList.getItem(0);
             var curve = this.ArrowPath.pathSegList.getItem(1);
             start.x = P1.X;
@@ -588,15 +597,15 @@ var AssureNote;
                 if (this.GX == null || this.GY == null) {
                 }
                 var NewPath = this.ArrowPath.getAttribute("d");
-
-                //if (this.PreviousArrowAnimateElement) {
-                //    this.ArrowPath.removeChild(this.PreviousArrowAnimateElement);
-                //    this.PreviousArrowAnimateElement = null;
-                //}
-                var AnimateElement = GSNShape.CreateSVGArrowMoveAnimateElement(Duration, OldPath, NewPath);
+                if (this.PreviousArrowAnimateElement) {
+                    this.RemoveAnimateElement(this.PreviousArrowAnimateElement);
+                    this.PreviousArrowAnimateElement = null;
+                }
+                var AnimateElement = GSNShape.CreateSVGArrowMoveAnimateElement(Duration, this.OldArrowPath, NewPath);
                 this.ArrowPath.appendChild(AnimateElement);
                 AnimateElement.beginElement();
                 this.PreviousArrowAnimateElement = AnimateElement;
+                this.OldArrowPath = NewPath;
             }
         };
 
