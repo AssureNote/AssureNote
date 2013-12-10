@@ -82,6 +82,10 @@ var AssureNote;
                 Plugin.ExecCommand(this, ParsedCommand.GetArgs());
             } else {
                 var Label = Method.toUpperCase();
+                if (this.PictgramPanel.ViewMap == null) {
+                    this.DebugP("Jump is diabled.");
+                    return;
+                }
                 var Node = this.PictgramPanel.ViewMap[Label];
                 if (Node != null) {
                     if ($("#" + Label).length > 0) {

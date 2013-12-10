@@ -61,6 +61,10 @@ var AssureNote;
                 }
 
                 switch (event.keyCode) {
+                    case 58:
+                        if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
+                            break;
+                        }
                     case 186:
                         _this.CmdLine.Show();
                         break;
