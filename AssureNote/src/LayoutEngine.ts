@@ -117,7 +117,40 @@ module AssureNote {
                     VisibleChildCount++;
                 });
                 ChildrenWidth -= SimpleLayoutEngine.TreeMargin;
-
+                // FIXME: compaction algorithm
+                //for (var i = 0; i < ThisNode.Children.length - 1; i++) {
+                //    var LeftSubNode = ThisNode.Children[i];
+                //    var RightSubNode = ThisNode.Children[i + 1];
+                //    if (LeftSubNode.IsFolded == RightSubNode.IsFolded) {
+                //        continue;
+                //    }
+                //    if (LeftSubNode.IsFolded) {
+                //        var W = RightSubNode.GetShape().GetNodeWidth();
+                //        if (RightSubNode.Left != null) {
+                //            W = W * 1.5 + SimpleLayoutEngine.ContextMargin;
+                //        } else {
+                //            W += SimpleLayoutEngine.ContextMargin;
+                //        }
+                //        var Shift = RightSubNode.GetShape().GetTreeWidth() / 2 - W;
+                //        for (var j = i + 1; j < ThisNode.Children.length; j++) {
+                //            ThisNode.Children[j].RelativeX -= Shift;
+                //        }
+                //        //ChildrenWidth -= Shift;
+                //    }
+                //    if (RightSubNode.IsFolded) {
+                //        var W = LeftSubNode.GetShape().GetNodeWidth();
+                //        if (LeftSubNode.Right != null) {
+                //            W = W * 1.5 + SimpleLayoutEngine.ContextMargin;
+                //        } else {
+                //            W += SimpleLayoutEngine.ContextMargin;
+                //        }
+                //        var Shift = RightSubNode.GetShape().GetTreeWidth() / 2 - W;
+                //        for (var j = i + 1; j < ThisNode.Children.length; j++) {
+                //            ThisNode.Children[j].RelativeX += Shift;
+                //        }
+                //        //ChildrenWidth -= Shift;
+                //    }
+                //}
                 var HeadWidth = VisibleChildCount == 1 ? TreeWidth : this.GetNodeWidth(ThisNode);
                 var Shift = (ChildrenWidth - this.GetNodeWidth(ThisNode)) / 2;
                 TreeLeftX = Math.min(TreeLeftX, -Shift);
