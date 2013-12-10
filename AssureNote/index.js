@@ -594,14 +594,17 @@ var AssureNote;
                 curve.y2 = (9 * P2.Y + P1.Y) / 10;
             }
             if (Duration > 0) {
-                if (this.GX == null || this.GY == null) {
-                }
                 var NewPath = this.ArrowPath.getAttribute("d");
                 if (this.PreviousArrowAnimateElement) {
                     this.RemoveAnimateElement(this.PreviousArrowAnimateElement);
                     this.PreviousArrowAnimateElement = null;
                 }
-                var AnimateElement = GSNShape.CreateSVGArrowMoveAnimateElement(Duration, this.OldArrowPath, NewPath);
+                if (this.GX == null || this.GY == null) {
+                    var AnimateElement = GSNShape.CreateSVGFadeInAnimateElement(Duration);
+                } else {
+                    var AnimateElement = GSNShape.CreateSVGArrowMoveAnimateElement(Duration, this.OldArrowPath, NewPath);
+                }
+
                 this.ArrowPath.appendChild(AnimateElement);
                 AnimateElement.beginElement();
                 this.PreviousArrowAnimateElement = AnimateElement;
