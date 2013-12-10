@@ -571,6 +571,28 @@ class GSNNode {
 		this.SetContent(new StringReader(TextDoc).GetLineList(true/*UntilSection*/));
 	}
 	
+	void GetHtmlContent() {
+		if(this.Digest != null) {
+			/*local*/StringReader Reader = new StringReader(this.NodeDoc);
+			/*local*/StringWriter Writer = new StringWriter();
+			/*loca;*/String Paragraph = "";
+			while(Reader.HasNext()) {
+				/*local*/String Line = Reader.ReadLine();
+				Paragraph += Line;
+				if(Line.length() == 0 && Paragraph.length() > 0) {
+					Writer.println("<p>" + Paragraph + "</p>");
+					continue;
+				}
+				/*local*/int Loc = Line.indexOf("::");
+				if(Loc > 0) {
+					Writer.println("<p class='tag'>" + Line + "</p>");
+					continue;
+				}
+			}
+		}
+	}
+
+	
 	ArrayList<GSNNode> GetNodeHistoryList() {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
 		/*local*/GSNNode LastNode = null;
