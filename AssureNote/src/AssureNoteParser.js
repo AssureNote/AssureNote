@@ -101,16 +101,13 @@ var StringWriter = (function () {
     StringWriter.prototype.print = function (s) {
         this.sb.append(s);
     };
-
     StringWriter.prototype.println = function (s) {
         this.sb.append(s);
         this.sb.append(Lib.LineFeed);
     };
-
     StringWriter.prototype.newline = function () {
         this.sb.append(Lib.LineFeed);
     };
-
     StringWriter.prototype.toString = function () {
         return this.sb.toString();
     };
@@ -170,7 +167,6 @@ var WikiSyntax = (function () {
         }
         return DefVal;
     };
-
     WikiSyntax.ParseGoalLevel = function (LabelLine) {
         var GoalLevel = 0;
         for (var i = 0; i < LabelLine.length; i++) {
@@ -180,7 +176,6 @@ var WikiSyntax = (function () {
         }
         return GoalLevel;
     };
-
     WikiSyntax.FormatGoalLevel = function (GoalLevel) {
         var sb = new StringBuilder();
         for (var i = 0; i < GoalLevel; i++) {
@@ -188,7 +183,6 @@ var WikiSyntax = (function () {
         }
         return sb.toString();
     };
-
     WikiSyntax.ParseNodeType = function (LabelLine) {
         var i;
         for (i = 0; i < LabelLine.length; i++) {
@@ -204,14 +198,14 @@ var WikiSyntax = (function () {
             if (ch == 71) {
                 return GSNType.Goal;
             }
-            if (ch == 67) {
-                return GSNType.Context;
-            }
-            if (ch == 69) {
-                return GSNType.Evidence;
-            }
             if (ch == 83) {
                 return GSNType.Strategy;
+            }
+            if (ch == 69 || ch == 77 || ch == 65) {
+                return GSNType.Evidence;
+            }
+            if (ch == 67 || ch == 74 || ch == 82) {
+                return GSNType.Context;
             }
         }
         return GSNType.Undefined;
@@ -279,7 +273,6 @@ var WikiSyntax = (function () {
         }
         return null;
     };
-
     WikiSyntax.FormatRefKey = function (NodeType, LabelNumber, HistoryTriple) {
         return WikiSyntax.FormatNodeType(NodeType) + LabelNumber + HistoryTriple;
     };
@@ -337,10 +330,9 @@ var TagUtils = (function () {
 })();
 
 var GSNNode = (function () {
-    function GSNNode(BaseDoc, ParentNode, GoalLevel, NodeType, LabelNumber, HistoryTriple) {
+    function GSNNode(BaseDoc, ParentNode, NodeType, LabelNumber, HistoryTriple) {
         this.BaseDoc = BaseDoc;
         this.ParentNode = ParentNode;
-        this.GoalLevel = GoalLevel;
         this.NodeType = NodeType;
         this.LabelNumber = LabelNumber;
         this.SectionCount = 0;
@@ -363,8 +355,8 @@ var GSNNode = (function () {
             ParentNode.AppendSubNode(this);
         }
     }
-    GSNNode.prototype.Duplicate = function (BaseDoc, ParentNode) {
-        var NewNode = new GSNNode(BaseDoc, ParentNode, this.GoalLevel, this.NodeType, this.LabelNumber, null);
+    GSNNode.prototype.DeepCopy = function (BaseDoc, ParentNode) {
+        var NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelNumber, null);
         NewNode.Created = this.Created;
         NewNode.LastModified = this.LastModified;
         NewNode.Digest = this.Digest;
@@ -375,7 +367,7 @@ var GSNNode = (function () {
         }
         for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
             var Node = this.NonNullSubNodeList().get(i);
-            Node.Duplicate(BaseDoc, NewNode);
+            Node.DeepCopy(BaseDoc, NewNode);
         }
         return NewNode;
     };
@@ -403,6 +395,18 @@ var GSNNode = (function () {
             var Node = this.NonNullSubNodeList().get(i);
             Node.Remap(NodeMap);
         }
+    };
+
+    GSNNode.prototype.GetGoalLevel = function () {
+        var GoalCount = 1;
+        var Node = this.ParentNode;
+        while (Node != null) {
+            if (Node.IsGoal()) {
+                GoalCount += 1;
+            }
+            Node = Node.ParentNode;
+        }
+        return GoalCount;
     };
 
     GSNNode.prototype.GetLabel = function () {
@@ -533,13 +537,13 @@ var GSNNode = (function () {
             }
         }
         if (NodeType == GSNType.Strategy && Creation) {
-            return new GSNNode(this.BaseDoc, this, this.GoalLevel, GSNType.Strategy, this.LabelNumber, null);
+            return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelNumber, null);
         }
         return null;
     };
 
     GSNNode.prototype.FormatNode = function (RefMap, Writer) {
-        Writer.print(WikiSyntax.FormatGoalLevel(this.GoalLevel));
+        Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
         Writer.print(" ");
         Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
         Writer.print(this.LabelNumber);
@@ -751,13 +755,13 @@ var GSNDoc = (function () {
         this.DocHistory = null;
         this.GoalCount = 0;
     }
-    GSNDoc.prototype.Duplicate = function (Author, Role, Date, Process) {
+    GSNDoc.prototype.DeepCopy = function (Author, Role, Date, Process) {
         var NewDoc = new GSNDoc(this.Record);
         NewDoc.GoalCount = this.GoalCount;
         NewDoc.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, NewDoc);
         NewDoc.DocTagMap = this.DuplicateTagMap(this.DocTagMap);
         if (this.TopGoal != null) {
-            NewDoc.TopGoal = this.TopGoal.Duplicate(NewDoc, null);
+            NewDoc.TopGoal = this.TopGoal.DeepCopy(NewDoc, null);
         }
         return NewDoc;
     };
@@ -810,7 +814,7 @@ var GSNDoc = (function () {
         }
         this.NodeMap.put(Key, Node);
         if (Node.NodeType == GSNType.Goal) {
-            if (Node.GoalLevel == 1) {
+            if (Node.GetGoalLevel() == 1) {
                 this.TopGoal = Node;
             }
             var num = WikiSyntax.ParseInt(Node.LabelNumber, 0);
@@ -872,7 +876,7 @@ var GSNRecord = (function () {
         this.HistoryList = new Array();
         this.EditingDoc = null;
     }
-    GSNRecord.prototype.Duplicate = function () {
+    GSNRecord.prototype.DeepCopy = function () {
         var NewRecord = new GSNRecord();
         for (var i = 0; i < this.HistoryList.size(); i++) {
             var Item = this.HistoryList.get(i);
@@ -949,7 +953,7 @@ var GSNRecord = (function () {
         if (this.EditingDoc == null) {
             var Doc = this.GetLatestDoc();
             if (Doc != null) {
-                this.EditingDoc = Doc.Duplicate(Author, Role, Date, Process);
+                this.EditingDoc = Doc.DeepCopy(Author, Role, Date, Process);
             } else {
                 this.EditingDoc = new GSNDoc(this);
                 this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
@@ -977,7 +981,7 @@ var GSNRecord = (function () {
         } else if (CommonHistory == this.HistoryList.size() - 1) {
             this.MergeAsFastFoward(NewRecord);
         } else {
-            var Record1 = this.Duplicate();
+            var Record1 = this.DeepCopy();
             //			MergeAsIncrementalAddition
         }
     };
@@ -1083,13 +1087,13 @@ var GSNRecord = (function () {
 var ParserContext = (function () {
     function ParserContext(NullableDoc, ParentNode) {
         if (ParentNode == null) {
-            ParentNode = new GSNNode(NullableDoc, null, 0, GSNType.Goal, null, null);
+            ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
         }
         this.NullableDoc = NullableDoc;
         this.FirstNode = null;
         this.LastGoalNode = null;
         this.LastNonContextNode = null;
-        this.GoalStackList = new Array();
+        this.GoalStack = new Array();
         this.SetLastNode(ParentNode);
     }
     ParserContext.prototype.SetLastNode = function (Node) {
@@ -1099,14 +1103,12 @@ var ParserContext = (function () {
         }
         if (!Node.IsContext()) {
             this.LastNonContextNode = Node;
-        } else {
-            this.LastNonContextNode = null;
         }
     };
 
-    ParserContext.prototype.GetParentNodeOfGoal = function (Level) {
-        if (Level - 1 < this.GoalStackList.size()) {
-            var ParentGoal = this.GoalStackList.get(Level - 1);
+    ParserContext.prototype.GetStrategyOfGoal = function (Level) {
+        if (Level - 1 < this.GoalStack.size()) {
+            var ParentGoal = this.GoalStack.get(Level - 1);
             if (ParentGoal != null) {
                 return ParentGoal.GetLastNode(GSNType.Strategy, true);
             }
@@ -1114,29 +1116,30 @@ var ParserContext = (function () {
         return null;
     };
 
-    ParserContext.prototype.GetGoalStackAt = function (Level) {
-        if (Level < this.GoalStackList.size()) {
-            return this.GoalStackList.get(Level);
-        }
-        return null;
-    };
-
+    //	GSNNode GetGoalStackAt(int Level) {
+    //		if (Level - 1 < this.GoalStack.size()) {
+    //			return this.GoalStack.get(Level-1);
+    //		}
+    //		return null;
+    //	}
     ParserContext.prototype.SetGoalStackAt = function (Node) {
-        while (this.GoalStackList.size() < Node.GoalLevel + 1) {
-            this.GoalStackList.add(null);
+        var GoalLevel = Node.GetGoalLevel();
+
+        while (!(GoalLevel - 1 < this.GoalStack.size())) {
+            this.GoalStack.add(null);
         }
-        this.GoalStackList.set(Node.GoalLevel, Node);
+        this.GoalStack.set(GoalLevel - 1, Node);
     };
 
     ParserContext.prototype.IsValidSection = function (Line, Reader) {
         var NodeType = WikiSyntax.ParseNodeType(Line);
         if (NodeType == GSNType.Goal) {
             var Level = WikiSyntax.ParseGoalLevel(Line);
-            var ParentNode = this.GetParentNodeOfGoal(Level);
+            var ParentNode = this.GetStrategyOfGoal(Level);
             if (ParentNode != null) {
                 return true;
             }
-            Reader.LogError("Mismatched goal level < " + (this.GoalStackList.size() + 2), Line);
+            Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
             return false;
         }
         if (NodeType == GSNType.Context) {
@@ -1178,19 +1181,17 @@ var ParserContext = (function () {
         var HistoryTriple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
         var Level = WikiSyntax.ParseGoalLevel(LabelLine);
         if (NodeType == GSNType.Goal) {
-            ParentNode = this.GetParentNodeOfGoal(Level);
+            ParentNode = this.GetStrategyOfGoal(Level);
         } else {
             ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.LastGoalNode;
-
             //			if(ParentNode.GoalLevel != Level) {
             //				Reader.LogError("mismatched level", Line);
             //			}
-            Level = ParentNode.GoalLevel;
         }
         if (this.NullableDoc != null) {
             LabelNumber = this.NullableDoc.CheckLabelNumber(ParentNode, NodeType, LabelNumber);
         }
-        NewNode = new GSNNode(this.NullableDoc, ParentNode, Level, NodeType, LabelNumber, HistoryTriple);
+        NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelNumber, HistoryTriple);
         if (this.FirstNode == null) {
             this.FirstNode = NewNode;
         }
@@ -1300,14 +1301,15 @@ var AssureNoteParser = (function () {
         if (argv.length == 1) {
             AssureNoteParser.merge(argv[0], null);
         }
-        if (argv.length == 0) {
-            try  {
-                PdfConverter.main(argv);
-            } catch (e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+
+        //		if(argv.length == 0) {
+        //			try {
+        //				PdfConverter.main(argv);
+        //			} catch (Exception e) {
+        //				// TODO Auto-generated catch block
+        //				e.printStackTrace();
+        //			}
+        //		}
         console.log("Usage: AssureNoteParser file [margingfile]");
     };
     return AssureNoteParser;

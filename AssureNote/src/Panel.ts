@@ -76,6 +76,10 @@ module AssureNote {
 				}
 
 				switch (event.keyCode) {
+					case 58: /*: in Firefox*/
+						if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
+							break;
+						}
 					case 186: /*:*/
 						this.CmdLine.Show();
 						break;

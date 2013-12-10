@@ -107,24 +107,19 @@ class StringReader {
 
 class StringWriter {
 	sb: StringBuilder;
-
 	constructor() {
 		this.sb = new StringBuilder();
 	}
-
 	print(s: string): void {
 		this.sb.append(s);
 	}
-
 	println(s: string): void {
 		this.sb.append(s);
 		this.sb.append(Lib.LineFeed);
 	}
-
 	newline(): void {
 		this.sb.append(Lib.LineFeed);
 	}
-
 	public toString(): string {
 		return this.sb.toString();
 	}
@@ -177,7 +172,6 @@ class GSNHistory {
 }
 
 class WikiSyntax {
-
 	static ParseInt(NumText: string, DefVal: number): number {
 		try {
 			return Lib.parseInt(NumText);
@@ -185,7 +179,6 @@ class WikiSyntax {
 		}
 		return DefVal;
 	}
-
 	static ParseGoalLevel(LabelLine: string): number {
 		var GoalLevel: number = 0;
 		for (var i: number = 0; i < LabelLine.length; i++) {
@@ -194,7 +187,6 @@ class WikiSyntax {
 		}
 		return GoalLevel;
 	}
-
 	static FormatGoalLevel(GoalLevel: number): string {
 		var sb: StringBuilder = new StringBuilder();
 		for (var i: number = 0; i < GoalLevel; i++) {
@@ -202,7 +194,6 @@ class WikiSyntax {
 		}
 		return sb.toString();
 	}
-
 	static ParseNodeType(LabelLine: string): GSNType {
 		var i: number;
 		for (i = 0; i < LabelLine.length; i++) {
@@ -216,14 +207,14 @@ class WikiSyntax {
 			if (ch == 71) {
 				return GSNType.Goal;
 			}
-			if (ch == 67) {
-				return GSNType.Context;
-			}
-			if (ch == 69) {
-				return GSNType.Evidence;
-			}
 			if (ch == 83) {
 				return GSNType.Strategy;
+			}
+			if (ch == 69 || ch == 77 || ch == 65) {
+				return GSNType.Evidence;
+			}
+			if (ch == 67 || ch == 74 || ch == 82) {
+				return GSNType.Context;
 			}
 		}
 		return GSNType.Undefined;
@@ -292,11 +283,9 @@ class WikiSyntax {
 		}
 		return null;
 	}
-
 	public static FormatRefKey(NodeType: GSNType, LabelNumber: string, HistoryTriple: string): string {
 		return WikiSyntax.FormatNodeType(NodeType) + LabelNumber + HistoryTriple;
 	}
-
 }
 
 class TagUtils {
@@ -351,7 +340,6 @@ class GSNNode {
 	ParentNode: GSNNode;
 	SubNodeList: Array<GSNNode>;
 	NodeType: GSNType;
-	GoalLevel: number; /* 1: top level */
 	LabelNumber: string; /* e.g, G1 G1.1 */
 	SectionCount: number;
 	
@@ -363,12 +351,11 @@ class GSNNode {
 	Digest: string;
 	TagMap: HashMap<string, string>;
 
-	constructor(BaseDoc: GSNDoc, ParentNode: GSNNode, GoalLevel: number, NodeType: GSNType, LabelNumber: string, HistoryTriple: GSNHistory[]) {
-		this.BaseDoc = BaseDoc;
-		this.ParentNode = ParentNode;
-		this.GoalLevel = GoalLevel;
-		this.NodeType = NodeType;
-		this.LabelNumber = LabelNumber;
+	constructor(BaseDoc: GSNDoc, ParentNode: GSNNode, NodeType: GSNType, LabelNumber: string, HistoryTriple: GSNHistory[]) {
+		this.BaseDoc     = BaseDoc;
+		this.ParentNode  = ParentNode;
+		this.NodeType    = NodeType;
+		this.LabelNumber = LabelNumber;    // G1.1
 		this.SectionCount = 0;
 		this.SubNodeList = null;
 		if (HistoryTriple != null) {
@@ -391,8 +378,8 @@ class GSNNode {
 		}
 	}
 	
-	Duplicate(BaseDoc: GSNDoc, ParentNode: GSNNode): GSNNode {
-		var NewNode: GSNNode = new GSNNode(BaseDoc, ParentNode, this.GoalLevel, this.NodeType, this.LabelNumber, null);
+	DeepCopy(BaseDoc: GSNDoc, ParentNode: GSNNode): GSNNode {
+		var NewNode: GSNNode = new GSNNode(BaseDoc, ParentNode, /*this.GoalLevel,*/ this.NodeType, this.LabelNumber, null);
 		NewNode.Created = this.Created;
 		NewNode.LastModified = this.LastModified;
 		NewNode.Digest = this.Digest;
@@ -403,7 +390,7 @@ class GSNNode {
 		}
 		for (var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
 			var Node: GSNNode = this.NonNullSubNodeList().get(i);
-			Node.Duplicate(BaseDoc, NewNode);
+			Node.DeepCopy(BaseDoc, NewNode);
 		}
 		return NewNode;
 	}
@@ -431,6 +418,18 @@ class GSNNode {
 			var Node: GSNNode = this.NonNullSubNodeList().get(i);
 			Node.Remap(NodeMap);
 		}
+	}
+	
+	public GetGoalLevel(): number {
+		var GoalCount: number = 1;
+		var Node: GSNNode = this.ParentNode;
+		while(Node != null) {
+			if(Node.IsGoal()) {
+				GoalCount += 1;
+			}
+			Node = Node.ParentNode;
+		}
+		return GoalCount;
 	}
 	
 	GetLabel(): string {
@@ -560,13 +559,13 @@ class GSNNode {
 			}
 		}
 		if (NodeType == GSNType.Strategy && Creation) {
-			return new GSNNode(this.BaseDoc, this, this.GoalLevel, GSNType.Strategy, this.LabelNumber, null);
+			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelNumber, null);
 		}
 		return null;
 	}
 
 	FormatNode(RefMap: HashMap<string, GSNNode>, Writer: StringWriter): void {
-		Writer.print(WikiSyntax.FormatGoalLevel(this.GoalLevel));
+		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		Writer.print(this.LabelNumber);
@@ -782,13 +781,13 @@ class GSNDoc {
 		this.GoalCount = 0;
 	}
 
-	Duplicate(Author: string, Role: string, Date: string, Process: string): GSNDoc {
+	DeepCopy(Author: string, Role: string, Date: string, Process: string): GSNDoc {
 		var NewDoc: GSNDoc = new GSNDoc(this.Record);
 		NewDoc.GoalCount = this.GoalCount;
 		NewDoc.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, NewDoc);
 		NewDoc.DocTagMap = this.DuplicateTagMap(this.DocTagMap);
 		if (this.TopGoal != null) {
-			NewDoc.TopGoal = this.TopGoal.Duplicate(NewDoc, null);
+			NewDoc.TopGoal = this.TopGoal.DeepCopy(NewDoc, null);
 		}
 		return NewDoc;
 	}
@@ -841,7 +840,7 @@ class GSNDoc {
 		}
 		this.NodeMap.put(Key, Node);
 		if (Node.NodeType == GSNType.Goal) {
-			if (Node.GoalLevel == 1) {
+			if (Node.GetGoalLevel() == 1) {
 				this.TopGoal = Node;
 			}
 			var num: number = WikiSyntax.ParseInt(Node.LabelNumber, 0);
@@ -872,7 +871,6 @@ class GSNDoc {
 		}
 		return this.UniqueNumber(NodeType, LabelNumber);
 	}
-
 
 	RemapNodeMap(): void {
 		var NodeMap: HashMap<string, GSNNode> = new HashMap<string, GSNNode>();
@@ -908,7 +906,7 @@ class GSNRecord {
 		this.EditingDoc = null;
 	}
 
-	Duplicate(): GSNRecord {
+	DeepCopy(): GSNRecord {
 		var NewRecord: GSNRecord = new GSNRecord();
 		for(var i: number = 0; i < this.HistoryList.size(); i++) {
 			var Item: GSNHistory = this.HistoryList.get(i);
@@ -985,7 +983,7 @@ class GSNRecord {
 		if (this.EditingDoc == null) {
 			var Doc: GSNDoc = this.GetLatestDoc();
 			if(Doc != null) {
-				this.EditingDoc = Doc.Duplicate(Author, Role, Date, Process);
+				this.EditingDoc = Doc.DeepCopy(Author, Role, Date, Process);
 			} else {
 				this.EditingDoc = new GSNDoc(this);
 				this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
@@ -1015,7 +1013,7 @@ class GSNRecord {
 			this.MergeAsFastFoward(NewRecord);
 		}
 		else {
-			var Record1: GSNRecord = this.Duplicate();
+			var Record1: GSNRecord = this.DeepCopy();
 //			MergeAsIncrementalAddition
 		}
 	}
@@ -1118,20 +1116,20 @@ class GSNRecord {
 
 class ParserContext {
 	NullableDoc: GSNDoc;
-	GoalStackList: Array<GSNNode>;
+	GoalStack: Array<GSNNode>;
 	FirstNode: GSNNode;
 	LastGoalNode: GSNNode;
 	LastNonContextNode: GSNNode;
 
 	constructor(NullableDoc: GSNDoc, ParentNode: GSNNode) {
 		if(ParentNode == null) {
-			ParentNode = new GSNNode(NullableDoc, null, 0, GSNType.Goal, null, null);
+			ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
 		}
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;
 		this.LastNonContextNode = null;
-		this.GoalStackList = new Array<GSNNode>();
+		this.GoalStack = new Array<GSNNode>();
 		this.SetLastNode(ParentNode);
 	}
 
@@ -1143,14 +1141,11 @@ class ParserContext {
 		if(!Node.IsContext()) {
 			this.LastNonContextNode = Node;			
 		}
-		else {
-			this.LastNonContextNode = null;
-		}
 	}
 	
-	GetParentNodeOfGoal(Level: number): GSNNode {
-		if (Level - 1 < this.GoalStackList.size()) {
-			var ParentGoal: GSNNode = this.GoalStackList.get(Level - 1);
+	GetStrategyOfGoal(Level: number): GSNNode {
+		if (Level - 1 < this.GoalStack.size()) {
+			var ParentGoal: GSNNode = this.GoalStack.get(Level - 1);
 			if (ParentGoal != null) {
 				return ParentGoal.GetLastNode(GSNType.Strategy, true/*Creation*/);
 			}
@@ -1158,29 +1153,31 @@ class ParserContext {
 		return null;
 	}
 
-	GetGoalStackAt(Level: number): GSNNode {
-		if (Level < this.GoalStackList.size()) {
-			return this.GoalStackList.get(Level);
-		}
-		return null;
-	}
+//	GSNNode GetGoalStackAt(int Level) {
+//		if (Level - 1 < this.GoalStack.size()) {
+//			return this.GoalStack.get(Level-1);
+//		}
+//		return null;
+//	}
 
 	SetGoalStackAt(Node: GSNNode): void {
-		while (this.GoalStackList.size() < Node.GoalLevel + 1) {
-			this.GoalStackList.add(null);
+		var GoalLevel: number = Node.GetGoalLevel();
+//		System.out.println("GoalLevel="+GoalLevel+ ", stack="+this.GoalStackList.size());
+		while (!(GoalLevel - 1 < this.GoalStack.size())) {
+			this.GoalStack.add(null);
 		}
-		this.GoalStackList.set(Node.GoalLevel, Node);
+		this.GoalStack.set(GoalLevel-1, Node);
 	}
 
 	IsValidSection(Line: string, Reader: StringReader): boolean {
 		var NodeType: GSNType = WikiSyntax.ParseNodeType(Line);
 		if (NodeType == GSNType.Goal) {
 			var Level: number = WikiSyntax.ParseGoalLevel(Line);
-			var ParentNode: GSNNode = this.GetParentNodeOfGoal(Level);
+			var ParentNode: GSNNode = this.GetStrategyOfGoal(Level);
 			if (ParentNode != null) {
 				return true;
 			}
-			Reader.LogError("Mismatched goal level < " + (this.GoalStackList.size() + 2), Line);
+			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
 			return false;
 		}
 		if (NodeType == GSNType.Context) {
@@ -1222,18 +1219,17 @@ class ParserContext {
 		var HistoryTriple: GSNHistory[] = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
 		var Level: number = WikiSyntax.ParseGoalLevel(LabelLine);
 		if (NodeType == GSNType.Goal) {
-			ParentNode = this.GetParentNodeOfGoal(Level);
+			ParentNode = this.GetStrategyOfGoal(Level);
 		} else {
 			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.LastGoalNode;
 //			if(ParentNode.GoalLevel != Level) {
 //				Reader.LogError("mismatched level", Line);
 //			}
-			Level = ParentNode.GoalLevel;
 		}
 		if(this.NullableDoc != null) {
 			LabelNumber = this.NullableDoc.CheckLabelNumber(ParentNode, NodeType, LabelNumber);
 		}
-		NewNode = new GSNNode(this.NullableDoc, ParentNode, Level, NodeType, LabelNumber, HistoryTriple);
+		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelNumber, HistoryTriple);
 		if(this.FirstNode == null) {
 			this.FirstNode = NewNode;
 		}
@@ -1343,14 +1339,14 @@ class AssureNoteParser {
 		if(argv.length == 1) {
 			AssureNoteParser.merge(argv[0], null);
 		}
-		if(argv.length == 0) {
-			try {
-				PdfConverter.main(argv);
-			} catch(e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-		}
+//		if(argv.length == 0) {
+//			try {
+//				PdfConverter.main(argv);
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} 
+//		}
 		console.log("Usage: AssureNoteParser file [margingfile]");
 	}
 }
