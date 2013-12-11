@@ -113,15 +113,14 @@ module AssureNote {
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     var Margin = SimpleLayoutEngine.TreeMargin;
 
-                    var DoCompaction = true;
+                    //var DoCompaction = true;
 
-
-                    if (DoCompaction && SubNode.IsFolded) {
+                    if (/*DoCompaction && */SubNode.IsFolded) {
                         SubNode.RelativeX = ChildrenTopWidth;
                         ChildrenTopWidth = ChildrenTopWidth + SubNode.Shape.GetNodeWidth() + Margin;
                         FoldedNodeRun.push(SubNode);
                     } else {
-                        if (DoCompaction && IsLastChildFolded) {
+                        if (/*DoCompaction && */IsLastChildFolded) {
                             var WidthDiff = ChildrenTopWidth - ChildrenBottomWidth;
                             if (WidthDiff < ChildHeadLeftSideMargin) {
                                 SubNode.RelativeX = ChildrenBottomWidth;
@@ -150,7 +149,7 @@ module AssureNote {
 
                     IsLastChildFolded = SubNode.IsFolded;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
-                    console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
+                    //console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
                 });
 
                 var ChildrenWidth = Math.max(ChildrenTopWidth, ChildrenBottomWidth) - SimpleLayoutEngine.TreeMargin;
@@ -165,7 +164,7 @@ module AssureNote {
             }
             Shape.SetTreeUpperLeft(TreeLeftX, 0);
             Shape.SetTreeSize(TreeWidth, TreeHeight);
-            console.log(ThisNode.Label + ": " + (<any>ThisNode.Shape).TreeBoundingBox.toString());
+            //console.log(ThisNode.Label + ": " + (<any>ThisNode.Shape).TreeBoundingBox.toString());
 		}
 
 	}
