@@ -130,6 +130,11 @@ module AssureNote {
                                     for (var i = 0; i < FoldedNodeRun.length; i++) {
                                         FoldedNodeRun[i].RelativeX += ChildHeadLeftSideMargin - WidthDiff;
                                     }
+                                } else {
+                                    var FoldedRunMargin = (ChildHeadLeftSideMargin - WidthDiff) / (FoldedNodeRun.length + 1)
+                                    for (var i = 0; i < FoldedNodeRun.length; i++) {
+                                        FoldedNodeRun[i].RelativeX += FoldedRunMargin * (i + 1);
+                                    }
                                 }
                             } else {
                                 SubNode.RelativeX = ChildrenTopWidth - ChildHeadLeftSideMargin;
