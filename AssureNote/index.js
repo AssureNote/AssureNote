@@ -548,19 +548,22 @@ var AssureNote;
                             this.RemoveAnimateElement(this.PreviousAnimateElement);
                             this.PreviousAnimateElement = null;
                         }
+                        var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s ease-out";
+                        this.Content.style["animation"] = AnimationStyleString;
+                        this.Content.style["MozAnimation"] = AnimationStyleString;
+                        this.Content.style["webkitAnimation"] = AnimationStyleString;
+                        this.Content.style["msAnimation"] = AnimationStyleString;
+                        this.Content.style["OAnimation"] = AnimationStyleString;
+                        var AnimateElement;
                         if (this.GX == null || this.GY == null) {
                             CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition(AnimationName));
-                            this.Content.style["-webkit-animation"] = AnimationName + " " + Duration / 1000 + "s ease-out";
-                            var AnimateElement = GSNShape.CreateSVGFadeInAnimateElement(Duration);
-                            this.ShapeGroup.appendChild(AnimateElement);
-                            AnimateElement.beginElement();
+                            AnimateElement = GSNShape.CreateSVGFadeInAnimateElement(Duration);
                         } else {
                             CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition(AnimationName, this.GX, this.GY));
-                            this.Content.style["-webkit-animation"] = AnimationName + " " + Duration / 1000 + "s ease-out";
-                            var AnimateElement = GSNShape.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
-                            this.ShapeGroup.appendChild(AnimateElement);
-                            AnimateElement.beginElement();
+                            AnimateElement = GSNShape.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
                         }
+                        this.ShapeGroup.appendChild(AnimateElement);
+                        AnimateElement.beginElement();
                         this.PreviousAnimateElement = AnimateElement;
                     }
                 }
@@ -576,7 +579,11 @@ var AssureNote;
             this.GX = null;
             this.GY = null;
             if (this.Content) {
-                this.Content.style["-webkit-animation"] = "";
+                this.Content.style.removeProperty("animation");
+                this.Content.style.removeProperty("MozAnimation");
+                this.Content.style.removeProperty("webkitAnimation");
+                this.Content.style.removeProperty("msAnimation");
+                this.Content.style.removeProperty("OAnimation");
             }
             if (this.PreviousAnimateElement) {
                 this.RemoveAnimateElement(this.PreviousAnimateElement);
