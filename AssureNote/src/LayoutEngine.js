@@ -18,25 +18,12 @@ var AssureNote;
     })();
     AssureNote.LayoutEngine = LayoutEngine;
 
-    AssureNote.DefaultMargin = 32;
-    AssureNote.ContextMargin = 10;
-    AssureNote.LevelMargin = 64;
-    AssureNote.TreeMargin = 12;
-
     var SimpleLayoutEngine = (function (_super) {
         __extends(SimpleLayoutEngine, _super);
         function SimpleLayoutEngine(AssureNoteApp) {
             _super.call(this, AssureNoteApp);
             this.AssureNoteApp = AssureNoteApp;
         }
-        SimpleLayoutEngine.prototype.GetNodeWidth = function (Node) {
-            return Node.GetShape().GetNodeWidth();
-        };
-
-        SimpleLayoutEngine.prototype.GetNodeHeight = function (Node) {
-            return Node.GetShape().GetNodeHeight();
-        };
-
         SimpleLayoutEngine.prototype.Render = function (ThisNode, DivFrag, SvgNodeFrag, SvgConnectionFrag) {
             var _this = this;
             if (ThisNode.IsVisible) {
@@ -72,18 +59,19 @@ var AssureNote;
             var Shape = ThisNode.GetShape();
             Shape.FitSizeToContent();
             var TreeLeftX = 0;
-            var TreeWidth = this.GetNodeWidth(ThisNode);
-            var TreeHeight = this.GetNodeHeight(ThisNode);
+            var ThisNodeWidth = Shape.GetNodeWidth();
+            var TreeWidth = ThisNodeWidth;
+            var TreeHeight = Shape.GetNodeHeight();
             if (ThisNode.Left != null) {
                 var OffsetX = 0;
-                var OffsetY = -AssureNote.ContextMargin;
+                var OffsetY = -SimpleLayoutEngine.ContextMargin;
                 ThisNode.ForEachVisibleLeftNodes(function (SubNode) {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += AssureNote.ContextMargin;
-                    SubNode.RelativeX = -(_this.GetNodeWidth(SubNode) + AssureNote.DefaultMargin);
+                    OffsetY += SimpleLayoutEngine.ContextMargin;
+                    SubNode.RelativeX = -(SubNode.Shape.GetNodeWidth() + SimpleLayoutEngine.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, _this.GetNodeWidth(SubNode) + AssureNote.DefaultMargin);
-                    OffsetY += _this.GetNodeHeight(SubNode);
+                    OffsetX = Math.max(0, SubNode.Shape.GetNodeWidth() + SimpleLayoutEngine.DefaultMargin);
+                    OffsetY += SubNode.Shape.GetNodeHeight();
                 });
                 if (OffsetY > 0) {
                     TreeWidth += OffsetX;
@@ -95,14 +83,14 @@ var AssureNote;
             }
             if (ThisNode.Right != null) {
                 var OffsetX = 0;
-                var OffsetY = -AssureNote.ContextMargin;
+                var OffsetY = -SimpleLayoutEngine.ContextMargin;
                 ThisNode.ForEachVisibleRightNodes(function (SubNode) {
                     SubNode.GetShape().FitSizeToContent();
-                    OffsetY += AssureNote.ContextMargin;
-                    SubNode.RelativeX = (_this.GetNodeWidth(ThisNode) + AssureNote.DefaultMargin);
+                    OffsetY += SimpleLayoutEngine.ContextMargin;
+                    SubNode.RelativeX = (SubNode.Shape.GetNodeWidth() + SimpleLayoutEngine.DefaultMargin);
                     SubNode.RelativeY = OffsetY;
-                    OffsetX = Math.max(0, AssureNote.DefaultMargin + _this.GetNodeWidth(SubNode));
-                    OffsetY += _this.GetNodeHeight(SubNode);
+                    OffsetX = Math.max(0, SimpleLayoutEngine.DefaultMargin + SubNode.Shape.GetNodeWidth());
+                    OffsetY += SubNode.Shape.GetNodeHeight();
                 });
                 if (OffsetY > 0) {
                     TreeWidth += OffsetX;
@@ -111,132 +99,81 @@ var AssureNote;
                     }
                 }
             }
-<<<<<<< HEAD
+            var HeadWidth = TreeWidth + -TreeLeftX;
+            Shape.SetHeadSize(HeadWidth, TreeHeight);
             TreeHeight += SimpleLayoutEngine.LevelMargin;
-
-=======
-            TreeHeight += AssureNote.LevelMargin;
->>>>>>> parent of e436183... move mergen constants to static field
-            var ChildrenWidth = 0;
+            var ChildrenTopWidth = 0;
+            var ChildrenBottomWidth = 0;
             var ChildrenHeight = 0;
-            var VisibleChildCount = 0;
+            var FoldedNodeRun = [];
             if (ThisNode.Children != null && ThisNode.Children.length > 0) {
-                var TopRightX = 0;
-                var BottomRightX = 0;
+                var IsLastChildFolded = false;
                 ThisNode.ForEachVisibleChildren(function (SubNode) {
                     _this.Layout(SubNode);
-                    var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
-                    SubNode.RelativeY = TreeHeight;
-<<<<<<< HEAD
-=======
-                    ChildrenWidth += ChildTreeWidth + AssureNote.TreeMargin;
->>>>>>> parent of e436183... move mergen constants to static field
-                    ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
-                    var ChildNodeWidth = SubNode.Shape.GetNodeWidth();
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
-                    if (SubNode.IsFolded || SubNode.Children != null) {
-                        SubNode.RelativeX = TopRightX;
-                        TopRightX += ChildTreeWidth + SimpleLayoutEngine.TreeMargin;
-                    } else {
-                        var TopLeftWidth = (SubNode.Left != null) ? ChildNodeWidth : 0;
-                        TopLeftWidth += SimpleLayoutEngine.ContextMargin;
-                        if (TopRightX + ChildNodeWidth > BottomRightX + (ChildTreeWidth / 2)) {
-                            BottomRightX = TopRightX;
-                        }
-                        SubNode.RelativeX = BottomRightX;
-                        TopRightX = BottomRightX;
-                        BottomRightX += ChildTreeWidth + SimpleLayoutEngine.TreeMargin;
-                        var TopWidth = ChildNodeWidth;
-                        if (SubNode.Left != null) {
-                            TopWidth += ChildNodeWidth + SimpleLayoutEngine.ContextMargin;
-                        }
-                        if (SubNode.Left != null) {
-                            TopWidth += ChildNodeWidth + SimpleLayoutEngine.ContextMargin;
-                        }
-                        TopRightX = BottomRightX - TopWidth;
-                    }
-                    VisibleChildCount++;
-                });
-<<<<<<< HEAD
-                ChildrenWidth = Math.max(TopRightX, BottomRightX);
-=======
-                ChildrenWidth -= AssureNote.TreeMargin;
+                    var ChildHeadWidth = SubNode.Shape.GetHeadWidth();
+                    var ChildHeadLeftSideMargin = -SubNode.Shape.GetTreeLeftX() + SubNode.Shape.GetHeadLeftX();
+                    var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
+                    var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
+                    var Margin = SimpleLayoutEngine.TreeMargin;
 
->>>>>>> parent of e436183... move mergen constants to static field
-                var HeadWidth = VisibleChildCount == 1 ? TreeWidth : this.GetNodeWidth(ThisNode);
-                var Shift = (ChildrenWidth - this.GetNodeWidth(ThisNode)) / 2;
+                    var DoCompaction = true;
+
+                    if (DoCompaction && SubNode.IsFolded) {
+                        SubNode.RelativeX = ChildrenTopWidth;
+                        ChildrenTopWidth = ChildrenTopWidth + SubNode.Shape.GetNodeWidth() + Margin;
+                        FoldedNodeRun.push(SubNode);
+                    } else {
+                        if (DoCompaction && IsLastChildFolded) {
+                            var WidthDiff = ChildrenTopWidth - ChildrenBottomWidth;
+                            if (WidthDiff < ChildHeadLeftSideMargin) {
+                                SubNode.RelativeX = ChildrenBottomWidth;
+                                ChildrenTopWidth = ChildrenBottomWidth + ChildHeadRightX + Margin;
+                                ChildrenBottomWidth = ChildrenBottomWidth + ChildTreeWidth + Margin;
+                                if (SubNode.RelativeX == 0) {
+                                    for (var i = 0; i < FoldedNodeRun.length; i++) {
+                                        FoldedNodeRun[i].RelativeX += ChildHeadLeftSideMargin - WidthDiff;
+                                    }
+                                }
+                            } else {
+                                SubNode.RelativeX = ChildrenTopWidth - ChildHeadLeftSideMargin;
+                                ChildrenBottomWidth = ChildrenTopWidth + ChildTreeWidth - ChildHeadLeftSideMargin + Margin;
+                                ChildrenTopWidth = ChildrenTopWidth + ChildHeadWidth + Margin;
+                            }
+                        } else {
+                            var ChildrenWidth = Math.max(ChildrenTopWidth, ChildrenBottomWidth);
+                            SubNode.RelativeX = ChildrenWidth;
+                            ChildrenTopWidth = ChildrenWidth + ChildHeadRightX + Margin;
+                            ChildrenBottomWidth = ChildrenWidth + ChildTreeWidth + Margin;
+                        }
+                        FoldedNodeRun = [];
+                        SubNode.RelativeX += -SubNode.Shape.GetTreeLeftX();
+                    }
+                    SubNode.RelativeY = TreeHeight;
+
+                    IsLastChildFolded = SubNode.IsFolded;
+                    ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
+                    console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
+                });
+
+                var ChildrenWidth = Math.max(ChildrenTopWidth, ChildrenBottomWidth) - SimpleLayoutEngine.TreeMargin;
+                var Shift = (ChildrenWidth - ThisNodeWidth) / 2;
                 TreeLeftX = Math.min(TreeLeftX, -Shift);
                 ThisNode.ForEachVisibleChildren(function (SubNode) {
                     SubNode.RelativeX -= Shift;
-                    SubNode.RelativeX += -SubNode.Shape.GetTreeLeftX();
                 });
-            }
 
-            //var ChildrenWidth = 0;
-            //var ChildrenHeight = 0;
-            //var VisibleChildCount = 0;
-            //if (ThisNode.Children != null && ThisNode.Children.length > 0) {
-            //    ThisNode.ForEachVisibleChildren((SubNode: NodeView) => {
-            //        this.Layout(SubNode);
-            //        var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
-            //        var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
-            //        SubNode.RelativeX = ChildrenWidth;
-            //        SubNode.RelativeY = TreeHeight;
-            //        ChildrenWidth += ChildTreeWidth + SimpleLayoutEngine.TreeMargin;
-            //        ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
-            //        VisibleChildCount++;
-            //    });
-            //    ChildrenWidth -= SimpleLayoutEngine.TreeMargin;
-            //    // FIXME: compaction algorithm
-            //    for (var i = 0; i < ThisNode.Children.length - 1; i++) {
-            //        var LeftSubNode = ThisNode.Children[i];
-            //        if (LeftSubNode.IsFolded) {
-            //            LeftSubNode
-            //        }
-            //        var RightSubNode = ThisNode.Children[i + 1];
-            //        LeftSubNode.Shape.GetTreeWidth();
-            //        if (LeftSubNode.IsFolded == RightSubNode.IsFolded) {
-            //            continue;
-            //        }
-            //        if (LeftSubNode.IsFolded) {
-            //            var W = RightSubNode.GetShape().GetNodeWidth();
-            //            if (RightSubNode.Left != null) {
-            //                W = W * 1.5 + SimpleLayoutEngine.ContextMargin;
-            //            } else {
-            //                W += SimpleLayoutEngine.ContextMargin;
-            //            }
-            //            var Shift = RightSubNode.GetShape().GetTreeWidth() / 2 - W;
-            //            for (var j = i + 1; j < ThisNode.Children.length; j++) {
-            //                ThisNode.Children[j].RelativeX -= Shift;
-            //            }
-            //            //ChildrenWidth -= Shift;
-            //        }
-            //        if (RightSubNode.IsFolded) {
-            //            var W = LeftSubNode.GetShape().GetNodeWidth();
-            //            if (LeftSubNode.Right != null) {
-            //                W = W * 1.5 + SimpleLayoutEngine.ContextMargin;
-            //            } else {
-            //                W += SimpleLayoutEngine.ContextMargin;
-            //            }
-            //            var Shift = RightSubNode.GetShape().GetTreeWidth() / 2 - W;
-            //            for (var j = i + 1; j < ThisNode.Children.length; j++) {
-            //                ThisNode.Children[j].RelativeX += Shift;
-            //            }
-            //            //ChildrenWidth -= Shift;
-            //        }
-            //    }
-            //    var HeadWidth = VisibleChildCount == 1 ? TreeWidth : this.GetNodeWidth(ThisNode);
-            //    var Shift = (ChildrenWidth - this.GetNodeWidth(ThisNode)) / 2;
-            //    TreeLeftX = Math.min(TreeLeftX, -Shift);
-            //    ThisNode.ForEachVisibleChildren((SubNode: NodeView) => {
-            //        SubNode.RelativeX -= Shift;
-            //        SubNode.RelativeX += -SubNode.Shape.GetTreeLeftX();
-            //    });
-            //}
+                TreeHeight += ChildrenHeight;
+                TreeWidth = Math.max(ChildrenWidth, HeadWidth);
+            }
             Shape.SetTreeUpperLeft(TreeLeftX, 0);
-            Shape.SetTreeSize(Math.max(ChildrenWidth, TreeWidth + -TreeLeftX), TreeHeight + ChildrenHeight);
+            Shape.SetTreeSize(TreeWidth, TreeHeight);
             console.log(ThisNode.Label + ": " + (ThisNode.Shape).TreeBoundingBox.toString());
         };
+        SimpleLayoutEngine.DefaultMargin = 32;
+        SimpleLayoutEngine.ContextMargin = 10;
+        SimpleLayoutEngine.LevelMargin = 64;
+        SimpleLayoutEngine.TreeMargin = 12;
         return SimpleLayoutEngine;
     })(LayoutEngine);
     AssureNote.SimpleLayoutEngine = SimpleLayoutEngine;

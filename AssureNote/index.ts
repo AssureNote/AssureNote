@@ -326,14 +326,15 @@ module AssureNote {
 		ColorClassName: string = ColorStyle.Default;
 		private NodeWidth: number;
         private NodeHeight: number;
-        private TreeBoundingBox: Rect;
-        private PreviousTreeTopLeft: Point; // for animation
+        private HeadBoundingBox: Rect; // Head is the node and Left and Right.
+        private TreeBoundingBox: Rect; // Tree is Head and Children
         private static ArrowPathMaster: SVGPathElement = null;
 
 		constructor(public NodeView: NodeView) {
 			this.Content = null;
 			this.NodeWidth = 250;
             this.NodeHeight = 0;
+            this.HeadBoundingBox = new Rect(0, 0, 0, 0);
             this.TreeBoundingBox = new Rect(0, 0, 0, 0);
 		}
 
@@ -352,7 +353,12 @@ module AssureNote {
 		SetTreeSize(Width : number, Height: number): void {
             this.TreeBoundingBox.Width = Width;
             this.TreeBoundingBox.Height = Height;
-		}
+        }
+
+        SetHeadSize(Width: number, Height: number): void {
+            this.HeadBoundingBox.Width = Width;
+            this.HeadBoundingBox.Height = Height;
+        }
 
 		GetNodeWidth(): number {
             return this.NodeWidth;
@@ -379,18 +385,40 @@ module AssureNote {
             return this.TreeBoundingBox.Height;
         }
 
+        GetHeadWidth(): number {
+            if (this.HeadBoundingBox.Width == 0) {
+                this.HeadBoundingBox.Width = 250; //FIXME
+            }
+            return this.HeadBoundingBox.Width;
+        }
+
+        GetHeadHeight(): number {
+            if (this.HeadBoundingBox.Height == 0) {
+                this.HeadBoundingBox.Height = 100; //FIXME
+            }
+            return this.HeadBoundingBox.Height;
+        }
+
         GetTreeLeftX(): number {
             return this.TreeBoundingBox.X;
         }
 
-        GetTreeUpperY(): number {
-            return this.TreeBoundingBox.Y;
+        //GetTreeUpperY(): number {
+        //    return this.TreeBoundingBox.Y;
+        //}
+
+        GetHeadLeftX(): number {
+            return this.HeadBoundingBox.X;
         }
 
         SetTreeUpperLeft(X: number, Y: number): void {
-            this.PreviousTreeTopLeft = new Point(this.TreeBoundingBox.X, this.TreeBoundingBox.Y);
             this.TreeBoundingBox.X = X;
             this.TreeBoundingBox.Y = Y;
+        }
+
+        SetHeadUpperLeft(X: number, Y: number): void {
+            this.HeadBoundingBox.X = X;
+            this.HeadBoundingBox.Y = Y;
         }
 
 		UpdateHtmlClass() {
