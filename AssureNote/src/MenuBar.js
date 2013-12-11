@@ -38,7 +38,7 @@ var AssureNote;
             this.CurrentView = CurrentView;
             $('#menu').remove();
             this.Menu = $('<div id="menu" style="display: none;"></div>');
-            this.Menu.appendTo($(ControlLayer));
+            this.Menu.appendTo(ControlLayer);
             this.CreateButtons(Contents);
 
             var refresh = function () {

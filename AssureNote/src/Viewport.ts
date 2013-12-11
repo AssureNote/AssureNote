@@ -166,7 +166,12 @@ module AssureNote {
 			this.ContentLayer.style["MozTransformOrigin"]    = "left top";
 			this.ContentLayer.style["msTransformOrigin"]     = "left top";
 			this.ContentLayer.style["OTransformOrigin"]      = "left top";
-			this.ContentLayer.style["webkitTransformOrigin"] = "left top";
+            this.ContentLayer.style["webkitTransformOrigin"] = "left top";
+            this.ControlLayer.style["transformOrigin"] = "left top";
+            this.ControlLayer.style["MozTransformOrigin"] = "left top";
+            this.ControlLayer.style["msTransformOrigin"] = "left top";
+            this.ControlLayer.style["OTransformOrigin"] = "left top";
+            this.ControlLayer.style["webkitTransformOrigin"] = "left top";
 			this.UpdateAttr();
 			var OnPointer = (e: PointerEvent) => { this.ScrollManager.OnPointerEvent(e, this); };
 			this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);

@@ -174,7 +174,8 @@ module AssureNote {
 
 			var Shape = this.PictgramPanel.MasterView.GetShape();
 			var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
-			var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+            var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+            this.PictgramPanel.ViewPort.SetScale(1);
 			this.PictgramPanel.ViewPort.SetOffset(WX, WY);
 		}
 
