@@ -145,8 +145,11 @@ module AssureNote {
 			var width: number = Screen.ContentLayer.clientWidth;
 			var height: number = Screen.ContentLayer.clientHeight;
 			var pointer = this.Pointers[0];
-			//Screen.SetOffset(width / 2 - pointer.pageX, height / 2 - pointer.pageY);
-		}
+        }
+
+        OnMouseWheel(e: { deltaX: number; deltaY: number }, Screen: ViewportManager) {
+            Screen.SetScale(Screen.GetScale() * (1 + e.deltaY * 0.02));
+        }
 	}
 
 	export class ViewportManager {
@@ -174,7 +177,8 @@ module AssureNote {
 			this.ContentLayer.addEventListener("pointermove", OnPointer, false);
 			this.ContentLayer.addEventListener("pointerup", OnPointer, false);
 			this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
-			//BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
+            //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
+            $(this.EventMapLayer).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
 		}
 
 		private static translateA(x: number, y: number): string {
@@ -209,7 +213,8 @@ module AssureNote {
 			this.ControlLayer.style["OTransform"]      = style;
 		}
 
-		SetScale(scale: number): void {
+        SetScale(scale: number): void {
+            scale = Math.max(0.2, Math.min(2.0, scale));
 			this.Scale = scale;
 			var cx = this.GetPageCenterX();
 			var cy = this.GetPageCenterY();
