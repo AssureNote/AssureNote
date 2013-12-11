@@ -323,20 +323,10 @@ var AssureNote;
             return Math.min(scaleWidth, scaleHeight);
         };
 
-        ViewportManager.prototype.SetCaseCenter = function (X, Y, NodeWidth, NodeHeight) {
-            var NewOffsetX = this.ConvertX(X, NodeWidth);
-            var NewOffsetY = this.ConvertY(Y, NodeHeight);
+        ViewportManager.prototype.SetCaseCenter = function (X, Y) {
+            var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));
+            var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y));
             this.SetOffset(NewOffsetX, NewOffsetY);
-        };
-
-        ViewportManager.prototype.ConvertX = function (X, NodeWidth) {
-            var ConvertedX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X)) - NodeWidth / 2;
-            return ConvertedX;
-        };
-
-        ViewportManager.prototype.ConvertY = function (Y, NodeHeight) {
-            var ConvertedY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y)) - NodeHeight / 2;
-            return ConvertedY;
         };
         return ViewportManager;
     })();

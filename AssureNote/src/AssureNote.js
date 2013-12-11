@@ -89,7 +89,7 @@ var AssureNote;
                 var Node = this.PictgramPanel.ViewMap[Label];
                 if (Node != null) {
                     if ($("#" + Label).length > 0) {
-                        this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetGx(), Node.GetGy(), Node.GetShape().GetNodeWidth(), Node.GetShape().GetNodeHeight());
+                        this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
                     } else {
                         this.DebugP("Invisible node " + Label + " Selected.");
                     }

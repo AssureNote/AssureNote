@@ -210,7 +210,7 @@ module AssureNote {
 			this.ControlLayer.style["MozTransform"]    = style;
 			this.ControlLayer.style["webkitTransform"] = style;
 			this.ControlLayer.style["msTransform"]     = style;
-			this.ControlLayer.style["OTransform"]      = style;
+            this.ControlLayer.style["OTransform"]      = style;
 		}
 
         SetScale(scale: number): void {
@@ -309,21 +309,10 @@ module AssureNote {
 			return Math.min(scaleWidth, scaleHeight);
 		}
 
-		SetCaseCenter(X: number, Y: number, NodeWidth: number, NodeHeight: number): void {
-			var NewOffsetX = this.ConvertX(X, NodeWidth);
-			var NewOffsetY = this.ConvertY(Y, NodeHeight);
+		SetCaseCenter(X: number, Y: number): void {
+            var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));
+            var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y));
 			this.SetOffset(NewOffsetX, NewOffsetY);
-		}
-
-		ConvertX(X: number, NodeWidth: number): number {
-			var ConvertedX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X)) - NodeWidth/2;
-			return ConvertedX;
-
-		}
-
-		ConvertY(Y: number, NodeHeight: number): number {
-			var ConvertedY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y)) - NodeHeight/2;
-			return ConvertedY;
 		}
 	}
 }

@@ -107,26 +107,35 @@ module AssureNote {
 
         // Global X: Scale-independent and transform-independent X distance from leftside of the top goal.
         // Return always 0 if this is top goal.
-        GetGx(): number {
+        GetGX(): number {
             if (NodeView.GlobalPositionCache != null && NodeView.GlobalPositionCache[this.Label]) {
                 return NodeView.GlobalPositionCache[this.Label].X;
             }
 			if (this.Parent == null) {
 				return this.RelativeX;
 			}
-			return this.Parent.GetGx() + this.RelativeX;
+			return this.Parent.GetGX() + this.RelativeX;
 		}
 
         // Global Y: Scale-independent and transform-independent Y distance from top of the top goal.
         // Return always 0 if this is top goal.
-        GetGy(): number {
+        GetGY(): number {
             if (NodeView.GlobalPositionCache != null && NodeView.GlobalPositionCache[this.Label]) {
                 return NodeView.GlobalPositionCache[this.Label].Y;
             }
 			if (this.Parent == null) {
 				return this.RelativeY;
 			}
-			return this.Parent.GetGy() + this.RelativeY;
+			return this.Parent.GetGY() + this.RelativeY;
+        }
+
+        // Global center X/Y: Node center position
+        GetCenterGX(): number {
+            return this.GetGX() + this.Shape.GetNodeWidth() * 0.5;
+        }
+
+        GetCenterGY(): number {
+            return this.GetGY() + this.Shape.GetNodeHeight() * 0.5;
         }
 
         // For memorization
