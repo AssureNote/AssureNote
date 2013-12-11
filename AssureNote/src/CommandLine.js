@@ -118,17 +118,25 @@ var AssureNote;
             };
 
             this.FunctionMap["set"] = function (AssureNoteApp, Args) {
-                if (Args.length > 2) {
+                if (Args.length > 0) {
                     switch (Args[0]) {
                         case "color":
-                            if (AssureNoteApp.PictgramPanel.ViewMap == null) {
-                                console.log("'set color' is disabled.");
-                                break;
+                            if (Args.length > 2) {
+                                if (AssureNoteApp.PictgramPanel.ViewMap == null) {
+                                    console.log("'set color' is disabled.");
+                                    break;
+                                }
+                                var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
+                                if (Node != null) {
+                                    console.log(Args);
+                                    $("#" + Args[1] + " h4").css("background-color", Args[2]);
+                                }
                             }
-                            var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
-                            if (Node != null) {
+                            break;
+                        case "scale":
+                            if (Args.length > 1) {
                                 console.log(Args);
-                                $("#" + Args[1] + " h4").css("background-color", Args[2]);
+                                AssureNoteApp.PictgramPanel.ViewPort.SetScale(Args[1] - 0);
                             }
                             break;
                     }
