@@ -11,3 +11,4 @@ src/Viewport.ts
 src/Editor.ts
 
 plugin/FullScreenEditor/FullScreenEditor.ts
+plugin/MessageChat/MessageChat.ts

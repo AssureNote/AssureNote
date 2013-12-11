@@ -7,6 +7,7 @@
 
 ///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='plugin/MessageChat/MessageChat.ts'/>
 
 module AssureNote {
 
@@ -833,6 +834,9 @@ $(() => {
 
 	AssureNote.SideMenu.Create(Menu);
 
-	var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
+    var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
+    var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
+    AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
+
 });

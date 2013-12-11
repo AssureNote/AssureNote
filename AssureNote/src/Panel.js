@@ -59,7 +59,7 @@ var AssureNote;
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
-
+                console.log(event.keyCode);
                 switch (event.keyCode) {
                     case 58:
                         if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
@@ -69,6 +69,9 @@ var AssureNote;
                         _this.CmdLine.Show();
                         break;
                     case 191:
+                        _this.CmdLine.Show();
+                        break;
+                    case 219:
                         _this.CmdLine.Show();
                         break;
                     case 13:

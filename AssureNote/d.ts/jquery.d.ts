@@ -228,9 +228,14 @@ interface JQueryParam {
 */
 interface JQueryStatic {
     /****
+     notify.js
+    *****/
+    notify(any): any;
+
+    /****
      jquery.cookie.js
     *****/
-	cookie(any): any;
+    cookie(any): any;
 
     /****
      AJAX

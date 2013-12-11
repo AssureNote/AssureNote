@@ -74,8 +74,8 @@ module AssureNote {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
-
-				switch (event.keyCode) {
+                console.log(event.keyCode);
+                switch (event.keyCode) {
 					case 58: /*: in Firefox*/
 						if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
 							break;
@@ -85,7 +85,10 @@ module AssureNote {
 						break;
 					case 191: /*/*/
 						this.CmdLine.Show();
-						break;
+                        break;
+                    case 219: /*@*/
+                        this.CmdLine.Show();
+                        break;
 					case 13: /*Enter*/
 						if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
 							var ParsedCommand = new CommandParser();
