@@ -145,7 +145,10 @@ var AssureNote;
             var width = Screen.ContentLayer.clientWidth;
             var height = Screen.ContentLayer.clientHeight;
             var pointer = this.Pointers[0];
-            //Screen.SetOffset(width / 2 - pointer.pageX, height / 2 - pointer.pageY);
+        };
+
+        ScrollManager.prototype.OnMouseWheel = function (e, Screen) {
+            Screen.SetScale(Screen.GetScale() * (1 + e.deltaY * 0.02));
         };
         return ScrollManager;
     })();
@@ -186,7 +189,11 @@ var AssureNote;
             this.ContentLayer.addEventListener("gesturedoubletap", function (e) {
                 _this.ScrollManager.OnDoubleTap(e, _this);
             }, false);
+
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
+            $(this.EventMapLayer).on('mousewheel', function (e) {
+                _this.ScrollManager.OnMouseWheel(e, _this);
+            });
         }
         ViewportManager.translateA = function (x, y) {
             return "translate(" + x + " " + y + ") ";
@@ -221,6 +228,7 @@ var AssureNote;
         };
 
         ViewportManager.prototype.SetScale = function (scale) {
+            scale = Math.max(0.2, Math.min(2.0, scale));
             this.Scale = scale;
             var cx = this.GetPageCenterX();
             var cy = this.GetPageCenterY();
