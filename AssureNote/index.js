@@ -471,55 +471,63 @@ var AssureNote;
         };
 
         GSNShape.CreateSVGMoveAnimateElement = function (Duration, FromGX, FromGY) {
-            var AnimateElement = AssureNote.AssureNoteUtils.CreateSVGElement("animateTransform");
-            AnimateElement.setAttribute("attributeName", "transform");
-            AnimateElement.setAttribute("attributeType", "XML");
-            AnimateElement.setAttribute("type", "translate");
-            AnimateElement.setAttribute("calcMode", "spline");
-            AnimateElement.setAttribute("keyTimes", "0;1");
-            AnimateElement.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
-            AnimateElement.setAttribute("restart", "never");
-            AnimateElement.setAttribute("begin", "indefinite");
+            if (GSNShape.SVGMoveAnimateElementMaster == null) {
+                GSNShape.SVGMoveAnimateElementMaster = AssureNote.AssureNoteUtils.CreateSVGElement("animateTransform");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("attributeName", "transform");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("attributeType", "XML");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("type", "translate");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("calcMode", "spline");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("keyTimes", "0;1");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("restart", "never");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("begin", "indefinite");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("repeatCount", "1");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("additive", "sum");
+                GSNShape.SVGMoveAnimateElementMaster.setAttribute("to", "0,0");
+            }
+            var AnimateElement = GSNShape.SVGMoveAnimateElementMaster.cloneNode();
             AnimateElement.setAttribute("dur", Duration.toString() + "ms");
-            AnimateElement.setAttribute("repeatCount", "1");
-            AnimateElement.setAttribute("additive", "sum");
             AnimateElement.setAttribute("from", "" + FromGX + "," + FromGY);
-            AnimateElement.setAttribute("to", "0,0");
             return AnimateElement;
         };
 
-        GSNShape.CreateSVGArrowMoveAnimateElement = function (Duration, OldPath, NewPath) {
-            var AnimateElement = AssureNote.AssureNoteUtils.CreateSVGElement("animate");
-            AnimateElement.setAttribute("attributeName", "d");
-            AnimateElement.setAttribute("attributeType", "XML");
-            AnimateElement.setAttribute("calcMode", "spline");
-            AnimateElement.setAttribute("keyTimes", "0;1");
-            AnimateElement.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
-            AnimateElement.setAttribute("restart", "never");
-            AnimateElement.setAttribute("begin", "indefinite");
+        GSNShape.CreateSVGArrowAnimateElement = function (Duration, OldPath, NewPath) {
+            if (GSNShape.SVGArrowAnimateElementMaster == null) {
+                GSNShape.SVGArrowAnimateElementMaster = AssureNote.AssureNoteUtils.CreateSVGElement("animate");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("attributeName", "d");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("attributeType", "XML");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("calcMode", "spline");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("keyTimes", "0;1");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("restart", "never");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("begin", "indefinite");
+                GSNShape.SVGArrowAnimateElementMaster.setAttribute("repeatCount", "1");
+            }
+            var AnimateElement = GSNShape.SVGArrowAnimateElementMaster.cloneNode();
             AnimateElement.setAttribute("dur", Duration.toString() + "ms");
-            AnimateElement.setAttribute("repeatCount", "1");
             if (OldPath) {
                 AnimateElement.setAttribute("from", OldPath);
-                console.log(OldPath);
             }
             AnimateElement.setAttribute("to", NewPath);
             return AnimateElement;
         };
 
         GSNShape.CreateSVGFadeInAnimateElement = function (Duration) {
-            var AnimateElement = AssureNote.AssureNoteUtils.CreateSVGElement("animate");
-            AnimateElement.setAttribute("attributeName", "fill-opacity");
-            AnimateElement.setAttribute("attributeType", "XML");
-            AnimateElement.setAttribute("calcMode", "spline");
-            AnimateElement.setAttribute("keyTimes", "0;1");
-            AnimateElement.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
-            AnimateElement.setAttribute("restart", "never");
-            AnimateElement.setAttribute("begin", "indefinite");
+            if (GSNShape.SVGFadeinAnimateElementMaster == null) {
+                GSNShape.SVGFadeinAnimateElementMaster = AssureNote.AssureNoteUtils.CreateSVGElement("animate");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("attributeName", "fill-opacity");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("attributeType", "XML");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("calcMode", "spline");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("keyTimes", "0;1");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("restart", "never");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("begin", "indefinite");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("repeatCount", "1");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("from", "0");
+                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("to", "1");
+            }
+            var AnimateElement = GSNShape.SVGFadeinAnimateElementMaster.cloneNode();
             AnimateElement.setAttribute("dur", Duration.toString() + "ms");
-            AnimateElement.setAttribute("repeatCount", "1");
-            AnimateElement.setAttribute("from", "0");
-            AnimateElement.setAttribute("to", "1");
             return AnimateElement;
         };
 
@@ -636,7 +644,7 @@ var AssureNote;
                 if (this.GX == null || this.GY == null) {
                     var AnimateElement = GSNShape.CreateSVGFadeInAnimateElement(Duration);
                 } else {
-                    var AnimateElement = GSNShape.CreateSVGArrowMoveAnimateElement(Duration, this.OldArrowPath, NewPath);
+                    var AnimateElement = GSNShape.CreateSVGArrowAnimateElement(Duration, this.OldArrowPath, NewPath);
                 }
 
                 this.ArrowPath.appendChild(AnimateElement);
