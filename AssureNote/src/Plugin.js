@@ -47,7 +47,11 @@ var AssureNote;
             this.PluginMap = {};
         }
         PluginManager.prototype.SetPlugin = function (Name, Plugin) {
-            this.PluginMap[Name] = Plugin;
+            if (!this.PluginMap[Name]) {
+                this.PluginMap[Name] = Plugin;
+            } else {
+                this.AssureNoteApp.DebugP("Plugin " + name + " already defined.");
+            }
         };
 
         PluginManager.prototype.GetPanelPlugin = function (Name, Label) {

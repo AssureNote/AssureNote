@@ -53,9 +53,13 @@ module AssureNote {
 			this.PluginMap = {};
         }
 
-		SetPlugin(Name: string, Plugin: Plugin): void {
-			this.PluginMap[Name] = Plugin;
-		}
+        SetPlugin(Name: string, Plugin: Plugin): void {
+            if (!this.PluginMap[Name]) {
+                this.PluginMap[Name] = Plugin;
+            } else {
+                this.AssureNoteApp.DebugP("Plugin " + name + " already defined.");
+            }
+        }
 
 		GetPanelPlugin(Name: string, Label?: string): Plugin {
 			//TODO change plugin by Label

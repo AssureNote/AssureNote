@@ -17,7 +17,7 @@ module AssureNote {
 		ViewPort: ViewportManager;
 		ViewMap: { [index: string]: NodeView };
 		MasterView: NodeView;
-		CmdLine: CommandLine;
+        CmdLine: CommandLine;
         Search: Search;
 
 		CurrentDoc: GSNDoc;// Convert to caseview
