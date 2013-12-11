@@ -1,6 +1,5 @@
 "use strict";
 var express = require('express')
-  , routes = require('./routes')
   , http = require('http')
   , path = require('path');
 
@@ -21,8 +20,6 @@ app.configure(function(){
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
-
-app.get('/', routes.index);
 
 var server = http.createServer(app);
 server.listen(app.get('port'), function(){
