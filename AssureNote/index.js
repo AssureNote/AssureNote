@@ -336,6 +336,7 @@ var AssureNote;
             this.Content = null;
             this.NodeWidth = 250;
             this.NodeHeight = 0;
+            this.HeadBoundingBox = new Rect(0, 0, 0, 0);
             this.TreeBoundingBox = new Rect(0, 0, 0, 0);
         }
         GSNShape.CreateArrowPath = function () {
@@ -353,6 +354,11 @@ var AssureNote;
         GSNShape.prototype.SetTreeSize = function (Width, Height) {
             this.TreeBoundingBox.Width = Width;
             this.TreeBoundingBox.Height = Height;
+        };
+
+        GSNShape.prototype.SetHeadSize = function (Width, Height) {
+            this.HeadBoundingBox.Width = Width;
+            this.HeadBoundingBox.Height = Height;
         };
 
         GSNShape.prototype.GetNodeWidth = function () {
@@ -380,18 +386,39 @@ var AssureNote;
             return this.TreeBoundingBox.Height;
         };
 
+        GSNShape.prototype.GetHeadWidth = function () {
+            if (this.HeadBoundingBox.Width == 0) {
+                this.HeadBoundingBox.Width = 250;
+            }
+            return this.HeadBoundingBox.Width;
+        };
+
+        GSNShape.prototype.GetHeadHeight = function () {
+            if (this.HeadBoundingBox.Height == 0) {
+                this.HeadBoundingBox.Height = 100;
+            }
+            return this.HeadBoundingBox.Height;
+        };
+
         GSNShape.prototype.GetTreeLeftX = function () {
             return this.TreeBoundingBox.X;
         };
 
-        GSNShape.prototype.GetTreeUpperY = function () {
-            return this.TreeBoundingBox.Y;
+        //GetTreeUpperY(): number {
+        //    return this.TreeBoundingBox.Y;
+        //}
+        GSNShape.prototype.GetHeadLeftX = function () {
+            return this.HeadBoundingBox.X;
         };
 
         GSNShape.prototype.SetTreeUpperLeft = function (X, Y) {
-            this.PreviousTreeTopLeft = new AssureNote.Point(this.TreeBoundingBox.X, this.TreeBoundingBox.Y);
             this.TreeBoundingBox.X = X;
             this.TreeBoundingBox.Y = Y;
+        };
+
+        GSNShape.prototype.SetHeadUpperLeft = function (X, Y) {
+            this.HeadBoundingBox.X = X;
+            this.HeadBoundingBox.Y = Y;
         };
 
         GSNShape.prototype.UpdateHtmlClass = function () {
