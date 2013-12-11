@@ -115,7 +115,10 @@ module AssureNote {
 
                     //var DoCompaction = true;
 
-                    if (/*DoCompaction && */SubNode.IsFolded) {
+                    var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
+                    var IsFolded = SubNode.IsFolded || IsUndeveloped;
+
+                    if (/*DoCompaction && */IsFolded) {
                         SubNode.RelativeX = ChildrenTopWidth;
                         ChildrenTopWidth = ChildrenTopWidth + SubNode.Shape.GetNodeWidth() + Margin;
                         FoldedNodeRun.push(SubNode);
@@ -152,7 +155,7 @@ module AssureNote {
                     }
                     SubNode.RelativeY = TreeHeight;
 
-                    IsLastChildFolded = SubNode.IsFolded;
+                    IsLastChildFolded = IsFolded;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     //console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
                 });

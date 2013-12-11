@@ -117,7 +117,11 @@ var AssureNote;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     var Margin = SimpleLayoutEngine.TreeMargin;
 
-                    if (SubNode.IsFolded) {
+                    //var DoCompaction = true;
+                    var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
+                    var IsFolded = SubNode.IsFolded || IsUndeveloped;
+
+                    if (IsFolded) {
                         SubNode.RelativeX = ChildrenTopWidth;
                         ChildrenTopWidth = ChildrenTopWidth + SubNode.Shape.GetNodeWidth() + Margin;
                         FoldedNodeRun.push(SubNode);
@@ -154,7 +158,7 @@ var AssureNote;
                     }
                     SubNode.RelativeY = TreeHeight;
 
-                    IsLastChildFolded = SubNode.IsFolded;
+                    IsLastChildFolded = IsFolded;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     //console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
                 });

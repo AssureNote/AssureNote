@@ -159,19 +159,27 @@ module AssureNote {
 		private OffsetY: number = 0;
 		private LogicalOffsetX: number = 0;
 		private LogicalOffsetY: number = 0;
-		private Scale: number = 1.0;
+        private Scale: number = 1.0;
+
+        private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
+            Element.style["transformOrigin"] = Value;
+            Element.style["MozTransformOrigin"] = Value;
+            Element.style["msTransformOrigin"] = Value;
+            Element.style["OTransformOrigin"] = Value;
+            Element.style["webkitTransformOrigin"] = Value;
+        }
+
+        private SetTransformToElement(Element: HTMLElement, Value: string) {
+            Element.style["transform"] = Value;
+            Element.style["MozTransform"] = Value;
+            Element.style["msTransform"] = Value;
+            Element.style["OTransform"] = Value;
+            Element.style["webkitTransform"] = Value;
+        }
 
 		constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
-			this.ContentLayer.style["transformOrigin"]       = "left top";
-			this.ContentLayer.style["MozTransformOrigin"]    = "left top";
-			this.ContentLayer.style["msTransformOrigin"]     = "left top";
-			this.ContentLayer.style["OTransformOrigin"]      = "left top";
-            this.ContentLayer.style["webkitTransformOrigin"] = "left top";
-            this.ControlLayer.style["transformOrigin"] = "left top";
-            this.ControlLayer.style["MozTransformOrigin"] = "left top";
-            this.ControlLayer.style["msTransformOrigin"] = "left top";
-            this.ControlLayer.style["OTransformOrigin"] = "left top";
-            this.ControlLayer.style["webkitTransformOrigin"] = "left top";
+            this.SetTransformOriginToElement(this.ContentLayer, "left top");
+            this.SetTransformOriginToElement(this.ControlLayer, "left top");
 			this.UpdateAttr();
 			var OnPointer = (e: PointerEvent) => { this.ScrollManager.OnPointerEvent(e, this); };
 			this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
@@ -206,16 +214,8 @@ module AssureNote {
 			var attr: string = ViewportManager.translateA(this.OffsetX, this.OffsetY) + ViewportManager.scaleA(this.Scale);
 			var style: string = ViewportManager.translateS(this.OffsetX, this.OffsetY) + ViewportManager.scaleS(this.Scale);
 			this.SVGLayer.setAttribute("transform", attr);
-			this.ContentLayer.style["transform"]       = style;
-			this.ContentLayer.style["MozTransform"]    = style;
-			this.ContentLayer.style["webkitTransform"] = style;
-			this.ContentLayer.style["msTransform"]     = style;
-			this.ContentLayer.style["OTransform"]      = style;
-			this.ControlLayer.style["transform"]       = style;
-			this.ControlLayer.style["MozTransform"]    = style;
-			this.ControlLayer.style["webkitTransform"] = style;
-			this.ControlLayer.style["msTransform"]     = style;
-            this.ControlLayer.style["OTransform"]      = style;
+            this.SetTransformToElement(this.ContentLayer, style);
+            this.SetTransformToElement(this.ControlLayer, style);
 		}
 
         SetScale(scale: number): void {
