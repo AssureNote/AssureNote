@@ -128,6 +128,10 @@ module AssureNote {
 				if (Args.length > 2) {
 					switch (Args[0]) {
 						case "color":
+							if (AssureNoteApp.PictgramPanel.ViewMap == null) {
+								console.log("'set color' is disabled.");
+								break;
+							}
 							var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
 							if (Node != null) {
 								console.log(Args);

@@ -36,7 +36,7 @@ var AssureNote;
                 }
                 var wx0 = TargetView.GetGx();
                 var wy0 = TargetView.GetGy();
-                _this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null);
+                _this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300);
                 var wx1 = TargetView.GetGx();
                 var wy1 = TargetView.GetGy();
                 var ViewPort = _this.AssureNoteApp.PictgramPanel.ViewPort;
@@ -66,7 +66,7 @@ var AssureNote;
         };
 
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            if (NodeView.GetNodeType() != GSNType.Goal) {
+            if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
                 return null;
             }
             return new AssureNote.MenuBarButton("folded-id", "images/copy.png", "fold", this.FoldingAction);

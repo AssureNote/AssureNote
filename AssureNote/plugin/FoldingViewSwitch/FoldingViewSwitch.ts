@@ -29,7 +29,7 @@ module AssureNote {
 				}
 				var wx0 = TargetView.GetGx();
 				var wy0 = TargetView.GetGy();
-				this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null); //FIXME Gx, Gy
+				this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300); //FIXME Gx, Gy
 				var wx1 = TargetView.GetGx();
 				var wy1 = TargetView.GetGy();
 				var ViewPort = this.AssureNoteApp.PictgramPanel.ViewPort;
@@ -60,7 +60,7 @@ module AssureNote {
 		}
 
 		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
-			if (NodeView.GetNodeType() != GSNType.Goal) {
+			if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
 				return null;
 			}
 			return new MenuBarButton("folded-id", "images/copy.png", "fold", this.FoldingAction);
