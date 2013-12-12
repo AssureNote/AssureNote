@@ -19,7 +19,7 @@ var AssureNote;
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new AssureNote.MenuBar(AssureNoteApp);
-            this.ContentLayer.onclick = function (event) {
+            this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
                 _this.AssureNoteApp.DebugP("click:" + Label);
                 if (Bar.IsEnable) {
@@ -36,26 +36,26 @@ var AssureNote;
                     _this.FocusedLabel = null;
                 }
                 return false;
-            };
+            });
 
             //FIXME
-            this.EventMapLayer.onclick = function (event) {
+            this.EventMapLayer.addEventListener("click", function (event) {
                 _this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
-            };
+            });
 
-            this.ContentLayer.ondblclick = function (event) {
+            this.ContentLayer.addEventListener("dblclick", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
                 var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("double click:" + Label);
                 return false;
-            };
+            });
 
             this.CmdLine = new AssureNote.CommandLine();
             this.Search = new AssureNote.Search(AssureNoteApp);
-            document.onkeydown = function (event) {
+            document.addEventListener("keydown", function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
@@ -85,17 +85,17 @@ var AssureNote;
                         }
                         break;
                 }
-            };
+            });
 
-            this.ContentLayer.onmouseover = function (event) {
+            this.ContentLayer.addEventListener("mouseover", function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
                 if (Label) {
-                    _this.AssureNoteApp.DebugP("mouseover:" + Label);
+                    //this.AssureNoteApp.DebugP("mouseover:"+Label);
                 }
-            };
+            });
 
             var DragHandler = function (e) {
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {

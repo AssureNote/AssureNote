@@ -34,20 +34,23 @@ module AssureNote {
 	}
 
 	export class ScrollManager {
-		InitialOffsetX: number = 0;
-		InitialOffsetY: number = 0;
-		InitialX: number = 0;
-		InitialY: number = 0;
-		CurrentX: number = 0;
-		CurrentY: number = 0;
-		Dx: number = 0;
-		Dy: number = 0;
-		MainPointerID: number = null;
-		Pointers: Pointer[] = [];
+        private InitialOffsetX: number = 0;
+        private InitialOffsetY: number = 0;
+        private InitialX: number = 0;
+        private InitialY: number = 0;
+        private CurrentX: number = 0;
+        private CurrentY: number = 0;
+        private Dx: number = 0;
+        private Dy: number = 0;
+        private MainPointerID: number = null;
+		private Pointers: Pointer[] = [];
 
 		private timer: number = 0;
 		private ANIMATE_THRESHOLD: number = 5;
-		private SPEED_MAX: number = 100;
+        private SPEED_MAX: number = 100;
+
+        constructor(private Viewport: ViewportManager) {
+        }
 
 		private SetInitialOffset(InitialOffsetX: number, InitialOffsetY: number) {
 			this.InitialOffsetX = InitialOffsetX;
@@ -102,26 +105,32 @@ module AssureNote {
 		}
 
 		OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
-			this.Pointers = e.getPointerList();
-			if (this.Pointers.length > 0) {
-				if (this.IsDragging()) {
-					var mainPointer = this.GetMainPointer();
-					if (mainPointer) {
-						this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-						Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
-					} else {
-						this.MainPointerID = null;
-					}
+            this.Pointers = e.getPointerList();
+            var IsTherePointer: boolean = this.Pointers.length > 0;
+            var HasDragJustStarted: boolean = IsTherePointer && !this.IsDragging();
+            var HasDragJustEnded: boolean = !IsTherePointer && this.IsDragging();
+
+            if (IsTherePointer) {
+                if (HasDragJustStarted) {
+                    this.StopAnimation();
+                    this.timer = null;
+                    var mainPointer = this.Pointers[0];
+                    this.MainPointerID = mainPointer.identifier;
+                    this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
+                    this.StartDrag(mainPointer.pageX, mainPointer.pageY);
+                    this.Viewport.SetEventMapLayerPosition(true);
 				} else {
-					this.StopAnimation();
-					this.timer = null;
-					var mainPointer = this.Pointers[0];
-					this.MainPointerID = mainPointer.identifier;
-					this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
-					this.StartDrag(mainPointer.pageX, mainPointer.pageY);
+                    var mainPointer = this.GetMainPointer();
+                    if (mainPointer) {
+                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
+                        Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
+                    } else {
+                        this.MainPointerID = null;
+                        this.Viewport.SetEventMapLayerPosition(false);
+                    }
 				}
 			} else {
-				if (this.IsDragging()) {
+                if (HasDragJustEnded) {
 					if (this.timer) {
 						this.StopAnimation();
 						this.timer = null;
@@ -138,6 +147,7 @@ module AssureNote {
 					}, 16);
 				}
 				this.MainPointerID = null;
+                this.Viewport.SetEventMapLayerPosition(false);
 			}
 		}
 
@@ -154,7 +164,7 @@ module AssureNote {
 
 	export class ViewportManager {
 		//windowX, windowY
-		ScrollManager: ScrollManager = new ScrollManager();
+		ScrollManager: ScrollManager = new ScrollManager(this);
 		private OffsetX: number = 0;
 		private OffsetY: number = 0;
 		private LogicalOffsetX: number = 0;
@@ -185,14 +195,24 @@ module AssureNote {
 			this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
 			this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
 			this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
-			this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
-			this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
-			this.ContentLayer.addEventListener("pointermove", OnPointer, false);
-			this.ContentLayer.addEventListener("pointerup", OnPointer, false);
-			this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
+			//this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
+			//this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
+			//this.ContentLayer.addEventListener("pointermove", OnPointer, false);
+			//this.ContentLayer.addEventListener("pointerup", OnPointer, false);
+			//this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
-            $(this.EventMapLayer).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
-		}
+            $(this.EventMapLayer.parentElement).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
+        }
+
+        private IsEventMapUpper: boolean = false;
+        public SetEventMapLayerPosition(IsUpper: boolean) {
+            if (IsUpper && !this.IsEventMapUpper) {
+                $(this.ControlLayer).after(this.EventMapLayer);
+            } else if(!IsUpper && this.IsEventMapUpper){
+                $(this.ContentLayer).before(this.EventMapLayer);
+            }
+            this.IsEventMapUpper = IsUpper;
+        }
 
 		private static translateA(x: number, y: number): string {
 			return "translate(" + x + " " + y + ") ";
