@@ -10,7 +10,7 @@ module AssureNote {
         }
 
         ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-			$.notify(Args.join(" "));
+			$.notify(Args.join(" "), "info");
 		}
 	}
 }

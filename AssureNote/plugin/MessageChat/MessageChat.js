@@ -16,8 +16,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         MessageChatPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            console.log(Args.join(" "));
-            $.notify(Args.join(" "));
+            $.notify(Args.join(" "), "info");
         };
         return MessageChatPlugin;
     })(AssureNote.Plugin);

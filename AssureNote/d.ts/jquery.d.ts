@@ -230,7 +230,8 @@ interface JQueryStatic {
     /****
      notify.js
     *****/
-    notify(any): any;
+    notify(str: any): any;
+    notify(str: any, type: any): any;
 
     /****
      jquery.cookie.js
