@@ -38,15 +38,14 @@ var AssureNote;
             this.CurrentView = CurrentView;
             $('#menu').remove();
             this.Menu = $('<div id="menu" style="display: none;"></div>');
-            this.Menu.appendTo($(ControlLayer));
+            this.Menu.appendTo(ControlLayer);
             this.CreateButtons(Contents);
 
             var refresh = function () {
                 AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);
-                var NodeRect = _this.CurrentView.Shape.Content.getBoundingClientRect();
-                var Scale = _this.AssureNoteApp.PictgramPanel.ViewPort.GetScale();
-                var Top = NodeRect.top / Scale + NodeRect.height + 5;
-                var Left = NodeRect.left / Scale + (NodeRect.width - _this.Menu.width()) / 2;
+                var Node = _this.CurrentView;
+                var Top = Node.GetGY() + Node.Shape.GetNodeHeight() + 5;
+                var Left = Node.GetGX() + (Node.Shape.GetNodeWidth() - _this.Menu.width()) / 2;
                 _this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
             };
 

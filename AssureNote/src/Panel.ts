@@ -30,7 +30,7 @@ module AssureNote {
 			this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
-			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ContentLayer);
+			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
 			var Bar = new MenuBar(AssureNoteApp);

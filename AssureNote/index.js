@@ -108,26 +108,35 @@ var AssureNote;
 
         // Global X: Scale-independent and transform-independent X distance from leftside of the top goal.
         // Return always 0 if this is top goal.
-        NodeView.prototype.GetGx = function () {
+        NodeView.prototype.GetGX = function () {
             if (NodeView.GlobalPositionCache != null && NodeView.GlobalPositionCache[this.Label]) {
                 return NodeView.GlobalPositionCache[this.Label].X;
             }
             if (this.Parent == null) {
                 return this.RelativeX;
             }
-            return this.Parent.GetGx() + this.RelativeX;
+            return this.Parent.GetGX() + this.RelativeX;
         };
 
         // Global Y: Scale-independent and transform-independent Y distance from top of the top goal.
         // Return always 0 if this is top goal.
-        NodeView.prototype.GetGy = function () {
+        NodeView.prototype.GetGY = function () {
             if (NodeView.GlobalPositionCache != null && NodeView.GlobalPositionCache[this.Label]) {
                 return NodeView.GlobalPositionCache[this.Label].Y;
             }
             if (this.Parent == null) {
                 return this.RelativeY;
             }
-            return this.Parent.GetGy() + this.RelativeY;
+            return this.Parent.GetGY() + this.RelativeY;
+        };
+
+        // Global center X/Y: Node center position
+        NodeView.prototype.GetCenterGX = function () {
+            return this.GetGX() + this.Shape.GetNodeWidth() * 0.5;
+        };
+
+        NodeView.prototype.GetCenterGY = function () {
+            return this.GetGY() + this.Shape.GetNodeHeight() * 0.5;
         };
 
         NodeView.SetGlobalPositionCacheEnabled = function (State) {
