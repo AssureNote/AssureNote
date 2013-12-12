@@ -258,13 +258,21 @@ module AssureNote {
 		private CalcLogicalOffsetY(OffsetY: number): number {
 			var cy = this.GetPageCenterY();
 			return (OffsetY - cy) / this.Scale + cy;
-		}
+        }
 
-		CalcLogicalOffsetXFromPageX(PageX: number): number {
+        PageXFromGX(GX: number) {
+            return (this.GetLogicalOffsetX() - GX) * this.Scale + this.GetPageCenterX();
+        }
+
+        PageYFromGY(GY: number) {
+            return (this.GetLogicalOffsetY() - GY) * this.Scale + this.GetPageCenterY();
+        }
+
+		GXFromPageX(PageX: number): number {
 			return this.GetLogicalOffsetX() - (PageX - this.GetPageCenterX()) / this.Scale;
 		}
 
-		CalcLogicalOffsetYFromPageY(PageY: number): number {
+		GYFromPageY(PageY: number): number {
 			return this.GetLogicalOffsetY() - (PageY - this.GetPageCenterY()) / this.Scale;
 		}
 

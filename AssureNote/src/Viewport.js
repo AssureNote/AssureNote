@@ -274,11 +274,19 @@ var AssureNote;
             return (OffsetY - cy) / this.Scale + cy;
         };
 
-        ViewportManager.prototype.CalcLogicalOffsetXFromPageX = function (PageX) {
+        ViewportManager.prototype.PageXFromGX = function (GX) {
+            return (this.GetLogicalOffsetX() - GX) * this.Scale + this.GetPageCenterX();
+        };
+
+        ViewportManager.prototype.PageYFromGY = function (GY) {
+            return (this.GetLogicalOffsetY() - GY) * this.Scale + this.GetPageCenterY();
+        };
+
+        ViewportManager.prototype.GXFromPageX = function (PageX) {
             return this.GetLogicalOffsetX() - (PageX - this.GetPageCenterX()) / this.Scale;
         };
 
-        ViewportManager.prototype.CalcLogicalOffsetYFromPageY = function (PageY) {
+        ViewportManager.prototype.GYFromPageY = function (PageY) {
             return this.GetLogicalOffsetY() - (PageY - this.GetPageCenterY()) / this.Scale;
         };
 
