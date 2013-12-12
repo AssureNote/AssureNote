@@ -60,8 +60,14 @@ var AssureNote;
             Shape.FitSizeToContent();
             var TreeLeftX = 0;
             var ThisNodeWidth = Shape.GetNodeWidth();
-            var TreeWidth = ThisNodeWidth;
+            var TreeRightX = ThisNodeWidth;
             var TreeHeight = Shape.GetNodeHeight();
+            if (ThisNode.IsFolded) {
+                Shape.SetHeadSize(ThisNodeWidth, TreeHeight);
+                Shape.SetTreeSize(ThisNodeWidth, TreeHeight);
+                Shape.SetHeadUpperLeft(0, 0);
+                Shape.SetTreeUpperLeft(0, 0);
+            }
             if (ThisNode.Left != null) {
                 var OffsetX = 0;
                 var OffsetY = -SimpleLayoutEngine.ContextMargin;
@@ -74,7 +80,7 @@ var AssureNote;
                     OffsetY += SubNode.Shape.GetNodeHeight();
                 });
                 if (OffsetY > 0) {
-                    TreeWidth += OffsetX;
+                    TreeRightX += OffsetX;
                     TreeLeftX = -OffsetX;
                     if (OffsetY > TreeHeight) {
                         TreeHeight = OffsetY;
@@ -93,14 +99,15 @@ var AssureNote;
                     OffsetY += SubNode.Shape.GetNodeHeight();
                 });
                 if (OffsetY > 0) {
-                    TreeWidth += OffsetX;
+                    TreeRightX += OffsetX;
                     if (OffsetY > TreeHeight) {
                         TreeHeight = OffsetY;
                     }
                 }
             }
-            var HeadWidth = TreeWidth + -TreeLeftX;
+            var HeadWidth = TreeRightX - TreeLeftX;
             Shape.SetHeadSize(HeadWidth, TreeHeight);
+            Shape.SetHeadUpperLeft(TreeLeftX, 0);
             TreeHeight += SimpleLayoutEngine.LevelMargin;
             var ChildrenTopWidth = 0;
             var ChildrenBottomWidth = 0;
@@ -111,7 +118,7 @@ var AssureNote;
                 ThisNode.ForEachVisibleChildren(function (SubNode) {
                     _this.Layout(SubNode);
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
-                    var ChildHeadWidth = SubNode.Shape.GetHeadWidth();
+                    var ChildHeadWidth = SubNode.IsFolded ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
                     var ChildHeadLeftSideMargin = -SubNode.Shape.GetTreeLeftX() + SubNode.Shape.GetHeadLeftX();
                     var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
@@ -119,11 +126,11 @@ var AssureNote;
 
                     //var DoCompaction = true;
                     var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
-                    var IsFolded = SubNode.IsFolded || IsUndeveloped;
+                    var IsFoldedLike = SubNode.IsFolded || IsUndeveloped;
 
-                    if (IsFolded) {
+                    if (IsFoldedLike) {
                         SubNode.RelativeX = ChildrenTopWidth;
-                        ChildrenTopWidth = ChildrenTopWidth + SubNode.Shape.GetNodeWidth() + Margin;
+                        ChildrenTopWidth = ChildrenTopWidth + ChildHeadWidth + Margin;
                         FoldedNodeRun.push(SubNode);
                     } else {
                         if (IsLastChildFolded) {
@@ -158,7 +165,7 @@ var AssureNote;
                     }
                     SubNode.RelativeY = TreeHeight;
 
-                    IsLastChildFolded = IsFolded;
+                    IsLastChildFolded = IsFoldedLike;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     //console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
                 });
@@ -171,10 +178,10 @@ var AssureNote;
                 });
 
                 TreeHeight += ChildrenHeight;
-                TreeWidth = Math.max(ChildrenWidth, HeadWidth);
+                TreeRightX = Math.max(ChildrenWidth, HeadWidth);
             }
             Shape.SetTreeUpperLeft(TreeLeftX, 0);
-            Shape.SetTreeSize(TreeWidth, TreeHeight);
+            Shape.SetTreeSize(TreeRightX, TreeHeight);
             //console.log(ThisNode.Label + ": " + (<any>ThisNode.Shape).TreeBoundingBox.toString());
         };
         SimpleLayoutEngine.DefaultMargin = 32;

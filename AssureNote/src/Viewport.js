@@ -32,7 +32,8 @@ var AssureNote;
     }
 
     var ScrollManager = (function () {
-        function ScrollManager() {
+        function ScrollManager(Viewport) {
+            this.Viewport = Viewport;
             this.InitialOffsetX = 0;
             this.InitialOffsetY = 0;
             this.InitialX = 0;
@@ -103,25 +104,31 @@ var AssureNote;
         ScrollManager.prototype.OnPointerEvent = function (e, Screen) {
             var _this = this;
             this.Pointers = e.getPointerList();
-            if (this.Pointers.length > 0) {
-                if (this.IsDragging()) {
-                    var mainPointer = this.GetMainPointer();
-                    if (mainPointer) {
-                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
-                    } else {
-                        this.MainPointerID = null;
-                    }
-                } else {
+            var IsTherePointer = this.Pointers.length > 0;
+            var HasDragJustStarted = IsTherePointer && !this.IsDragging();
+            var HasDragJustEnded = !IsTherePointer && this.IsDragging();
+
+            if (IsTherePointer) {
+                if (HasDragJustStarted) {
                     this.StopAnimation();
                     this.timer = null;
                     var mainPointer = this.Pointers[0];
                     this.MainPointerID = mainPointer.identifier;
                     this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
                     this.StartDrag(mainPointer.pageX, mainPointer.pageY);
+                    this.Viewport.SetEventMapLayerPosition(true);
+                } else {
+                    var mainPointer = this.GetMainPointer();
+                    if (mainPointer) {
+                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
+                        Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
+                    } else {
+                        this.MainPointerID = null;
+                        this.Viewport.SetEventMapLayerPosition(false);
+                    }
                 }
             } else {
-                if (this.IsDragging()) {
+                if (HasDragJustEnded) {
                     if (this.timer) {
                         this.StopAnimation();
                         this.timer = null;
@@ -138,6 +145,7 @@ var AssureNote;
                     }, 16);
                 }
                 this.MainPointerID = null;
+                this.Viewport.SetEventMapLayerPosition(false);
             }
         };
 
@@ -162,12 +170,13 @@ var AssureNote;
             this.ContentLayer = ContentLayer;
             this.ControlLayer = ControlLayer;
             //windowX, windowY
-            this.ScrollManager = new ScrollManager();
+            this.ScrollManager = new ScrollManager(this);
             this.OffsetX = 0;
             this.OffsetY = 0;
             this.LogicalOffsetX = 0;
             this.LogicalOffsetY = 0;
             this.Scale = 1.0;
+            this.IsEventMapUpper = false;
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
@@ -177,18 +186,14 @@ var AssureNote;
             this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
             this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
             this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
-            this.EventMapLayer.addEventListener("gesturedoubletap", function (e) {
-                _this.ScrollManager.OnDoubleTap(e, _this);
-            }, false);
-            this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
-            this.ContentLayer.addEventListener("pointermove", OnPointer, false);
-            this.ContentLayer.addEventListener("pointerup", OnPointer, false);
-            this.ContentLayer.addEventListener("gesturedoubletap", function (e) {
-                _this.ScrollManager.OnDoubleTap(e, _this);
-            }, false);
 
+            //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
+            //this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
+            //this.ContentLayer.addEventListener("pointermove", OnPointer, false);
+            //this.ContentLayer.addEventListener("pointerup", OnPointer, false);
+            //this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
-            $(this.EventMapLayer).on('mousewheel', function (e) {
+            $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
                 _this.ScrollManager.OnMouseWheel(e, _this);
             });
         }
@@ -206,6 +211,15 @@ var AssureNote;
             Element.style["msTransform"] = Value;
             Element.style["OTransform"] = Value;
             Element.style["webkitTransform"] = Value;
+        };
+
+        ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {
+            if (IsUpper && !this.IsEventMapUpper) {
+                $(this.ControlLayer).after(this.EventMapLayer);
+            } else if (!IsUpper && this.IsEventMapUpper) {
+                $(this.ContentLayer).before(this.EventMapLayer);
+            }
+            this.IsEventMapUpper = IsUpper;
         };
 
         ViewportManager.translateA = function (x, y) {
@@ -274,11 +288,19 @@ var AssureNote;
             return (OffsetY - cy) / this.Scale + cy;
         };
 
-        ViewportManager.prototype.CalcLogicalOffsetXFromPageX = function (PageX) {
+        ViewportManager.prototype.PageXFromGX = function (GX) {
+            return (this.GetLogicalOffsetX() - GX) * this.Scale + this.GetPageCenterX();
+        };
+
+        ViewportManager.prototype.PageYFromGY = function (GY) {
+            return (this.GetLogicalOffsetY() - GY) * this.Scale + this.GetPageCenterY();
+        };
+
+        ViewportManager.prototype.GXFromPageX = function (PageX) {
             return this.GetLogicalOffsetX() - (PageX - this.GetPageCenterX()) / this.Scale;
         };
 
-        ViewportManager.prototype.CalcLogicalOffsetYFromPageY = function (PageY) {
+        ViewportManager.prototype.GYFromPageY = function (PageY) {
             return this.GetLogicalOffsetY() - (PageY - this.GetPageCenterY()) / this.Scale;
         };
 
