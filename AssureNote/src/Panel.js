@@ -50,6 +50,10 @@ var AssureNote;
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
                 var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("double click:" + Label);
+                if (Bar.IsEnable) {
+                    Bar.Remove();
+                }
+                _this.AssureNoteApp.ExecDoubleClicked(NodeView);
                 return false;
             });
 

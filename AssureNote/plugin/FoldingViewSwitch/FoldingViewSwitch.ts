@@ -9,6 +9,7 @@ module AssureNote {
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			super();
 			this.HasMenuBarButton = true;
+			this.HasDoubleClicked = true;
 
 			this.FoldingAction = (event: Event, TargetView: NodeView) => {
 				if (TargetView.GetNodeType() == GSNType.Strategy) {
@@ -37,6 +38,11 @@ module AssureNote {
 				var OffY0 = ViewPort.GetOffsetY();
 				this.AssureNoteApp.PictgramPanel.ViewPort.SetOffset(OffX0 + wx1 - wx0, OffY0 + wy1 - wy0);
 			};
+		}
+
+		ExecDoubleClicked(NodeView: NodeView): void {
+			var event = document.createEvent("UIEvents");
+			this.FoldingAction(event, NodeView);
 		}
 
 		ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {

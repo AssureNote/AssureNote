@@ -126,6 +126,11 @@ module AssureNote {
 			}
 		}
 
+		ExecDoubleClicked(NodeView: NodeView): void {
+			var Plugin = this.PluginManager.GetDoubleClicked();
+			Plugin.ExecDoubleClicked(NodeView);
+		}
+
 		ExecCommand(ParsedCommand: CommandParser): void {
 			var Method = ParsedCommand.GetMethod();
 			if (Method == "search") {

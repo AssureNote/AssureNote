@@ -67,6 +67,11 @@ var AssureNote;
             }
         };
 
+        AssureNoteApp.prototype.ExecDoubleClicked = function (NodeView) {
+            var Plugin = this.PluginManager.GetDoubleClicked();
+            Plugin.ExecDoubleClicked(NodeView);
+        };
+
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
             var Method = ParsedCommand.GetMethod();
             if (Method == "search") {

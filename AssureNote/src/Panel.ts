@@ -65,6 +65,10 @@ module AssureNote {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
 				var NodeView = this.ViewMap[Label];
 				this.AssureNoteApp.DebugP("double click:" + Label);
+				if (Bar.IsEnable) { //TODO cancel click event
+					Bar.Remove();
+				}
+				this.AssureNoteApp.ExecDoubleClicked(NodeView);
 				return false;
 			});
 
