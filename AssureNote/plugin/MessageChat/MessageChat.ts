@@ -15,8 +15,10 @@ module AssureNote {
         }
 
         ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-            this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
-			$.notify(Args.join(' '), 'info');
+            if (AssureNoteApp.SocketManager.IsConnected()) {
+                this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
+                $.notify(Args.join(' '), 'info');
+            }
         }
 	}
 

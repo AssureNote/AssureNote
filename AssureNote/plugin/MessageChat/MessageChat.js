@@ -20,8 +20,10 @@ var AssureNote;
             });
         }
         MessageChatPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
-            $.notify(Args.join(' '), 'info');
+            if (AssureNoteApp.SocketManager.IsConnected()) {
+                this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
+                $.notify(Args.join(' '), 'info');
+            }
         };
         return MessageChatPlugin;
     })(AssureNote.Plugin);
