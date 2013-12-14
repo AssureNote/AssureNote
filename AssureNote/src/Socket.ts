@@ -26,7 +26,7 @@ module AssureNote {
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             if (!this.IsOperational()) {
-                AssureNoteApp.DebugP('socket.io not found');
+                AssureNoteApp.DebugP('socket.io not found')
             }
             this.socket = null;
         }
@@ -50,7 +50,11 @@ module AssureNote {
         EnableListeners(): void{
             var self = this;
             this.socket.on('disconnect', function (data) {
-                self.socket = null;
+                self.socket = null
+            });
+            this.socket.on('join', function (data) {
+                console.log('join');
+                console.log(data);
             });
         }
 

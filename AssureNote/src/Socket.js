@@ -47,6 +47,10 @@ var AssureNote;
             this.socket.on('disconnect', function (data) {
                 self.socket = null;
             });
+            this.socket.on('join', function (data) {
+                console.log('join');
+                console.log(data);
+            });
         };
 
         SocketManager.prototype.ReceiveData = function (data) {

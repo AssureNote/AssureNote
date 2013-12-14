@@ -2,12 +2,24 @@
 
 import socketio = require('socket.io');
 
-var io: SocketManager = socketio.listen(3002);
+class AssureNoteServer {
+    io: SocketManager;
+    constructor() {
+        this.io = socketio.listen(3002);
+        this.io.sockets.on('connection', function (socket) {
+            console.log('id: ' + socket.id + ' connected');
+            socket.broadcast.emit('join', {id: socket.id, list: this.GetUserList()});
+        });
+        
+        this.io.sockets.on('disconnect', function (socket) {
+            console.log('id: ' + socket.id + ' leave');
+            socket.broadcast.emit('leave', {id: socket.id, list: this.GetUserList()});
+        });
+    }
 
-io.sockets.on('connection', function (socket) {
-    console.log('connection');
-    socket.emit('news', { hello: 'world' });
-    socket.on('my other event', function (data) {
-        console.log(data);
-    });
-});
+    GetUserList() {
+        return [];
+    }
+}
+
+new AssureNoteServer();

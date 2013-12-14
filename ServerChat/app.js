@@ -1,14 +1,25 @@
 ///<reference path='d.ts/socket.io/socket.io.d.ts' />
 var socketio = require('socket.io');
 
-var io = socketio.listen(3002);
+var AssureNoteServer = (function () {
+    function AssureNoteServer() {
+        this.io = socketio.listen(3002);
+        this.io.sockets.on('connection', function (socket) {
+            console.log('id: ' + socket.id + ' connected');
+            socket.broadcast.emit('join', { id: socket.id, list: this.GetUserList() });
+        });
 
-io.sockets.on('connection', function (socket) {
-    console.log('connection');
-    socket.emit('news', { hello: 'world' });
-    socket.on('my other event', function (data) {
-        console.log(data);
-    });
-});
+        this.io.sockets.on('disconnect', function (socket) {
+            console.log('id: ' + socket.id + ' leave');
+            socket.broadcast.emit('leave', { id: socket.id, list: this.GetUserList() });
+        });
+    }
+    AssureNoteServer.prototype.GetUserList = function () {
+        return [];
+    };
+    return AssureNoteServer;
+})();
+
+new AssureNoteServer();
 
 //# sourceMappingURL=app.js.map
