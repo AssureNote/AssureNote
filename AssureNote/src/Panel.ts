@@ -179,6 +179,7 @@ module AssureNote {
         }
 
         Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number, Duration?: number): void {
+
             this.Clear();
             var TargetView = this.ViewMap[Label];
 

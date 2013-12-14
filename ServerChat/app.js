@@ -24,6 +24,9 @@ var AssureNoteServer = (function () {
         socket.on('message', function (message) {
             socket.broadcast.emit('message', message);
         });
+        socket.on('update', function (data) {
+            socket.broadcast.emit('update', data);
+        });
     };
 
     AssureNoteServer.prototype.GetUserList = function () {

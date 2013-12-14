@@ -18,6 +18,15 @@ var AssureNote;
     //    result: any;
     //    error: any;
     //}
+    var WGSNSocket = (function () {
+        function WGSNSocket(name, WGSN) {
+            this.name = name;
+            this.WGSN = WGSN;
+        }
+        return WGSNSocket;
+    })();
+    AssureNote.WGSNSocket = WGSNSocket;
+
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
@@ -52,6 +61,10 @@ var AssureNote;
                 console.log('init');
                 console.log(data);
             });
+            this.socket.on('update', function (data) {
+                console.log('update');
+                self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
+            });
 
             for (var key in this.handler) {
                 this.socket.on(key, this.handler[key]);
@@ -80,6 +93,14 @@ var AssureNote;
         SocketManager.prototype.IsOperational = function () {
             /* Checks the existence of socked.io.js */
             return io != null && io.connect != null;
+        };
+
+        SocketManager.prototype.UpdateWGSN = function () {
+            var TopGoal = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopGoal;
+            var Writer = new StringWriter();
+            TopGoal.FormatSubNode(1, Writer);
+            var WGSN = Writer.toString();
+            this.Emit('update', new WGSNSocket(this.AssureNoteApp.WGSNName, WGSN));
         };
         return SocketManager;
     })();

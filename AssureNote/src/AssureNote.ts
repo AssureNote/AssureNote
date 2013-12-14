@@ -184,7 +184,7 @@ module AssureNote {
 			var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
             var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
             this.PictgramPanel.ViewPort.SetScale(1);
-			this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+            this.PictgramPanel.ViewPort.SetOffset(WX, WY);
 		}
 
 		ProcessDroppedFiles(Files: File[]): void {
@@ -197,7 +197,10 @@ module AssureNote {
 				reader.onload = (event) => {
 					var Contents: string = (<any>event.target).result;
 					var Name: string = Files[0].name;
-					this.LoadNewWGSN(Name, Contents);
+                    this.LoadNewWGSN(Name, Contents);
+
+                    /* TODO resolve conflict */
+                    this.SocketManager.UpdateWGSN();
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

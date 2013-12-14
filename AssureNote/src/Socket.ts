@@ -1,3 +1,4 @@
+///<reference path='./AssureNoteParser.ts'/>
 declare var io: any;
 
 module AssureNote {
@@ -20,6 +21,10 @@ module AssureNote {
     //    result: any;
     //    error: any;
     //}
+
+    export class WGSNSocket {
+        constructor(public name: string, public WGSN: string) { }
+    }
 
     export class SocketManager {
         private socket: any;
@@ -58,6 +63,10 @@ module AssureNote {
                 console.log('init');
                 console.log(data);
             });
+            this.socket.on('update', function (data) {
+                console.log('update');
+                self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
+            });
 
             for (var key in this.handler) {
                 this.socket.on(key, this.handler[key]);
@@ -86,6 +95,14 @@ module AssureNote {
         IsOperational() {
             /* Checks the existence of socked.io.js */
             return io != null && io.connect != null;
+        }
+
+        UpdateWGSN() {
+            var TopGoal: GSNNode = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopGoal;
+            var Writer = new StringWriter();
+            TopGoal.FormatSubNode(1, Writer);
+            var WGSN: string = Writer.toString();
+            this.Emit('update', new WGSNSocket(this.AssureNoteApp.WGSNName, WGSN));
         }
     }
 }

@@ -27,6 +27,9 @@ class AssureNoteServer {
         socket.on('message', function(message: string) {
             socket.broadcast.emit('message', message);
         });
+        socket.on('update', function(data: {name: string; WGSN: string}) {
+            socket.broadcast.emit('update', data);
+        });
     }
 
     GetUserList() {

@@ -138,6 +138,9 @@ var AssureNote;
                     var Contents = (event.target).result;
                     var Name = Files[0].name;
                     _this.LoadNewWGSN(Name, Contents);
+
+                    /* TODO resolve conflict */
+                    _this.SocketManager.UpdateWGSN();
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
