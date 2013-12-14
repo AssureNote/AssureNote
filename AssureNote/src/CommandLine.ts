@@ -129,19 +129,27 @@ module AssureNote {
 			};
 
 			this.FunctionMap["set"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
-				if (Args.length > 2) {
+				if (Args.length > 0) {
 					switch (Args[0]) {
-						case "color":
-							if (AssureNoteApp.PictgramPanel.ViewMap == null) {
-								console.log("'set color' is disabled.");
-								break;
-							}
-							var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
-							if (Node != null) {
-								console.log(Args);
-								$("#" + Args[1] + " h4").css("background-color", Args[2]);
-							}
-							break;
+                        case "color":
+                            if (Args.length > 2) {
+                                if (AssureNoteApp.PictgramPanel.ViewMap == null) {
+                                    console.log("'set color' is disabled.");
+                                    break;
+                                }
+                                var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
+                                if (Node != null) {
+                                    console.log(Args);
+                                    $("#" + Args[1] + " h4").css("background-color", Args[2]);
+                                }
+                            }
+                            break;
+                        case "scale":
+                            if (Args.length > 1) {
+                                console.log(Args);
+                                AssureNoteApp.PictgramPanel.ViewPort.SetScale(<number><any>Args[1] - 0);
+                            }
+                            break;
 					}
 				}
 			}

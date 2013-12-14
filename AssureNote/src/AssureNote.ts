@@ -126,6 +126,11 @@ module AssureNote {
 			}
 		}
 
+		ExecDoubleClicked(NodeView: NodeView): void {
+			var Plugin = this.PluginManager.GetDoubleClicked();
+			Plugin.ExecDoubleClicked(NodeView);
+		}
+
 		ExecCommand(ParsedCommand: CommandParser): void {
 			var Method = ParsedCommand.GetMethod();
 			if (Method == "search") {
@@ -149,7 +154,7 @@ module AssureNote {
 				var Node = this.PictgramPanel.ViewMap[Label];
 				if (Node != null) {
 					if ($("#" + Label).length > 0) { //FIXME use IsVisible
-						this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetGx(), Node.GetGy(), Node.GetShape().GetNodeWidth(), Node.GetShape().GetNodeHeight());
+						this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
 					} else {
 						this.DebugP("Invisible node "+ Label +" Selected.");
 					}
@@ -174,7 +179,8 @@ module AssureNote {
 
 			var Shape = this.PictgramPanel.MasterView.GetShape();
 			var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
-			var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+            var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
+            this.PictgramPanel.ViewPort.SetScale(1);
 			this.PictgramPanel.ViewPort.SetOffset(WX, WY);
 		}
 

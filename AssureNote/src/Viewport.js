@@ -32,7 +32,8 @@ var AssureNote;
     }
 
     var ScrollManager = (function () {
-        function ScrollManager() {
+        function ScrollManager(Viewport) {
+            this.Viewport = Viewport;
             this.InitialOffsetX = 0;
             this.InitialOffsetY = 0;
             this.InitialX = 0;
@@ -103,25 +104,31 @@ var AssureNote;
         ScrollManager.prototype.OnPointerEvent = function (e, Screen) {
             var _this = this;
             this.Pointers = e.getPointerList();
-            if (this.Pointers.length > 0) {
-                if (this.IsDragging()) {
-                    var mainPointer = this.GetMainPointer();
-                    if (mainPointer) {
-                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
-                    } else {
-                        this.MainPointerID = null;
-                    }
-                } else {
+            var IsTherePointer = this.Pointers.length > 0;
+            var HasDragJustStarted = IsTherePointer && !this.IsDragging();
+            var HasDragJustEnded = !IsTherePointer && this.IsDragging();
+
+            if (IsTherePointer) {
+                if (HasDragJustStarted) {
                     this.StopAnimation();
                     this.timer = null;
                     var mainPointer = this.Pointers[0];
                     this.MainPointerID = mainPointer.identifier;
                     this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
                     this.StartDrag(mainPointer.pageX, mainPointer.pageY);
+                    this.Viewport.SetEventMapLayerPosition(true);
+                } else {
+                    var mainPointer = this.GetMainPointer();
+                    if (mainPointer) {
+                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
+                        Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
+                    } else {
+                        this.MainPointerID = null;
+                        this.Viewport.SetEventMapLayerPosition(false);
+                    }
                 }
             } else {
-                if (this.IsDragging()) {
+                if (HasDragJustEnded) {
                     if (this.timer) {
                         this.StopAnimation();
                         this.timer = null;
@@ -138,6 +145,7 @@ var AssureNote;
                     }, 16);
                 }
                 this.MainPointerID = null;
+                this.Viewport.SetEventMapLayerPosition(false);
             }
         };
 
@@ -145,7 +153,10 @@ var AssureNote;
             var width = Screen.ContentLayer.clientWidth;
             var height = Screen.ContentLayer.clientHeight;
             var pointer = this.Pointers[0];
-            //Screen.SetOffset(width / 2 - pointer.pageX, height / 2 - pointer.pageY);
+        };
+
+        ScrollManager.prototype.OnMouseWheel = function (e, Screen) {
+            Screen.SetScale(Screen.GetScale() * (1 + e.deltaY * 0.02));
         };
         return ScrollManager;
     })();
@@ -159,17 +170,15 @@ var AssureNote;
             this.ContentLayer = ContentLayer;
             this.ControlLayer = ControlLayer;
             //windowX, windowY
-            this.ScrollManager = new ScrollManager();
+            this.ScrollManager = new ScrollManager(this);
             this.OffsetX = 0;
             this.OffsetY = 0;
             this.LogicalOffsetX = 0;
             this.LogicalOffsetY = 0;
             this.Scale = 1.0;
-            this.ContentLayer.style["transformOrigin"] = "left top";
-            this.ContentLayer.style["MozTransformOrigin"] = "left top";
-            this.ContentLayer.style["msTransformOrigin"] = "left top";
-            this.ContentLayer.style["OTransformOrigin"] = "left top";
-            this.ContentLayer.style["webkitTransformOrigin"] = "left top";
+            this.IsEventMapUpper = false;
+            this.SetTransformOriginToElement(this.ContentLayer, "left top");
+            this.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
             var OnPointer = function (e) {
                 _this.ScrollManager.OnPointerEvent(e, _this);
@@ -177,17 +186,42 @@ var AssureNote;
             this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
             this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
             this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
-            this.EventMapLayer.addEventListener("gesturedoubletap", function (e) {
-                _this.ScrollManager.OnDoubleTap(e, _this);
-            }, false);
-            this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
-            this.ContentLayer.addEventListener("pointermove", OnPointer, false);
-            this.ContentLayer.addEventListener("pointerup", OnPointer, false);
-            this.ContentLayer.addEventListener("gesturedoubletap", function (e) {
-                _this.ScrollManager.OnDoubleTap(e, _this);
-            }, false);
+
+            //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
+            //this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
+            //this.ContentLayer.addEventListener("pointermove", OnPointer, false);
+            //this.ContentLayer.addEventListener("pointerup", OnPointer, false);
+            //this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
+            $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
+                _this.ScrollManager.OnMouseWheel(e, _this);
+            });
         }
+        ViewportManager.prototype.SetTransformOriginToElement = function (Element, Value) {
+            Element.style["transformOrigin"] = Value;
+            Element.style["MozTransformOrigin"] = Value;
+            Element.style["msTransformOrigin"] = Value;
+            Element.style["OTransformOrigin"] = Value;
+            Element.style["webkitTransformOrigin"] = Value;
+        };
+
+        ViewportManager.prototype.SetTransformToElement = function (Element, Value) {
+            Element.style["transform"] = Value;
+            Element.style["MozTransform"] = Value;
+            Element.style["msTransform"] = Value;
+            Element.style["OTransform"] = Value;
+            Element.style["webkitTransform"] = Value;
+        };
+
+        ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {
+            if (IsUpper && !this.IsEventMapUpper) {
+                $(this.ControlLayer).after(this.EventMapLayer);
+            } else if (!IsUpper && this.IsEventMapUpper) {
+                $(this.ContentLayer).before(this.EventMapLayer);
+            }
+            this.IsEventMapUpper = IsUpper;
+        };
+
         ViewportManager.translateA = function (x, y) {
             return "translate(" + x + " " + y + ") ";
         };
@@ -208,19 +242,12 @@ var AssureNote;
             var attr = ViewportManager.translateA(this.OffsetX, this.OffsetY) + ViewportManager.scaleA(this.Scale);
             var style = ViewportManager.translateS(this.OffsetX, this.OffsetY) + ViewportManager.scaleS(this.Scale);
             this.SVGLayer.setAttribute("transform", attr);
-            this.ContentLayer.style["transform"] = style;
-            this.ContentLayer.style["MozTransform"] = style;
-            this.ContentLayer.style["webkitTransform"] = style;
-            this.ContentLayer.style["msTransform"] = style;
-            this.ContentLayer.style["OTransform"] = style;
-            this.ControlLayer.style["transform"] = style;
-            this.ControlLayer.style["MozTransform"] = style;
-            this.ControlLayer.style["webkitTransform"] = style;
-            this.ControlLayer.style["msTransform"] = style;
-            this.ControlLayer.style["OTransform"] = style;
+            this.SetTransformToElement(this.ContentLayer, style);
+            this.SetTransformToElement(this.ControlLayer, style);
         };
 
         ViewportManager.prototype.SetScale = function (scale) {
+            scale = Math.max(0.2, Math.min(2.0, scale));
             this.Scale = scale;
             var cx = this.GetPageCenterX();
             var cy = this.GetPageCenterY();
@@ -261,11 +288,19 @@ var AssureNote;
             return (OffsetY - cy) / this.Scale + cy;
         };
 
-        ViewportManager.prototype.CalcLogicalOffsetXFromPageX = function (PageX) {
+        ViewportManager.prototype.PageXFromGX = function (GX) {
+            return (this.GetLogicalOffsetX() - GX) * this.Scale + this.GetPageCenterX();
+        };
+
+        ViewportManager.prototype.PageYFromGY = function (GY) {
+            return (this.GetLogicalOffsetY() - GY) * this.Scale + this.GetPageCenterY();
+        };
+
+        ViewportManager.prototype.GXFromPageX = function (PageX) {
             return this.GetLogicalOffsetX() - (PageX - this.GetPageCenterX()) / this.Scale;
         };
 
-        ViewportManager.prototype.CalcLogicalOffsetYFromPageY = function (PageY) {
+        ViewportManager.prototype.GYFromPageY = function (PageY) {
             return this.GetLogicalOffsetY() - (PageY - this.GetPageCenterY()) / this.Scale;
         };
 
@@ -315,20 +350,10 @@ var AssureNote;
             return Math.min(scaleWidth, scaleHeight);
         };
 
-        ViewportManager.prototype.SetCaseCenter = function (X, Y, NodeWidth, NodeHeight) {
-            var NewOffsetX = this.ConvertX(X, NodeWidth);
-            var NewOffsetY = this.ConvertY(Y, NodeHeight);
+        ViewportManager.prototype.SetCaseCenter = function (X, Y) {
+            var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));
+            var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y));
             this.SetOffset(NewOffsetX, NewOffsetY);
-        };
-
-        ViewportManager.prototype.ConvertX = function (X, NodeWidth) {
-            var ConvertedX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X)) - NodeWidth / 2;
-            return ConvertedX;
-        };
-
-        ViewportManager.prototype.ConvertY = function (Y, NodeHeight) {
-            var ConvertedY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y)) - NodeHeight / 2;
-            return ConvertedY;
         };
         return ViewportManager;
     })();

@@ -6,6 +6,7 @@ var AssureNote;
         function Plugin() {
             this.HasMenuBarButton = false;
             this.HasEditor = false;
+            this.HasDoubleClicked = false;
         }
         Plugin.prototype.ExecCommand = function (AssureNote, Args) {
         };
@@ -13,9 +14,10 @@ var AssureNote;
         Plugin.prototype.Display = function (PluginPanel, GSNDoc, Label) {
         };
 
+        Plugin.prototype.ExecDoubleClicked = function (NodeView) {
+        };
+
         Plugin.prototype.CreateMenuBarButton = function (NodeView) {
-            //return new MenuBarButton("sample-id", "images/sample.png", "sample", (TargetView: NodeView) => {
-            //});
             return null;
         };
 
@@ -47,7 +49,11 @@ var AssureNote;
             this.PluginMap = {};
         }
         PluginManager.prototype.SetPlugin = function (Name, Plugin) {
-            this.PluginMap[Name] = Plugin;
+            if (!this.PluginMap[Name]) {
+                this.PluginMap[Name] = Plugin;
+            } else {
+                this.AssureNoteApp.DebugP("Plugin " + name + " already defined.");
+            }
         };
 
         PluginManager.prototype.GetPanelPlugin = function (Name, Label) {
@@ -69,6 +75,19 @@ var AssureNote;
                     if (Button != null) {
                         ret.push(Button);
                     }
+                }
+            });
+            return ret;
+        };
+
+        PluginManager.prototype.GetDoubleClicked = function () {
+            var ret = null;
+
+            //FIXME Editing mode
+            $.each(this.PluginMap, function (key, value) {
+                if (value.HasDoubleClicked) {
+                    ret = value;
+                    return false;
                 }
             });
             return ret;
