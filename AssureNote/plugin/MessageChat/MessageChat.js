@@ -29,7 +29,9 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         ConnectServerPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            var self = this;
+            if (AssureNoteApp.SocketManager.IsOperational()) {
+                AssureNoteApp.SocketManager.Connect();
+            }
         };
         return ConnectServerPlugin;
     })(AssureNote.Plugin);

@@ -18,14 +18,12 @@ module AssureNote {
     export class SocketManager {
         socket: any;
         constructor(public AssureNoteApp: AssureNoteApp) {
-            /* Check the existence of socked.io.js */
-            if (!io || !io.connect) {
+            if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found');
-            };
-
-            this.socket = io.connect('http://localhost:3002');
-            this.enableListeners();
+            }
+            this.socket = null;
         }
+
         enableListeners(): void{
             var self = this;
             this.socket.on('disconnect', function (data) {
@@ -38,6 +36,27 @@ module AssureNote {
 
         handleData (data: JsonRPCResponse): void{
 
+        }
+
+        Connect() {
+            this.socket = io.connect('http://localhost:3002');
+            this.enableListeners();
+            console.log(this.socket);
+        }
+
+        DisConnect() {
+            this.socket.disconnect();
+            this.socket = null;
+        }
+
+        IsConnected() {
+            /* Checks the connection */
+            return this.socket != null;
+        }
+
+        IsOperational() {
+            /* Checks the existence of socked.io.js */
+            return io != null && io.connect != null;
         }
     }
 }

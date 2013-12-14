@@ -21,9 +21,9 @@ module AssureNote {
             super();
         }
         ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-            var self = this;
-
-
+            if (AssureNoteApp.SocketManager.IsOperational()) {
+                AssureNoteApp.SocketManager.Connect();
+            }
         }
     }
 }
