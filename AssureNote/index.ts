@@ -863,8 +863,10 @@ $(() => {
 	AssureNote.SideMenu.Create(Menu);
 
     var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
-    var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
+    var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
+    var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
 
 });

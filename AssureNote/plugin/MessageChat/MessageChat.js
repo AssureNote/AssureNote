@@ -29,7 +29,7 @@ var AssureNote;
             if (!io || !io.connect)
                 return;
 
-            var socket = io.connect('http://localhost:443');
+            var socket = io.connect('http://localhost:3002');
         };
         return ConnectServerPlugin;
     })(AssureNote.Plugin);
