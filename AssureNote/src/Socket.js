@@ -1,23 +1,23 @@
 var AssureNote;
 (function (AssureNote) {
-    var JsonRPCRequest = (function () {
-        function JsonRPCRequest(method, params) {
-            this.method = method;
-            this.params = params;
-            this.jsonrpc = '2.0';
-            this.id = null;
-        }
-        return JsonRPCRequest;
-    })();
-    AssureNote.JsonRPCRequest = JsonRPCRequest;
-
-    var JsonRPCResponse = (function () {
-        function JsonRPCResponse() {
-        }
-        return JsonRPCResponse;
-    })();
-    AssureNote.JsonRPCResponse = JsonRPCResponse;
-
+    //export class JsonRPCRequest {
+    //    jsonrpc: string;
+    //    method: string;
+    //    id: number;
+    //    params: any;
+    //    constructor(method: string, params: any) {
+    //        this.method = method;
+    //        this.params = params;
+    //        this.jsonrpc = '2.0';
+    //        this.id = null;
+    //    }
+    //}
+    //export class JsonRPCResponse {
+    //    jsonrpc: string;
+    //    id: number;
+    //    result: any;
+    //    error: any;
+    //}
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
@@ -25,21 +25,18 @@ var AssureNote;
                 AssureNoteApp.DebugP('socket.io not found');
             }
             this.socket = null;
+            this.handler = {};
         }
         SocketManager.prototype.RegisterSocketHandler = function (key, handler) {
-            if (!this.IsConnected()) {
-                this.AssureNoteApp.DebugP('Socket not enable');
-            }
-
-            this.socket.on(key, handler);
+            this.handler[key] = handler;
         };
 
-        SocketManager.prototype.EmitMessage = function (method, params) {
+        SocketManager.prototype.Emit = function (method, params) {
             if (!this.IsConnected()) {
                 this.AssureNoteApp.DebugP('Socket not enable.');
+                return;
             }
-            var Request = new JsonRPCRequest(method, params);
-            this.socket.emit(method, Request);
+            this.socket.emit(method, params);
         };
 
         SocketManager.prototype.EnableListeners = function () {
@@ -55,18 +52,15 @@ var AssureNote;
                 console.log('init');
                 console.log(data);
             });
-        };
 
-        SocketManager.prototype.ReceiveData = function (data) {
-            if (data.jsonrpc != '2.0') {
-                this.AssureNoteApp.DebugP('invalid rpc format');
+            for (var key in this.handler) {
+                this.socket.on(key, this.handler[key]);
             }
         };
 
         SocketManager.prototype.Connect = function () {
             this.socket = io.connect('http://localhost:3002');
             this.EnableListeners();
-            console.log(this.socket);
         };
 
         SocketManager.prototype.DisConnect = function () {

@@ -7,12 +7,17 @@ module AssureNote {
     export class MessageChatPlugin extends Plugin {
         public EditorUtil: EditorUtil;
 		constructor(public AssureNoteApp: AssureNoteApp) {
-			super();
+            super();
+            this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {
+                    console.log(data);
+                $.notify(data);
+            });
         }
 
         ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-			$.notify(Args.join(" "), "info");
-		}
+            this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
+			$.notify(Args.join(' '), 'info');
+        }
 	}
 
     export class ConnectServerPlugin extends Plugin {

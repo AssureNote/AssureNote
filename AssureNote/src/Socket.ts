@@ -1,50 +1,48 @@
 declare var io: any;
 
 module AssureNote {
-    export class JsonRPCRequest {
-        jsonrpc: string;
-        method: string;
-        id: number;
-        params: any;
-        constructor(method: string, params: any) {
-            this.method = method;
-            this.params = params;
-            this.jsonrpc = '2.0';
-            this.id = null;
-        }
-    }
+    //export class JsonRPCRequest {
+    //    jsonrpc: string;
+    //    method: string;
+    //    id: number;
+    //    params: any;
+    //    constructor(method: string, params: any) {
+    //        this.method = method;
+    //        this.params = params;
+    //        this.jsonrpc = '2.0';
+    //        this.id = null;
+    //    }
+    //}
 
-    export class JsonRPCResponse {
-        jsonrpc: string;
-        id: number;
-        result: any;
-        error: any;
-    }
+    //export class JsonRPCResponse {
+    //    jsonrpc: string;
+    //    id: number;
+    //    result: any;
+    //    error: any;
+    //}
 
     export class SocketManager {
         private socket: any;
+        private handler: { [key: string]: (any) => void };
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found')
             }
             this.socket = null;
+            this.handler = {};
         }
 
-        RegisterSocketHandler(key: string, handler: (data: JsonRPCResponse) => void) {
-            if (!this.IsConnected()) {
-                this.AssureNoteApp.DebugP('Socket not enable');
-            }
-
-            this.socket.on(key, handler);
+        RegisterSocketHandler(key: string, handler: (params: any) => void) {
+            this.handler[key] = handler;
         }
 
-        EmitMessage(method: string, params: any) {
+        Emit(method: string, params: any) {
             if (!this.IsConnected()) {
                 this.AssureNoteApp.DebugP('Socket not enable.');
-            }
-            var Request = new JsonRPCRequest(method, params);
-            this.socket.emit(method, Request);
+                return;
+            }   
+            this.socket.emit(method, params);
         }
 
         EnableListeners(): void{
@@ -60,18 +58,15 @@ module AssureNote {
                 console.log('init');
                 console.log(data);
             });
-        }
 
-        ReceiveData (data: JsonRPCResponse): void{
-            if (data.jsonrpc != '2.0') {
-                this.AssureNoteApp.DebugP('invalid rpc format');
+            for (var key in this.handler) {
+                this.socket.on(key, this.handler[key]);
             }
         }
 
         Connect() {
             this.socket = io.connect('http://localhost:3002');
             this.EnableListeners();
-            console.log(this.socket);
         }
 
         DisConnect() {

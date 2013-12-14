@@ -7,6 +7,7 @@ var AssureNoteServer = (function () {
         var self = this;
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
+            self.EnableListeners(socket);
             socket.join(self.room);
             console.log('id: ' + socket.id + ' connected');
             socket.emit('init', { id: socket.id, list: self.GetUserList() });
@@ -19,6 +20,12 @@ var AssureNoteServer = (function () {
             socket.broadcast.emit('leave', { id: socket.id, list: self.GetUserList() });
         });
     }
+    AssureNoteServer.prototype.EnableListeners = function (socket) {
+        socket.on('message', function (message) {
+            socket.broadcast.emit('message', message);
+        });
+    };
+
     AssureNoteServer.prototype.GetUserList = function () {
         var res = [];
         var Clients = this.io.sockets.clients(this.room);

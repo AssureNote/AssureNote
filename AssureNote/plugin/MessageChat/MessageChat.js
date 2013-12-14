@@ -14,9 +14,14 @@ var AssureNote;
         function MessageChatPlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
+            this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {
+                console.log(data);
+                $.notify(data);
+            });
         }
         MessageChatPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            $.notify(Args.join(" "), "info");
+            this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
+            $.notify(Args.join(' '), 'info');
         };
         return MessageChatPlugin;
     })(AssureNote.Plugin);
