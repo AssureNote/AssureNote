@@ -12,6 +12,7 @@ var __extends = this.__extends || function (d, b) {
 };
 ///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='plugin/MessageChat/MessageChat.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var ColorStyle = (function () {
@@ -867,5 +868,9 @@ $(function () {
 
     var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
+    var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
+    var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
 });
 //# sourceMappingURL=index.js.map

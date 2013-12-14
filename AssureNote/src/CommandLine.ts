@@ -22,6 +22,10 @@ module AssureNote {
 					if (s.length > 1) {
 						this.Args = s.slice(1);
 					}
+				} else if (s[0][0].match(/@/) != null) {
+					this.Method = "message";
+					this.Args = [];
+					this.Args.push(line.slice(1));
 				}
 			}
 		}

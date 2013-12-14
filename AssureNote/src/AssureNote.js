@@ -1,4 +1,5 @@
 ///<reference path='SideMenu.ts'/>
+///<reference path='Socket.ts'/>
 var AssureNote;
 (function (AssureNote) {
     (function (AssureNoteUtils) {
@@ -52,6 +53,7 @@ var AssureNote;
         function AssureNoteApp() {
             //var Api = new AssureNote.ServerAPI("http://", "", "");
             this.PluginManager = new AssureNote.PluginManager(this);
+            this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
             this.Commands = new AssureNote.CommandLineBuiltinFunctions();
@@ -136,6 +138,9 @@ var AssureNote;
                     var Contents = (event.target).result;
                     var Name = Files[0].name;
                     _this.LoadNewWGSN(Name, Contents);
+
+                    /* TODO resolve conflict */
+                    _this.SocketManager.UpdateWGSN();
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
