@@ -58,8 +58,12 @@ var AssureNote;
             }
         };
 
-        SocketManager.prototype.Connect = function () {
-            this.socket = io.connect('http://localhost:3002');
+        SocketManager.prototype.Connect = function (host) {
+            if (host == null || host == '') {
+                this.socket = io.connect('http://localhost:3002');
+            } else {
+                this.socket = io.connect(host);
+            }
             this.EnableListeners();
         };
 

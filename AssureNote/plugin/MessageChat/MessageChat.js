@@ -36,8 +36,13 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         ConnectServerPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
+            console.log(Args);
+            if (Args.length > 1) {
+                AssureNoteApp.DebugP('Invalid parameter: ' + Args);
+                return;
+            }
             if (AssureNoteApp.SocketManager.IsOperational()) {
-                AssureNoteApp.SocketManager.Connect();
+                AssureNoteApp.SocketManager.Connect(Args[0]);
             }
         };
         return ConnectServerPlugin;

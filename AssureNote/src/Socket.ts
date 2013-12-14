@@ -64,8 +64,12 @@ module AssureNote {
             }
         }
 
-        Connect() {
-            this.socket = io.connect('http://localhost:3002');
+        Connect(host: string) {
+            if (host == null || host =='') {
+                this.socket = io.connect('http://localhost:3002');
+            } else {
+                this.socket = io.connect(host);
+            }
             this.EnableListeners();
         }
 
