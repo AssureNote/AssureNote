@@ -1,7 +1,11 @@
 var AssureNote;
 (function (AssureNote) {
     var JsonRPCRequest = (function () {
-        function JsonRPCRequest() {
+        function JsonRPCRequest(method, params) {
+            this.method = method;
+            this.params = params;
+            this.jsonrpc = '2.0';
+            this.id = null;
         }
         return JsonRPCRequest;
     })();
@@ -22,22 +26,38 @@ var AssureNote;
             }
             this.socket = null;
         }
-        SocketManager.prototype.enableListeners = function () {
+        SocketManager.prototype.RegisterSocketHandler = function (key, handler) {
+            if (!this.IsConnected()) {
+                this.AssureNoteApp.DebugP('Socket not enable');
+            }
+
+            this.socket.on(key, handler);
+        };
+
+        SocketManager.prototype.EmitMessage = function (method, params) {
+            if (!this.IsConnected()) {
+                this.AssureNoteApp.DebugP('Socket not enable.');
+            }
+            var Request = new JsonRPCRequest(method, params);
+            this.socket.emit(method, Request);
+        };
+
+        SocketManager.prototype.EnableListeners = function () {
             var self = this;
             this.socket.on('disconnect', function (data) {
                 self.socket = null;
             });
-            this.socket.on('data', function (data) {
-                self.handleData(data);
-            });
         };
 
-        SocketManager.prototype.handleData = function (data) {
+        SocketManager.prototype.ReceiveData = function (data) {
+            if (data.jsonrpc != '2.0') {
+                this.AssureNoteApp.DebugP('invalid rpc format');
+            }
         };
 
         SocketManager.prototype.Connect = function () {
             this.socket = io.connect('http://localhost:3002');
-            this.enableListeners();
+            this.EnableListeners();
             console.log(this.socket);
         };
 
