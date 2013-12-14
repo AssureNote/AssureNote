@@ -51,6 +51,10 @@ var AssureNote;
                 console.log('join');
                 console.log(data);
             });
+            this.socket.on('init', function (data) {
+                console.log('init');
+                console.log(data);
+            });
         };
 
         SocketManager.prototype.ReceiveData = function (data) {

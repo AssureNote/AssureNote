@@ -3,19 +3,29 @@ var socketio = require('socket.io');
 
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
+        this.room = 'room';
+        var self = this;
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
+            socket.join(self.room);
             console.log('id: ' + socket.id + ' connected');
-            socket.broadcast.emit('join', { id: socket.id, list: this.GetUserList() });
+            socket.emit('init', { id: socket.id, list: self.GetUserList() });
+            socket.broadcast.emit('join', { id: socket.id, list: self.GetUserList() });
         });
 
         this.io.sockets.on('disconnect', function (socket) {
+            socket.unjoin(self.room);
             console.log('id: ' + socket.id + ' leave');
-            socket.broadcast.emit('leave', { id: socket.id, list: this.GetUserList() });
+            socket.broadcast.emit('leave', { id: socket.id, list: self.GetUserList() });
         });
     }
     AssureNoteServer.prototype.GetUserList = function () {
-        return [];
+        var res = [];
+        var Clients = this.io.sockets.clients(this.room);
+        for (var i in Clients) {
+            res.push(Clients[i].id);
+        }
+        return res;
     };
     return AssureNoteServer;
 })();
