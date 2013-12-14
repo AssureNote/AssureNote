@@ -1,4 +1,5 @@
 ///<reference path='SideMenu.ts'/>
+///<reference path='Socket.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
 
@@ -26,7 +27,7 @@ module AssureNote {
 			var element = document.getElementById(Label);
 			var view = element.getBoundingClientRect();
 			return new Point(view.left, view.top);
-		}
+        }
 
 		export function CreateGSNShape(NodeView: NodeView): GSNShape {
 			switch (NodeView.GetNodeType()) {
@@ -99,7 +100,8 @@ module AssureNote {
 	}
 
 	export class AssureNoteApp {
-		PluginManager: PluginManager;
+        PluginManager: PluginManager;
+        SocketManager: SocketManager;
 		PictgramPanel: PictgramPanel;
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
@@ -109,9 +111,10 @@ module AssureNote {
 
 		constructor() {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
-			this.PluginManager = new PluginManager(this);
+            this.PluginManager = new PluginManager(this);
+            this.SocketManager = new SocketManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
-			this.PluginPanel = new PluginPanel(this);
+            this.PluginPanel = new PluginPanel(this);
 			this.Commands = new CommandLineBuiltinFunctions();
 		}
 

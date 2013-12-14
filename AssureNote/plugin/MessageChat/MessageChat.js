@@ -1,3 +1,6 @@
+///<reference path="../../src/AssureNoteParser.ts" />
+///<reference path="../../src/Plugin.ts" />
+///<reference path="../../src/Editor.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -26,10 +29,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         ConnectServerPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            if (!io || !io.connect)
-                return;
-
-            var socket = io.connect('http://localhost:3002');
+            var self = this;
         };
         return ConnectServerPlugin;
     })(AssureNote.Plugin);
