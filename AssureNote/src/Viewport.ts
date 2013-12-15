@@ -49,6 +49,7 @@ module AssureNote {
 		private ANIMATE_THRESHOLD: number = 5;
         private SPEED_MAX: number = 100;
 
+
         constructor(private Viewport: ViewportManager) {
         }
 
@@ -170,6 +171,7 @@ module AssureNote {
 		private LogicalOffsetX: number = 0;
 		private LogicalOffsetY: number = 0;
         private Scale: number = 1.0;
+        private HTMLBodyBoundingRect: ClientRect;
 
         private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
             Element.style["transformOrigin"] = Value;
@@ -196,12 +198,10 @@ module AssureNote {
 			this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
 			this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
 			//this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
-			//this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
-			//this.ContentLayer.addEventListener("pointermove", OnPointer, false);
-			//this.ContentLayer.addEventListener("pointerup", OnPointer, false);
-			//this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
             $(this.EventMapLayer.parentElement).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
+            document.body.addEventListener("resize", (e) => { this.HTMLBodyBoundingRect = document.body.getBoundingClientRect(); });
+            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
         }
 
         private IsEventMapUpper: boolean = false;
@@ -305,11 +305,11 @@ module AssureNote {
 		}
 
 		GetWidth(): number {
-			return document.body.clientWidth;
+            return this.HTMLBodyBoundingRect.width;
 		}
 
 		GetHeight(): number {
-			return document.body.clientHeight;
+            return this.HTMLBodyBoundingRect.height;
 		}
 
 		GetPageCenterX(): number {
@@ -320,27 +320,27 @@ module AssureNote {
 			return this.GetHeight() / 2;
 		}
 
-		GetCaseWidth(): number {
-			return this.SVGLayer.getBoundingClientRect().width;
-		}
+		//GetCaseWidth(): number {
+		//	return this.SVGLayer.getBoundingClientRect().width;
+		//}
 
-		GetCaseHeight(): number {
-			return this.SVGLayer.getBoundingClientRect().height;
-		}
+		//GetCaseHeight(): number {
+		//	return this.SVGLayer.getBoundingClientRect().height;
+		//}
 
 		GetScale() {
 			return this.Scale;
 		}
 
-		GetScaleRate() {
-			var svgwidth = this.GetCaseWidth();
-			var svgheight = this.GetCaseHeight();
-			var bodywidth = this.GetWidth();
-			var bodyheight = this.GetHeight();
-			var scaleWidth = bodywidth / svgwidth;
-			var scaleHeight = bodyheight / svgheight;
-			return Math.min(scaleWidth, scaleHeight);
-		}
+		//GetScaleRate() {
+		//	var svgwidth = this.GetCaseWidth();
+		//	var svgheight = this.GetCaseHeight();
+		//	var bodywidth = this.GetWidth();
+		//	var bodyheight = this.GetHeight();
+		//	var scaleWidth = bodywidth / svgwidth;
+		//	var scaleHeight = bodyheight / svgheight;
+		//	return Math.min(scaleWidth, scaleHeight);
+		//}
 
 		SetCaseCenter(X: number, Y: number): void {
             var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));
