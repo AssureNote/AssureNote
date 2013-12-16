@@ -45,7 +45,7 @@ module AssureNote {
 
 		Search(TargetView: NodeView, SearchWord?: string): void {
 			var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-			var ViewPort = this.AssureNoteApp.PictgramPanel.ViewPort;
+			var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
 			this.AssureNoteApp.DebugP("Keyword is "+ SearchWord);
 			if (SearchWord != null) {
 				this.SearchWord = SearchWord;
@@ -87,7 +87,7 @@ module AssureNote {
 
 				this.MoveFlag = true;
 				this.SetDestination(this.HitNodes[this.NodeIndex], ViewMap);
-				this.MoveToNext(this.AssureNoteApp.PictgramPanel.ViewPort, () => {
+				this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, () => {
 					//ViewMap[this.HitNodes[this.NodeIndex].GetLabel()].Shape.EnableHighlight();
 					//if (!ShiftKey) {
 					//	if (this.NodeIndex == 0) {

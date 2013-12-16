@@ -14,7 +14,7 @@ module AssureNote {
         EventMapLayer: HTMLDivElement;
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
-		ViewPort: ViewportManager;
+		Viewport: ViewportManager;
 		ViewMap: { [index: string]: NodeView };
 		MasterView: NodeView;
         CmdLine: CommandLine;
@@ -30,7 +30,7 @@ module AssureNote {
 			this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
-			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
+			this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new MenuBar(AssureNoteApp);
@@ -136,7 +136,22 @@ module AssureNote {
 						this.AssureNoteApp.ProcessDroppedFiles((<any>(<any>event.originalEvent).dataTransfer).files);
 						return false;
 					}
-				});
+                });
+
+            this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
+                var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
+                this.MasterView.TraverseVisubleNode((Node: NodeView) => {
+                    if (Node.IsFolded) {
+                        var DX = HitBoxCenter.X - Node.GetCenterGX();
+                        var DY = HitBoxCenter.Y - Node.GetCenterGY();
+                        console.log(new Point(DX, DY));
+                        if (DX * DX + DY * DY < 150 * 150) {
+                            this.AssureNoteApp.ExecDoubleClicked(Node);
+                        }
+                        return false;
+                    }
+                });
+            }
 		}
 
 		SetFoldedAllGoalNode(NodeView: NodeView): void {
@@ -202,7 +217,7 @@ module AssureNote {
             this.SVGLayer.style.display = "";
             // Do scroll
             if (wx != null && wy != null) {
-                this.ViewPort.SetOffset(wx, wy);
+                this.Viewport.SetOffset(wx, wy);
             }
         }
 

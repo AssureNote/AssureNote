@@ -23,6 +23,9 @@ module AssureNote {
         public Clone(): Point {
             return new Point(this.X, this.Y);
         }
+        public toString() {
+            return "(" + this.X + ", " + this.Y + ")";
+        }
 	}
 
 	export enum Direction {
@@ -75,7 +78,10 @@ module AssureNote {
 			}
 
 			this.CurrentX = CurrentX;
-			this.CurrentY = CurrentY;
+            this.CurrentY = CurrentY;
+            if (this.OnDragged) {
+                this.OnDragged(this.Viewport);
+            }
 		}
 
 		private CalcOffsetX(): number {
@@ -103,7 +109,9 @@ module AssureNote {
 			clearInterval(this.timer);
 			this.Dx = 0;
 			this.Dy = 0;
-		}
+        }
+
+        OnDragged: (Viewport: ViewportManager) => void;
 
 		OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
             this.Pointers = e.getPointerList();
@@ -177,7 +185,6 @@ module AssureNote {
             Element.style["transformOrigin"] = Value;
             Element.style["MozTransformOrigin"] = Value;
             Element.style["msTransformOrigin"] = Value;
-            Element.style["OTransformOrigin"] = Value;
             Element.style["webkitTransformOrigin"] = Value;
         }
 
@@ -185,7 +192,6 @@ module AssureNote {
             Element.style["transform"] = Value;
             Element.style["MozTransform"] = Value;
             Element.style["msTransform"] = Value;
-            Element.style["OTransform"] = Value;
             Element.style["webkitTransform"] = Value;
         }
 
@@ -289,11 +295,11 @@ module AssureNote {
         }
 
 		GXFromPageX(PageX: number): number {
-			return this.GetLogicalOffsetX() - (PageX - this.GetPageCenterX()) / this.Scale;
+            return (PageX - this.GetPageCenterX()) / this.Scale + this.GetPageCenterX() - this.GetLogicalOffsetX();
 		}
 
 		GYFromPageY(PageY: number): number {
-			return this.GetLogicalOffsetY() - (PageY - this.GetPageCenterY()) / this.Scale;
+            return (PageY - this.GetPageCenterY()) / this.Scale + this.GetPageCenterY() - this.GetLogicalOffsetY();
 		}
 
 		GetOffsetX(): number {

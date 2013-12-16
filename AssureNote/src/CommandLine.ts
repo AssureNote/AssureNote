@@ -147,7 +147,7 @@ module AssureNote {
                         case "scale":
                             if (Args.length > 1) {
                                 console.log(Args);
-                                AssureNoteApp.PictgramPanel.ViewPort.SetScale(<number><any>Args[1] - 0);
+                                AssureNoteApp.PictgramPanel.Viewport.SetScale(<number><any>Args[1] - 0);
                             }
                             break;
 					}

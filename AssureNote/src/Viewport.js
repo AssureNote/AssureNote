@@ -15,6 +15,9 @@ var AssureNote;
         Point.prototype.Clone = function () {
             return new Point(this.X, this.Y);
         };
+        Point.prototype.toString = function () {
+            return "(" + this.X + ", " + this.Y + ")";
+        };
         return Point;
     })();
     AssureNote.Point = Point;
@@ -71,6 +74,9 @@ var AssureNote;
 
             this.CurrentX = CurrentX;
             this.CurrentY = CurrentY;
+            if (this.OnDragged) {
+                this.OnDragged(this.Viewport);
+            }
         };
 
         ScrollManager.prototype.CalcOffsetX = function () {
@@ -201,7 +207,6 @@ var AssureNote;
             Element.style["transformOrigin"] = Value;
             Element.style["MozTransformOrigin"] = Value;
             Element.style["msTransformOrigin"] = Value;
-            Element.style["OTransformOrigin"] = Value;
             Element.style["webkitTransformOrigin"] = Value;
         };
 
@@ -209,7 +214,6 @@ var AssureNote;
             Element.style["transform"] = Value;
             Element.style["MozTransform"] = Value;
             Element.style["msTransform"] = Value;
-            Element.style["OTransform"] = Value;
             Element.style["webkitTransform"] = Value;
         };
 
@@ -297,11 +301,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.GXFromPageX = function (PageX) {
-            return this.GetLogicalOffsetX() - (PageX - this.GetPageCenterX()) / this.Scale;
+            return (PageX - this.GetPageCenterX()) / this.Scale + this.GetPageCenterX() - this.GetLogicalOffsetX();
         };
 
         ViewportManager.prototype.GYFromPageY = function (PageY) {
-            return this.GetLogicalOffsetY() - (PageY - this.GetPageCenterY()) / this.Scale;
+            return (PageY - this.GetPageCenterY()) / this.Scale + this.GetPageCenterY() - this.GetLogicalOffsetY();
         };
 
         ViewportManager.prototype.GetOffsetX = function () {

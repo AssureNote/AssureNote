@@ -259,46 +259,65 @@ module AssureNote {
             });
         }
 
-        private ForEachVisibleSubNode(SubNodes: NodeView[], Action: (NodeView) => void): void {
+        private ForEachVisibleSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {
             if (SubNodes != null && !this.IsFolded) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
-                        Action(SubNodes[i]);
+                        if (Action(SubNodes[i]) === false) {
+                            return false;
+                        }
                     }
                 }
             }
+            return true;
         }
 
-        ForEachVisibleChildren(Action: (SubNode: NodeView) => void): void {
+        ForEachVisibleChildren(Action: (SubNode: NodeView) => any): void {
             this.ForEachVisibleSubNode(this.Children, Action);
         }
 
-		ForEachVisibleRightNodes(Action: (SubNode: NodeView) => void): void {
+        ForEachVisibleRightNodes(Action: (SubNode: NodeView) => any): void {
             this.ForEachVisibleSubNode(this.Right, Action);
         }
 
-		ForEachVisibleLeftNodes(Action: (SubNode: NodeView) => void): void {
+        ForEachVisibleLeftNodes(Action: (SubNode: NodeView) => any): void {
             this.ForEachVisibleSubNode(this.Left, Action);
         }
 
-		ForEachVisibleAllSubNodes(Action: (SubNode: NodeView) => void): void {
-            this.ForEachVisibleSubNode(this.Left, Action);
-            this.ForEachVisibleSubNode(this.Right, Action);
-            this.ForEachVisibleSubNode(this.Children, Action);
+        ForEachVisibleAllSubNodes(Action: (SubNode: NodeView) => any): boolean {
+            if (this.ForEachVisibleSubNode(this.Left, Action) &&
+                this.ForEachVisibleSubNode(this.Right, Action) &&
+                this.ForEachVisibleSubNode(this.Children, Action)) return true;
+            return false;
         }
 
-        private ForEachSubNode(SubNodes: NodeView[], Action: (NodeView) => void): void {
+        TraverseVisubleNode(Action: (SubNode: NodeView) => any): void {
+            Action(this);
+            this.ForEachVisibleAllSubNodes((SubNode: NodeView) => { SubNode.TraverseVisubleNode(Action); });
+        }
+
+        private ForEachSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {
             if (SubNodes != null) {
                 for (var i = 0; i < SubNodes.length; i++) {
-                    Action(SubNodes[i]);
+                    if (!Action(SubNodes[i])) {
+                        return false;
+                    }
                 }
             }
+            return true;
         }
 
-        ForEachAllSubNodes(Action: (SubNode: NodeView) => void): void {
-            this.ForEachSubNode(this.Left, Action);
-            this.ForEachSubNode(this.Right, Action);
-            this.ForEachSubNode(this.Children, Action);
+        ForEachAllSubNodes(Action: (SubNode: NodeView) => any): boolean {
+            if (this.ForEachSubNode(this.Left, Action) &&
+                this.ForEachSubNode(this.Right, Action) &&
+                this.ForEachSubNode(this.Children, Action)) return true;
+            return false;
+        }
+
+        TraverseNode(Action: (SubNode: NodeView) => any): boolean {
+            if (Action(this) === false) return false;
+            if (this.ForEachAllSubNodes((SubNode: NodeView) => { return SubNode.TraverseNode(Action); })) return true;
+            return false;
         }
 
         ClearAnimationCache(Force?: boolean): void {

@@ -96,7 +96,7 @@ var AssureNote;
                 var Node = this.PictgramPanel.ViewMap[Label];
                 if (Node != null) {
                     if ($("#" + Label).length > 0) {
-                        this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+                        this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
                     } else {
                         this.DebugP("Invisible node " + Label + " Selected.");
                     }
@@ -122,8 +122,8 @@ var AssureNote;
             var Shape = this.PictgramPanel.MasterView.GetShape();
             var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
             var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
-            this.PictgramPanel.ViewPort.SetScale(1);
-            this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+            this.PictgramPanel.Viewport.SetScale(1);
+            this.PictgramPanel.Viewport.SetOffset(WX, WY);
         };
 
         AssureNoteApp.prototype.ProcessDroppedFiles = function (Files) {

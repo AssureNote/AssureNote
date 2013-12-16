@@ -261,10 +261,13 @@ var AssureNote;
             if (SubNodes != null && !this.IsFolded) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
-                        Action(SubNodes[i]);
+                        if (Action(SubNodes[i]) === false) {
+                            return false;
+                        }
                     }
                 }
             }
+            return true;
         };
 
         NodeView.prototype.ForEachVisibleChildren = function (Action) {
@@ -280,23 +283,43 @@ var AssureNote;
         };
 
         NodeView.prototype.ForEachVisibleAllSubNodes = function (Action) {
-            this.ForEachVisibleSubNode(this.Left, Action);
-            this.ForEachVisibleSubNode(this.Right, Action);
-            this.ForEachVisibleSubNode(this.Children, Action);
+            if (this.ForEachVisibleSubNode(this.Left, Action) && this.ForEachVisibleSubNode(this.Right, Action) && this.ForEachVisibleSubNode(this.Children, Action))
+                return true;
+            return false;
+        };
+
+        NodeView.prototype.TraverseVisubleNode = function (Action) {
+            Action(this);
+            this.ForEachVisibleAllSubNodes(function (SubNode) {
+                SubNode.TraverseVisubleNode(Action);
+            });
         };
 
         NodeView.prototype.ForEachSubNode = function (SubNodes, Action) {
             if (SubNodes != null) {
                 for (var i = 0; i < SubNodes.length; i++) {
-                    Action(SubNodes[i]);
+                    if (!Action(SubNodes[i])) {
+                        return false;
+                    }
                 }
             }
+            return true;
         };
 
         NodeView.prototype.ForEachAllSubNodes = function (Action) {
-            this.ForEachSubNode(this.Left, Action);
-            this.ForEachSubNode(this.Right, Action);
-            this.ForEachSubNode(this.Children, Action);
+            if (this.ForEachSubNode(this.Left, Action) && this.ForEachSubNode(this.Right, Action) && this.ForEachSubNode(this.Children, Action))
+                return true;
+            return false;
+        };
+
+        NodeView.prototype.TraverseNode = function (Action) {
+            if (Action(this) === false)
+                return false;
+            if (this.ForEachAllSubNodes(function (SubNode) {
+                return SubNode.TraverseNode(Action);
+            }))
+                return true;
+            return false;
         };
 
         NodeView.prototype.ClearAnimationCache = function (Force) {

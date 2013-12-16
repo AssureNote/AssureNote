@@ -33,7 +33,7 @@ var AssureNote;
         Search.prototype.Search = function (TargetView, SearchWord) {
             var _this = this;
             var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-            var ViewPort = this.AssureNoteApp.PictgramPanel.ViewPort;
+            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
             this.AssureNoteApp.DebugP("Keyword is " + SearchWord);
             if (SearchWord != null) {
                 this.SearchWord = SearchWord;
@@ -74,7 +74,7 @@ var AssureNote;
                 //}
                 this.MoveFlag = true;
                 this.SetDestination(this.HitNodes[this.NodeIndex], ViewMap);
-                this.MoveToNext(this.AssureNoteApp.PictgramPanel.ViewPort, function () {
+                this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, function () {
                     //ViewMap[this.HitNodes[this.NodeIndex].GetLabel()].Shape.EnableHighlight();
                     //if (!ShiftKey) {
                     //	if (this.NodeIndex == 0) {
