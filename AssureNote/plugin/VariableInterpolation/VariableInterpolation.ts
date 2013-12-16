@@ -9,13 +9,26 @@ module AssureNote {
             super();
         }
 
+        Style(str: string): string {
+            console.log('Match: ' + str);
+            var div: HTMLSpanElement = document.createElement('span');
+            div.className = 'node-variable';
+            div.textContent = str;
+            return div.outerHTML;
+        }
+
         Supplant(str: string, map: any) {
             return str.replace(/\[([^\[\]]*)\]/g,
                 (v: string, b: string) => {
-                   var res = map[b];
-                   return typeof res === 'string' || typeof res === 'number' ? res : v;
+                    var value = map[b];
+                    var res: string = typeof value === 'string' || typeof value === 'number' ? value : v;
+                    return this.Style(res);
                 }
             );
+        }
+
+        RenderHTML(NodeDoc: string): string {
+            return this.Supplant(NodeDoc, {age: 10});
         }
 	}
 }

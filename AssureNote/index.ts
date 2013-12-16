@@ -8,6 +8,7 @@
 ///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
 ///<reference path='plugin/MessageChat/MessageChat.ts'/>
+///<reference path='plugin/VariableInterpolation/VariableInterpolation.ts'/>
 
 module AssureNote {
 
@@ -470,7 +471,7 @@ module AssureNote {
                 this.UpdateHtmlClass();
 
 				div.appendChild(h4);
-				div.appendChild(p);
+                div.appendChild(p);
 			}
         }
 
@@ -890,5 +891,6 @@ $(() => {
     AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
     var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
-
+    var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
 });

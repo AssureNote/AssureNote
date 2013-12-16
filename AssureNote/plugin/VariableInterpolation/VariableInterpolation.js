@@ -15,11 +15,25 @@ var AssureNote;
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
         }
+        VariableInterpolationPlugin.prototype.Style = function (str) {
+            console.log('Match: ' + str);
+            var div = document.createElement('span');
+            div.className = 'node-variable';
+            div.textContent = str;
+            return div.outerHTML;
+        };
+
         VariableInterpolationPlugin.prototype.Supplant = function (str, map) {
+            var _this = this;
             return str.replace(/\[([^\[\]]*)\]/g, function (v, b) {
-                var res = map[b];
-                return typeof res === 'string' || typeof res === 'number' ? res : v;
+                var value = map[b];
+                var res = typeof value === 'string' || typeof value === 'number' ? value : v;
+                return _this.Style(res);
             });
+        };
+
+        VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc) {
+            return this.Supplant(NodeDoc, { age: 10 });
         };
         return VariableInterpolationPlugin;
     })(AssureNote.Plugin);
