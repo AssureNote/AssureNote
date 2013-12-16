@@ -631,6 +631,35 @@ class GSNNode {
 		}
 		return this.TagMap;
 	}
+	
+	HashMap<String, String> MergeTagMap(HashMap<String, String> BaseMap, HashMap<String, String> NewMap) {
+		/*local*/HashMap<String, String> Result = new HashMap<String, String>();
+		/*local*/String[] KeySet = (/*cast*/String[])BaseMap.keySet().toArray();
+		for (/*local*/int i = 0; i < KeySet.length; i++) {
+			Result.put(KeySet[i],  BaseMap.get(KeySet[i]));
+		}
+		KeySet = (/*cast*/String[])NewMap.keySet().toArray();
+		for (/*local*/int i = 0; i < KeySet.length; i++) {
+			Result.put(KeySet[i],  NewMap.get(KeySet[i]));
+		}
+		return Result;
+	}
+	
+	HashMap<String, String> GetTagMapWithLexicalScope() {
+		/*local*/HashMap<String, String> Result = null;
+		if (this.ParentNode != null) {
+			Result = this.MergeTagMap(this.ParentNode.GetTagMapWithLexicalScope(), this.GetTagMap());
+		} else {
+			Result = this.GetTagMap();
+		}
+		for (/*local*/int i = 0; i < this.SubNodeList.size(); i++) {
+			/*local*/GSNNode Node = this.SubNodeList.get(i);
+			if (Node.IsContext()) {
+				Result = this.MergeTagMap(Result, Node.GetTagMap());
+			}
+		}
+		return Result;
+	}
 
 	GSNNode GetLastNode(GSNType NodeType, boolean Creation) {
 		if (this.SubNodeList != null) {

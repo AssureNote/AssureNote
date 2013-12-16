@@ -21,8 +21,11 @@ module AssureNote {
             return str.replace(/\[([^\[\]]*)\]/g,
                 (v: string, b: string) => {
                     var value = map[b];
-                    var res: string = typeof value === 'string' || typeof value === 'number' ? value : v;
-                    return this.Style(res);
+                    if (typeof value === 'string' || typeof value === 'number') {
+                        return this.Style(value);
+                    } else {
+                        return v;
+                    }
                 }
             );
         }

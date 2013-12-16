@@ -27,8 +27,11 @@ var AssureNote;
             var _this = this;
             return str.replace(/\[([^\[\]]*)\]/g, function (v, b) {
                 var value = map[b];
-                var res = typeof value === 'string' || typeof value === 'number' ? value : v;
-                return _this.Style(res);
+                if (typeof value === 'string' || typeof value === 'number') {
+                    return _this.Style(value);
+                } else {
+                    return v;
+                }
             });
         };
 

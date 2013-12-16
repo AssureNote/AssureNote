@@ -527,6 +527,35 @@ var GSNNode = (function () {
         return this.TagMap;
     };
 
+    GSNNode.prototype.MergeTagMap = function (BaseMap, NewMap) {
+        var Result = new HashMap();
+        var KeySet = BaseMap.keySet();
+        for (var i = 0; i < KeySet.length; i++) {
+            Result.put(KeySet[i], BaseMap.get(KeySet[i]));
+        }
+        KeySet = NewMap.keySet();
+        for (var i = 0; i < KeySet.length; i++) {
+            Result.put(KeySet[i], NewMap.get(KeySet[i]));
+        }
+        return Result;
+    };
+
+    GSNNode.prototype.GetTagMapWithLexicalScope = function () {
+        var Result = null;
+        if (this.ParentNode != null) {
+            Result = this.MergeTagMap(this.ParentNode.GetTagMapWithLexicalScope(), this.GetTagMap());
+        } else {
+            Result = this.GetTagMap();
+        }
+        for (var i = 0; i < this.SubNodeList.size(); i++) {
+            var Node = this.SubNodeList.get(i);
+            if (Node.IsContext()) {
+                Result = this.MergeTagMap(Result, Node.GetTagMap());
+            }
+        }
+        return Result;
+    };
+
     GSNNode.prototype.GetLastNode = function (NodeType, Creation) {
         if (this.SubNodeList != null) {
             for (var i = this.SubNodeList.size() - 1; i >= 0; i--) {
