@@ -458,7 +458,7 @@ var AssureNote;
             this.Content.className = "node";
         };
 
-        GSNShape.prototype.PrerenderHTMLContent = function () {
+        GSNShape.prototype.PrerenderHTMLContent = function (manager) {
             if (this.Content == null) {
                 var div = document.createElement("div");
                 this.Content = div;
@@ -470,8 +470,7 @@ var AssureNote;
                 h4.textContent = this.NodeView.Label;
 
                 var p = document.createElement("p");
-                p.textContent = this.NodeView.NodeDoc.trim();
-
+                p.innerHTML = manager.InvokeHTMLRenderPlugin(this.NodeView.NodeDoc.trim());
                 this.UpdateHtmlClass();
 
                 div.appendChild(h4);
@@ -479,8 +478,8 @@ var AssureNote;
             }
         };
 
-        GSNShape.prototype.PrerenderContent = function () {
-            this.PrerenderHTMLContent();
+        GSNShape.prototype.PrerenderContent = function (manager) {
+            this.PrerenderHTMLContent(manager);
             this.PrerenderSVGContent();
         };
 

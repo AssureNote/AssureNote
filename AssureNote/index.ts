@@ -454,7 +454,7 @@ module AssureNote {
 			this.Content.className = "node";
         }
 
-		private PrerenderHTMLContent(): void {
+		private PrerenderHTMLContent(manager: PluginManager): void {
             if (this.Content == null) {
 				var div = document.createElement("div");
                 this.Content = div;
@@ -465,9 +465,8 @@ module AssureNote {
 				var h4 = document.createElement("h4");
 				h4.textContent = this.NodeView.Label;
 
-				var p = document.createElement("p");
-                p.textContent = this.NodeView.NodeDoc.trim();
-
+                var p = document.createElement("p");
+                p.innerHTML = manager.InvokeHTMLRenderPlugin(this.NodeView.NodeDoc.trim());
                 this.UpdateHtmlClass();
 
 				div.appendChild(h4);
@@ -475,8 +474,8 @@ module AssureNote {
 			}
         }
 
-        PrerenderContent() {
-            this.PrerenderHTMLContent();
+        PrerenderContent(manager: PluginManager) {
+            this.PrerenderHTMLContent(manager);
             this.PrerenderSVGContent();
         }
 

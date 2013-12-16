@@ -28,6 +28,11 @@ var AssureNote;
         Plugin.prototype.EditorDisableCallback = function () {
             return null;
         };
+
+        Plugin.prototype.RenderHTML = function (NodeDoc) {
+            /* Do nothing */
+            return NodeDoc;
+        };
         return Plugin;
     })();
     AssureNote.Plugin = Plugin;
@@ -91,6 +96,13 @@ var AssureNote;
                 }
             });
             return ret;
+        };
+
+        PluginManager.prototype.InvokeHTMLRenderPlugin = function (NodeDoc) {
+            $.each(this.PluginMap, function (key, value) {
+                NodeDoc = value.RenderHTML(NodeDoc);
+            });
+            return NodeDoc;
         };
         return PluginManager;
     })();
