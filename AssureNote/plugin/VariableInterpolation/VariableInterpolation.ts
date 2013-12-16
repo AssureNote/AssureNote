@@ -9,10 +9,10 @@ module AssureNote {
             super();
         }
 
-        Style(str: string): string {
+        Style(str: string, cls: string): string {
             console.log('Match: ' + str);
             var div: HTMLSpanElement = document.createElement('span');
-            div.className = 'node-variable';
+            div.className = cls;
             div.textContent = str;
             return div.outerHTML;
         }
@@ -22,9 +22,9 @@ module AssureNote {
                 (v: string, b: string) => {
                     var value = map[b];
                     if (typeof value === 'string' || typeof value === 'number') {
-                        return this.Style(value);
+                        return this.Style(value, 'node-variable');
                     } else {
-                        return v;
+                        return this.Style(v, 'node-variable-undefined');
                     }
                 }
             );
@@ -32,7 +32,7 @@ module AssureNote {
 
         RenderHTML(NodeDoc: string, Model: GSNNode): string {
             var Map: HashMap<String, String> = Model.GetTagMapWithLexicalScope();
-            return this.Supplant(NodeDoc, Map ? Map.hash : null);
+            return this.Supplant(NodeDoc, Map ? Map.hash : {});
         }
 	}
 }

@@ -39,6 +39,11 @@ h4 {
 	font-weight: bold;
 }
 
+.node-variable-undefined {
+	font-weight: bold;
+	color: Gray;
+}
+
 .node-goal {
 	padding: 5px 10px;
 	width : 230px;
