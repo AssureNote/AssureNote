@@ -12,6 +12,7 @@ var __extends = this.__extends || function (d, b) {
 };
 ///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='plugin/MessageChat/MessageChat.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var ColorStyle = (function () {
@@ -260,10 +261,13 @@ var AssureNote;
             if (SubNodes != null && !this.IsFolded) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
-                        Action(SubNodes[i]);
+                        if (Action(SubNodes[i]) === false) {
+                            return false;
+                        }
                     }
                 }
             }
+            return true;
         };
 
         NodeView.prototype.ForEachVisibleChildren = function (Action) {
@@ -279,23 +283,43 @@ var AssureNote;
         };
 
         NodeView.prototype.ForEachVisibleAllSubNodes = function (Action) {
-            this.ForEachVisibleSubNode(this.Left, Action);
-            this.ForEachVisibleSubNode(this.Right, Action);
-            this.ForEachVisibleSubNode(this.Children, Action);
+            if (this.ForEachVisibleSubNode(this.Left, Action) && this.ForEachVisibleSubNode(this.Right, Action) && this.ForEachVisibleSubNode(this.Children, Action))
+                return true;
+            return false;
+        };
+
+        NodeView.prototype.TraverseVisubleNode = function (Action) {
+            Action(this);
+            this.ForEachVisibleAllSubNodes(function (SubNode) {
+                SubNode.TraverseVisubleNode(Action);
+            });
         };
 
         NodeView.prototype.ForEachSubNode = function (SubNodes, Action) {
             if (SubNodes != null) {
                 for (var i = 0; i < SubNodes.length; i++) {
-                    Action(SubNodes[i]);
+                    if (!Action(SubNodes[i])) {
+                        return false;
+                    }
                 }
             }
+            return true;
         };
 
         NodeView.prototype.ForEachAllSubNodes = function (Action) {
-            this.ForEachSubNode(this.Left, Action);
-            this.ForEachSubNode(this.Right, Action);
-            this.ForEachSubNode(this.Children, Action);
+            if (this.ForEachSubNode(this.Left, Action) && this.ForEachSubNode(this.Right, Action) && this.ForEachSubNode(this.Children, Action))
+                return true;
+            return false;
+        };
+
+        NodeView.prototype.TraverseNode = function (Action) {
+            if (Action(this) === false)
+                return false;
+            if (this.ForEachAllSubNodes(function (SubNode) {
+                return SubNode.TraverseNode(Action);
+            }))
+                return true;
+            return false;
         };
 
         NodeView.prototype.ClearAnimationCache = function (Force) {
@@ -471,12 +495,12 @@ var AssureNote;
         GSNShape.prototype.FitSizeToContent = function () {
         };
 
-        GSNShape.CreateCSSMoveAnimationDefinition = function (Name, FromGX, FromGY) {
-            return "@-webkit-keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
+        GSNShape.CreateCSSMoveAnimationDefinition = function (Prefix, Name, FromGX, FromGY) {
+            return "@" + Prefix + "keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
         };
 
-        GSNShape.CreateCSSFadeInAnimationDefinition = function (Name) {
-            return "@-webkit-keyframes " + Name + " { 0% { opacity: 0; } }";
+        GSNShape.CreateCSSFadeInAnimationDefinition = function (Prefix, Name) {
+            return "@" + Prefix + "keyframes " + Name + " { 0% { opacity: 0; } }";
         };
 
         GSNShape.CreateSVGMoveAnimateElement = function (Duration, FromGX, FromGY) {
@@ -570,13 +594,18 @@ var AssureNote;
                         this.Content.style["MozAnimation"] = AnimationStyleString;
                         this.Content.style["webkitAnimation"] = AnimationStyleString;
                         this.Content.style["msAnimation"] = AnimationStyleString;
-                        this.Content.style["OAnimation"] = AnimationStyleString;
                         var AnimateElement;
                         if (this.GX == null || this.GY == null) {
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition(AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-webkit-", AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-moz-", AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-ms-", AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("", AnimationName));
                             AnimateElement = GSNShape.CreateSVGFadeInAnimateElement(Duration);
                         } else {
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition(AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
                             AnimateElement = GSNShape.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
                         }
                         this.ShapeGroup.appendChild(AnimateElement);
@@ -600,7 +629,6 @@ var AssureNote;
                 this.Content.style.removeProperty("MozAnimation");
                 this.Content.style.removeProperty("webkitAnimation");
                 this.Content.style.removeProperty("msAnimation");
-                this.Content.style.removeProperty("OAnimation");
             }
             if (this.PreviousAnimateElement) {
                 this.RemoveAnimateElement(this.PreviousAnimateElement);
@@ -867,5 +895,9 @@ $(function () {
 
     var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
+    var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
+    var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
 });
 //# sourceMappingURL=index.js.map

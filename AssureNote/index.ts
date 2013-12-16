@@ -7,6 +7,7 @@
 
 ///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='plugin/MessageChat/MessageChat.ts'/>
 
 module AssureNote {
 
@@ -258,46 +259,65 @@ module AssureNote {
             });
         }
 
-        private ForEachVisibleSubNode(SubNodes: NodeView[], Action: (NodeView) => void): void {
+        private ForEachVisibleSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {
             if (SubNodes != null && !this.IsFolded) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
-                        Action(SubNodes[i]);
+                        if (Action(SubNodes[i]) === false) {
+                            return false;
+                        }
                     }
                 }
             }
+            return true;
         }
 
-        ForEachVisibleChildren(Action: (SubNode: NodeView) => void): void {
+        ForEachVisibleChildren(Action: (SubNode: NodeView) => any): void {
             this.ForEachVisibleSubNode(this.Children, Action);
         }
 
-		ForEachVisibleRightNodes(Action: (SubNode: NodeView) => void): void {
+        ForEachVisibleRightNodes(Action: (SubNode: NodeView) => any): void {
             this.ForEachVisibleSubNode(this.Right, Action);
         }
 
-		ForEachVisibleLeftNodes(Action: (SubNode: NodeView) => void): void {
+        ForEachVisibleLeftNodes(Action: (SubNode: NodeView) => any): void {
             this.ForEachVisibleSubNode(this.Left, Action);
         }
 
-		ForEachVisibleAllSubNodes(Action: (SubNode: NodeView) => void): void {
-            this.ForEachVisibleSubNode(this.Left, Action);
-            this.ForEachVisibleSubNode(this.Right, Action);
-            this.ForEachVisibleSubNode(this.Children, Action);
+        ForEachVisibleAllSubNodes(Action: (SubNode: NodeView) => any): boolean {
+            if (this.ForEachVisibleSubNode(this.Left, Action) &&
+                this.ForEachVisibleSubNode(this.Right, Action) &&
+                this.ForEachVisibleSubNode(this.Children, Action)) return true;
+            return false;
         }
 
-        private ForEachSubNode(SubNodes: NodeView[], Action: (NodeView) => void): void {
+        TraverseVisubleNode(Action: (SubNode: NodeView) => any): void {
+            Action(this);
+            this.ForEachVisibleAllSubNodes((SubNode: NodeView) => { SubNode.TraverseVisubleNode(Action); });
+        }
+
+        private ForEachSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {
             if (SubNodes != null) {
                 for (var i = 0; i < SubNodes.length; i++) {
-                    Action(SubNodes[i]);
+                    if (!Action(SubNodes[i])) {
+                        return false;
+                    }
                 }
             }
+            return true;
         }
 
-        ForEachAllSubNodes(Action: (SubNode: NodeView) => void): void {
-            this.ForEachSubNode(this.Left, Action);
-            this.ForEachSubNode(this.Right, Action);
-            this.ForEachSubNode(this.Children, Action);
+        ForEachAllSubNodes(Action: (SubNode: NodeView) => any): boolean {
+            if (this.ForEachSubNode(this.Left, Action) &&
+                this.ForEachSubNode(this.Right, Action) &&
+                this.ForEachSubNode(this.Children, Action)) return true;
+            return false;
+        }
+
+        TraverseNode(Action: (SubNode: NodeView) => any): boolean {
+            if (Action(this) === false) return false;
+            if (this.ForEachAllSubNodes((SubNode: NodeView) => { return SubNode.TraverseNode(Action); })) return true;
+            return false;
         }
 
         ClearAnimationCache(Force?: boolean): void {
@@ -471,12 +491,12 @@ module AssureNote {
         FitSizeToContent(): void {
         }
 
-        static CreateCSSMoveAnimationDefinition(Name: string, FromGX: number, FromGY: number): string {
-            return "@-webkit-keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
+        static CreateCSSMoveAnimationDefinition(Prefix: string, Name: string, FromGX: number, FromGY: number): string {
+            return "@" + Prefix + "keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
         }
 
-        static CreateCSSFadeInAnimationDefinition(Name: string): string {
-            return "@-webkit-keyframes " + Name + " { 0% { opacity: 0; } }";
+        static CreateCSSFadeInAnimationDefinition(Prefix: string, Name: string): string {
+            return "@" + Prefix + "keyframes " + Name + " { 0% { opacity: 0; } }";
         }
 
         private static SVGMoveAnimateElementMaster: SVGElement;
@@ -581,13 +601,18 @@ module AssureNote {
                         this.Content.style["MozAnimation"] = AnimationStyleString;
                         this.Content.style["webkitAnimation"] = AnimationStyleString;
                         this.Content.style["msAnimation"] = AnimationStyleString;
-                        this.Content.style["OAnimation"] = AnimationStyleString;
                         var AnimateElement: any;
                         if (this.GX == null || this.GY == null) {
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition(AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-webkit-", AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-moz-", AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-ms-", AnimationName));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("", AnimationName));
                             AnimateElement = GSNShape.CreateSVGFadeInAnimateElement(Duration);
                         } else {
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition(AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
                             AnimateElement = GSNShape.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
                         }
                         this.ShapeGroup.appendChild(AnimateElement);
@@ -611,7 +636,6 @@ module AssureNote {
                 this.Content.style.removeProperty("MozAnimation");
                 this.Content.style.removeProperty("webkitAnimation");
                 this.Content.style.removeProperty("msAnimation");
-                this.Content.style.removeProperty("OAnimation");
             }
             if (this.PreviousAnimateElement) {
                 this.RemoveAnimateElement(this.PreviousAnimateElement);
@@ -861,6 +885,11 @@ $(() => {
 
 	AssureNote.SideMenu.Create(Menu);
 
-	var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
+    var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
+    var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
+    var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
+
 });

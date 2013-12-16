@@ -15,7 +15,7 @@ var AssureNote;
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
             this.ControlLayer = (document.getElementById("control-layer"));
-            this.ViewPort = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
+            this.Viewport = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new AssureNote.MenuBar(AssureNoteApp);
@@ -50,6 +50,10 @@ var AssureNote;
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabel(event);
                 var NodeView = _this.ViewMap[Label];
                 _this.AssureNoteApp.DebugP("double click:" + Label);
+                if (Bar.IsEnable) {
+                    Bar.Remove();
+                }
+                _this.AssureNoteApp.ExecDoubleClicked(NodeView);
                 return false;
             });
 
@@ -59,7 +63,7 @@ var AssureNote;
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
-
+                console.log(event.keyCode);
                 switch (event.keyCode) {
                     case 58:
                         if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
@@ -69,6 +73,9 @@ var AssureNote;
                         _this.CmdLine.Show();
                         break;
                     case 191:
+                        _this.CmdLine.Show();
+                        break;
+                    case 219:
                         _this.CmdLine.Show();
                         break;
                     case 13:
@@ -111,6 +118,21 @@ var AssureNote;
                     return false;
                 }
             });
+
+            this.Viewport.ScrollManager.OnDragged = function (Viewport) {
+                var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
+                _this.MasterView.TraverseVisubleNode(function (Node) {
+                    if (Node.IsFolded) {
+                        var DX = HitBoxCenter.X - Node.GetCenterGX();
+                        var DY = HitBoxCenter.Y - Node.GetCenterGY();
+                        console.log(new AssureNote.Point(DX, DY));
+                        if (DX * DX + DY * DY < 150 * 150) {
+                            _this.AssureNoteApp.ExecDoubleClicked(Node);
+                        }
+                        return false;
+                    }
+                });
+            };
         }
         PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
             var _this = this;
@@ -173,7 +195,7 @@ var AssureNote;
             this.SVGLayer.style.display = "";
 
             if (wx != null && wy != null) {
-                this.ViewPort.SetOffset(wx, wy);
+                this.Viewport.SetOffset(wx, wy);
             }
         };
 

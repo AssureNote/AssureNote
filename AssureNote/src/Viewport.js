@@ -15,6 +15,9 @@ var AssureNote;
         Point.prototype.Clone = function () {
             return new Point(this.X, this.Y);
         };
+        Point.prototype.toString = function () {
+            return "(" + this.X + ", " + this.Y + ")";
+        };
         return Point;
     })();
     AssureNote.Point = Point;
@@ -71,6 +74,9 @@ var AssureNote;
 
             this.CurrentX = CurrentX;
             this.CurrentY = CurrentY;
+            if (this.OnDragged) {
+                this.OnDragged(this.Viewport);
+            }
         };
 
         ScrollManager.prototype.CalcOffsetX = function () {
@@ -188,20 +194,19 @@ var AssureNote;
             this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
 
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
-            //this.ContentLayer.addEventListener("pointerdown", OnPointer, false);
-            //this.ContentLayer.addEventListener("pointermove", OnPointer, false);
-            //this.ContentLayer.addEventListener("pointerup", OnPointer, false);
-            //this.ContentLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
             $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
                 _this.ScrollManager.OnMouseWheel(e, _this);
             });
+            document.body.addEventListener("resize", function (e) {
+                _this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
+            });
+            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
         }
         ViewportManager.prototype.SetTransformOriginToElement = function (Element, Value) {
             Element.style["transformOrigin"] = Value;
             Element.style["MozTransformOrigin"] = Value;
             Element.style["msTransformOrigin"] = Value;
-            Element.style["OTransformOrigin"] = Value;
             Element.style["webkitTransformOrigin"] = Value;
         };
 
@@ -209,7 +214,6 @@ var AssureNote;
             Element.style["transform"] = Value;
             Element.style["MozTransform"] = Value;
             Element.style["msTransform"] = Value;
-            Element.style["OTransform"] = Value;
             Element.style["webkitTransform"] = Value;
         };
 
@@ -297,11 +301,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.GXFromPageX = function (PageX) {
-            return this.GetLogicalOffsetX() - (PageX - this.GetPageCenterX()) / this.Scale;
+            return (PageX - this.GetPageCenterX()) / this.Scale + this.GetPageCenterX() - this.GetLogicalOffsetX();
         };
 
         ViewportManager.prototype.GYFromPageY = function (PageY) {
-            return this.GetLogicalOffsetY() - (PageY - this.GetPageCenterY()) / this.Scale;
+            return (PageY - this.GetPageCenterY()) / this.Scale + this.GetPageCenterY() - this.GetLogicalOffsetY();
         };
 
         ViewportManager.prototype.GetOffsetX = function () {
@@ -313,11 +317,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.GetWidth = function () {
-            return document.body.clientWidth;
+            return this.HTMLBodyBoundingRect.width;
         };
 
         ViewportManager.prototype.GetHeight = function () {
-            return document.body.clientHeight;
+            return this.HTMLBodyBoundingRect.height;
         };
 
         ViewportManager.prototype.GetPageCenterX = function () {
@@ -328,28 +332,25 @@ var AssureNote;
             return this.GetHeight() / 2;
         };
 
-        ViewportManager.prototype.GetCaseWidth = function () {
-            return this.SVGLayer.getBoundingClientRect().width;
-        };
-
-        ViewportManager.prototype.GetCaseHeight = function () {
-            return this.SVGLayer.getBoundingClientRect().height;
-        };
-
+        //GetCaseWidth(): number {
+        //	return this.SVGLayer.getBoundingClientRect().width;
+        //}
+        //GetCaseHeight(): number {
+        //	return this.SVGLayer.getBoundingClientRect().height;
+        //}
         ViewportManager.prototype.GetScale = function () {
             return this.Scale;
         };
 
-        ViewportManager.prototype.GetScaleRate = function () {
-            var svgwidth = this.GetCaseWidth();
-            var svgheight = this.GetCaseHeight();
-            var bodywidth = this.GetWidth();
-            var bodyheight = this.GetHeight();
-            var scaleWidth = bodywidth / svgwidth;
-            var scaleHeight = bodyheight / svgheight;
-            return Math.min(scaleWidth, scaleHeight);
-        };
-
+        //GetScaleRate() {
+        //	var svgwidth = this.GetCaseWidth();
+        //	var svgheight = this.GetCaseHeight();
+        //	var bodywidth = this.GetWidth();
+        //	var bodyheight = this.GetHeight();
+        //	var scaleWidth = bodywidth / svgwidth;
+        //	var scaleHeight = bodyheight / svgheight;
+        //	return Math.min(scaleWidth, scaleHeight);
+        //}
         ViewportManager.prototype.SetCaseCenter = function (X, Y) {
             var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));
             var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y));

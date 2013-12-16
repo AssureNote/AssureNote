@@ -14,7 +14,7 @@ module AssureNote {
         EventMapLayer: HTMLDivElement;
 		ContentLayer: HTMLDivElement;
 		ControlLayer: HTMLDivElement;
-		ViewPort: ViewportManager;
+		Viewport: ViewportManager;
 		ViewMap: { [index: string]: NodeView };
 		MasterView: NodeView;
         CmdLine: CommandLine;
@@ -30,7 +30,7 @@ module AssureNote {
 			this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
 			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
-			this.ViewPort = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
+			this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new MenuBar(AssureNoteApp);
@@ -65,6 +65,10 @@ module AssureNote {
 				var Label: string = AssureNoteUtils.GetNodeLabel(event);
 				var NodeView = this.ViewMap[Label];
 				this.AssureNoteApp.DebugP("double click:" + Label);
+				if (Bar.IsEnable) { //TODO cancel click event
+					Bar.Remove();
+				}
+				this.AssureNoteApp.ExecDoubleClicked(NodeView);
 				return false;
 			});
 
@@ -74,8 +78,8 @@ module AssureNote {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
-
-				switch (event.keyCode) {
+                console.log(event.keyCode);
+                switch (event.keyCode) {
 					case 58: /*: in Firefox*/
 						if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
 							break;
@@ -85,7 +89,10 @@ module AssureNote {
 						break;
 					case 191: /*/*/
 						this.CmdLine.Show();
-						break;
+                        break;
+                    case 219: /*@*/
+                        this.CmdLine.Show();
+                        break;
 					case 13: /*Enter*/
 						if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
 							var ParsedCommand = new CommandParser();
@@ -129,7 +136,22 @@ module AssureNote {
 						this.AssureNoteApp.ProcessDroppedFiles((<any>(<any>event.originalEvent).dataTransfer).files);
 						return false;
 					}
-				});
+                });
+
+            this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
+                var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
+                this.MasterView.TraverseVisubleNode((Node: NodeView) => {
+                    if (Node.IsFolded) {
+                        var DX = HitBoxCenter.X - Node.GetCenterGX();
+                        var DY = HitBoxCenter.Y - Node.GetCenterGY();
+                        console.log(new Point(DX, DY));
+                        if (DX * DX + DY * DY < 150 * 150) {
+                            this.AssureNoteApp.ExecDoubleClicked(Node);
+                        }
+                        return false;
+                    }
+                });
+            }
 		}
 
 		SetFoldedAllGoalNode(NodeView: NodeView): void {
@@ -172,6 +194,7 @@ module AssureNote {
         }
 
         Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number, Duration?: number): void {
+
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -194,7 +217,7 @@ module AssureNote {
             this.SVGLayer.style.display = "";
             // Do scroll
             if (wx != null && wy != null) {
-                this.ViewPort.SetOffset(wx, wy);
+                this.Viewport.SetOffset(wx, wy);
             }
         }
 

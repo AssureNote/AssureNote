@@ -16,34 +16,18 @@ body {
 	top: 5px;
 }
 
-#viewer {
-	left: 0px;
-	top : 0px;
-	width : 100%;
-	min-height: 100%;
-	bottom: 0px;
-	-webkit-transition: all 0.5s ease-in-out;
-}
-
-#dcase-manager {
-	margin-top: 60px;
-}
-
-#dcase-tags li.line {
-	border-style: solid;
-	border-width: 1px 0 0 0;
-	border-color: #eee;
-}
-
-#alltags {
-	color: #000;
-	font-weight: bold;
+#content-layer {
+	user-select:none;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-khtml-user-select:none;
+	-webkit-user-drag:none;
+	-khtml-user-drag:none;
 }
 
 h4 {
 	font-weight: bold;
 }
-
 
 .node {
 	position: absolute;

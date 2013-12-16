@@ -123,7 +123,11 @@ module AssureNote {
 			this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
 
 			this.AssureNoteApp.PluginPanel.IsVisible = true;
-			this.AssureNoteApp.MasterRecord.CloseEditor();
+            this.AssureNoteApp.MasterRecord.CloseEditor();
+
+            /* TODO resolve conflict */
+            this.AssureNoteApp.SocketManager.UpdateWGSN();
+
             $(this.Selector).addClass("animated fadeOutUp");
 
             /* Need to wait a bit for the end of animation */

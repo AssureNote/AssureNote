@@ -1,4 +1,5 @@
 ///<reference path='SideMenu.ts'/>
+///<reference path='Socket.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
 
@@ -26,7 +27,7 @@ module AssureNote {
 			var element = document.getElementById(Label);
 			var view = element.getBoundingClientRect();
 			return new Point(view.left, view.top);
-		}
+        }
 
 		export function CreateGSNShape(NodeView: NodeView): GSNShape {
 			switch (NodeView.GetNodeType()) {
@@ -99,7 +100,8 @@ module AssureNote {
 	}
 
 	export class AssureNoteApp {
-		PluginManager: PluginManager;
+        PluginManager: PluginManager;
+        SocketManager: SocketManager;
 		PictgramPanel: PictgramPanel;
 		PluginPanel: PluginPanel;
 		IsDebugMode: boolean;
@@ -109,9 +111,10 @@ module AssureNote {
 
 		constructor() {
 			//var Api = new AssureNote.ServerAPI("http://", "", "");
-			this.PluginManager = new PluginManager(this);
+            this.PluginManager = new PluginManager(this);
+            this.SocketManager = new SocketManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
-			this.PluginPanel = new PluginPanel(this);
+            this.PluginPanel = new PluginPanel(this);
 			this.Commands = new CommandLineBuiltinFunctions();
 		}
 
@@ -124,6 +127,11 @@ module AssureNote {
 				console.log("Assert: " + message);
 				throw "Assert: " + message;
 			}
+		}
+
+		ExecDoubleClicked(NodeView: NodeView): void {
+			var Plugin = this.PluginManager.GetDoubleClicked();
+			Plugin.ExecDoubleClicked(NodeView);
 		}
 
 		ExecCommand(ParsedCommand: CommandParser): void {
@@ -149,7 +157,7 @@ module AssureNote {
 				var Node = this.PictgramPanel.ViewMap[Label];
 				if (Node != null) {
 					if ($("#" + Label).length > 0) { //FIXME use IsVisible
-						this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+						this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
 					} else {
 						this.DebugP("Invisible node "+ Label +" Selected.");
 					}
@@ -175,8 +183,8 @@ module AssureNote {
 			var Shape = this.PictgramPanel.MasterView.GetShape();
 			var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
             var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
-            this.PictgramPanel.ViewPort.SetScale(1);
-			this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+            this.PictgramPanel.Viewport.SetScale(1);
+            this.PictgramPanel.Viewport.SetOffset(WX, WY);
 		}
 
 		ProcessDroppedFiles(Files: File[]): void {
@@ -189,7 +197,10 @@ module AssureNote {
 				reader.onload = (event) => {
 					var Contents: string = (<any>event.target).result;
 					var Name: string = Files[0].name;
-					this.LoadNewWGSN(Name, Contents);
+                    this.LoadNewWGSN(Name, Contents);
+
+                    /* TODO resolve conflict */
+                    this.SocketManager.UpdateWGSN();
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}

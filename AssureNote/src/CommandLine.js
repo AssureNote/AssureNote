@@ -17,6 +17,10 @@ var AssureNote;
                     if (s.length > 1) {
                         this.Args = s.slice(1);
                     }
+                } else if (s[0][0].match(/@/) != null) {
+                    this.Method = "message";
+                    this.Args = [];
+                    this.Args.push(line.slice(1));
                 }
             }
         };
@@ -136,7 +140,7 @@ var AssureNote;
                         case "scale":
                             if (Args.length > 1) {
                                 console.log(Args);
-                                AssureNoteApp.PictgramPanel.ViewPort.SetScale(Args[1] - 0);
+                                AssureNoteApp.PictgramPanel.Viewport.SetScale(Args[1] - 0);
                             }
                             break;
                     }

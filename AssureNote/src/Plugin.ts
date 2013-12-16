@@ -5,11 +5,13 @@ module AssureNote {
 
 	export class Plugin {
         public HasMenuBarButton: boolean;
-        public HasEditor: boolean;
+		public HasEditor: boolean;
+		public HasDoubleClicked: boolean;
 
 		constructor() {
             this.HasMenuBarButton = false;
-            this.HasEditor = false;
+			this.HasEditor = false;
+			this.HasDoubleClicked = false;
 		}
 
 		ExecCommand(AssureNote: AssureNoteApp, Args: string[]): void {
@@ -18,9 +20,10 @@ module AssureNote {
 		Display(PluginPanel: PluginPanel, GSNDoc: GSNDoc, Label: string): void {
 		}
 
+		ExecDoubleClicked(NodeView: NodeView): void {
+		}
+
 		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
-			//return new MenuBarButton("sample-id", "images/sample.png", "sample", (TargetView: NodeView) => {
-			//});
 			return null;
         }
 
@@ -79,6 +82,18 @@ module AssureNote {
 					if (Button != null) {
 						ret.push(Button);
 					}
+				}
+			});
+			return ret;
+		}
+
+		GetDoubleClicked(): Plugin {
+			var ret: Plugin = null;
+			//FIXME Editing mode
+			$.each(this.PluginMap, (key, value: Plugin) => {
+				if (value.HasDoubleClicked) {
+					ret = value;
+					return false;
 				}
 			});
 			return ret;

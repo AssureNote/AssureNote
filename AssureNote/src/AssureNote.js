@@ -1,4 +1,5 @@
 ///<reference path='SideMenu.ts'/>
+///<reference path='Socket.ts'/>
 var AssureNote;
 (function (AssureNote) {
     (function (AssureNoteUtils) {
@@ -52,6 +53,7 @@ var AssureNote;
         function AssureNoteApp() {
             //var Api = new AssureNote.ServerAPI("http://", "", "");
             this.PluginManager = new AssureNote.PluginManager(this);
+            this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
             this.Commands = new AssureNote.CommandLineBuiltinFunctions();
@@ -65,6 +67,11 @@ var AssureNote;
                 console.log("Assert: " + message);
                 throw "Assert: " + message;
             }
+        };
+
+        AssureNoteApp.prototype.ExecDoubleClicked = function (NodeView) {
+            var Plugin = this.PluginManager.GetDoubleClicked();
+            Plugin.ExecDoubleClicked(NodeView);
         };
 
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
@@ -89,7 +96,7 @@ var AssureNote;
                 var Node = this.PictgramPanel.ViewMap[Label];
                 if (Node != null) {
                     if ($("#" + Label).length > 0) {
-                        this.PictgramPanel.ViewPort.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+                        this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
                     } else {
                         this.DebugP("Invisible node " + Label + " Selected.");
                     }
@@ -115,8 +122,8 @@ var AssureNote;
             var Shape = this.PictgramPanel.MasterView.GetShape();
             var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
             var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
-            this.PictgramPanel.ViewPort.SetScale(1);
-            this.PictgramPanel.ViewPort.SetOffset(WX, WY);
+            this.PictgramPanel.Viewport.SetScale(1);
+            this.PictgramPanel.Viewport.SetOffset(WX, WY);
         };
 
         AssureNoteApp.prototype.ProcessDroppedFiles = function (Files) {
@@ -131,6 +138,9 @@ var AssureNote;
                     var Contents = (event.target).result;
                     var Name = Files[0].name;
                     _this.LoadNewWGSN(Name, Contents);
+
+                    /* TODO resolve conflict */
+                    _this.SocketManager.UpdateWGSN();
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }

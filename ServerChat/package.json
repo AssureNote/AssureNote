@@ -1,0 +1,15 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "*",
+	"socket.io": "0.9.6"
+  },
+  "devDependencies": {
+    "typescript": "0.9.1-1"
+  }
+}
