@@ -23,7 +23,7 @@ module AssureNote {
 
         private Render(ThisNode: NodeView, DivFrag: DocumentFragment, SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment): void {
             if (ThisNode.IsVisible) {
-                ThisNode.GetShape().PrerenderContent();
+                ThisNode.GetShape().PrerenderContent(this.AssureNoteApp.PluginManager);
                 ThisNode.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
                 if (!ThisNode.IsFolded) {
                     ThisNode.ForEachVisibleAllSubNodes((SubNode: NodeView) => {

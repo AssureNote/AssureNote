@@ -63,6 +63,7 @@
     <TypeScriptCompile Include="index.ts" />
     <TypeScriptCompile Include="plugin\FoldingViewSwitch\FoldingViewSwitch.ts" />
     <TypeScriptCompile Include="plugin\MessageChat\MessageChat.ts" />
+    <TypeScriptCompile Include="plugin\VariableInterpolation\VariableInterpolation.ts" />
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
     <TypeScriptCompile Include="src\Editor.ts" />
     <TypeScriptCompile Include="src\MenuBar.ts" />

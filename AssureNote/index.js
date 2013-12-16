@@ -13,6 +13,7 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
 ///<reference path='plugin/MessageChat/MessageChat.ts'/>
+///<reference path='plugin/VariableInterpolation/VariableInterpolation.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var ColorStyle = (function () {
@@ -458,7 +459,7 @@ var AssureNote;
             this.Content.className = "node";
         };
 
-        GSNShape.prototype.PrerenderHTMLContent = function () {
+        GSNShape.prototype.PrerenderHTMLContent = function (manager) {
             if (this.Content == null) {
                 var div = document.createElement("div");
                 this.Content = div;
@@ -470,17 +471,15 @@ var AssureNote;
                 h4.textContent = this.NodeView.Label;
 
                 var p = document.createElement("p");
-                p.textContent = this.NodeView.NodeDoc.trim();
-
+                p.innerHTML = manager.InvokeHTMLRenderPlugin(this.NodeView.NodeDoc.trim(), this.NodeView.Model);
                 this.UpdateHtmlClass();
-
                 div.appendChild(h4);
                 div.appendChild(p);
             }
         };
 
-        GSNShape.prototype.PrerenderContent = function () {
-            this.PrerenderHTMLContent();
+        GSNShape.prototype.PrerenderContent = function (manager) {
+            this.PrerenderHTMLContent(manager);
             this.PrerenderSVGContent();
         };
 
@@ -899,5 +898,7 @@ $(function () {
     AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
     var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
+    var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
 });
 //# sourceMappingURL=index.js.map

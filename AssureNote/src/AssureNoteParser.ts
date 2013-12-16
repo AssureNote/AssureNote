@@ -548,6 +548,40 @@ class GSNNode {
 		}
 		return this.TagMap;
 	}
+	
+	MergeTagMap(BaseMap: HashMap<string, string>, NewMap: HashMap<string, string>): HashMap<string, string> {
+		if (BaseMap == null) return NewMap;
+		if (NewMap == null) return BaseMap;
+		
+		var Result: HashMap<string, string> = new HashMap<string, string>();
+		var KeySet: string[] = <string[]>BaseMap.keySet();
+		for (var i: number = 0; i < KeySet.length; i++) {
+			Result.put(KeySet[i],  BaseMap.get(KeySet[i]));
+		}
+		KeySet = <string[]>NewMap.keySet();
+		for (var i: number = 0; i < KeySet.length; i++) {
+			Result.put(KeySet[i],  NewMap.get(KeySet[i]));
+		}
+		return Result;
+	}
+	
+	GetTagMapWithLexicalScope(): HashMap<string, string> {
+		var Result: HashMap<string, string> = null;
+		if (this.ParentNode != null) {
+			Result = this.MergeTagMap(this.ParentNode.GetTagMapWithLexicalScope(), this.GetTagMap());
+		} else {
+			Result = this.GetTagMap();
+		}
+		if (this.SubNodeList != null) {
+			for (var i: number = 0; i < this.SubNodeList.size(); i++) {
+				var Node: GSNNode = this.SubNodeList.get(i);
+				if (Node.IsContext()) {
+					Result = this.MergeTagMap(Result, Node.GetTagMap());
+				}
+			}
+		}
+		return Result;
+	}
 
 	GetLastNode(NodeType: GSNType, Creation: boolean): GSNNode {
 		if (this.SubNodeList != null) {

@@ -27,7 +27,7 @@ var AssureNote;
         SimpleLayoutEngine.prototype.Render = function (ThisNode, DivFrag, SvgNodeFrag, SvgConnectionFrag) {
             var _this = this;
             if (ThisNode.IsVisible) {
-                ThisNode.GetShape().PrerenderContent();
+                ThisNode.GetShape().PrerenderContent(this.AssureNoteApp.PluginManager);
                 ThisNode.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
                 if (!ThisNode.IsFolded) {
                     ThisNode.ForEachVisibleAllSubNodes(function (SubNode) {

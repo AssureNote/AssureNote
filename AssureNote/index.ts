@@ -8,6 +8,7 @@
 ///<reference path='plugin/FoldingViewSwitch/FoldingViewSwitch.ts'/>
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
 ///<reference path='plugin/MessageChat/MessageChat.ts'/>
+///<reference path='plugin/VariableInterpolation/VariableInterpolation.ts'/>
 
 module AssureNote {
 
@@ -454,7 +455,7 @@ module AssureNote {
 			this.Content.className = "node";
         }
 
-		private PrerenderHTMLContent(): void {
+		private PrerenderHTMLContent(manager: PluginManager): void {
             if (this.Content == null) {
 				var div = document.createElement("div");
                 this.Content = div;
@@ -465,18 +466,16 @@ module AssureNote {
 				var h4 = document.createElement("h4");
 				h4.textContent = this.NodeView.Label;
 
-				var p = document.createElement("p");
-                p.textContent = this.NodeView.NodeDoc.trim();
-
+                var p = document.createElement("p");
+                p.innerHTML = manager.InvokeHTMLRenderPlugin(this.NodeView.NodeDoc.trim(), this.NodeView.Model);
                 this.UpdateHtmlClass();
-
 				div.appendChild(h4);
-				div.appendChild(p);
+                div.appendChild(p);
 			}
         }
 
-        PrerenderContent() {
-            this.PrerenderHTMLContent();
+        PrerenderContent(manager: PluginManager) {
+            this.PrerenderHTMLContent(manager);
             this.PrerenderSVGContent();
         }
 
@@ -891,5 +890,6 @@ $(() => {
     AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
     var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
-
+    var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
 });

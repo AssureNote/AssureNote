@@ -34,6 +34,11 @@ module AssureNote {
         EditorDisableCallback(): () => void {
             return null;
         }
+
+        RenderHTML(NodeDoc: string, Model: GSNNode): string {
+            /* Do nothing */
+            return NodeDoc;
+        }
     }
 
 
@@ -97,7 +102,14 @@ module AssureNote {
 				}
 			});
 			return ret;
-		}
+        }
+
+        InvokeHTMLRenderPlugin(NodeDoc: string, Model: GSNNode): string {
+            $.each(this.PluginMap, (key: string, value: Plugin) => {
+                NodeDoc = value.RenderHTML(NodeDoc, Model);
+            });
+            return NodeDoc;
+        }
 
 	}
 }
