@@ -30,8 +30,9 @@ module AssureNote {
             );
         }
 
-        RenderHTML(NodeDoc: string): string {
-            return this.Supplant(NodeDoc, {age: 10});
+        RenderHTML(NodeDoc: string, Model: GSNNode): string {
+            var Map: HashMap<String, String> = Model.GetTagMapWithLexicalScope();
+            return this.Supplant(NodeDoc, Map ? Map.hash : null);
         }
 	}
 }

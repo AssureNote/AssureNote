@@ -550,6 +550,9 @@ class GSNNode {
 	}
 	
 	MergeTagMap(BaseMap: HashMap<string, string>, NewMap: HashMap<string, string>): HashMap<string, string> {
+		if (BaseMap == null) return NewMap;
+		if (NewMap == null) return BaseMap;
+		
 		var Result: HashMap<string, string> = new HashMap<string, string>();
 		var KeySet: string[] = <string[]>BaseMap.keySet();
 		for (var i: number = 0; i < KeySet.length; i++) {
@@ -569,10 +572,12 @@ class GSNNode {
 		} else {
 			Result = this.GetTagMap();
 		}
-		for (var i: number = 0; i < this.SubNodeList.size(); i++) {
-			var Node: GSNNode = this.SubNodeList.get(i);
-			if (Node.IsContext()) {
-				Result = this.MergeTagMap(Result, Node.GetTagMap());
+		if (this.SubNodeList != null) {
+			for (var i: number = 0; i < this.SubNodeList.size(); i++) {
+				var Node: GSNNode = this.SubNodeList.get(i);
+				if (Node.IsContext()) {
+					Result = this.MergeTagMap(Result, Node.GetTagMap());
+				}
 			}
 		}
 		return Result;

@@ -35,7 +35,7 @@ module AssureNote {
             return null;
         }
 
-        RenderHTML(NodeDoc: string): string {
+        RenderHTML(NodeDoc: string, Model: GSNNode): string {
             /* Do nothing */
             return NodeDoc;
         }
@@ -104,9 +104,9 @@ module AssureNote {
 			return ret;
         }
 
-        InvokeHTMLRenderPlugin(NodeDoc: string): string {
+        InvokeHTMLRenderPlugin(NodeDoc: string, Model: GSNNode): string {
             $.each(this.PluginMap, (key: string, value: Plugin) => {
-                NodeDoc = value.RenderHTML(NodeDoc);
+                NodeDoc = value.RenderHTML(NodeDoc, Model);
             });
             return NodeDoc;
         }

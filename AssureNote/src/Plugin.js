@@ -29,7 +29,7 @@ var AssureNote;
             return null;
         };
 
-        Plugin.prototype.RenderHTML = function (NodeDoc) {
+        Plugin.prototype.RenderHTML = function (NodeDoc, Model) {
             /* Do nothing */
             return NodeDoc;
         };
@@ -98,9 +98,9 @@ var AssureNote;
             return ret;
         };
 
-        PluginManager.prototype.InvokeHTMLRenderPlugin = function (NodeDoc) {
+        PluginManager.prototype.InvokeHTMLRenderPlugin = function (NodeDoc, Model) {
             $.each(this.PluginMap, function (key, value) {
-                NodeDoc = value.RenderHTML(NodeDoc);
+                NodeDoc = value.RenderHTML(NodeDoc, Model);
             });
             return NodeDoc;
         };

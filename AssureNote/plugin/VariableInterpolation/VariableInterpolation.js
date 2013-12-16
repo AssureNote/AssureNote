@@ -35,8 +35,9 @@ var AssureNote;
             });
         };
 
-        VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc) {
-            return this.Supplant(NodeDoc, { age: 10 });
+        VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc, Model) {
+            var Map = Model.GetTagMapWithLexicalScope();
+            return this.Supplant(NodeDoc, Map ? Map.hash : null);
         };
         return VariableInterpolationPlugin;
     })(AssureNote.Plugin);

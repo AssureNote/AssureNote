@@ -528,6 +528,11 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.MergeTagMap = function (BaseMap, NewMap) {
+        if (BaseMap == null)
+            return NewMap;
+        if (NewMap == null)
+            return BaseMap;
+
         var Result = new HashMap();
         var KeySet = BaseMap.keySet();
         for (var i = 0; i < KeySet.length; i++) {
@@ -547,10 +552,12 @@ var GSNNode = (function () {
         } else {
             Result = this.GetTagMap();
         }
-        for (var i = 0; i < this.SubNodeList.size(); i++) {
-            var Node = this.SubNodeList.get(i);
-            if (Node.IsContext()) {
-                Result = this.MergeTagMap(Result, Node.GetTagMap());
+        if (this.SubNodeList != null) {
+            for (var i = 0; i < this.SubNodeList.size(); i++) {
+                var Node = this.SubNodeList.get(i);
+                if (Node.IsContext()) {
+                    Result = this.MergeTagMap(Result, Node.GetTagMap());
+                }
             }
         }
         return Result;
