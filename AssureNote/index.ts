@@ -292,9 +292,9 @@ module AssureNote {
             return false;
         }
 
-        TraverseVisubleNode(Action: (SubNode: NodeView) => any): void {
+        TraverseVisibleNode(Action: (SubNode: NodeView) => any): void {
             Action(this);
-            this.ForEachVisibleAllSubNodes((SubNode: NodeView) => { SubNode.TraverseVisubleNode(Action); });
+            this.ForEachVisibleAllSubNodes((SubNode: NodeView) => { SubNode.TraverseVisibleNode(Action); });
         }
 
         private ForEachSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {

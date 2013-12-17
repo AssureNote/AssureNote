@@ -39,8 +39,7 @@ var AssureNote;
             });
 
             //FIXME
-            this.EventMapLayer.addEventListener("click", function (event) {
-                _this.FocusedLabel = null;
+            this.EventMapLayer.addEventListener("pointerdown", function (event) {
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -121,7 +120,7 @@ var AssureNote;
 
             this.Viewport.ScrollManager.OnDragged = function (Viewport) {
                 var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
-                _this.MasterView.TraverseVisubleNode(function (Node) {
+                _this.MasterView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();

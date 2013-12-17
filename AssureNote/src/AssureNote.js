@@ -94,6 +94,10 @@ var AssureNote;
                     return;
                 }
                 var Node = this.PictgramPanel.ViewMap[Label];
+                if (Method == "" && Node == null) {
+                    Label = this.PictgramPanel.FocusedLabel;
+                    Node = this.PictgramPanel.ViewMap[Label];
+                }
                 if (Node != null) {
                     if ($("#" + Label).length > 0) {
                         this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());

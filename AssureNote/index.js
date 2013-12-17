@@ -289,10 +289,10 @@ var AssureNote;
             return false;
         };
 
-        NodeView.prototype.TraverseVisubleNode = function (Action) {
+        NodeView.prototype.TraverseVisibleNode = function (Action) {
             Action(this);
             this.ForEachVisibleAllSubNodes(function (SubNode) {
-                SubNode.TraverseVisubleNode(Action);
+                SubNode.TraverseVisibleNode(Action);
             });
         };
 

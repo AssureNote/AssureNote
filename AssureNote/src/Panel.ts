@@ -49,13 +49,13 @@ module AssureNote {
 					}
 				} else {
 					this.FocusedLabel = null;
-				}
+                }
 				return false;
 			});
 
             //FIXME
-            this.EventMapLayer.addEventListener("click", (event: MouseEvent) => {
-                this.FocusedLabel = null;
+            this.EventMapLayer.addEventListener("pointerdown", (event: MouseEvent) => {
+                //this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -140,7 +140,7 @@ module AssureNote {
 
             this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
                 var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
-                this.MasterView.TraverseVisubleNode((Node: NodeView) => {
+                this.MasterView.TraverseVisibleNode((Node: NodeView) => {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
