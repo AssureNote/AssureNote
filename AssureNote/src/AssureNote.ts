@@ -154,15 +154,19 @@ module AssureNote {
 					this.DebugP("Jump is diabled.");
 					return;
 				}
-				var Node = this.PictgramPanel.ViewMap[Label];
-				if (Node != null) {
-					if ($("#" + Label).length > 0) { //FIXME use IsVisible
-						this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
-					} else {
-						this.DebugP("Invisible node "+ Label +" Selected.");
-					}
-					return;
-				}
+                var Node = this.PictgramPanel.ViewMap[Label];
+                if (Method == "" && Node == null) {
+                    Label = this.PictgramPanel.FocusedLabel;
+                    Node = this.PictgramPanel.ViewMap[Label];
+                }
+                if (Node != null) {
+                    if ($("#" + Label).length > 0) { //FIXME use IsVisible
+                        this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+                    } else {
+                        this.DebugP("Invisible node " + Label + " Selected.");
+                    }
+                    return;
+                }
 				this.DebugP("undefined command: " + ParsedCommand.GetMethod());
 			}
 		}

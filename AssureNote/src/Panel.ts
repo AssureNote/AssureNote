@@ -49,13 +49,13 @@ module AssureNote {
 					}
 				} else {
 					this.FocusedLabel = null;
-				}
+                }
 				return false;
 			});
 
             //FIXME
             this.EventMapLayer.addEventListener("pointerdown", (event: MouseEvent) => {
-                this.FocusedLabel = null;
+                //this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }

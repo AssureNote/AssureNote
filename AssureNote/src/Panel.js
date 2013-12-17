@@ -40,7 +40,6 @@ var AssureNote;
 
             //FIXME
             this.EventMapLayer.addEventListener("pointerdown", function (event) {
-                _this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
