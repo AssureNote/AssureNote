@@ -65,7 +65,7 @@ h4 {
 }
 
 .assurenote-default {
-	fill: rgba(255, 255, 255, 0.50);
+	fill: rgba(255, 255, 255, 1.0);
 	/*filli: #b4d8df;*/
 	stroke: black;
 	stroke-width: 2;
