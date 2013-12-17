@@ -308,6 +308,14 @@ var AssureNote;
             return (PageY - this.GetPageCenterY()) / this.Scale + this.GetPageCenterY() - this.GetLogicalOffsetY();
         };
 
+        ViewportManager.prototype.ConvertRectGlobalXYFromPageXY = function (PageRect) {
+            var x1 = this.GXFromPageX(PageRect.X);
+            var y1 = this.GYFromPageY(PageRect.Y);
+            var x2 = this.GXFromPageX(PageRect.X + PageRect.Width);
+            var y2 = this.GYFromPageY(PageRect.Y + PageRect.Height);
+            return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
+        };
+
         ViewportManager.prototype.GetOffsetX = function () {
             return this.OffsetX;
         };
@@ -324,6 +332,10 @@ var AssureNote;
             return this.HTMLBodyBoundingRect.height;
         };
 
+        ViewportManager.prototype.GetPageRect = function () {
+            return new AssureNote.Rect(0, 0, this.GetWidth(), this.GetHeight());
+        };
+
         ViewportManager.prototype.GetPageCenterX = function () {
             return this.GetWidth() / 2;
         };
@@ -332,25 +344,10 @@ var AssureNote;
             return this.GetHeight() / 2;
         };
 
-        //GetCaseWidth(): number {
-        //	return this.SVGLayer.getBoundingClientRect().width;
-        //}
-        //GetCaseHeight(): number {
-        //	return this.SVGLayer.getBoundingClientRect().height;
-        //}
         ViewportManager.prototype.GetScale = function () {
             return this.Scale;
         };
 
-        //GetScaleRate() {
-        //	var svgwidth = this.GetCaseWidth();
-        //	var svgheight = this.GetCaseHeight();
-        //	var bodywidth = this.GetWidth();
-        //	var bodyheight = this.GetHeight();
-        //	var scaleWidth = bodywidth / svgwidth;
-        //	var scaleHeight = bodyheight / svgheight;
-        //	return Math.min(scaleWidth, scaleHeight);
-        //}
         ViewportManager.prototype.SetCaseCenter = function (X, Y) {
             var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));
             var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y));
