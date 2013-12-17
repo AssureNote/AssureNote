@@ -61,6 +61,9 @@ var AssureNote;
             this.InitialY = InitialY;
             this.CurrentX = InitialX;
             this.CurrentY = InitialY;
+            if (this.OnStartDrag) {
+                this.OnStartDrag(this.Viewport);
+            }
         };
 
         ScrollManager.prototype.UpdateDrag = function (CurrentX, CurrentY) {
@@ -107,6 +110,14 @@ var AssureNote;
             this.Dy = 0;
         };
 
+        ScrollManager.prototype.EndDrag = function () {
+            this.MainPointerID = null;
+            this.Viewport.SetEventMapLayerPosition(false);
+            if (this.OnEndDrag) {
+                this.OnEndDrag(this.Viewport);
+            }
+        };
+
         ScrollManager.prototype.OnPointerEvent = function (e, Screen) {
             var _this = this;
             this.Pointers = e.getPointerList();
@@ -129,8 +140,7 @@ var AssureNote;
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
                         Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
                     } else {
-                        this.MainPointerID = null;
-                        this.Viewport.SetEventMapLayerPosition(false);
+                        this.EndDrag();
                     }
                 }
             } else {
@@ -150,8 +160,7 @@ var AssureNote;
                         Screen.SetOffset(_this.CalcOffsetX(), _this.CalcOffsetY());
                     }, 16);
                 }
-                this.MainPointerID = null;
-                this.Viewport.SetEventMapLayerPosition(false);
+                this.EndDrag();
             }
         };
 

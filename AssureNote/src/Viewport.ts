@@ -65,7 +65,10 @@ module AssureNote {
 			this.InitialX = InitialX;
 			this.InitialY = InitialY;
 			this.CurrentX = InitialX;
-			this.CurrentY = InitialY;
+            this.CurrentY = InitialY;
+            if (this.OnStartDrag) {
+                this.OnStartDrag(this.Viewport);
+            }
 		}
 
 		private UpdateDrag(CurrentX: number, CurrentY: number) {
@@ -111,7 +114,17 @@ module AssureNote {
 			this.Dy = 0;
         }
 
+        private EndDrag() {
+            this.MainPointerID = null;
+            this.Viewport.SetEventMapLayerPosition(false);
+            if (this.OnEndDrag) {
+                this.OnEndDrag(this.Viewport);
+            }
+        }
+
         OnDragged: (Viewport: ViewportManager) => void;
+        OnStartDrag: (Viewport: ViewportManager) => void;
+        OnEndDrag: (Viewport: ViewportManager) => void;
 
 		OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
             this.Pointers = e.getPointerList();
@@ -134,8 +147,7 @@ module AssureNote {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
                         Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
                     } else {
-                        this.MainPointerID = null;
-                        this.Viewport.SetEventMapLayerPosition(false);
+                        this.EndDrag();
                     }
 				}
 			} else {
@@ -155,8 +167,7 @@ module AssureNote {
 						Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
 					}, 16);
 				}
-				this.MainPointerID = null;
-                this.Viewport.SetEventMapLayerPosition(false);
+                this.EndDrag();
 			}
 		}
 

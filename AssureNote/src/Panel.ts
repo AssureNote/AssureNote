@@ -152,7 +152,13 @@ module AssureNote {
                         return false;
                     }
                 });
-            }
+            };
+            this.Viewport.ScrollManager.OnStartDrag = (Viewport: ViewportManager) => {
+                $("#auto-expand-area").show(300);
+            };
+            this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
+                $("#auto-expand-area").hide(300);
+            };
 		}
 
 		SetFoldedAllGoalNode(NodeView: NodeView): void {

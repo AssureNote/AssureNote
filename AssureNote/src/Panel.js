@@ -134,6 +134,12 @@ var AssureNote;
                     }
                 });
             };
+            this.Viewport.ScrollManager.OnStartDrag = function (Viewport) {
+                $("#auto-expand-area").show(300);
+            };
+            this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
+                $("#auto-expand-area").hide(300);
+            };
         }
         PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
             var _this = this;

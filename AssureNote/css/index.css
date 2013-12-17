@@ -106,3 +106,16 @@ h4 {
 	fill: #FFAA7D;
 	stroke: orange;
 }
+
+#auto-expand-area {
+    border: 2px solid red;
+    width: 200px;
+    height: 200px;
+    border-radius: 100px;
+    left: 50%;
+    top: 30%;
+    position: absolute;
+    margin-left: -100px;
+    margin-top: -100px;
+    display:none;
+}
