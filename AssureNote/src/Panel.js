@@ -247,7 +247,7 @@ var AssureNote;
                 mode: "text/x-asn",
                 lineWrapping: true
             });
-
+            console.log(textarea);
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }

@@ -11,7 +11,8 @@ var AssureNote;
 (function (AssureNote) {
     var FullScreenEditorPlugin = (function (_super) {
         __extends(FullScreenEditorPlugin, _super);
-        function FullScreenEditorPlugin(AssureNoteApp, textarea/*CodeMirror*/ , selector) {
+        function FullScreenEditorPlugin(AssureNoteApp, textarea, selector) {
+            var _this = this;
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             this.textarea = textarea;
@@ -24,6 +25,9 @@ var AssureNote;
                 left: "5%",
                 width: "90%",
                 height: "90%"
+            });
+            CodeMirror.on(this.textarea, 'cursorActivity', function (doc) {
+                return _this.MoveBackgroundNode(doc);
             });
         }
         FullScreenEditorPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
@@ -58,6 +62,27 @@ var AssureNote;
                 TargetView.Model.FormatSubNode(1, Writer);
                 _this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
             });
+        };
+
+        /* This focuses on the node where the cursor of CodeMirror indicate */
+        FullScreenEditorPlugin.prototype.MoveBackgroundNode = function (doc) {
+            var Label = null;
+            var line = doc.getCursor().line;
+            while (line >= 0) {
+                var LineString = doc.getLine(line);
+                if (LineString.startsWith('*')) {
+                    var LabelChar = WikiSyntax.FormatNodeType(WikiSyntax.ParseNodeType(LineString));
+                    var LabelNum = WikiSyntax.ParseLabelNumber(LineString);
+                    Label = LabelChar + LabelNum;
+                    break;
+                }
+                line -= 1;
+            }
+
+            if (Label) {
+                /* TODO move */
+                console.log(Label);
+            }
         };
         return FullScreenEditorPlugin;
     })(AssureNote.Plugin);

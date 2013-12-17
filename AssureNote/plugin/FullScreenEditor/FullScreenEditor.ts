@@ -5,7 +5,7 @@
 module AssureNote {
     export class FullScreenEditorPlugin extends Plugin {
         public EditorUtil: EditorUtil;
-		constructor(public AssureNoteApp: AssureNoteApp, public textarea: any/*CodeMirror*/, public selector: string) {
+		constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
 			super();
             this.HasMenuBarButton = true;
             this.HasEditor = true;
@@ -16,6 +16,7 @@ module AssureNote {
                 width: "90%",
                 height: "90%"
             });
+            CodeMirror.on(this.textarea, 'cursorActivity', (doc: CodeMirror.Doc) => this.MoveBackgroundNode(doc));
         }
 
 		ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
@@ -34,7 +35,7 @@ module AssureNote {
 				}
 				var Writer = new StringWriter();
 				TargetView.Model.FormatSubNode(1, Writer);
-				this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
+                this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
 			} else {
 				AssureNoteApp.DebugP(Label + " not found.");
 			}
@@ -50,7 +51,27 @@ module AssureNote {
 					TargetView.Model.FormatSubNode(1, Writer);
                     this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
 			});
-		}
+        }
 
+        /* This focuses on the node where the cursor of CodeMirror indicate */
+        MoveBackgroundNode(doc: CodeMirror.Doc) {
+            var Label: string = null;
+            var line = doc.getCursor().line;
+            while (line >= 0) {
+                var LineString: string = doc.getLine(line);
+                if (LineString.startsWith('*')) {
+                    var LabelChar: string = WikiSyntax.FormatNodeType(WikiSyntax.ParseNodeType(LineString));
+                    var LabelNum: string = WikiSyntax.ParseLabelNumber(LineString);
+                    Label = LabelChar + LabelNum;
+                    break;
+                }
+                line -= 1;
+            }
+
+            if (Label) {
+                /* TODO move */
+                console.log(Label);
+            }
+        }
 	}
 }
