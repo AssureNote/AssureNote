@@ -7,6 +7,10 @@ var AssureNote;
         CommandParser.prototype.Parse = function (line) {
             var s = line.split(" ");
             if (s.length > 0) {
+                if (s[0][0] == null) {
+                    this.Method = "";
+                    return;
+                }
                 if (s[0][0].match(/\//) != null) {
                     this.Method = "search";
                     this.Args = [];

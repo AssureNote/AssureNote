@@ -11,7 +11,11 @@ module AssureNote {
 
 		Parse(line: string): void {
 			var s = line.split(" ");
-			if (s.length > 0) {
+            if (s.length > 0) {
+                if (s[0][0] == null) {
+                    this.Method = "";
+                    return;
+                }
 				if (s[0][0].match(/\//) != null) {
 					this.Method = "search";
 					this.Args = [];
