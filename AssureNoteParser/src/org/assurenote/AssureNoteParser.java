@@ -1455,19 +1455,17 @@ public class AssureNoteParser {
 
 	public final static void main(String[] argv) {
 		if(argv.length == 2) {
-			AssureNoteParser.merge(argv[0], argv[1]);
+			//AssureNoteParser.merge(argv[0], argv[1]);
+			/*local*/GSNRecord MasterRecord = new GSNRecord();
+			MasterRecord.Parse(Lib.ReadFile(argv[0]));
+			MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+			/*local*/StringWriter Writer = new StringWriter();
+			MasterRecord.FormatRecord(Writer);
+			System.out.println(Writer.toString());
 		}
 		if(argv.length == 1) {
 			AssureNoteParser.merge(argv[0], null);
 		}
-//		if(argv.length == 0) {
-//			try {
-//				PdfConverter.main(argv);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} 
-//		}
 		System.out.println("Usage: AssureNoteParser file [margingfile]");
 	}
 }
