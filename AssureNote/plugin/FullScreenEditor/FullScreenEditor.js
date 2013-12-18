@@ -78,10 +78,12 @@ var AssureNote;
                 }
                 line -= 1;
             }
-
             if (Label) {
-                /* TODO move */
-                console.log(Label);
+                var View = this.AssureNoteApp.PictgramPanel.ViewMap[Label];
+                if (View) {
+                    console.log(View.GetCenterGX() + " " + View.GetCenterGY());
+                    this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
+                }
             }
         };
         return FullScreenEditorPlugin;
