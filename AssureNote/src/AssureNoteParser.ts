@@ -702,7 +702,7 @@ class GSNNode {
 			}
 		}
 		if(NewNode.LastModified == null) {
-			var NewLabelNumber: string = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, this.NodeType, null);
+			var NewLabelNumber: string = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
 			if(LabelMap != null && this.LabelNumber != null) {
 				LabelMap.put(NewNode.GetLabel(), NewLabelNumber);
 			}

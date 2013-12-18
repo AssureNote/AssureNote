@@ -685,7 +685,7 @@ var GSNNode = (function () {
             }
         }
         if (NewNode.LastModified == null) {
-            var NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, this.NodeType, null);
+            var NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
             if (LabelMap != null && this.LabelNumber != null) {
                 LabelMap.put(NewNode.GetLabel(), NewLabelNumber);
             }
