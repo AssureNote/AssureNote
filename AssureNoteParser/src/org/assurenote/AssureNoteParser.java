@@ -970,16 +970,9 @@ class GSNDoc {
 		}
 	}
 
-	private String UniqueNumber(GSNType NodeType, String LabelNumber) {
-		/*local*/GSNNode Node = this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber);
-		if (Node == null) {
-			return LabelNumber;
-		}
-		return this.UniqueNumber(NodeType, LabelNumber + "'");
-	}
-
 	String CheckLabelNumber(GSNNode ParentNode, GSNType NodeType, String LabelNumber) {
-		if (LabelNumber == null) {
+		while (LabelNumber == null || this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType ) + LabelNumber) != null) {
+		//if (LabelNumber == null) {
 			if (NodeType == GSNType.Goal) {
 				this.GoalCount += 1;
 				LabelNumber = "" + this.GoalCount;
@@ -989,7 +982,8 @@ class GSNDoc {
 				LabelNumber = GoalNode.LabelNumber + "." + GoalNode.SectionCount;
 			}
 		}
-		return this.UniqueNumber(NodeType, LabelNumber);
+		return LabelNumber;
+		//return this.UniqueNumber(NodeType, LabelNumber);
 	}
 
 	void RemapNodeMap() {

@@ -860,16 +860,8 @@ var GSNDoc = (function () {
         }
     };
 
-    GSNDoc.prototype.UniqueNumber = function (NodeType, LabelNumber) {
-        var Node = this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber);
-        if (Node == null) {
-            return LabelNumber;
-        }
-        return this.UniqueNumber(NodeType, LabelNumber + "'");
-    };
-
     GSNDoc.prototype.CheckLabelNumber = function (ParentNode, NodeType, LabelNumber) {
-        if (LabelNumber == null) {
+        while (LabelNumber == null || this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber) != null) {
             if (NodeType == GSNType.Goal) {
                 this.GoalCount += 1;
                 LabelNumber = "" + this.GoalCount;
@@ -879,7 +871,8 @@ var GSNDoc = (function () {
                 LabelNumber = GoalNode.LabelNumber + "." + GoalNode.SectionCount;
             }
         }
-        return this.UniqueNumber(NodeType, LabelNumber);
+        return LabelNumber;
+        //return this.UniqueNumber(NodeType, LabelNumber);
     };
 
     GSNDoc.prototype.RemapNodeMap = function () {
