@@ -69,7 +69,9 @@ module AssureNote {
             }
             if (Label) {
                 var View: NodeView = this.AssureNoteApp.PictgramPanel.ViewMap[Label];
-                if (View) {
+
+                /* Node exists and visible */
+                if (View && View.Shape) {
                     console.log(View.GetCenterGX() + " " +  View.GetCenterGY())
                     this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
                 }

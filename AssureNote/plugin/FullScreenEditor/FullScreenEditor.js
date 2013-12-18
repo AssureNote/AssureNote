@@ -80,7 +80,8 @@ var AssureNote;
             }
             if (Label) {
                 var View = this.AssureNoteApp.PictgramPanel.ViewMap[Label];
-                if (View) {
+
+                if (View && View.Shape) {
                     console.log(View.GetCenterGX() + " " + View.GetCenterGY());
                     this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
                 }
