@@ -65,7 +65,10 @@ module AssureNote {
 			this.InitialX = InitialX;
 			this.InitialY = InitialY;
 			this.CurrentX = InitialX;
-			this.CurrentY = InitialY;
+            this.CurrentY = InitialY;
+            if (this.OnStartDrag) {
+                this.OnStartDrag(this.Viewport);
+            }
 		}
 
 		private UpdateDrag(CurrentX: number, CurrentY: number) {
@@ -111,7 +114,17 @@ module AssureNote {
 			this.Dy = 0;
         }
 
+        private EndDrag() {
+            this.MainPointerID = null;
+            this.Viewport.SetEventMapLayerPosition(false);
+            if (this.OnEndDrag) {
+                this.OnEndDrag(this.Viewport);
+            }
+        }
+
         OnDragged: (Viewport: ViewportManager) => void;
+        OnStartDrag: (Viewport: ViewportManager) => void;
+        OnEndDrag: (Viewport: ViewportManager) => void;
 
 		OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
             this.Pointers = e.getPointerList();
@@ -134,8 +147,7 @@ module AssureNote {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
                         Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
                     } else {
-                        this.MainPointerID = null;
-                        this.Viewport.SetEventMapLayerPosition(false);
+                        this.EndDrag();
                     }
 				}
 			} else {
@@ -155,8 +167,7 @@ module AssureNote {
 						Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
 					}, 16);
 				}
-				this.MainPointerID = null;
-                this.Viewport.SetEventMapLayerPosition(false);
+                this.EndDrag();
 			}
 		}
 
@@ -300,7 +311,15 @@ module AssureNote {
 
 		GYFromPageY(PageY: number): number {
             return (PageY - this.GetPageCenterY()) / this.Scale + this.GetPageCenterY() - this.GetLogicalOffsetY();
-		}
+        }
+
+        ConvertRectGlobalXYFromPageXY(PageRect: Rect): Rect {
+            var x1 = this.GXFromPageX(PageRect.X);
+            var y1 = this.GYFromPageY(PageRect.Y);
+            var x2 = this.GXFromPageX(PageRect.X + PageRect.Width);
+            var y2 = this.GYFromPageY(PageRect.Y + PageRect.Height);
+            return new Rect(x1, y1, x2 - x1, y2 - y1); 
+        }
 
 		GetOffsetX(): number {
 			return this.OffsetX;
@@ -316,7 +335,11 @@ module AssureNote {
 
 		GetHeight(): number {
             return this.HTMLBodyBoundingRect.height;
-		}
+        }
+
+        GetPageRect(): Rect {
+            return new Rect(0, 0, this.GetWidth(), this.GetHeight());
+        }
 
 		GetPageCenterX(): number {
 			return this.GetWidth() / 2;
@@ -326,27 +349,9 @@ module AssureNote {
 			return this.GetHeight() / 2;
 		}
 
-		//GetCaseWidth(): number {
-		//	return this.SVGLayer.getBoundingClientRect().width;
-		//}
-
-		//GetCaseHeight(): number {
-		//	return this.SVGLayer.getBoundingClientRect().height;
-		//}
-
 		GetScale() {
 			return this.Scale;
 		}
-
-		//GetScaleRate() {
-		//	var svgwidth = this.GetCaseWidth();
-		//	var svgheight = this.GetCaseHeight();
-		//	var bodywidth = this.GetWidth();
-		//	var bodyheight = this.GetHeight();
-		//	var scaleWidth = bodywidth / svgwidth;
-		//	var scaleHeight = bodyheight / svgheight;
-		//	return Math.min(scaleWidth, scaleHeight);
-		//}
 
 		SetCaseCenter(X: number, Y: number): void {
             var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));

@@ -29,7 +29,7 @@ module AssureNote {
 			this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));
 			this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
 			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
-			this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
+            this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
 			this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
@@ -144,14 +144,21 @@ module AssureNote {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
+                        var R = 150 / this.Viewport.GetScale();
                         console.log(new Point(DX, DY));
-                        if (DX * DX + DY * DY < 150 * 150) {
+                        if (DX * DX + DY * DY < R * R) {
                             this.AssureNoteApp.ExecDoubleClicked(Node);
                         }
                         return false;
                     }
                 });
-            }
+            };
+            this.Viewport.ScrollManager.OnStartDrag = (Viewport: ViewportManager) => {
+                $("#auto-expand-area").show(300);
+            };
+            this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
+                $("#auto-expand-area").hide(300);
+            };
 		}
 
 		SetFoldedAllGoalNode(NodeView: NodeView): void {
@@ -258,7 +265,7 @@ module AssureNote {
 				mode: "text/x-asn",
 				lineWrapping: true,
             });
-
+            console.log(textarea);
             this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }

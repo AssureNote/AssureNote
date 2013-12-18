@@ -124,13 +124,20 @@ var AssureNote;
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
+                        var R = 150 / _this.Viewport.GetScale();
                         console.log(new AssureNote.Point(DX, DY));
-                        if (DX * DX + DY * DY < 150 * 150) {
+                        if (DX * DX + DY * DY < R * R) {
                             _this.AssureNoteApp.ExecDoubleClicked(Node);
                         }
                         return false;
                     }
                 });
+            };
+            this.Viewport.ScrollManager.OnStartDrag = function (Viewport) {
+                $("#auto-expand-area").show(300);
+            };
+            this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
+                $("#auto-expand-area").hide(300);
             };
         }
         PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
@@ -240,7 +247,7 @@ var AssureNote;
                 mode: "text/x-asn",
                 lineWrapping: true
             });
-
+            console.log(textarea);
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }
