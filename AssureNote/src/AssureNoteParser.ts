@@ -421,7 +421,7 @@ class GSNNode {
 	}
 	
 	public GetGoalLevel(): number {
-		var GoalCount: number = 1;
+		var GoalCount: number = this.IsGoal() ? 1 : 0;
 		var Node: GSNNode = this.ParentNode;
 		while(Node != null) {
 			if(Node.IsGoal()) {
@@ -599,7 +599,7 @@ class GSNNode {
 	}
 
 	FormatNode(RefMap: HashMap<string, GSNNode>, Writer: StringWriter): void {
-		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
+		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		Writer.print(this.LabelNumber);

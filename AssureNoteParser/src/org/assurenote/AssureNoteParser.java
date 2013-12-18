@@ -503,7 +503,7 @@ class GSNNode {
 	}
 	
 	public int GetGoalLevel() {
-		/*local*/int GoalCount = 1;
+		/*local*/int GoalCount = this.IsGoal() ? 1 : 0;
 		/*local*/GSNNode Node = this.ParentNode;
 		while(Node != null) {
 			if(Node.IsGoal()) {
@@ -682,7 +682,7 @@ class GSNNode {
 	}
 
 	void FormatNode(HashMap<String, GSNNode> RefMap, StringWriter Writer) {
-		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
+		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		Writer.print(this.LabelNumber);
@@ -1422,7 +1422,7 @@ public class AssureNoteParser {
 			MasterRecord.Merge(BranchRecord);
 		}
 		else {
-			MasterRecord.RenumberAll();
+			//MasterRecord.RenumberAll();
 		}
 		/*local*/StringWriter Writer = new StringWriter();
 		MasterRecord.FormatRecord(Writer);

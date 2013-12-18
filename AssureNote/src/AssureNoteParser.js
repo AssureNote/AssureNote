@@ -398,7 +398,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.GetGoalLevel = function () {
-        var GoalCount = 1;
+        var GoalCount = this.IsGoal() ? 1 : 0;
         var Node = this.ParentNode;
         while (Node != null) {
             if (Node.IsGoal()) {
@@ -579,7 +579,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.FormatNode = function (RefMap, Writer) {
-        Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
+        Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
         Writer.print(" ");
         Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
         Writer.print(this.LabelNumber);
