@@ -711,8 +711,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var SubNode: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
+			var SubNode: GSNNode = NewNode.NonNullSubNodeList().get(i);
 			this.MergeSubNode(SubNode, LabelMap);
 		}
 	}
@@ -1156,7 +1156,7 @@ class ParserContext {
 	LastNonContextNode: GSNNode;
 
 	constructor(NullableDoc: GSNDoc, ParentNode: GSNNode) {
-		if(ParentNode == null) {
+		if(ParentNode == null || !ParentNode.IsGoal()) {
 			ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
 		}
 		this.NullableDoc = NullableDoc;  // nullabel
@@ -1368,19 +1368,18 @@ class AssureNoteParser {
 
 	public  static main(argv: string[]): void {
 		if(argv.length == 2) {
-			AssureNoteParser.merge(argv[0], argv[1]);
+			//AssureNoteParser.merge(argv[0], argv[1]);
+			var MasterRecord: GSNRecord = new GSNRecord();
+			MasterRecord.Parse(Lib.ReadFile(argv[0]));
+			var NewNode: GSNNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+			var Writer: StringWriter = new StringWriter();
+			NewNode.FormatNode(new HashMap<string, GSNNode>(), Writer);
+			//MasterRecord.FormatRecord(Writer);
+			console.log(Writer.toString());
 		}
 		if(argv.length == 1) {
 			AssureNoteParser.merge(argv[0], null);
 		}
-//		if(argv.length == 0) {
-//			try {
-//				PdfConverter.main(argv);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} 
-//		}
 		console.log("Usage: AssureNoteParser file [margingfile]");
 	}
 }

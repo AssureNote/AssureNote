@@ -694,8 +694,8 @@ var GSNNode = (function () {
             NewNode.LastModified = this.BaseDoc.DocHistory;
         }
         NewNode.BaseDoc = this.BaseDoc;
-        for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
-            var SubNode = this.NonNullSubNodeList().get(i);
+        for (var i = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
+            var SubNode = NewNode.NonNullSubNodeList().get(i);
             this.MergeSubNode(SubNode, LabelMap);
         }
     };
@@ -1122,7 +1122,7 @@ var GSNRecord = (function () {
 
 var ParserContext = (function () {
     function ParserContext(NullableDoc, ParentNode) {
-        if (ParentNode == null) {
+        if (ParentNode == null || !ParentNode.IsGoal()) {
             ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
         }
         this.NullableDoc = NullableDoc;
@@ -1332,20 +1332,19 @@ var AssureNoteParser = (function () {
 
     AssureNoteParser.main = function (argv) {
         if (argv.length == 2) {
-            AssureNoteParser.merge(argv[0], argv[1]);
+            //AssureNoteParser.merge(argv[0], argv[1]);
+            var MasterRecord = new GSNRecord();
+            MasterRecord.Parse(Lib.ReadFile(argv[0]));
+            var NewNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+            var Writer = new StringWriter();
+            NewNode.FormatNode(new HashMap(), Writer);
+
+            //MasterRecord.FormatRecord(Writer);
+            console.log(Writer.toString());
         }
         if (argv.length == 1) {
             AssureNoteParser.merge(argv[0], null);
         }
-
-        //		if(argv.length == 0) {
-        //			try {
-        //				PdfConverter.main(argv);
-        //			} catch (Exception e) {
-        //				// TODO Auto-generated catch block
-        //				e.printStackTrace();
-        //			}
-        //		}
         console.log("Usage: AssureNoteParser file [margingfile]");
     };
     return AssureNoteParser;

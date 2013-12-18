@@ -796,8 +796,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode SubNode = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode SubNode = NewNode.NonNullSubNodeList().get(i);
 			this.MergeSubNode(SubNode, LabelMap);
 		}
 	}
@@ -1243,7 +1243,7 @@ class ParserContext {
 	/*field*/GSNNode LastNonContextNode;
 
 	ParserContext/*constructor*/(GSNDoc NullableDoc, GSNNode ParentNode) {
-		if(ParentNode == null) {
+		if(ParentNode == null || !ParentNode.IsGoal()) {
 			ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
 		}
 		this.NullableDoc = NullableDoc;  // nullabel
@@ -1458,9 +1458,10 @@ public class AssureNoteParser {
 			//AssureNoteParser.merge(argv[0], argv[1]);
 			/*local*/GSNRecord MasterRecord = new GSNRecord();
 			MasterRecord.Parse(Lib.ReadFile(argv[0]));
-			MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+			/*local*/GSNNode NewNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
 			/*local*/StringWriter Writer = new StringWriter();
-			MasterRecord.FormatRecord(Writer);
+			NewNode.FormatNode(new HashMap<String, GSNNode>(), Writer);
+			//MasterRecord.FormatRecord(Writer);
 			System.out.println(Writer.toString());
 		}
 		if(argv.length == 1) {

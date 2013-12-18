@@ -98,12 +98,12 @@ module AssureNote {
 
             //TODO input user name
             this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
-            //var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
+            var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
 
-            var Reader: StringReader = new StringReader(WGSN);
+            //var Reader: StringReader = new StringReader(WGSN);
             var NewDoc = this.AssureNoteApp.MasterRecord.EditingDoc;
-            var Parser: ParserContext = new ParserContext(null, null);
-            var NewNode = Parser.ParseNode(Reader, null);
+            //var Parser: ParserContext = new ParserContext(null, null);
+            //var NewNode = Parser.ParseNode(Reader, null);
 
             var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
             if (TopGoal.GetLabel() == NewNode.GetLabel()) {
