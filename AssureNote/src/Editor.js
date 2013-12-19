@@ -39,6 +39,7 @@ var AssureNote;
             this.TextArea.refresh();
         };
 
+        //Deprecated!!
         EditorUtil.prototype.MakeMap = function (Node, NodeMap) {
             NodeMap[Node.GetLabel()] = Node;
             for (var i = 0; i < Node.NonNullSubNodeList().length; i++) {
@@ -47,6 +48,7 @@ var AssureNote;
             }
         };
 
+        //Deprecated!!
         EditorUtil.prototype.CopyNodesInfo = function (OldNodeMap, NewNodeMap, NewDoc) {
             var NewNodeLabels = Object.keys(NewNodeMap);
             for (var j = 0; j < NewNodeLabels.length; j++) {
@@ -72,6 +74,7 @@ var AssureNote;
             }
         };
 
+        //Deprecated!!
         EditorUtil.prototype.MergeModel = function (OriginNode, NewNode, NewDoc) {
             var OldNodeMap = {};
             this.MakeMap(OriginNode, OldNodeMap);
@@ -94,34 +97,18 @@ var AssureNote;
 
         EditorUtil.prototype.DisableEditor = function (OldNodeView) {
             var _this = this;
-            var Node = OldNodeView.Model;
             var WGSN = (this.TextArea).getValue();
 
+            //Create a new GSNDoc
             //TODO input user name
             this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
-
-            //var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
-            var Reader = new StringReader(WGSN);
-            var NewDoc = this.AssureNoteApp.MasterRecord.EditingDoc;
-            var Parser = new ParserContext(null, null);
-            var NewNode = Parser.ParseNode(Reader, null);
+            var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.GetLabel());
+            var NewNode = Node.ReplaceSubNodeAsText(WGSN);
 
             var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
-            if (TopGoal.GetLabel() == NewNode.GetLabel()) {
-                var OldNodeMap = {};
-                this.MakeMap(TopGoal, OldNodeMap);
-                var NewNodeMap = {};
-                this.MakeMap(NewNode, NewNodeMap);
-
-                this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
-                this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal = NewNode;
-                TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
-            } else {
-                this.MergeModel(TopGoal, NewNode, NewDoc);
-            }
-
-            //OldNodeView.Update(TopGoal, this.AssureNoteApp.PictgramPanel.ViewMap);
-            this.AssureNoteApp.PictgramPanel.SetView(new AssureNote.NodeView(TopGoal, true));
+            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
+            this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
             this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
 
             this.AssureNoteApp.PluginPanel.IsVisible = true;

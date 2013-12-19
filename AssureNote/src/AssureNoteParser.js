@@ -398,7 +398,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.GetGoalLevel = function () {
-        var GoalCount = 1;
+        var GoalCount = this.IsGoal() ? 1 : 0;
         var Node = this.ParentNode;
         while (Node != null) {
             if (Node.IsGoal()) {
@@ -579,7 +579,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.FormatNode = function (RefMap, Writer) {
-        Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
+        Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
         Writer.print(" ");
         Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
         Writer.print(this.LabelNumber);
@@ -685,7 +685,7 @@ var GSNNode = (function () {
             }
         }
         if (NewNode.LastModified == null) {
-            var NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, this.NodeType, null);
+            var NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
             if (LabelMap != null && this.LabelNumber != null) {
                 LabelMap.put(NewNode.GetLabel(), NewLabelNumber);
             }
@@ -694,8 +694,8 @@ var GSNNode = (function () {
             NewNode.LastModified = this.BaseDoc.DocHistory;
         }
         NewNode.BaseDoc = this.BaseDoc;
-        for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
-            var SubNode = this.NonNullSubNodeList().get(i);
+        for (var i = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
+            var SubNode = NewNode.NonNullSubNodeList().get(i);
             this.MergeSubNode(SubNode, LabelMap);
         }
     };
@@ -860,16 +860,8 @@ var GSNDoc = (function () {
         }
     };
 
-    GSNDoc.prototype.UniqueNumber = function (NodeType, LabelNumber) {
-        var Node = this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber);
-        if (Node == null) {
-            return LabelNumber;
-        }
-        return this.UniqueNumber(NodeType, LabelNumber + "'");
-    };
-
     GSNDoc.prototype.CheckLabelNumber = function (ParentNode, NodeType, LabelNumber) {
-        if (LabelNumber == null) {
+        while (LabelNumber == null || this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber) != null) {
             if (NodeType == GSNType.Goal) {
                 this.GoalCount += 1;
                 LabelNumber = "" + this.GoalCount;
@@ -879,7 +871,8 @@ var GSNDoc = (function () {
                 LabelNumber = GoalNode.LabelNumber + "." + GoalNode.SectionCount;
             }
         }
-        return this.UniqueNumber(NodeType, LabelNumber);
+        return LabelNumber;
+        //return this.UniqueNumber(NodeType, LabelNumber);
     };
 
     GSNDoc.prototype.RemapNodeMap = function () {
@@ -1122,7 +1115,7 @@ var GSNRecord = (function () {
 
 var ParserContext = (function () {
     function ParserContext(NullableDoc, ParentNode) {
-        if (ParentNode == null) {
+        if (ParentNode == null || !ParentNode.IsGoal()) {
             ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
         }
         this.NullableDoc = NullableDoc;
@@ -1332,20 +1325,19 @@ var AssureNoteParser = (function () {
 
     AssureNoteParser.main = function (argv) {
         if (argv.length == 2) {
-            AssureNoteParser.merge(argv[0], argv[1]);
+            //AssureNoteParser.merge(argv[0], argv[1]);
+            var MasterRecord = new GSNRecord();
+            MasterRecord.Parse(Lib.ReadFile(argv[0]));
+            var NewNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+            var Writer = new StringWriter();
+            NewNode.FormatNode(new HashMap(), Writer);
+
+            //MasterRecord.FormatRecord(Writer);
+            console.log(Writer.toString());
         }
         if (argv.length == 1) {
             AssureNoteParser.merge(argv[0], null);
         }
-
-        //		if(argv.length == 0) {
-        //			try {
-        //				PdfConverter.main(argv);
-        //			} catch (Exception e) {
-        //				// TODO Auto-generated catch block
-        //				e.printStackTrace();
-        //			}
-        //		}
         console.log("Usage: AssureNoteParser file [margingfile]");
     };
     return AssureNoteParser;

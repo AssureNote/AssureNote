@@ -421,7 +421,7 @@ class GSNNode {
 	}
 	
 	public GetGoalLevel(): number {
-		var GoalCount: number = 1;
+		var GoalCount: number = this.IsGoal() ? 1 : 0;
 		var Node: GSNNode = this.ParentNode;
 		while(Node != null) {
 			if(Node.IsGoal()) {
@@ -599,7 +599,7 @@ class GSNNode {
 	}
 
 	FormatNode(RefMap: HashMap<string, GSNNode>, Writer: StringWriter): void {
-		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
+		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		Writer.print(this.LabelNumber);
@@ -702,7 +702,7 @@ class GSNNode {
 			}
 		}
 		if(NewNode.LastModified == null) {
-			var NewLabelNumber: string = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, this.NodeType, null);
+			var NewLabelNumber: string = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
 			if(LabelMap != null && this.LabelNumber != null) {
 				LabelMap.put(NewNode.GetLabel(), NewLabelNumber);
 			}
@@ -711,8 +711,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var SubNode: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
+			var SubNode: GSNNode = NewNode.NonNullSubNodeList().get(i);
 			this.MergeSubNode(SubNode, LabelMap);
 		}
 	}
@@ -884,16 +884,9 @@ class GSNDoc {
 		}
 	}
 
-	private UniqueNumber(NodeType: GSNType, LabelNumber: string): string {
-		var Node: GSNNode = this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber);
-		if (Node == null) {
-			return LabelNumber;
-		}
-		return this.UniqueNumber(NodeType, LabelNumber + "'");
-	}
-
 	CheckLabelNumber(ParentNode: GSNNode, NodeType: GSNType, LabelNumber: string): string {
-		if (LabelNumber == null) {
+		while (LabelNumber == null || this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType ) + LabelNumber) != null) {
+		//if (LabelNumber == null) {
 			if (NodeType == GSNType.Goal) {
 				this.GoalCount += 1;
 				LabelNumber = "" + this.GoalCount;
@@ -903,7 +896,8 @@ class GSNDoc {
 				LabelNumber = GoalNode.LabelNumber + "." + GoalNode.SectionCount;
 			}
 		}
-		return this.UniqueNumber(NodeType, LabelNumber);
+		return LabelNumber;
+		//return this.UniqueNumber(NodeType, LabelNumber);
 	}
 
 	RemapNodeMap(): void {
@@ -1156,7 +1150,7 @@ class ParserContext {
 	LastNonContextNode: GSNNode;
 
 	constructor(NullableDoc: GSNDoc, ParentNode: GSNNode) {
-		if(ParentNode == null) {
+		if(ParentNode == null || !ParentNode.IsGoal()) {
 			ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
 		}
 		this.NullableDoc = NullableDoc;  // nullabel
@@ -1368,19 +1362,18 @@ class AssureNoteParser {
 
 	public  static main(argv: string[]): void {
 		if(argv.length == 2) {
-			AssureNoteParser.merge(argv[0], argv[1]);
+			//AssureNoteParser.merge(argv[0], argv[1]);
+			var MasterRecord: GSNRecord = new GSNRecord();
+			MasterRecord.Parse(Lib.ReadFile(argv[0]));
+			var NewNode: GSNNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+			var Writer: StringWriter = new StringWriter();
+			NewNode.FormatNode(new HashMap<string, GSNNode>(), Writer);
+			//MasterRecord.FormatRecord(Writer);
+			console.log(Writer.toString());
 		}
 		if(argv.length == 1) {
 			AssureNoteParser.merge(argv[0], null);
 		}
-//		if(argv.length == 0) {
-//			try {
-//				PdfConverter.main(argv);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} 
-//		}
 		console.log("Usage: AssureNoteParser file [margingfile]");
 	}
 }
