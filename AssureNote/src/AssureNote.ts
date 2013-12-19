@@ -160,7 +160,7 @@ module AssureNote {
                     Node = this.PictgramPanel.ViewMap[Label];
                 }
                 if (Node != null) {
-                    if ($("#" + Label).length > 0) { //FIXME use IsVisible
+                    if ($("#" + Label.replace(/\./g,"\\.")).length > 0) { //FIXME use IsVisible
                         this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
                     } else {
                         this.DebugP("Invisible node " + Label + " Selected.");
