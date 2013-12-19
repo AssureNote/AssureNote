@@ -110,9 +110,11 @@ var AssureNote;
             var ChildrenBottomWidth = 0;
             var ChildrenHeight = 0;
             var FoldedNodeRun = [];
+            var VisibleChildrenCount = 0;
             if (ThisNode.Children != null && ThisNode.Children.length > 0) {
                 var IsLastChildFolded = false;
                 ThisNode.ForEachVisibleChildren(function (SubNode) {
+                    VisibleChildrenCount++;
                     _this.Layout(SubNode);
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
                     var ChildHeadWidth = SubNode.IsFolded ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
@@ -168,6 +170,11 @@ var AssureNote;
 
                 var ChildrenWidth = Math.max(ChildrenTopWidth, ChildrenBottomWidth) - SimpleLayoutEngine.ChildrenHorizontalMargin;
                 var Shift = (ChildrenWidth - ThisNodeWidth) / 2;
+                if (VisibleChildrenCount == 1) {
+                    ThisNode.ForEachVisibleChildren(function (SubNode) {
+                        Shift = -SubNode.Shape.GetTreeLeftX();
+                    });
+                }
                 TreeLeftX = Math.min(TreeLeftX, -Shift);
                 ThisNode.ForEachVisibleChildren(function (SubNode) {
                     SubNode.RelativeX -= Shift;
