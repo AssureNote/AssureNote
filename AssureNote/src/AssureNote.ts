@@ -12,7 +12,7 @@ module AssureNote {
 			saveAs(blob, FileName);
 		}
 
-		export function GetNodeLabel(event: Event): string {
+		export function GetNodeLabelFromEvent(event: Event): string {
 			var element = <HTMLElement>event.srcElement;
 			while (element != null) {
 				if (element.id != "") {

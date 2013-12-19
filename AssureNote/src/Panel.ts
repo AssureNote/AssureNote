@@ -35,22 +35,12 @@ module AssureNote {
 
             var Bar = new MenuBar(AssureNoteApp);
             this.ContentLayer.addEventListener("click", (event: MouseEvent) => {
-				var Label: string = AssureNoteUtils.GetNodeLabel(event);
+				var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
 				this.AssureNoteApp.DebugP("click:" + Label);
 				if (Bar.IsEnable) {
 					Bar.Remove();
 				}
-				var NodeView = this.ViewMap[Label];
-				if (NodeView != null) {
-					this.FocusedLabel = Label;
-					if (!Bar.IsEnable) {
-						var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
-						Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
-					}
-				} else {
-					this.FocusedLabel = null;
-                }
-				return false;
+                event.preventDefault();
 			});
 
             //FIXME
@@ -61,15 +51,30 @@ module AssureNote {
                 }
             });
 
+            this.ContentLayer.addEventListener("contextmenu", (event: MouseEvent) => {
+                var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
+                var NodeView = this.ViewMap[Label];
+                if (NodeView != null) {
+                    this.FocusedLabel = Label;
+                    if (!Bar.IsEnable) {
+                        var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
+                        Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
+                    }
+                } else {
+                    this.FocusedLabel = null;
+                }
+                event.preventDefault();
+            });
+
             this.ContentLayer.addEventListener("dblclick", (event: MouseEvent) => {
-				var Label: string = AssureNoteUtils.GetNodeLabel(event);
+				var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
 				var NodeView = this.ViewMap[Label];
 				this.AssureNoteApp.DebugP("double click:" + Label);
 				if (Bar.IsEnable) { //TODO cancel click event
 					Bar.Remove();
 				}
 				this.AssureNoteApp.ExecDoubleClicked(NodeView);
-				return false;
+                event.preventDefault();
 			});
 
 			this.CmdLine = new CommandLine();
@@ -112,7 +117,7 @@ module AssureNote {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
 					return;
 				}
-				var Label = AssureNoteUtils.GetNodeLabel(event);
+				var Label = AssureNoteUtils.GetNodeLabelFromEvent(event);
 				if (Label) {
 					//this.AssureNoteApp.DebugP("mouseover:"+Label);
 				}

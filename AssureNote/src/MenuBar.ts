@@ -54,7 +54,7 @@ module AssureNote {
 				distance: 60,
 				labels: 'tc',
 				duration: 200,
-				fadeIn: 400,
+				fadeIn: 200,
 				source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
 				onReady: refresh,
 			});

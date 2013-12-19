@@ -9,7 +9,7 @@ var AssureNote;
         }
         AssureNoteUtils.SaveAs = SaveAs;
 
-        function GetNodeLabel(event) {
+        function GetNodeLabelFromEvent(event) {
             var element = event.srcElement;
             while (element != null) {
                 if (element.id != "") {
@@ -19,7 +19,7 @@ var AssureNote;
             }
             return "";
         }
-        AssureNoteUtils.GetNodeLabel = GetNodeLabel;
+        AssureNoteUtils.GetNodeLabelFromEvent = GetNodeLabelFromEvent;
 
         function GetNodePosition(Label) {
             var element = document.getElementById(Label);
