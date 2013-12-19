@@ -88,6 +88,7 @@ var AssureNote;
             if (Plugin != null) {
                 Plugin.ExecCommand(this, ParsedCommand.GetArgs());
             } else {
+                //TODO split jump-node function
                 var Label = Method.toUpperCase();
                 if (this.PictgramPanel.ViewMap == null) {
                     this.DebugP("Jump is diabled.");

@@ -147,8 +147,8 @@ module AssureNote {
 			var Plugin = this.PluginManager.GetCommandPlugin(Method);
 			if (Plugin != null) {
 				Plugin.ExecCommand(this, ParsedCommand.GetArgs());
-			}
-			else {
+			} else {
+                //TODO split jump-node function
 				var Label = Method.toUpperCase();
 				if (this.PictgramPanel.ViewMap == null) {
 					this.DebugP("Jump is diabled.");
