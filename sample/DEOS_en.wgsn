@@ -1,0 +1,49 @@
+* G
+[System] is dependable.
+
+* C
+System:: 
+
+* S
+Arguing over DEOS Process
+
+** G
+Stakeholders of [System] are defined. 
+
+** S
+Accountability design
+
+** G
+[System] can deliver correct services.
+
+** S
+Depen
+
+** G
+[System] is resilient.
+
+** S
+Arguing resilience patterns.
+
+*** G
+[System] can detect errors
+
+*** G
+[System] can prevent failures.
+
+*** G
+[System] can recover failures.
+
+** G
+[System] changes.
+
+** S
+[System] is ..
+
+*** G
+[System] is scalable.
+
+*** G
+[System] is sustainable.
+
+
