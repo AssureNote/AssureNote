@@ -62,7 +62,6 @@ var AssureNote;
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
-                console.log(event.keyCode);
                 switch (event.keyCode) {
                     case 58:
                         if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
@@ -125,7 +124,6 @@ var AssureNote;
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetScale();
-                        console.log(new AssureNote.Point(DX, DY));
                         if (DX * DX + DY * DY < R * R) {
                             _this.AssureNoteApp.ExecDoubleClicked(Node);
                         }
@@ -247,7 +245,6 @@ var AssureNote;
                 mode: "text/x-asn",
                 lineWrapping: true
             });
-            console.log(textarea);
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }
