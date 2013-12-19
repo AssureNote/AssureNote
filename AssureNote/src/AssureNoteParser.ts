@@ -354,7 +354,7 @@ class GSNNode {
 	constructor(BaseDoc: GSNDoc, ParentNode: GSNNode, NodeType: GSNType, LabelNumber: string, HistoryTriple: GSNHistory[]) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
-		this.NodeType    = NodeType;
+		this.NodeType    = NodeType;	
 		this.LabelNumber = LabelNumber;    // G1.1
 		this.SectionCount = 0;
 		this.SubNodeList = null;
@@ -488,6 +488,28 @@ class GSNNode {
 	UpdateContent(TextDoc: string): void {
 		this.SetContent(new StringReader(TextDoc).GetLineList(true/*UntilSection*/));
 	}
+	
+	GetHtmlContent(): void {
+		if(this.Digest != null) {
+			var Reader: StringReader = new StringReader(this.NodeDoc);
+			var Writer: StringWriter = new StringWriter();
+			var Paragraph: string = "";
+			while(Reader.HasNext()) {
+				var Line: string = Reader.ReadLine();
+				Paragraph += Line;
+				if(Line.length == 0 && Paragraph.length > 0) {
+					Writer.println("<p>" + Paragraph + "</p>");
+					continue;
+				}
+				var Loc: number = Line.indexOf("::");
+				if(Loc > 0) {
+					Writer.println("<p class='tag'>" + Line + "</p>");
+					continue;
+				}
+			}
+		}
+	}
+
 	
 	GetNodeHistoryList(): Array<GSNNode> {
 		var NodeList: Array<GSNNode> = new Array<GSNNode>();
@@ -667,10 +689,10 @@ class GSNNode {
 
 	ReplaceSubNodeAsText(DocText: string): GSNNode {
 		var Reader: StringReader = new StringReader(DocText);
-		var Parser: ParserContext = new ParserContext(null, this.ParentNode);
+		var Parser: ParserContext = new ParserContext(null);
 		var NewNode: GSNNode = Parser.ParseNode(Reader, null);
 		if(NewNode != null) {
-			this.ReplaceSubNode(NewNode, null);
+			NewNode = this.ReplaceSubNode(NewNode, null);
 		}
 		return NewNode;
 	}
@@ -994,7 +1016,7 @@ class GSNRecord {
 		var Reader: StringReader = new StringReader(TextDoc);
 		while (Reader.HasNext()) {
 			var Doc: GSNDoc = new GSNDoc(this);
-			var Parser: ParserContext = new ParserContext(Doc, null);
+			var Parser: ParserContext = new ParserContext(Doc);
 			Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
 		}
 	}
@@ -1149,10 +1171,8 @@ class ParserContext {
 	LastGoalNode: GSNNode;
 	LastNonContextNode: GSNNode;
 
-	constructor(NullableDoc: GSNDoc, ParentNode: GSNNode) {
-		if(ParentNode == null || !ParentNode.IsGoal()) {
-			ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
-		}
+	constructor(NullableDoc: GSNDoc) {
+		var ParentNode: GSNNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;
@@ -1335,7 +1355,7 @@ class AssureNoteParser {
 			MasterRecord.Merge(BranchRecord);
 		}
 		else {
-			MasterRecord.RenumberAll();
+			//MasterRecord.RenumberAll();
 		}
 		var Writer: StringWriter = new StringWriter();
 		MasterRecord.FormatRecord(Writer);

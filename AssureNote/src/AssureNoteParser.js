@@ -466,6 +466,27 @@ var GSNNode = (function () {
         this.SetContent(new StringReader(TextDoc).GetLineList(true));
     };
 
+    GSNNode.prototype.GetHtmlContent = function () {
+        if (this.Digest != null) {
+            var Reader = new StringReader(this.NodeDoc);
+            var Writer = new StringWriter();
+            var Paragraph = "";
+            while (Reader.HasNext()) {
+                var Line = Reader.ReadLine();
+                Paragraph += Line;
+                if (Line.length == 0 && Paragraph.length > 0) {
+                    Writer.println("<p>" + Paragraph + "</p>");
+                    continue;
+                }
+                var Loc = Line.indexOf("::");
+                if (Loc > 0) {
+                    Writer.println("<p class='tag'>" + Line + "</p>");
+                    continue;
+                }
+            }
+        }
+    };
+
     GSNNode.prototype.GetNodeHistoryList = function () {
         var NodeList = new Array();
         var LastNode = null;
@@ -649,10 +670,10 @@ var GSNNode = (function () {
 
     GSNNode.prototype.ReplaceSubNodeAsText = function (DocText) {
         var Reader = new StringReader(DocText);
-        var Parser = new ParserContext(null, this.ParentNode);
+        var Parser = new ParserContext(null);
         var NewNode = Parser.ParseNode(Reader, null);
         if (NewNode != null) {
-            this.ReplaceSubNode(NewNode, null);
+            NewNode = this.ReplaceSubNode(NewNode, null);
         }
         return NewNode;
     };
@@ -965,7 +986,7 @@ var GSNRecord = (function () {
         var Reader = new StringReader(TextDoc);
         while (Reader.HasNext()) {
             var Doc = new GSNDoc(this);
-            var Parser = new ParserContext(Doc, null);
+            var Parser = new ParserContext(Doc);
             Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
         }
     };
@@ -1114,10 +1135,8 @@ var GSNRecord = (function () {
 })();
 
 var ParserContext = (function () {
-    function ParserContext(NullableDoc, ParentNode) {
-        if (ParentNode == null || !ParentNode.IsGoal()) {
-            ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
-        }
+    function ParserContext(NullableDoc) {
+        var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
         this.NullableDoc = NullableDoc;
         this.FirstNode = null;
         this.LastGoalNode = null;
@@ -1299,7 +1318,7 @@ var AssureNoteParser = (function () {
             BranchRecord.Parse(Lib.ReadFile(BranchFile));
             MasterRecord.Merge(BranchRecord);
         } else {
-            MasterRecord.RenumberAll();
+            //MasterRecord.RenumberAll();
         }
         var Writer = new StringWriter();
         MasterRecord.FormatRecord(Writer);

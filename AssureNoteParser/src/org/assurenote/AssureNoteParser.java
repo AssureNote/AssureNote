@@ -436,7 +436,7 @@ class GSNNode {
 	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType, String LabelNumber, GSNHistory[] HistoryTriple) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
-		this.NodeType    = NodeType;
+		this.NodeType    = NodeType;	
 		this.LabelNumber = LabelNumber;    // G1.1
 		this.SectionCount = 0;
 		this.SubNodeList = null;
@@ -575,7 +575,7 @@ class GSNNode {
 		if(this.Digest != null) {
 			/*local*/StringReader Reader = new StringReader(this.NodeDoc);
 			/*local*/StringWriter Writer = new StringWriter();
-			/*loca;*/String Paragraph = "";
+			/*local*/String Paragraph = "";
 			while(Reader.HasNext()) {
 				/*local*/String Line = Reader.ReadLine();
 				Paragraph += Line;
@@ -773,10 +773,10 @@ class GSNNode {
 
 	GSNNode ReplaceSubNodeAsText(String DocText) {
 		/*local*/StringReader Reader = new StringReader(DocText);
-		/*local*/ParserContext Parser = new ParserContext(null, this.ParentNode);
+		/*local*/ParserContext Parser = new ParserContext(null);
 		/*local*/GSNNode NewNode = Parser.ParseNode(Reader, null);
 		if(NewNode != null) {
-			this.ReplaceSubNode(NewNode, null);
+			NewNode = this.ReplaceSubNode(NewNode, null);
 		}
 		return NewNode;
 	}
@@ -1103,7 +1103,7 @@ class GSNRecord {
 		/*local*/StringReader Reader = new StringReader(TextDoc);
 		while (Reader.HasNext()) {
 			/*local*/GSNDoc Doc = new GSNDoc(this);
-			/*local*/ParserContext Parser = new ParserContext(Doc, null);
+			/*local*/ParserContext Parser = new ParserContext(Doc);
 			Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
 		}
 	}
@@ -1258,10 +1258,8 @@ class ParserContext {
 	/*field*/GSNNode LastGoalNode;
 	/*field*/GSNNode LastNonContextNode;
 
-	ParserContext/*constructor*/(GSNDoc NullableDoc, GSNNode ParentNode) {
-		if(ParentNode == null || !ParentNode.IsGoal()) {
-			ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
-		}
+	ParserContext/*constructor*/(GSNDoc NullableDoc) {
+		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;

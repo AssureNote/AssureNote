@@ -104,19 +104,21 @@ var AssureNote;
             this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
             var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.GetLabel());
             var NewNode = Node.ReplaceSubNodeAsText(WGSN);
+            console.log(NewNode);
 
-            var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
-            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
-            this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
-            this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+            if (NewNode) {
+                var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
+                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+                NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
+                this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
+                this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
 
-            this.AssureNoteApp.PluginPanel.IsVisible = true;
+                this.AssureNoteApp.PluginPanel.IsVisible = true;
+
+                /* TODO resolve conflict */
+                this.AssureNoteApp.SocketManager.UpdateWGSN();
+            }
             this.AssureNoteApp.MasterRecord.CloseEditor();
-
-            /* TODO resolve conflict */
-            this.AssureNoteApp.SocketManager.UpdateWGSN();
-
             $(this.Selector).addClass("animated fadeOutUp");
 
             /* Need to wait a bit for the end of animation */
