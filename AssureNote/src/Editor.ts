@@ -37,64 +37,6 @@ module AssureNote {
             this.TextArea.refresh();
         }
 
-        //Deprecated!!
-        private MakeMap(Node: GSNNode, NodeMap: { [index: string]: GSNNode }): void {
-            NodeMap[Node.GetLabel()] = Node;
-            for (var i = 0; i < Node.NonNullSubNodeList().length; i++) {
-                var SubNode = Node.NonNullSubNodeList().get(i);
-                this.MakeMap(SubNode, NodeMap);
-            }
-        }
-
-        //Deprecated!!
-        private CopyNodesInfo(OldNodeMap: { [index: string]: GSNNode },
-            NewNodeMap: { [index: string]: GSNNode }, NewDoc: GSNDoc
-            ): void {
-                var NewNodeLabels = Object.keys(NewNodeMap);
-                for (var j = 0; j < NewNodeLabels.length; j++) {
-                    var Label = NewNodeLabels[j];
-                    var NewNodeModel = NewNodeMap[Label];
-                    var OldNodeModel = OldNodeMap[Label];
-                    if (OldNodeMap[Label] != null) {
-                        NewNodeModel.BaseDoc = OldNodeModel.BaseDoc;
-                        NewNodeModel.Created = OldNodeModel.Created;
-                        //NewNodeModel.GoalLevel = OldNodeModel.GoalLevel;
-                        if (NewNodeModel.Digest == OldNodeModel.Digest) {
-                            NewNodeModel.LastModified = OldNodeModel.LastModified;
-                        } else {
-                            NewNodeModel.LastModified = NewDoc.DocHistory;
-                        }
-                    } else {
-                        NewNodeModel.BaseDoc = NewDoc;
-                        NewNodeModel.Created = NewDoc.DocHistory;
-                        //NewNodeModel.GoalLevel = NewNodeModel.ParentNode.GoalLevel; //FIXME
-                        NewNodeModel.LastModified = NewDoc.DocHistory;
-                    }
-                }
-        }
-
-        //Deprecated!!
-        private MergeModel(OriginNode: GSNNode, NewNode: GSNNode, NewDoc: GSNDoc): void {
-
-            var OldNodeMap = <{ [index: string]: GSNNode }>{};
-            this.MakeMap(OriginNode, OldNodeMap);
-            var MergeTopNode = OldNodeMap[NewNode.GetLabel()];
-            var MergeParentNode = MergeTopNode.ParentNode;
-
-            var NewNodeMap = <{ [index: string]: GSNNode }>{};
-            this.MakeMap(NewNode, NewNodeMap);
-
-            for (var i = 0; i < MergeParentNode.SubNodeList.length; i++) {
-                var SubNode = MergeParentNode.SubNodeList[i];
-                if (SubNode.GetLabel() == MergeTopNode.GetLabel()) {
-                    this.CopyNodesInfo(OldNodeMap, NewNodeMap, NewDoc);
-                    MergeParentNode.SubNodeList[i] = NewNode;
-                    NewNode.ParentNode = MergeParentNode;
-                    return;
-                }
-            }
-        }
-
         DisableEditor(OldNodeView: NodeView): void {
             var WGSN: string = (<any>this.TextArea).getValue();
 

@@ -167,7 +167,7 @@ module AssureNote {
                     }
                     return;
                 }
-				this.DebugP("undefined command: " + ParsedCommand.GetMethod());
+				this.DebugP("undefined command: " + Method);
 			}
 		}
 
