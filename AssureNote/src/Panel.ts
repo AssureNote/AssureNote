@@ -145,7 +145,7 @@ module AssureNote {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / this.Viewport.GetScale();
-                        console.log(new Point(DX, DY));
+                        //console.log(new Point(DX, DY));
                         if (DX * DX + DY * DY < R * R) {
                             this.AssureNoteApp.ExecDoubleClicked(Node);
                         }

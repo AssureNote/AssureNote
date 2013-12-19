@@ -433,10 +433,6 @@ module AssureNote {
             return this.TreeBoundingBox.X;
         }
 
-        //GetTreeUpperY(): number {
-        //    return this.TreeBoundingBox.Y;
-        //}
-
         GetHeadLeftX(): number {
             return this.HeadBoundingBox.X;
         }
@@ -490,84 +486,11 @@ module AssureNote {
         FitSizeToContent(): void {
         }
 
-        static CreateCSSMoveAnimationDefinition(Prefix: string, Name: string, FromGX: number, FromGY: number): string {
-            return "@" + Prefix + "keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
-        }
-
-        static CreateCSSFadeInAnimationDefinition(Prefix: string, Name: string): string {
-            return "@" + Prefix + "keyframes " + Name + " { 0% { opacity: 0; } }";
-        }
-
-        private static SVGMoveAnimateElementMaster: SVGElement;
-        private static SVGArrowAnimateElementMaster: SVGElement;
-        private static SVGFadeinAnimateElementMaster: SVGElement;
-
-        static CreateSVGMoveAnimateElement(Duration: number, FromGX: number, FromGY: number): SVGElement {
-            if (GSNShape.SVGMoveAnimateElementMaster == null) {
-                GSNShape.SVGMoveAnimateElementMaster = AssureNoteUtils.CreateSVGElement("animateTransform");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("attributeName", "transform");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("attributeType", "XML");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("type", "translate");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("calcMode", "spline");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("keyTimes", "0;1");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("restart", "never");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("begin", "indefinite");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("repeatCount", "1");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("additive", "sum");
-                GSNShape.SVGMoveAnimateElementMaster.setAttribute("to", "0,0");
-            }
-            var AnimateElement = <SVGElement>GSNShape.SVGMoveAnimateElementMaster.cloneNode();
-            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
-            AnimateElement.setAttribute("from", "" + FromGX + "," + FromGY);
-            return AnimateElement;
-        }
-
-        static CreateSVGArrowAnimateElement(Duration: number, OldPath: string, NewPath: string): SVGElement {
-            if (GSNShape.SVGArrowAnimateElementMaster == null) {
-                GSNShape.SVGArrowAnimateElementMaster = AssureNoteUtils.CreateSVGElement("animate");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("attributeName", "d");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("attributeType", "XML");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("calcMode", "spline");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("keyTimes", "0;1");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("restart", "never");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("begin", "indefinite");
-                GSNShape.SVGArrowAnimateElementMaster.setAttribute("repeatCount", "1");
-            }
-            var AnimateElement = <SVGElement>GSNShape.SVGArrowAnimateElementMaster.cloneNode();
-            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
-            if (OldPath) {
-                AnimateElement.setAttribute("from", OldPath);
-            }
-            AnimateElement.setAttribute("to", NewPath);
-            return AnimateElement;
-        }
-
-        static CreateSVGFadeInAnimateElement(Duration: number): SVGElement {
-            if (GSNShape.SVGFadeinAnimateElementMaster == null) {
-                GSNShape.SVGFadeinAnimateElementMaster = AssureNoteUtils.CreateSVGElement("animate");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("attributeName", "fill-opacity");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("attributeType", "XML");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("calcMode", "spline");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("keyTimes", "0;1");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("restart", "never");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("begin", "indefinite");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("repeatCount", "1");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("from", "0");
-                GSNShape.SVGFadeinAnimateElementMaster.setAttribute("to", "1");
-            }
-            var AnimateElement = <SVGElement>GSNShape.SVGFadeinAnimateElementMaster.cloneNode();
-            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
-            return AnimateElement;
-        }
-
         private GX = null;
         private GY = null;
 
-        static CSSAnimationDefinitionCount = 0;
-        static GetCSSAnimationID(): number {
+        private static CSSAnimationDefinitionCount = 0;
+        private static GetCSSAnimationID(): number {
             return GSNShape.CSSAnimationDefinitionCount++;
         }
 
@@ -602,17 +525,17 @@ module AssureNote {
                         this.Content.style["msAnimation"] = AnimationStyleString;
                         var AnimateElement: any;
                         if (this.GX == null || this.GY == null) {
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-webkit-", AnimationName));
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-moz-", AnimationName));
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("-ms-", AnimationName));
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSFadeInAnimationDefinition("", AnimationName));
-                            AnimateElement = GSNShape.CreateSVGFadeInAnimateElement(Duration);
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-webkit-", AnimationName));
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-moz-", AnimationName));
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-ms-", AnimationName));
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("", AnimationName));
+                            AnimateElement = AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
                         } else {
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(GSNShape.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
-                            AnimateElement = GSNShape.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
+                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
+                            AnimateElement = AssureNoteUtils.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
                         }
                         this.ShapeGroup.appendChild(AnimateElement);
                         AnimateElement.beginElement();
@@ -688,9 +611,9 @@ module AssureNote {
                     this.PreviousArrowAnimateElement = null
                 }
                 if (this.GX == null || this.GY == null) {
-                    var AnimateElement: any = GSNShape.CreateSVGFadeInAnimateElement(Duration);
+                    var AnimateElement: any = AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
                 } else {
-                    var AnimateElement: any = GSNShape.CreateSVGArrowAnimateElement(Duration, this.OldArrowPath, NewPath);
+                    var AnimateElement: any = AssureNoteUtils.CreateSVGArrowAnimateElement(Duration, this.OldArrowPath, NewPath);
                 }
 
                 this.ArrowPath.appendChild(AnimateElement);
@@ -732,11 +655,7 @@ module AssureNote {
 		PrerenderSVGContent(): void {
 			super.PrerenderSVGContent();
 			this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
-            //this.BodyRect = AssureNoteUtils.CreateSVGElement("use");
-			//this.BodyRect.setAttribute("xlink:href", "#goal-masterhoge");
 			this.BodyRect.setAttribute("class", this.ColorClassName);
-            //this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("use");
-			//this.UndevelopedSymbol.setAttribute("xlink:href", "#UndevelopdSymbol");
 			this.ShapeGroup.appendChild(this.BodyRect);
 			if (this.NodeView.IsFolded) {
 				this.ModuleRect = AssureNoteUtils.CreateSVGElement("rect");
@@ -747,7 +666,6 @@ module AssureNote {
 				this.ShapeGroup.appendChild(this.ModuleRect);
 			}
 			if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
-				//FIXME use CreateSVGElement("use");
 				this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("polygon");
 				this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
 				this.UndevelopedSymbol.setAttribute("class", this.ColorClassName);
@@ -756,7 +674,6 @@ module AssureNote {
 		}
 
         FitSizeToContent(): void {
-			//super.Resize(CaseViewer, NodeModel, HTMLDoc);
 			this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
 			this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
 			if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
@@ -804,9 +721,7 @@ module AssureNote {
 		PrerenderSVGContent(): void {
             super.PrerenderSVGContent();
 			this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
-			//this.BodyPolygon = AssureNoteUtils.CreateSVGElement("use");
 			this.BodyPolygon.setAttribute("class", this.ColorClassName);
-			//this.BodyPolygon.setAttribute("xlink:href", "#strategy-master");
 			this.ShapeGroup.appendChild(this.BodyPolygon);
 		}
 
@@ -837,17 +752,21 @@ module AssureNote {
 	}
 
 	export class GSNEvidenceShape extends GSNShape {
-		//BodyEllipse: SVGUseElement;
 		BodyEllipse: SVGEllipseElement;
 
 		PrerenderSVGContent(): void {
 			super.PrerenderSVGContent();
 			this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
-			//this.BodyEllipse = AssureNoteUtils.CreateSVGElement("use");
 			this.BodyEllipse.setAttribute("class", this.ColorClassName);
-			//this.BodyEllipse.setAttribute("xlink:href", "#evidence-master");
 			this.ShapeGroup.appendChild(this.BodyEllipse);
-		}
+        }
+
+        GetNodeHeight(): number {
+            if (this["NodeHeight"] == 0) {
+                this["NodeHeight"] = Math.max(this.Content.clientHeight, this.GetNodeWidth());
+            }
+            return this["NodeHeight"];
+        }
 
         FitSizeToContent(): void {
 			this.BodyEllipse.setAttribute("cx", (this.GetNodeWidth()/ 2).toString());

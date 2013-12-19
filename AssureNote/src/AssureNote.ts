@@ -97,6 +97,78 @@ module AssureNote {
             return <SVGElement>document.createElementNS('http://www.w3.org/2000/svg', name);
         }
 
+        var SVGMoveAnimateElementMaster: SVGElement = null;
+        var SVGArrowAnimateElementMaster: SVGElement = null;
+        var SVGFadeinAnimateElementMaster: SVGElement = null;
+
+        export function CreateSVGMoveAnimateElement(Duration: number, FromGX: number, FromGY: number): SVGElement {
+            if (SVGMoveAnimateElementMaster == null) {
+                SVGMoveAnimateElementMaster = AssureNoteUtils.CreateSVGElement("animateTransform");
+                SVGMoveAnimateElementMaster.setAttribute("attributeName", "transform");
+                SVGMoveAnimateElementMaster.setAttribute("attributeType", "XML");
+                SVGMoveAnimateElementMaster.setAttribute("type", "translate");
+                SVGMoveAnimateElementMaster.setAttribute("calcMode", "spline");
+                SVGMoveAnimateElementMaster.setAttribute("keyTimes", "0;1");
+                SVGMoveAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+                SVGMoveAnimateElementMaster.setAttribute("restart", "never");
+                SVGMoveAnimateElementMaster.setAttribute("begin", "indefinite");
+                SVGMoveAnimateElementMaster.setAttribute("repeatCount", "1");
+                SVGMoveAnimateElementMaster.setAttribute("additive", "sum");
+                SVGMoveAnimateElementMaster.setAttribute("to", "0,0");
+            }
+            var AnimateElement = <SVGElement>SVGMoveAnimateElementMaster.cloneNode();
+            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
+            AnimateElement.setAttribute("from", "" + FromGX + "," + FromGY);
+            return AnimateElement;
+        }
+
+        export function CreateSVGArrowAnimateElement(Duration: number, OldPath: string, NewPath: string): SVGElement {
+            if (SVGArrowAnimateElementMaster == null) {
+                SVGArrowAnimateElementMaster = AssureNoteUtils.CreateSVGElement("animate");
+                SVGArrowAnimateElementMaster.setAttribute("attributeName", "d");
+                SVGArrowAnimateElementMaster.setAttribute("attributeType", "XML");
+                SVGArrowAnimateElementMaster.setAttribute("calcMode", "spline");
+                SVGArrowAnimateElementMaster.setAttribute("keyTimes", "0;1");
+                SVGArrowAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+                SVGArrowAnimateElementMaster.setAttribute("restart", "never");
+                SVGArrowAnimateElementMaster.setAttribute("begin", "indefinite");
+                SVGArrowAnimateElementMaster.setAttribute("repeatCount", "1");
+            }
+            var AnimateElement = <SVGElement>SVGArrowAnimateElementMaster.cloneNode();
+            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
+            if (OldPath) {
+                AnimateElement.setAttribute("from", OldPath);
+            }
+            AnimateElement.setAttribute("to", NewPath);
+            return AnimateElement;
+        }
+
+        export function CreateSVGFadeinAnimateElement(Duration: number): SVGElement {
+            if (SVGFadeinAnimateElementMaster == null) {
+                SVGFadeinAnimateElementMaster = AssureNoteUtils.CreateSVGElement("animate");
+                SVGFadeinAnimateElementMaster.setAttribute("attributeName", "fill-opacity");
+                SVGFadeinAnimateElementMaster.setAttribute("attributeType", "XML");
+                SVGFadeinAnimateElementMaster.setAttribute("calcMode", "spline");
+                SVGFadeinAnimateElementMaster.setAttribute("keyTimes", "0;1");
+                SVGFadeinAnimateElementMaster.setAttribute("keySplines", "0.0 0.0 0.58 1.0");
+                SVGFadeinAnimateElementMaster.setAttribute("restart", "never");
+                SVGFadeinAnimateElementMaster.setAttribute("begin", "indefinite");
+                SVGFadeinAnimateElementMaster.setAttribute("repeatCount", "1");
+                SVGFadeinAnimateElementMaster.setAttribute("from", "0");
+                SVGFadeinAnimateElementMaster.setAttribute("to", "1");
+            }
+            var AnimateElement = <SVGElement>SVGFadeinAnimateElementMaster.cloneNode();
+            AnimateElement.setAttribute("dur", Duration.toString() + "ms");
+            return AnimateElement;
+        }
+
+        export function CreateCSSMoveAnimationDefinition(Prefix: string, Name: string, FromGX: number, FromGY: number): string {
+            return "@" + Prefix + "keyframes " + Name + " { 0% { left: " + FromGX + "px; top: " + FromGY + "px; } }";
+        }
+
+        export function CreateCSSFadeinAnimationDefinition(Prefix: string, Name: string): string {
+            return "@" + Prefix + "keyframes " + Name + " { 0% { opacity: 0; } }";
+        }
 	}
 
 	export class AssureNoteApp {
