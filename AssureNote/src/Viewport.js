@@ -7,33 +7,6 @@ document.createSVGElement = function (name) {
 /* VIEW (MVC) */
 var AssureNote;
 (function (AssureNote) {
-    var Point = (function () {
-        function Point(X, Y) {
-            this.X = X;
-            this.Y = Y;
-        }
-        Point.prototype.Clone = function () {
-            return new Point(this.X, this.Y);
-        };
-        Point.prototype.toString = function () {
-            return "(" + this.X + ", " + this.Y + ")";
-        };
-        return Point;
-    })();
-    AssureNote.Point = Point;
-
-    (function (Direction) {
-        Direction[Direction["Left"] = 0] = "Left";
-        Direction[Direction["Top"] = 1] = "Top";
-        Direction[Direction["Right"] = 2] = "Right";
-        Direction[Direction["Bottom"] = 3] = "Bottom";
-    })(AssureNote.Direction || (AssureNote.Direction = {}));
-    var Direction = AssureNote.Direction;
-
-    function ReverseDirection(Dir) {
-        return (Dir + 2) & 3;
-    }
-
     var ScrollManager = (function () {
         function ScrollManager(Viewport) {
             this.Viewport = Viewport;

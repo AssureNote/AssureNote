@@ -65,8 +65,11 @@
     <TypeScriptCompile Include="plugin\MessageChat\MessageChat.ts" />
     <TypeScriptCompile Include="plugin\VariableInterpolation\VariableInterpolation.ts" />
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
+    <TypeScriptCompile Include="src\AssureNoteUtils.ts" />
     <TypeScriptCompile Include="src\Editor.ts" />
+    <TypeScriptCompile Include="src\GSNShape.ts" />
     <TypeScriptCompile Include="src\MenuBar.ts" />
+    <TypeScriptCompile Include="src\NodeView.ts" />
     <TypeScriptCompile Include="src\old\CaseDecoder.ts" />
     <TypeScriptCompile Include="src\old\CaseEncoder.ts" />
     <TypeScriptCompile Include="src\old\CaseModel.ts" />

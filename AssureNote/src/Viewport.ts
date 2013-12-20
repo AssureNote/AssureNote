@@ -18,24 +18,6 @@ document.createSVGElement = function (name: string): Element {
 /* VIEW (MVC) */
 module AssureNote {
 
-	export class Point {
-        constructor(public X: number, public Y: number) { }
-        public Clone(): Point {
-            return new Point(this.X, this.Y);
-        }
-        public toString() {
-            return "(" + this.X + ", " + this.Y + ")";
-        }
-	}
-
-	export enum Direction {
-		Left, Top, Right, Bottom
-	}
-
-	function ReverseDirection(Dir: Direction): Direction {
-		return (Dir + 2) & 3;
-	}
-
 	export class ScrollManager {
         private InitialOffsetX: number = 0;
         private InitialOffsetY: number = 0;

@@ -1,4 +1,5 @@
 ///<reference path='./AssureNote.ts'/>
+///<reference path='./AssureNoteUtils.ts'/>
 ///<reference path='./CommandLine.ts'/>
 ///<reference path='./SearchNode.ts'/>
 ///<reference path='./LayoutEngine.ts'/>
