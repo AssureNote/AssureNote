@@ -13,17 +13,23 @@ module AssureNote {
 		IsDebugMode: boolean;
 		MasterRecord: GSNRecord;
 		WGSNName: string;
-		Commands: CommandLineBuiltinFunctions;
+        Commands: CommandLineBuiltinFunctions;
+        CommandPrototypes: CommandPrototype[];
 
 		constructor() {
-			//var Api = new AssureNote.ServerAPI("http://", "", "");
             this.PluginManager = new PluginManager(this);
             this.SocketManager = new SocketManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
             this.PluginPanel = new PluginPanel(this);
-			this.Commands = new CommandLineBuiltinFunctions();
+            this.Commands = new CommandLineBuiltinFunctions();
+            this.CommandPrototypes = [];
 		}
 
+        public RegistCommand(Command: CommandPrototype) {
+            this.CommandPrototypes.push(Command);
+        }
+
+        // Deprecated
 		DebugP(Message: string): void {
 			console.log(Message);
 		}

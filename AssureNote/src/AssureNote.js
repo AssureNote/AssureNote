@@ -4,13 +4,18 @@ var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
-            //var Api = new AssureNote.ServerAPI("http://", "", "");
             this.PluginManager = new AssureNote.PluginManager(this);
             this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
             this.Commands = new AssureNote.CommandLineBuiltinFunctions();
+            this.CommandPrototypes = [];
         }
+        AssureNoteApp.prototype.RegistCommand = function (Command) {
+            this.CommandPrototypes.push(Command);
+        };
+
+        // Deprecated
         AssureNoteApp.prototype.DebugP = function (Message) {
             console.log(Message);
         };
