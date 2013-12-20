@@ -16,8 +16,6 @@ $(function () {
 
     var Menu = [];
 
-    AssureNote.SideMenu.Create(Menu);
-
     var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
     var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
