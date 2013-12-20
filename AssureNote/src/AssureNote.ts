@@ -50,7 +50,11 @@ module AssureNote {
 			var Method = ParsedCommand.GetMethod();
 			if (Method == "search") {
 				return;
-			}
+            }
+            jQuery.each(this.CommandPrototypes, (i: number, v: CommandPrototype) => {
+                v.GetCommandLineName() == Method;
+                //v.Instanciate();
+            });
 			var BuiltinCommand = this.Commands.GetFunction(Method);
 			if (BuiltinCommand != null) {
 				BuiltinCommand(this, ParsedCommand.GetArgs());

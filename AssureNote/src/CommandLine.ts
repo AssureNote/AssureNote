@@ -91,6 +91,7 @@ module AssureNote {
 		}
 	}
 
+    //Deprecated
 	export class CommandLineBuiltinFunctions {
 		FunctionMap: {[index: string]: (AssureNoteApp: AssureNoteApp, Args: string[]) => void};
 		constructor() {

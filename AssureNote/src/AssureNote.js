@@ -37,6 +37,10 @@ var AssureNote;
             if (Method == "search") {
                 return;
             }
+            jQuery.each(this.CommandPrototypes, function (i, v) {
+                v.GetCommandLineName() == Method;
+                //v.Instanciate();
+            });
             var BuiltinCommand = this.Commands.GetFunction(Method);
             if (BuiltinCommand != null) {
                 BuiltinCommand(this, ParsedCommand.GetArgs());

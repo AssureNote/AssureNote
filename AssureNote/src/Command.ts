@@ -2,11 +2,19 @@
 module AssureNote {
 
     export class CommandPrototype {
-        constructor(private Name: string, private DisplayName: string) {
+        constructor(private CommandLineName: string, private DisplayName: string) {
         }
         
         public Instanciate(Target: NodeView, ...Params: any[]) {
             return new Command(this, Target, Params);
+        }
+
+        public GetCommandLineName() {
+            return this.CommandLineName;
+        }
+
+        public GetDisplayName() {
+            return this.DisplayName;
         }
     }
 

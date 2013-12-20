@@ -85,6 +85,7 @@ var AssureNote;
     })();
     AssureNote.CommandLine = CommandLine;
 
+    //Deprecated
     var CommandLineBuiltinFunctions = (function () {
         function CommandLineBuiltinFunctions() {
             this.FunctionMap = {};
