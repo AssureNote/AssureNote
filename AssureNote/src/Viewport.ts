@@ -354,8 +354,8 @@ module AssureNote {
 		}
 
 		SetCaseCenter(X: number, Y: number): void {
-            var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X));
-            var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y));
+            var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X * this.Scale));
+            var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y * this.Scale));
 			this.SetOffset(NewOffsetX, NewOffsetY);
 		}
 	}

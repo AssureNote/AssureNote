@@ -398,7 +398,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.GetGoalLevel = function () {
-        var GoalCount = 1;
+        var GoalCount = this.IsGoal() ? 1 : 0;
         var Node = this.ParentNode;
         while (Node != null) {
             if (Node.IsGoal()) {
@@ -464,6 +464,27 @@ var GSNNode = (function () {
 
     GSNNode.prototype.UpdateContent = function (TextDoc) {
         this.SetContent(new StringReader(TextDoc).GetLineList(true));
+    };
+
+    GSNNode.prototype.GetHtmlContent = function () {
+        if (this.Digest != null) {
+            var Reader = new StringReader(this.NodeDoc);
+            var Writer = new StringWriter();
+            var Paragraph = "";
+            while (Reader.HasNext()) {
+                var Line = Reader.ReadLine();
+                Paragraph += Line;
+                if (Line.length == 0 && Paragraph.length > 0) {
+                    Writer.println("<p>" + Paragraph + "</p>");
+                    continue;
+                }
+                var Loc = Line.indexOf("::");
+                if (Loc > 0) {
+                    Writer.println("<p class='tag'>" + Line + "</p>");
+                    continue;
+                }
+            }
+        }
     };
 
     GSNNode.prototype.GetNodeHistoryList = function () {
@@ -579,7 +600,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.FormatNode = function (RefMap, Writer) {
-        Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
+        Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
         Writer.print(" ");
         Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
         Writer.print(this.LabelNumber);
@@ -649,10 +670,10 @@ var GSNNode = (function () {
 
     GSNNode.prototype.ReplaceSubNodeAsText = function (DocText) {
         var Reader = new StringReader(DocText);
-        var Parser = new ParserContext(null, this.ParentNode);
+        var Parser = new ParserContext(null);
         var NewNode = Parser.ParseNode(Reader, null);
         if (NewNode != null) {
-            this.ReplaceSubNode(NewNode, null);
+            NewNode = this.ReplaceSubNode(NewNode, null);
         }
         return NewNode;
     };
@@ -685,7 +706,7 @@ var GSNNode = (function () {
             }
         }
         if (NewNode.LastModified == null) {
-            var NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, this.NodeType, null);
+            var NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
             if (LabelMap != null && this.LabelNumber != null) {
                 LabelMap.put(NewNode.GetLabel(), NewLabelNumber);
             }
@@ -694,8 +715,8 @@ var GSNNode = (function () {
             NewNode.LastModified = this.BaseDoc.DocHistory;
         }
         NewNode.BaseDoc = this.BaseDoc;
-        for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
-            var SubNode = this.NonNullSubNodeList().get(i);
+        for (var i = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
+            var SubNode = NewNode.NonNullSubNodeList().get(i);
             this.MergeSubNode(SubNode, LabelMap);
         }
     };
@@ -860,16 +881,8 @@ var GSNDoc = (function () {
         }
     };
 
-    GSNDoc.prototype.UniqueNumber = function (NodeType, LabelNumber) {
-        var Node = this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber);
-        if (Node == null) {
-            return LabelNumber;
-        }
-        return this.UniqueNumber(NodeType, LabelNumber + "'");
-    };
-
     GSNDoc.prototype.CheckLabelNumber = function (ParentNode, NodeType, LabelNumber) {
-        if (LabelNumber == null) {
+        while (LabelNumber == null || this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber) != null) {
             if (NodeType == GSNType.Goal) {
                 this.GoalCount += 1;
                 LabelNumber = "" + this.GoalCount;
@@ -879,7 +892,8 @@ var GSNDoc = (function () {
                 LabelNumber = GoalNode.LabelNumber + "." + GoalNode.SectionCount;
             }
         }
-        return this.UniqueNumber(NodeType, LabelNumber);
+        return LabelNumber;
+        //return this.UniqueNumber(NodeType, LabelNumber);
     };
 
     GSNDoc.prototype.RemapNodeMap = function () {
@@ -972,7 +986,7 @@ var GSNRecord = (function () {
         var Reader = new StringReader(TextDoc);
         while (Reader.HasNext()) {
             var Doc = new GSNDoc(this);
-            var Parser = new ParserContext(Doc, null);
+            var Parser = new ParserContext(Doc);
             Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
         }
     };
@@ -1121,10 +1135,8 @@ var GSNRecord = (function () {
 })();
 
 var ParserContext = (function () {
-    function ParserContext(NullableDoc, ParentNode) {
-        if (ParentNode == null) {
-            ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
-        }
+    function ParserContext(NullableDoc) {
+        var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
         this.NullableDoc = NullableDoc;
         this.FirstNode = null;
         this.LastGoalNode = null;
@@ -1306,7 +1318,7 @@ var AssureNoteParser = (function () {
             BranchRecord.Parse(Lib.ReadFile(BranchFile));
             MasterRecord.Merge(BranchRecord);
         } else {
-            MasterRecord.RenumberAll();
+            //MasterRecord.RenumberAll();
         }
         var Writer = new StringWriter();
         MasterRecord.FormatRecord(Writer);
@@ -1332,20 +1344,19 @@ var AssureNoteParser = (function () {
 
     AssureNoteParser.main = function (argv) {
         if (argv.length == 2) {
-            AssureNoteParser.merge(argv[0], argv[1]);
+            //AssureNoteParser.merge(argv[0], argv[1]);
+            var MasterRecord = new GSNRecord();
+            MasterRecord.Parse(Lib.ReadFile(argv[0]));
+            var NewNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+            var Writer = new StringWriter();
+            NewNode.FormatNode(new HashMap(), Writer);
+
+            //MasterRecord.FormatRecord(Writer);
+            console.log(Writer.toString());
         }
         if (argv.length == 1) {
             AssureNoteParser.merge(argv[0], null);
         }
-
-        //		if(argv.length == 0) {
-        //			try {
-        //				PdfConverter.main(argv);
-        //			} catch (Exception e) {
-        //				// TODO Auto-generated catch block
-        //				e.printStackTrace();
-        //			}
-        //		}
         console.log("Usage: AssureNoteParser file [margingfile]");
     };
     return AssureNoteParser;

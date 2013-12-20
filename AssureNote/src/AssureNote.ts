@@ -12,7 +12,7 @@ module AssureNote {
 			saveAs(blob, FileName);
 		}
 
-		export function GetNodeLabel(event: Event): string {
+		export function GetNodeLabelFromEvent(event: Event): string {
 			var element = <HTMLElement>event.srcElement;
 			while (element != null) {
 				if (element.id != "") {
@@ -219,8 +219,8 @@ module AssureNote {
 			var Plugin = this.PluginManager.GetCommandPlugin(Method);
 			if (Plugin != null) {
 				Plugin.ExecCommand(this, ParsedCommand.GetArgs());
-			}
-			else {
+			} else {
+                //TODO split jump-node function
 				var Label = Method.toUpperCase();
 				if (this.PictgramPanel.ViewMap == null) {
 					this.DebugP("Jump is diabled.");
@@ -232,14 +232,14 @@ module AssureNote {
                     Node = this.PictgramPanel.ViewMap[Label];
                 }
                 if (Node != null) {
-                    if ($("#" + Label).length > 0) { //FIXME use IsVisible
+                    if ($("#" + Label.replace(/\./g,"\\.")).length > 0) { //FIXME use IsVisible
                         this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
                     } else {
                         this.DebugP("Invisible node " + Label + " Selected.");
                     }
                     return;
                 }
-				this.DebugP("undefined command: " + ParsedCommand.GetMethod());
+				this.DebugP("undefined command: " + Method);
 			}
 		}
 

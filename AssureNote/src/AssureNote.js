@@ -9,7 +9,7 @@ var AssureNote;
         }
         AssureNoteUtils.SaveAs = SaveAs;
 
-        function GetNodeLabel(event) {
+        function GetNodeLabelFromEvent(event) {
             var element = event.srcElement;
             while (element != null) {
                 if (element.id != "") {
@@ -19,7 +19,7 @@ var AssureNote;
             }
             return "";
         }
-        AssureNoteUtils.GetNodeLabel = GetNodeLabel;
+        AssureNoteUtils.GetNodeLabelFromEvent = GetNodeLabelFromEvent;
 
         function GetNodePosition(Label) {
             var element = document.getElementById(Label);
@@ -166,6 +166,7 @@ var AssureNote;
             if (Plugin != null) {
                 Plugin.ExecCommand(this, ParsedCommand.GetArgs());
             } else {
+                //TODO split jump-node function
                 var Label = Method.toUpperCase();
                 if (this.PictgramPanel.ViewMap == null) {
                     this.DebugP("Jump is diabled.");
@@ -177,14 +178,14 @@ var AssureNote;
                     Node = this.PictgramPanel.ViewMap[Label];
                 }
                 if (Node != null) {
-                    if ($("#" + Label).length > 0) {
+                    if ($("#" + Label.replace(/\./g, "\\.")).length > 0) {
                         this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
                     } else {
                         this.DebugP("Invisible node " + Label + " Selected.");
                     }
                     return;
                 }
-                this.DebugP("undefined command: " + ParsedCommand.GetMethod());
+                this.DebugP("undefined command: " + Method);
             }
         };
 

@@ -436,7 +436,7 @@ class GSNNode {
 	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType, String LabelNumber, GSNHistory[] HistoryTriple) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
-		this.NodeType    = NodeType;
+		this.NodeType    = NodeType;	
 		this.LabelNumber = LabelNumber;    // G1.1
 		this.SectionCount = 0;
 		this.SubNodeList = null;
@@ -503,7 +503,7 @@ class GSNNode {
 	}
 	
 	public int GetGoalLevel() {
-		/*local*/int GoalCount = 1;
+		/*local*/int GoalCount = this.IsGoal() ? 1 : 0;
 		/*local*/GSNNode Node = this.ParentNode;
 		while(Node != null) {
 			if(Node.IsGoal()) {
@@ -570,6 +570,28 @@ class GSNNode {
 	void UpdateContent(String TextDoc) {
 		this.SetContent(new StringReader(TextDoc).GetLineList(true/*UntilSection*/));
 	}
+	
+	void GetHtmlContent() {
+		if(this.Digest != null) {
+			/*local*/StringReader Reader = new StringReader(this.NodeDoc);
+			/*local*/StringWriter Writer = new StringWriter();
+			/*local*/String Paragraph = "";
+			while(Reader.HasNext()) {
+				/*local*/String Line = Reader.ReadLine();
+				Paragraph += Line;
+				if(Line.length() == 0 && Paragraph.length() > 0) {
+					Writer.println("<p>" + Paragraph + "</p>");
+					continue;
+				}
+				/*local*/int Loc = Line.indexOf("::");
+				if(Loc > 0) {
+					Writer.println("<p class='tag'>" + Line + "</p>");
+					continue;
+				}
+			}
+		}
+	}
+
 	
 	ArrayList<GSNNode> GetNodeHistoryList() {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
@@ -682,7 +704,7 @@ class GSNNode {
 	}
 
 	void FormatNode(HashMap<String, GSNNode> RefMap, StringWriter Writer) {
-		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
+		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		Writer.print(this.LabelNumber);
@@ -751,10 +773,10 @@ class GSNNode {
 
 	GSNNode ReplaceSubNodeAsText(String DocText) {
 		/*local*/StringReader Reader = new StringReader(DocText);
-		/*local*/ParserContext Parser = new ParserContext(null, this.ParentNode);
+		/*local*/ParserContext Parser = new ParserContext(null);
 		/*local*/GSNNode NewNode = Parser.ParseNode(Reader, null);
 		if(NewNode != null) {
-			this.ReplaceSubNode(NewNode, null);
+			NewNode = this.ReplaceSubNode(NewNode, null);
 		}
 		return NewNode;
 	}
@@ -787,7 +809,7 @@ class GSNNode {
 			}
 		}
 		if(NewNode.LastModified == null) {
-			/*local*/String NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, this.NodeType, null);
+			/*local*/String NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
 			if(LabelMap != null && this.LabelNumber != null) {
 				LabelMap.put(NewNode.GetLabel(), NewLabelNumber);
 			}
@@ -796,8 +818,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode SubNode = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
+			/*local*/GSNNode SubNode = NewNode.NonNullSubNodeList().get(i);
 			this.MergeSubNode(SubNode, LabelMap);
 		}
 	}
@@ -970,16 +992,9 @@ class GSNDoc {
 		}
 	}
 
-	private String UniqueNumber(GSNType NodeType, String LabelNumber) {
-		/*local*/GSNNode Node = this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType) + LabelNumber);
-		if (Node == null) {
-			return LabelNumber;
-		}
-		return this.UniqueNumber(NodeType, LabelNumber + "'");
-	}
-
 	String CheckLabelNumber(GSNNode ParentNode, GSNType NodeType, String LabelNumber) {
-		if (LabelNumber == null) {
+		while (LabelNumber == null || this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType ) + LabelNumber) != null) {
+		//if (LabelNumber == null) {
 			if (NodeType == GSNType.Goal) {
 				this.GoalCount += 1;
 				LabelNumber = "" + this.GoalCount;
@@ -989,7 +1004,8 @@ class GSNDoc {
 				LabelNumber = GoalNode.LabelNumber + "." + GoalNode.SectionCount;
 			}
 		}
-		return this.UniqueNumber(NodeType, LabelNumber);
+		return LabelNumber;
+		//return this.UniqueNumber(NodeType, LabelNumber);
 	}
 
 	void RemapNodeMap() {
@@ -1087,7 +1103,7 @@ class GSNRecord {
 		/*local*/StringReader Reader = new StringReader(TextDoc);
 		while (Reader.HasNext()) {
 			/*local*/GSNDoc Doc = new GSNDoc(this);
-			/*local*/ParserContext Parser = new ParserContext(Doc, null);
+			/*local*/ParserContext Parser = new ParserContext(Doc);
 			Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
 		}
 	}
@@ -1242,10 +1258,8 @@ class ParserContext {
 	/*field*/GSNNode LastGoalNode;
 	/*field*/GSNNode LastNonContextNode;
 
-	ParserContext/*constructor*/(GSNDoc NullableDoc, GSNNode ParentNode) {
-		if(ParentNode == null) {
-			ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
-		}
+	ParserContext/*constructor*/(GSNDoc NullableDoc) {
+		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;
@@ -1428,7 +1442,7 @@ public class AssureNoteParser {
 			MasterRecord.Merge(BranchRecord);
 		}
 		else {
-			MasterRecord.RenumberAll();
+			//MasterRecord.RenumberAll();
 		}
 		/*local*/StringWriter Writer = new StringWriter();
 		MasterRecord.FormatRecord(Writer);
@@ -1455,19 +1469,18 @@ public class AssureNoteParser {
 
 	public final static void main(String[] argv) {
 		if(argv.length == 2) {
-			AssureNoteParser.merge(argv[0], argv[1]);
+			//AssureNoteParser.merge(argv[0], argv[1]);
+			/*local*/GSNRecord MasterRecord = new GSNRecord();
+			MasterRecord.Parse(Lib.ReadFile(argv[0]));
+			/*local*/GSNNode NewNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+			/*local*/StringWriter Writer = new StringWriter();
+			NewNode.FormatNode(new HashMap<String, GSNNode>(), Writer);
+			//MasterRecord.FormatRecord(Writer);
+			System.out.println(Writer.toString());
 		}
 		if(argv.length == 1) {
 			AssureNoteParser.merge(argv[0], null);
 		}
-//		if(argv.length == 0) {
-//			try {
-//				PdfConverter.main(argv);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} 
-//		}
 		System.out.println("Usage: AssureNoteParser file [margingfile]");
 	}
 }

@@ -1,0 +1,54 @@
+#0::2013-12-07T00:18:02+0900;unknown;converter;-
+Revision:: 0
+* G1 #0:0
+[System] is dependable.
+
+* C1.1 #0:0
+System::
+
+* C1.3 #0:0
+Justification:: J
+
+* S1.2 #0:0
+Arguing over DEOS Process
+
+** G2 #0:0
+Stakeholders of [System] are defined.
+
+** S2.1 #0:0
+Accountability design
+
+** G3 #0:0
+[System] can deliver correct services.
+
+** S3.1 #0:0
+Depen
+
+** G4 #0:0
+[System] is resilient.
+
+** S4.1 #0:0
+Arguing resilience patterns.
+
+*** G5 #0:0
+[System] can detect errors
+
+*** G6 #0:0
+[System] can prevent failures.
+
+*** G7 #0:0
+[System] can recover failures.
+
+** G8 #0:0
+[System] changes.
+
+** S8.1 #0:0
+[System] is ..
+
+*** G9 #0:0
+[System] is scalable.
+
+*** G10 #0:0
+[System] is sustainable.
+
+
