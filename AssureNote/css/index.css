@@ -12,8 +12,8 @@ body {
 	width: 194px;
 	height: 64px;
 	position: fixed;
-	left: 8px;
-	top: 5px;
+	right: 0px;
+	top: -3px;
 }
 
 #content-layer {

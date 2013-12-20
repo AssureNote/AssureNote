@@ -753,7 +753,7 @@ $(() => {
 	var AssureNoteApp = new AssureNote.AssureNoteApp();
 	Debug.AssureNote = AssureNoteApp;
 
-	var Menu: AssureNote.SideMenuContent[] = [];
+	//var Menu: AssureNote.SideMenuContent[] = [];
 	//Menu.push(new AssureNote.SideMenuContent("#", "Download", "download-wgsn", "glyphicon-floppy-disk", (ev: Event) => {
 	//	var Writer = new StringWriter();
 	//	AssureNoteApp.MasterRecord.FormatRecord(Writer);
@@ -765,7 +765,7 @@ $(() => {
 	//	AssureNoteApp.LoadNewWGSN(Name, "* G1");
 	//}));
 
-	AssureNote.SideMenu.Create(Menu);
+	//AssureNote.SideMenu.Create(Menu);
 
     var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
