@@ -19,7 +19,7 @@ var Rawdata = (function () {
         this.authid = null;
     }
     Rawdata.tableToObject = function (row) {
-        return new Rawdata(row.recid, row.data, row.context, row.timestamp);
+        return new Rawdata(row.recid, row.data, JSON.parse(row.context), row.timestamp);
     };
 
     Rawdata.prototype.setMonitorInfo = function (type, location, authid) {
@@ -37,7 +37,7 @@ var RawdataDAO = (function (_super) {
         _super.apply(this, arguments);
     }
     RawdataDAO.prototype.insertRawdata = function (params, callback) {
-        this.con.query('INSERT INTO rawdata(monitorid, data, context, timestamp) VALUES(?, ?, ?, ?)', [params.monitorid, params.data, params.context ? params.context : '', params.timestamp], function (err, result) {
+        this.con.query('INSERT INTO rawdata(monitorid, data, context, timestamp) VALUES(?, ?, ?, ?)', [params.monitorid, params.data, params.context ? JSON.stringify(params.context) : '', params.timestamp], function (err, result) {
             if (err) {
                 callback(err, null);
                 return;
