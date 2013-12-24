@@ -292,5 +292,9 @@ module AssureNote {
                 });
             }
         }
+
+        HasSideNode(): boolean {
+            return (this.Left != null && this.Left.length > 0) || (this.Right != null && this.Right.length > 0)
+        }
     }
 }

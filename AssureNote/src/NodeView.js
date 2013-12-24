@@ -284,6 +284,10 @@ var AssureNote;
                 });
             }
         };
+
+        NodeView.prototype.HasSideNode = function () {
+            return (this.Left != null && this.Left.length > 0) || (this.Right != null && this.Right.length > 0);
+        };
         NodeView.GlobalPositionCache = null;
         return NodeView;
     })();

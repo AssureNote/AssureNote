@@ -76,6 +76,12 @@ module AssureNote {
                     LeftNodesWidth = Math.max(LeftNodesWidth, SubNode.Shape.GetNodeWidth());
                     LeftNodesHeight += SubNode.Shape.GetNodeHeight();
                 });
+                var LeftShift = (ThisNode.Shape.GetNodeHeight() - LeftNodesHeight) / 2;
+                if (LeftShift > 0) {
+                    ThisNode.ForEachVisibleLeftNodes((SubNode: NodeView) => {
+                        SubNode.RelativeY += LeftShift;
+                    });
+                }
                 if (LeftNodesHeight > 0) {
                     TreeLeftX = -(LeftNodesWidth + SimpleLayoutEngine.ContextHorizontalMargin);
                     TreeHeight = Math.max(TreeHeight, LeftNodesHeight);
@@ -92,6 +98,12 @@ module AssureNote {
                     RightNodesWidth = Math.max(RightNodesWidth, SubNode.Shape.GetNodeWidth());
                     RightNodesHeight += SubNode.Shape.GetNodeHeight();
                 });
+                var RightShift = (ThisNode.Shape.GetNodeHeight() - RightNodesHeight) / 2;
+                if (RightShift > 0) {
+                    ThisNode.ForEachVisibleRightNodes((SubNode: NodeView) => {
+                        SubNode.RelativeY += RightShift;
+                    });
+                }
                 if (RightNodesHeight > 0) {
                     TreeRightX += RightNodesWidth + SimpleLayoutEngine.ContextHorizontalMargin;
                     TreeHeight = Math.max(TreeHeight, RightNodesHeight);
@@ -108,7 +120,7 @@ module AssureNote {
             var FoldedNodeRun: NodeView[] = [];
             var VisibleChildrenCount = 0;
             if (ThisNode.Children != null && ThisNode.Children.length > 0) {
-                var IsLastChildFolded = false;
+                var IsPreviousChildFolded = false;
                 ThisNode.ForEachVisibleChildren((SubNode: NodeView) => {
                     VisibleChildrenCount++;
                     this.Layout(SubNode);
@@ -127,7 +139,7 @@ module AssureNote {
                         ChildrenTopWidth = ChildrenTopWidth + ChildHeadWidth + Margin;
                         FoldedNodeRun.push(SubNode);
                     } else {
-                        if (IsLastChildFolded) {
+                        if (IsPreviousChildFolded) {
                             var WidthDiff = ChildrenTopWidth - ChildrenBottomWidth;
                             if (WidthDiff < ChildHeadLeftSideMargin) {
                                 SubNode.RelativeX = ChildrenBottomWidth;
@@ -159,21 +171,26 @@ module AssureNote {
                     }
                     SubNode.RelativeY = TreeHeight;
 
-                    IsLastChildFolded = IsFoldedLike;
+                    IsPreviousChildFolded = IsFoldedLike;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     //console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
                 });
 
                 var ChildrenWidth = Math.max(ChildrenTopWidth, ChildrenBottomWidth) - SimpleLayoutEngine.ChildrenHorizontalMargin;
-                var Shift = (ChildrenWidth - ThisNodeWidth) / 2;
+                var ShiftX = (ChildrenWidth - ThisNodeWidth) / 2;
+                var ShiftY = 0;
                 if (VisibleChildrenCount == 1) {
                     ThisNode.ForEachVisibleChildren((SubNode: NodeView) => {
-                        Shift = -SubNode.Shape.GetTreeLeftX();
+                        ShiftX = -SubNode.Shape.GetTreeLeftX();
+                        if (!SubNode.HasSideNode()) {
+                            ShiftY = ThisNode.Shape.GetNodeHeight() + SimpleLayoutEngine.ChildrenVerticalMargin - TreeHeight;
+                        }
                     });
                 }
-                TreeLeftX = Math.min(TreeLeftX, -Shift);
+                TreeLeftX = Math.min(TreeLeftX, -ShiftX);
                 ThisNode.ForEachVisibleChildren((SubNode: NodeView) => {
-                    SubNode.RelativeX -= Shift;
+                    SubNode.RelativeX -= ShiftX;
+                    SubNode.RelativeY += ShiftY;
                 });
 
                 TreeHeight += ChildrenHeight;
