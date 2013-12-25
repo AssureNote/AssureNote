@@ -111,15 +111,15 @@ module AssureNote {
 				}
 			};
 
-			this.FunctionMap["w"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
-				var Writer = new StringWriter();
-				AssureNoteApp.MasterRecord.FormatRecord(Writer);
-				if (Args.length > 0) {
-					AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Args[0]);
-				} else {
-					AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
-				}
-			};
+			//this.FunctionMap["w"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+			//	var Writer = new StringWriter();
+			//	AssureNoteApp.MasterRecord.FormatRecord(Writer);
+			//	if (Args.length > 0) {
+			//		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Args[0]);
+			//	} else {
+			//		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
+			//	}
+			//};
 
 			this.FunctionMap["unfoldAll"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
 				var TopView = AssureNoteApp.PictgramPanel.MasterView;
