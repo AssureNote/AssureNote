@@ -1,16 +1,23 @@
 index.ts
+
 src/AssureNote.ts
 src/AssureNoteParser.ts
+src/AssureNoteUtils.ts
+src/Command.ts
 src/CommandLine.ts
+src/Editor.ts
+src/GSNShape.ts
 src/LayoutEngine.ts
 src/MenuBar.ts
+src/NodeView.ts
 src/Panel.ts
 src/Plugin.ts
+src/SearchNode.ts
 src/SideMenu.ts
 src/Socket.ts
 src/Viewport.ts
-src/Editor.ts
 
+plugin/FoldingViewSwitch/FoldingViewSwitch.ts
 plugin/FullScreenEditor/FullScreenEditor.ts
 plugin/MessageChat/MessageChat.ts
 plugin/VariableInterpolation/VariableInterpolation.ts
