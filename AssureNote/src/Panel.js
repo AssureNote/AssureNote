@@ -193,7 +193,7 @@ var AssureNote;
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
-            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
+            NodeView.SetGlobalPositionCacheEnabled(true);
 
             var CSSAnimationBuffer = [];
             TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
@@ -201,7 +201,7 @@ var AssureNote;
 
             TargetView.ClearAnimationCache();
 
-            AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
+            NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
 
