@@ -7,77 +7,74 @@ var __extends = this.__extends || function (d, b) {
 };
 var AssureNote;
 (function (AssureNote) {
-    var CommandPrototype = (function () {
-        function CommandPrototype(App) {
+    var Command = (function () {
+        function Command(App) {
             this.App = App;
         }
-        CommandPrototype.prototype.Instanciate = function (Target) {
-            var Params = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                Params[_i] = arguments[_i + 1];
-            }
-            return new Command(this, Target, Params);
-        };
-
-        CommandPrototype.prototype.GetCommandLineName = function () {
+        Command.prototype.GetCommandLineName = function () {
             return "";
         };
 
-        CommandPrototype.prototype.GetDisplayName = function () {
+        Command.prototype.GetDisplayName = function () {
             return "";
         };
-        return CommandPrototype;
-    })();
-    AssureNote.CommandPrototype = CommandPrototype;
 
-    var Command = (function () {
-        function Command(Proto, Target, Params) {
-            this.Proto = Proto;
-            this.Target = Target;
-        }
-        Command.prototype.Invoke = function () {
+        Command.prototype.Invoke = function (Target, Params) {
         };
         return Command;
     })();
     AssureNote.Command = Command;
 
-    var SaveCommandPrototype = (function (_super) {
-        __extends(SaveCommandPrototype, _super);
-        function SaveCommandPrototype() {
-            _super.apply(this, arguments);
+    var SaveCommand = (function (_super) {
+        __extends(SaveCommand, _super);
+        function SaveCommand(App) {
+            _super.call(this, App);
         }
-        SaveCommandPrototype.prototype.Instanciate = function (Target) {
-            var Params = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                Params[_i] = arguments[_i + 1];
-            }
-            return new SaveCommand(this, Target, Params);
-        };
-
-        SaveCommandPrototype.prototype.GetCommandLineName = function () {
+        SaveCommand.prototype.GetCommandLineName = function () {
             return "w";
         };
 
-        SaveCommandPrototype.prototype.GetDisplayName = function () {
+        SaveCommand.prototype.GetDisplayName = function () {
             return "Save";
         };
-        return SaveCommandPrototype;
-    })(CommandPrototype);
-    AssureNote.SaveCommandPrototype = SaveCommandPrototype;
 
-    var SaveCommand = (function (_super) {
-        __extends(SaveCommand, _super);
-        function SaveCommand(Proto, Target, Params) {
-            _super.call(this, Proto, Target, Params);
-            this.FileName = Params.length > 0 ? Params[0] : this.Proto.App.WGSNName;
-        }
-        SaveCommand.prototype.Invoke = function () {
+        SaveCommand.prototype.Invoke = function (Target, Params) {
             var Writer = new StringWriter();
-            this.Proto.App.MasterRecord.FormatRecord(Writer);
-            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), this.FileName);
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Params.length > 0 ? Params[0] : this.App.WGSNName);
         };
         return SaveCommand;
     })(Command);
     AssureNote.SaveCommand = SaveCommand;
+
+    var NewCommand = (function (_super) {
+        __extends(NewCommand, _super);
+        function NewCommand(App) {
+            _super.call(this, App);
+        }
+        NewCommand.prototype.GetCommandLineName = function () {
+            return "new";
+        };
+
+        NewCommand.prototype.GetDisplayName = function () {
+            return "New";
+        };
+
+        NewCommand.prototype.Invoke = function (Target, Params) {
+            if (Params.length > 0) {
+                this.App.LoadNewWGSN(Params[0], "* G1");
+            } else {
+                var Name = prompt("Enter the file name");
+                if (Name != null) {
+                    if (Name == "") {
+                        Name = "default.wgsn";
+                    }
+                    this.App.LoadNewWGSN(Name, "* G1");
+                }
+            }
+        };
+        return NewCommand;
+    })(Command);
+    AssureNote.NewCommand = NewCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

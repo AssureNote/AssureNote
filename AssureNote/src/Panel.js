@@ -228,6 +228,10 @@ var AssureNote;
             Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.MasterRecord.GetLatestDoc(), Label);
         };
 
+        PictgramPanel.prototype.GetFocusedView = function () {
+            return this.ViewMap[this.FocusedLabel];
+        };
+
         //TODO
         PictgramPanel.prototype.NavigateUp = function () {
         };

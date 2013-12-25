@@ -2,14 +2,10 @@
 
 module AssureNote {
 
-    export class CommandPrototype {
+    export class Command {
         constructor(public App: AssureNote.AssureNoteApp) {
         }
         
-        public Instanciate(Target: NodeView, ...Params: any[]) {
-            return new Command(this, Target, Params);
-        }
-
         public GetCommandLineName(): string {
             return "";
         }
@@ -17,21 +13,16 @@ module AssureNote {
         public GetDisplayName(): string {
             return "";
         }
-    }
 
-    export class Command {
-        constructor(public Proto: CommandPrototype, public Target: NodeView, Params: any[]) {
+        public Invoke(Target: NodeView, Params: any[]) {
 
-        }
-
-        public Invoke() {
         }
 
     }
 
-    export class SaveCommandPrototype extends CommandPrototype{
-        public Instanciate(Target: NodeView, ...Params: any[]) {
-            return new SaveCommand(this, Target, Params);
+    export class SaveCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
         }
 
         public GetCommandLineName(): string {
@@ -41,20 +32,39 @@ module AssureNote {
         public GetDisplayName(): string {
             return "Save";
         }
+
+        public Invoke(Target: NodeView, Params: any[]) {
+            var Writer = new StringWriter();
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Params.length > 0 ? Params[0] : this.App.WGSNName);
+        }
     }
 
-    export class SaveCommand extends Command {
-        private FileName: string;
-
-        constructor(Proto: CommandPrototype, Target: NodeView, Params: any[]) {
-            super(Proto, Target, Params);
-            this.FileName = Params.length > 0 ? Params[0] : this.Proto.App.WGSNName;
+    export class NewCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
         }
 
-        public Invoke() {
-            var Writer = new StringWriter();
-            this.Proto.App.MasterRecord.FormatRecord(Writer);
-            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), this.FileName);
+        public GetCommandLineName(): string {
+            return "new";
+        }
+
+        public GetDisplayName(): string {
+            return "New";
+        }
+
+        public Invoke(Target: NodeView, Params: any[]) {
+            if (Params.length > 0) {
+                this.App.LoadNewWGSN(Params[0], "* G1");
+            } else {
+                var Name = prompt("Enter the file name");
+                if (Name != null) {
+                    if (Name == "") {
+                        Name = "default.wgsn";
+                    }
+                    this.App.LoadNewWGSN(Name, "* G1");
+                }
+            }
         }
     }
 

@@ -14,22 +14,21 @@ module AssureNote {
 		IsDebugMode: boolean;
 		MasterRecord: GSNRecord;
 		WGSNName: string;
-        Commands: CommandLineBuiltinFunctions;
-        CommandPrototypes: CommandPrototype[];
+        Commands: Command[];
 
 		constructor() {
             this.PluginManager = new PluginManager(this);
             this.SocketManager = new SocketManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
             this.PluginPanel = new PluginPanel(this);
-            this.Commands = new CommandLineBuiltinFunctions();
-            this.CommandPrototypes = [];
+            this.Commands = [];
 
-            this.RegistCommand(new SaveCommandPrototype(this));
+            this.RegistCommand(new SaveCommand(this));
+            this.RegistCommand(new NewCommand(this));
 		}
 
-        public RegistCommand(Command: CommandPrototype) {
-            this.CommandPrototypes.push(Command);
+        public RegistCommand(Command: Command) {
+            this.Commands.push(Command);
         }
 
         // Deprecated
@@ -49,10 +48,10 @@ module AssureNote {
 			Plugin.ExecDoubleClicked(NodeView);
         }
 
-        FindCommandByCommandLineName(Name: string): CommandPrototype {
-            for (var i = 0; i < this.CommandPrototypes.length; ++i) {
-                if (this.CommandPrototypes[i].GetCommandLineName() == Name) {
-                    return this.CommandPrototypes[i];
+        FindCommandByCommandLineName(Name: string): Command {
+            for (var i = 0; i < this.Commands.length; ++i) {
+                if (this.Commands[i].GetCommandLineName() == Name) {
+                    return this.Commands[i];
                 }
             }
         }
@@ -62,13 +61,9 @@ module AssureNote {
 			if (CommandName == "search") {
 				return;
             }
-            jQuery.each(this.CommandPrototypes, (i: number, v: CommandPrototype) => {
-                v.GetCommandLineName() == CommandName;
-                //v.Instanciate();
-            });
-            var CommandPrototype = this.FindCommandByCommandLineName(CommandName);
-            var Command = CommandPrototype.Instanciate(null);
-            Command.Invoke();
+
+            var Command = this.FindCommandByCommandLineName(CommandName);
+            Command.Invoke(this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
 
 			//var BuiltinCommand = this.Commands.GetFunction(MethodName);
 			//if (BuiltinCommand != null) {
