@@ -7,7 +7,7 @@ var async = require('async');
 export interface InsertArg {
 	monitorid: number;
 	data: number;
-	context?: string;
+	context?: Object;
 	timestamp: Date;
 }
 
@@ -17,14 +17,14 @@ export class Rawdata {
 	location: string;
 	authid: string;
 
-	constructor(public recid: number, public data: number, public context: string, public timestamp: Date) {
+	constructor(public recid: number, public data: number, public context: Object, public timestamp: Date) {
 		this.type = null;
 		this.location = null;
 		this.authid = null;
 	}
 
 	static tableToObject(row: any) {
-		return new Rawdata(row.recid, row.data, row.context, row.timestamp);
+		return new Rawdata(row.recid, row.data, JSON.parse(row.context), row.timestamp);
 	}
 
 	setMonitorInfo(type: string, location: string, authid: string): void {
@@ -39,7 +39,7 @@ export class RawdataDAO extends model.DAO {
 
 	insertRawdata(params: InsertArg, callback: (err: any, recid: number) => void): void {
 		this.con.query('INSERT INTO rawdata(monitorid, data, context, timestamp) VALUES(?, ?, ?, ?)',
-			[params.monitorid, params.data, params.context ? params.context : '', params.timestamp],
+			[params.monitorid, params.data, params.context ? JSON.stringify(params.context) : '', params.timestamp],
 			(err, result) => {
 				if(err) {
 					callback(err, null);
