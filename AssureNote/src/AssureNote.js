@@ -1,5 +1,6 @@
 ///<reference path='SideMenu.ts'/>
 ///<reference path='Socket.ts'/>
+///<reference path='Command.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
@@ -10,6 +11,8 @@ var AssureNote;
             this.PluginPanel = new AssureNote.PluginPanel(this);
             this.Commands = new AssureNote.CommandLineBuiltinFunctions();
             this.CommandPrototypes = [];
+
+            this.RegistCommand(new AssureNote.SaveCommandPrototype(this));
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             this.CommandPrototypes.push(Command);
@@ -32,45 +35,56 @@ var AssureNote;
             Plugin.ExecDoubleClicked(NodeView);
         };
 
+        AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
+            for (var i = 0; i < this.CommandPrototypes.length; ++i) {
+                if (this.CommandPrototypes[i].GetCommandLineName() == Name) {
+                    return this.CommandPrototypes[i];
+                }
+            }
+        };
+
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
-            var Method = ParsedCommand.GetMethod();
-            if (Method == "search") {
+            var CommandName = ParsedCommand.GetMethod();
+            if (CommandName == "search") {
                 return;
             }
             jQuery.each(this.CommandPrototypes, function (i, v) {
-                v.GetCommandLineName() == Method;
+                v.GetCommandLineName() == CommandName;
                 //v.Instanciate();
             });
-            var BuiltinCommand = this.Commands.GetFunction(Method);
-            if (BuiltinCommand != null) {
-                BuiltinCommand(this, ParsedCommand.GetArgs());
-                return;
-            }
-            var Plugin = this.PluginManager.GetCommandPlugin(Method);
-            if (Plugin != null) {
-                Plugin.ExecCommand(this, ParsedCommand.GetArgs());
-            } else {
-                //TODO split jump-node function
-                var Label = Method.toUpperCase();
-                if (this.PictgramPanel.ViewMap == null) {
-                    this.DebugP("Jump is diabled.");
-                    return;
-                }
-                var Node = this.PictgramPanel.ViewMap[Label];
-                if (Method == "" && Node == null) {
-                    Label = this.PictgramPanel.FocusedLabel;
-                    Node = this.PictgramPanel.ViewMap[Label];
-                }
-                if (Node != null) {
-                    if ($("#" + Label.replace(/\./g, "\\.")).length > 0) {
-                        this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
-                    } else {
-                        this.DebugP("Invisible node " + Label + " Selected.");
-                    }
-                    return;
-                }
-                this.DebugP("undefined command: " + Method);
-            }
+            var CommandPrototype = this.FindCommandByCommandLineName(CommandName);
+            var Command = CommandPrototype.Instanciate(null);
+            Command.Invoke();
+            //var BuiltinCommand = this.Commands.GetFunction(MethodName);
+            //if (BuiltinCommand != null) {
+            //	BuiltinCommand(this, ParsedCommand.GetArgs());
+            //	return;
+            //}
+            //var Plugin = this.PluginManager.GetCommandPlugin(MethodName);
+            //if (Plugin != null) {
+            //	Plugin.ExecCommand(this, ParsedCommand.GetArgs());
+            //} else {
+            //    //TODO split jump-node function
+            //	var Label = MethodName.toUpperCase();
+            //	if (this.PictgramPanel.ViewMap == null) {
+            //		this.DebugP("Jump is diabled.");
+            //		return;
+            //	}
+            //    var Node = this.PictgramPanel.ViewMap[Label];
+            //    if (MethodName == "" && Node == null) {
+            //        Label = this.PictgramPanel.FocusedLabel;
+            //        Node = this.PictgramPanel.ViewMap[Label];
+            //    }
+            //    if (Node != null) {
+            //        if ($("#" + Label.replace(/\./g,"\\.")).length > 0) { //FIXME use IsVisible
+            //            this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+            //        } else {
+            //            this.DebugP("Invisible node " + Label + " Selected.");
+            //        }
+            //        return;
+            //    }
+            //	this.DebugP("undefined command: " + MethodName);
+            //}
         };
 
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {

@@ -1,5 +1,6 @@
 ///<reference path='SideMenu.ts'/>
 ///<reference path='Socket.ts'/>
+///<reference path='Command.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
 
@@ -23,6 +24,8 @@ module AssureNote {
             this.PluginPanel = new PluginPanel(this);
             this.Commands = new CommandLineBuiltinFunctions();
             this.CommandPrototypes = [];
+
+            this.RegistCommand(new SaveCommandPrototype(this));
 		}
 
         public RegistCommand(Command: CommandPrototype) {
@@ -44,47 +47,59 @@ module AssureNote {
 		ExecDoubleClicked(NodeView: NodeView): void {
 			var Plugin = this.PluginManager.GetDoubleClicked();
 			Plugin.ExecDoubleClicked(NodeView);
-		}
+        }
+
+        FindCommandByCommandLineName(Name: string): CommandPrototype {
+            for (var i = 0; i < this.CommandPrototypes.length; ++i) {
+                if (this.CommandPrototypes[i].GetCommandLineName() == Name) {
+                    return this.CommandPrototypes[i];
+                }
+            }
+        }
 
 		ExecCommand(ParsedCommand: CommandParser): void {
-			var Method = ParsedCommand.GetMethod();
-			if (Method == "search") {
+			var CommandName = ParsedCommand.GetMethod();
+			if (CommandName == "search") {
 				return;
             }
             jQuery.each(this.CommandPrototypes, (i: number, v: CommandPrototype) => {
-                v.GetCommandLineName() == Method;
+                v.GetCommandLineName() == CommandName;
                 //v.Instanciate();
             });
-			var BuiltinCommand = this.Commands.GetFunction(Method);
-			if (BuiltinCommand != null) {
-				BuiltinCommand(this, ParsedCommand.GetArgs());
-				return;
-			}
-			var Plugin = this.PluginManager.GetCommandPlugin(Method);
-			if (Plugin != null) {
-				Plugin.ExecCommand(this, ParsedCommand.GetArgs());
-			} else {
-                //TODO split jump-node function
-				var Label = Method.toUpperCase();
-				if (this.PictgramPanel.ViewMap == null) {
-					this.DebugP("Jump is diabled.");
-					return;
-				}
-                var Node = this.PictgramPanel.ViewMap[Label];
-                if (Method == "" && Node == null) {
-                    Label = this.PictgramPanel.FocusedLabel;
-                    Node = this.PictgramPanel.ViewMap[Label];
-                }
-                if (Node != null) {
-                    if ($("#" + Label.replace(/\./g,"\\.")).length > 0) { //FIXME use IsVisible
-                        this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
-                    } else {
-                        this.DebugP("Invisible node " + Label + " Selected.");
-                    }
-                    return;
-                }
-				this.DebugP("undefined command: " + Method);
-			}
+            var CommandPrototype = this.FindCommandByCommandLineName(CommandName);
+            var Command = CommandPrototype.Instanciate(null);
+            Command.Invoke();
+
+			//var BuiltinCommand = this.Commands.GetFunction(MethodName);
+			//if (BuiltinCommand != null) {
+			//	BuiltinCommand(this, ParsedCommand.GetArgs());
+			//	return;
+			//}
+			//var Plugin = this.PluginManager.GetCommandPlugin(MethodName);
+			//if (Plugin != null) {
+			//	Plugin.ExecCommand(this, ParsedCommand.GetArgs());
+			//} else {
+            //    //TODO split jump-node function
+			//	var Label = MethodName.toUpperCase();
+			//	if (this.PictgramPanel.ViewMap == null) {
+			//		this.DebugP("Jump is diabled.");
+			//		return;
+			//	}
+            //    var Node = this.PictgramPanel.ViewMap[Label];
+            //    if (MethodName == "" && Node == null) {
+            //        Label = this.PictgramPanel.FocusedLabel;
+            //        Node = this.PictgramPanel.ViewMap[Label];
+            //    }
+            //    if (Node != null) {
+            //        if ($("#" + Label.replace(/\./g,"\\.")).length > 0) { //FIXME use IsVisible
+            //            this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+            //        } else {
+            //            this.DebugP("Invisible node " + Label + " Selected.");
+            //        }
+            //        return;
+            //    }
+			//	this.DebugP("undefined command: " + MethodName);
+			//}
 		}
 
 		LoadNewWGSN(Name: string, WGSN: string): void {
