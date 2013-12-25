@@ -26,8 +26,7 @@ module AssureNote {
 
         public Invoke() {
         }
-        public Revert() {
-        }
+
     }
 
     export class SaveCommandPrototype extends CommandPrototype{
@@ -56,8 +55,6 @@ module AssureNote {
             var Writer = new StringWriter();
             this.Proto.App.MasterRecord.FormatRecord(Writer);
             AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), this.FileName);
-        }
-        public Revert() {
         }
     }
 

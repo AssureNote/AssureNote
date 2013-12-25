@@ -37,8 +37,6 @@ var AssureNote;
         }
         Command.prototype.Invoke = function () {
         };
-        Command.prototype.Revert = function () {
-        };
         return Command;
     })();
     AssureNote.Command = Command;
@@ -77,8 +75,6 @@ var AssureNote;
             var Writer = new StringWriter();
             this.Proto.App.MasterRecord.FormatRecord(Writer);
             AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), this.FileName);
-        };
-        SaveCommand.prototype.Revert = function () {
         };
         return SaveCommand;
     })(Command);
