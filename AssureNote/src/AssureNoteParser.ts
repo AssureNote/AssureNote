@@ -1219,12 +1219,16 @@ class ParserContext {
 
 	IsValidSection(Line: string, Reader: StringReader): boolean {
 		var NodeType: GSNType = WikiSyntax.ParseNodeType(Line);
+		var Level: number = WikiSyntax.ParseGoalLevel(Line);
 		if (NodeType == GSNType.Goal) {
-			var Level: number = WikiSyntax.ParseGoalLevel(Line);
 			var ParentNode: GSNNode = this.GetStrategyOfGoal(Level);
 			if (ParentNode != null) {
 				return true;
 			}
+			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
+			return false;
+		}
+		if (this.GoalStack.size() <= Level) {
 			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
 			return false;
 		}
@@ -1269,7 +1273,7 @@ class ParserContext {
 		if (NodeType == GSNType.Goal) {
 			ParentNode = this.GetStrategyOfGoal(Level);
 		} else {
-			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.LastGoalNode;
+			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GoalStack.get(Level);
 //			if(ParentNode.GoalLevel != Level) {
 //				Reader.LogError("mismatched level", Line);
 //			}
@@ -1342,7 +1346,6 @@ class ParserContext {
 		}
 		LineList.clear();
 	}
-
 }
 
 class AssureNoteParser {

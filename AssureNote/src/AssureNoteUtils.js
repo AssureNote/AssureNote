@@ -29,13 +29,13 @@ var AssureNote;
         function CreateGSNShape(NodeView) {
             switch (NodeView.GetNodeType()) {
                 case GSNType.Goal:
-                    return new AssureNote.GSNGoalShape(NodeView);
+                    return new GSNGoalShape(NodeView);
                 case GSNType.Context:
-                    return new AssureNote.GSNContextShape(NodeView);
+                    return new GSNContextShape(NodeView);
                 case GSNType.Strategy:
-                    return new AssureNote.GSNStrategyShape(NodeView);
+                    return new GSNStrategyShape(NodeView);
                 case GSNType.Evidence:
-                    return new AssureNote.GSNEvidenceShape(NodeView);
+                    return new GSNEvidenceShape(NodeView);
             }
         }
         AssureNoteUtils.CreateGSNShape = CreateGSNShape;

@@ -1181,12 +1181,16 @@ var ParserContext = (function () {
 
     ParserContext.prototype.IsValidSection = function (Line, Reader) {
         var NodeType = WikiSyntax.ParseNodeType(Line);
+        var Level = WikiSyntax.ParseGoalLevel(Line);
         if (NodeType == GSNType.Goal) {
-            var Level = WikiSyntax.ParseGoalLevel(Line);
             var ParentNode = this.GetStrategyOfGoal(Level);
             if (ParentNode != null) {
                 return true;
             }
+            Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
+            return false;
+        }
+        if (this.GoalStack.size() <= Level) {
             Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
             return false;
         }
@@ -1231,7 +1235,7 @@ var ParserContext = (function () {
         if (NodeType == GSNType.Goal) {
             ParentNode = this.GetStrategyOfGoal(Level);
         } else {
-            ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.LastGoalNode;
+            ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GoalStack.get(Level);
             //			if(ParentNode.GoalLevel != Level) {
             //				Reader.LogError("mismatched level", Line);
             //			}

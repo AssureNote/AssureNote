@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class TestAssureNoteParser {
 
@@ -104,7 +105,7 @@ public class TestAssureNoteParser {
 		assertEquals(History.Date, "2000-01-01T00:00:00+0900");
 	}
 
-	class WGSNFilter implements FilenameFilter {
+	private class WGSNFilter implements FilenameFilter {
 		public boolean accept(File file, String name) {
 			return name.endsWith(".wgsn");
 		}
@@ -124,5 +125,45 @@ public class TestAssureNoteParser {
 			
 			assertNotNull(TopGoal);
 		}
+	}
+	
+	@Test
+	public void ParseMultipleGSNDiagrams() {
+		String old = "*G";
+		String next = "*G\n*C";
+		
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(old);
+		
+		assertNotNull(MasterRecord);
+		assertEquals(MasterRecord.HistoryList.size(), 1);
+		
+		MasterRecord.Parse(next);
+		
+		assertEquals(MasterRecord.HistoryList.size(), 2);
+	}
+	
+	@Test
+	public void ParseGoalWithStrategies() {
+		String input = "*G\n*S\n**G\n*S\n**G";
+		
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input); 
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		
+		assertNotNull(TopGoal);
+		assertNotNull(TopGoal.SubNodeList);
+		
+		System.out.println(TopGoal.SubNodeList.size());
+		assertEquals(TopGoal.SubNodeList.size(), 2);
+		
+		assertEquals(TopGoal.SubNodeList.get(0).NodeType, GSNType.Strategy);
+		assertEquals(TopGoal.SubNodeList.get(1).NodeType, GSNType.Strategy);
+		assertEquals(TopGoal.SubNodeList.get(0).SubNodeList.size(), 1);
+		assertEquals(TopGoal.SubNodeList.get(1).SubNodeList.size(), 1);
+		assertEquals(TopGoal.SubNodeList.get(0).SubNodeList.get(0).NodeType, GSNType.Goal);
+		assertEquals(TopGoal.SubNodeList.get(1).SubNodeList.get(0).NodeType, GSNType.Goal);
 	}
 }
