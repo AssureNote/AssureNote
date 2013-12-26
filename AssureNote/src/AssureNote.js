@@ -9,13 +9,13 @@ var AssureNote;
             this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
-            this.Commands = new AssureNote.CommandLineBuiltinFunctions();
-            this.CommandPrototypes = [];
+            this.Commands = [];
 
-            this.RegistCommand(new AssureNote.SaveCommandPrototype(this));
+            this.RegistCommand(new AssureNote.SaveCommand(this));
+            this.RegistCommand(new AssureNote.NewCommand(this));
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
-            this.CommandPrototypes.push(Command);
+            this.Commands.push(Command);
         };
 
         // Deprecated
@@ -36,9 +36,9 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
-            for (var i = 0; i < this.CommandPrototypes.length; ++i) {
-                if (this.CommandPrototypes[i].GetCommandLineName() == Name) {
-                    return this.CommandPrototypes[i];
+            for (var i = 0; i < this.Commands.length; ++i) {
+                if (this.Commands[i].GetCommandLineName() == Name) {
+                    return this.Commands[i];
                 }
             }
         };
@@ -48,13 +48,9 @@ var AssureNote;
             if (CommandName == "search") {
                 return;
             }
-            jQuery.each(this.CommandPrototypes, function (i, v) {
-                v.GetCommandLineName() == CommandName;
-                //v.Instanciate();
-            });
-            var CommandPrototype = this.FindCommandByCommandLineName(CommandName);
-            var Command = CommandPrototype.Instanciate(null);
-            Command.Invoke();
+
+            var Command = this.FindCommandByCommandLineName(CommandName);
+            Command.Invoke(this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
             //var BuiltinCommand = this.Commands.GetFunction(MethodName);
             //if (BuiltinCommand != null) {
             //	BuiltinCommand(this, ParsedCommand.GetArgs());

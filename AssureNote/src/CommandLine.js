@@ -90,20 +90,19 @@ var AssureNote;
         function CommandLineBuiltinFunctions() {
             this.FunctionMap = {};
 
-            this.FunctionMap["new"] = function (AssureNoteApp, Args) {
-                if (Args.length > 0) {
-                    AssureNoteApp.LoadNewWGSN(Args[0], "* G1");
-                } else {
-                    var Name = prompt("Enter the file name");
-                    if (Name != null) {
-                        if (Name == "") {
-                            Name = "default.wgsn";
-                        }
-                        AssureNoteApp.LoadNewWGSN(Name, "* G1");
-                    }
-                }
-            };
-
+            //this.FunctionMap["new"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+            //	if (Args.length > 0) {
+            //		AssureNoteApp.LoadNewWGSN(Args[0], "* G1");
+            //	} else {
+            //		var Name = prompt("Enter the file name");
+            //		if (Name != null) {
+            //			if (Name == "") {
+            //				Name = "default.wgsn";
+            //			}
+            //			AssureNoteApp.LoadNewWGSN(Name, "* G1");
+            //		}
+            //	}
+            //};
             //this.FunctionMap["w"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
             //	var Writer = new StringWriter();
             //	AssureNoteApp.MasterRecord.FormatRecord(Writer);
