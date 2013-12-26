@@ -89,7 +89,6 @@ var AssureNote;
     var CommandLineBuiltinFunctions = (function () {
         function CommandLineBuiltinFunctions() {
             this.FunctionMap = {};
-
             //this.FunctionMap["new"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
             //	if (Args.length > 0) {
             //		AssureNoteApp.LoadNewWGSN(Args[0], "* G1");
@@ -112,48 +111,43 @@ var AssureNote;
             //		AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), AssureNoteApp.WGSNName);
             //	}
             //};
-            this.FunctionMap["unfoldAll"] = function (AssureNoteApp, Args) {
-                var TopView = AssureNoteApp.PictgramPanel.MasterView;
-                var unfoldAll = function (TargetView) {
-                    TargetView.IsFolded = false;
-                    TargetView.ForEachVisibleChildren(function (SubNode) {
-                        unfoldAll(SubNode);
-                    });
-                };
-                unfoldAll(TopView);
-                AssureNoteApp.PictgramPanel.Draw();
-            };
-
-            this.FunctionMap["set"] = function (AssureNoteApp, Args) {
-                if (Args.length > 0) {
-                    switch (Args[0]) {
-                        case "color":
-                            if (Args.length > 2) {
-                                if (AssureNoteApp.PictgramPanel.ViewMap == null) {
-                                    console.log("'set color' is disabled.");
-                                    break;
-                                }
-                                var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
-                                if (Node != null) {
-                                    console.log(Args);
-                                    $("#" + Args[1] + " h4").css("background-color", Args[2]);
-                                }
-                            }
-                            break;
-                        case "scale":
-                            if (Args.length > 1) {
-                                console.log(Args);
-                                AssureNoteApp.PictgramPanel.Viewport.SetScale(Args[1] - 0);
-                            }
-                            break;
-                    }
-                }
-            };
+            //this.FunctionMap["unfoldAll"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+            //	var TopView = AssureNoteApp.PictgramPanel.MasterView;
+            //	var unfoldAll = (TargetView: NodeView) => {
+            //		TargetView.IsFolded = false;
+            //		TargetView.ForEachVisibleChildren((SubNode: NodeView) => {
+            //			unfoldAll(SubNode);
+            //		});
+            //	};
+            //	unfoldAll(TopView);
+            //	AssureNoteApp.PictgramPanel.Draw();
+            //};
+            //this.FunctionMap["set"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+            //	if (Args.length > 0) {
+            //		switch (Args[0]) {
+            //            case "color":
+            //                //if (Args.length > 2) {
+            //                //    if (AssureNoteApp.PictgramPanel.ViewMap == null) {
+            //                //        console.log("'set color' is disabled.");
+            //                //        break;
+            //                //    }
+            //                //    var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
+            //                //    if (Node != null) {
+            //                //        console.log(Args);
+            //                //        $("#" + Args[1] + " h4").css("background-color", Args[2]);
+            //                //    }
+            //                //}
+            //                break;
+            //            case "scale":
+            //                //if (Args.length > 1) {
+            //                //    console.log(Args);
+            //                //    AssureNoteApp.PictgramPanel.Viewport.SetScale(<number><any>Args[1] - 0);
+            //                //}
+            //                break;
+            //		}
+            //	}
+            //}
         }
-        CommandLineBuiltinFunctions.prototype.GetFunction = function (Key) {
-            //FIXME
-            return this.FunctionMap[Key];
-        };
         return CommandLineBuiltinFunctions;
     })();
     AssureNote.CommandLineBuiltinFunctions = CommandLineBuiltinFunctions;

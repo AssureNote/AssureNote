@@ -121,50 +121,50 @@ module AssureNote {
 			//	}
 			//};
 
-			this.FunctionMap["unfoldAll"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
-				var TopView = AssureNoteApp.PictgramPanel.MasterView;
-				var unfoldAll = (TargetView: NodeView) => {
-					TargetView.IsFolded = false;
-					TargetView.ForEachVisibleChildren((SubNode: NodeView) => {
-						unfoldAll(SubNode);
-					});
-				};
-				unfoldAll(TopView);
-				AssureNoteApp.PictgramPanel.Draw();
-			};
+			//this.FunctionMap["unfoldAll"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+			//	var TopView = AssureNoteApp.PictgramPanel.MasterView;
+			//	var unfoldAll = (TargetView: NodeView) => {
+			//		TargetView.IsFolded = false;
+			//		TargetView.ForEachVisibleChildren((SubNode: NodeView) => {
+			//			unfoldAll(SubNode);
+			//		});
+			//	};
+			//	unfoldAll(TopView);
+			//	AssureNoteApp.PictgramPanel.Draw();
+			//};
 
-			this.FunctionMap["set"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
-				if (Args.length > 0) {
-					switch (Args[0]) {
-                        case "color":
-                            if (Args.length > 2) {
-                                if (AssureNoteApp.PictgramPanel.ViewMap == null) {
-                                    console.log("'set color' is disabled.");
-                                    break;
-                                }
-                                var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
-                                if (Node != null) {
-                                    console.log(Args);
-                                    $("#" + Args[1] + " h4").css("background-color", Args[2]);
-                                }
-                            }
-                            break;
-                        case "scale":
-                            if (Args.length > 1) {
-                                console.log(Args);
-                                AssureNoteApp.PictgramPanel.Viewport.SetScale(<number><any>Args[1] - 0);
-                            }
-                            break;
-					}
-				}
-			}
+			//this.FunctionMap["set"] = (AssureNoteApp: AssureNoteApp, Args: string[]) => {
+			//	if (Args.length > 0) {
+			//		switch (Args[0]) {
+            //            case "color":
+            //                //if (Args.length > 2) {
+            //                //    if (AssureNoteApp.PictgramPanel.ViewMap == null) {
+            //                //        console.log("'set color' is disabled.");
+            //                //        break;
+            //                //    }
+            //                //    var Node = AssureNoteApp.PictgramPanel.ViewMap[Args[1]];
+            //                //    if (Node != null) {
+            //                //        console.log(Args);
+            //                //        $("#" + Args[1] + " h4").css("background-color", Args[2]);
+            //                //    }
+            //                //}
+            //                break;
+            //            case "scale":
+            //                //if (Args.length > 1) {
+            //                //    console.log(Args);
+            //                //    AssureNoteApp.PictgramPanel.Viewport.SetScale(<number><any>Args[1] - 0);
+            //                //}
+            //                break;
+			//		}
+			//	}
+			//}
 
 		}
 
-		GetFunction(Key: string): (AssureNoteApp: AssureNoteApp, Args: string[]) => void {
-			//FIXME
-			return this.FunctionMap[Key];
-		}
+		//GetFunction(Key: string): (AssureNoteApp: AssureNoteApp, Args: string[]) => void {
+		//	//FIXME
+		//	return this.FunctionMap[Key];
+		//}
 	}
 
 }

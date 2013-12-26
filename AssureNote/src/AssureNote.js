@@ -9,13 +9,20 @@ var AssureNote;
             this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
-            this.Commands = [];
+            this.Commands = {};
 
+            this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
             this.RegistCommand(new AssureNote.NewCommand(this));
+            this.RegistCommand(new AssureNote.UnfoldAllCommand(this));
+            this.RegistCommand(new AssureNote.SetColorCommand(this));
+            this.RegistCommand(new AssureNote.SetScaleCommand(this));
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
-            this.Commands.push(Command);
+            var Names = Command.GetCommandLineNames();
+            for (var i = 0; i < Names.length; ++i) {
+                this.Commands[Names[i]] = Command;
+            }
         };
 
         // Deprecated
@@ -36,11 +43,7 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
-            for (var i = 0; i < this.Commands.length; ++i) {
-                if (this.Commands[i].GetCommandLineName() == Name) {
-                    return this.Commands[i];
-                }
-            }
+            return this.Commands[Name] || this.DefaultCommand;
         };
 
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {

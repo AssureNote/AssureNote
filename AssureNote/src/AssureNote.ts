@@ -14,21 +14,29 @@ module AssureNote {
 		IsDebugMode: boolean;
 		MasterRecord: GSNRecord;
 		WGSNName: string;
-        Commands: Command[];
+        Commands: { [index: string]: Command };
+        DefaultCommand: AssureNote.CommandMissingCommand;
 
 		constructor() {
             this.PluginManager = new PluginManager(this);
             this.SocketManager = new SocketManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
             this.PluginPanel = new PluginPanel(this);
-            this.Commands = [];
+            this.Commands = {};
 
+            this.DefaultCommand = new CommandMissingCommand(this);
             this.RegistCommand(new SaveCommand(this));
             this.RegistCommand(new NewCommand(this));
+            this.RegistCommand(new UnfoldAllCommand(this));
+            this.RegistCommand(new SetColorCommand(this));
+            this.RegistCommand(new SetScaleCommand(this));
 		}
 
         public RegistCommand(Command: Command) {
-            this.Commands.push(Command);
+            var Names = Command.GetCommandLineNames();
+            for (var i = 0; i < Names.length; ++i) {
+                this.Commands[Names[i]] = Command;
+            }
         }
 
         // Deprecated
@@ -49,11 +57,7 @@ module AssureNote {
         }
 
         FindCommandByCommandLineName(Name: string): Command {
-            for (var i = 0; i < this.Commands.length; ++i) {
-                if (this.Commands[i].GetCommandLineName() == Name) {
-                    return this.Commands[i];
-                }
-            }
+            return this.Commands[Name] || this.DefaultCommand;
         }
 
 		ExecCommand(ParsedCommand: CommandParser): void {
