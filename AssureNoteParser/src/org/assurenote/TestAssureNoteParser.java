@@ -166,4 +166,42 @@ public class TestAssureNoteParser {
 		assertEquals(TopGoal.SubNodeList.get(0).SubNodeList.get(0).NodeType, GSNType.Goal);
 		assertEquals(TopGoal.SubNodeList.get(1).SubNodeList.get(0).NodeType, GSNType.Goal);
 	}
+	
+	@Test
+	public void ParseDescription() {
+		String input = "*G\nhi, all";
+		
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		assertNotNull(LatestDoc);
+		
+		assertNotNull(TopGoal);
+		assertEquals(TopGoal.NodeType, GSNType.Goal);
+		assertNull(TopGoal.SubNodeList);
+		System.out.println(TopGoal.NodeDoc);
+		assertEquals(TopGoal.NodeDoc, "\nhi, all");
+	}
+	
+	@Test
+	public void ParseInvalidDepth() {
+		String input = "*G\n**S\n*C";
+		
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		assertNotNull(LatestDoc);
+		
+		assertNotNull(TopGoal);
+		assertNotNull(TopGoal.SubNodeList);
+		assertEquals(TopGoal.NodeDoc, "\n**S");
+		assertEquals(TopGoal.SubNodeList.size(), 1);
+		
+		GSNNode SubNode = TopGoal.SubNodeList.get(0);
+		assertEquals(SubNode.NodeType, GSNType.Context);
+	}
 }
