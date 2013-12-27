@@ -140,7 +140,6 @@ module AssureNote {
 						event.stopPropagation();
 						event.preventDefault();
 						this.AssureNoteApp.ProcessDroppedFiles((<any>(<any>event.originalEvent).dataTransfer).files);
-						return false;
 					}
                 });
 
@@ -149,7 +148,7 @@ module AssureNote {
                 this.MasterView.TraverseVisibleNode((Node: NodeView) => {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
-                        var DY = HitBoxCenter.Y - Node.GetCenterGY();
+                        var DY = HitBoxCenter.Y - Node.GetCenterGY() / 3;
                         var R = 150 / this.Viewport.GetScale();
                         if (DX * DX + DY * DY < R * R) {
                             this.AssureNoteApp.ExecDoubleClicked(Node);
@@ -252,7 +251,10 @@ module AssureNote {
         }
 
         GetFocusedView(): NodeView {
-            return this.ViewMap[this.FocusedLabel];
+            if (this.ViewMap) {
+                return this.ViewMap[this.FocusedLabel];
+            }
+            return null;
         }
 
 		//TODO

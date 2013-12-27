@@ -168,5 +168,29 @@ var AssureNote;
         return SetScaleCommand;
     })(Command);
     AssureNote.SetScaleCommand = SetScaleCommand;
+
+    var OpenCommand = (function (_super) {
+        __extends(OpenCommand, _super);
+        function OpenCommand(App) {
+            _super.call(this, App);
+        }
+        OpenCommand.prototype.GetCommandLineNames = function () {
+            return ["e", "open"];
+        };
+
+        OpenCommand.prototype.GetDisplayName = function () {
+            return "Open...";
+        };
+
+        OpenCommand.prototype.Invoke = function (FocusedView, Params) {
+            var _this = this;
+            $("#file-open-dialog").change(function (e) {
+                _this.App.ProcessDroppedFiles((e.srcElement).files);
+            });
+            $("#file-open-dialog").click();
+        };
+        return OpenCommand;
+    })(Command);
+    AssureNote.OpenCommand = OpenCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map
