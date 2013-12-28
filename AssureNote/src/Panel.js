@@ -120,7 +120,6 @@ var AssureNote;
                     event.stopPropagation();
                     event.preventDefault();
                     _this.AssureNoteApp.ProcessDroppedFiles(((event.originalEvent).dataTransfer).files);
-                    return false;
                 }
             });
 
@@ -129,7 +128,7 @@ var AssureNote;
                 _this.MasterView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
-                        var DY = HitBoxCenter.Y - Node.GetCenterGY();
+                        var DY = HitBoxCenter.Y - Node.GetCenterGY() / 3;
                         var R = 150 / _this.Viewport.GetScale();
                         if (DX * DX + DY * DY < R * R) {
                             _this.AssureNoteApp.ExecDoubleClicked(Node);
@@ -229,7 +228,10 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.GetFocusedView = function () {
-            return this.ViewMap[this.FocusedLabel];
+            if (this.ViewMap) {
+                return this.ViewMap[this.FocusedLabel];
+            }
+            return null;
         };
 
         //TODO

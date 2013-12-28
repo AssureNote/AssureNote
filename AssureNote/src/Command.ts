@@ -149,4 +149,25 @@ module AssureNote {
             }
         }
     }
+
+    export class OpenCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["e", "open"];
+        }
+
+        public GetDisplayName(): string {
+            return "Open...";
+        }
+
+        public Invoke(FocusedView: NodeView, Params: any[]) {
+            $("#file-open-dialog").change((e: Event) => {
+                this.App.ProcessDroppedFiles(<any>(<HTMLInputElement>e.srcElement).files);
+            });
+            $("#file-open-dialog").click();
+        }
+    }
 }
