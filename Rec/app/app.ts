@@ -8,7 +8,7 @@ import api = module('./routes/api');
 import http = module('http');
 import path = module('path');
 
-export var app = <express.Express>express();
+export var app = <Express>express();
 
 // all environments
 app.set('port', process.env.PORT || 3001);
