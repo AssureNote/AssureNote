@@ -204,4 +204,16 @@ public class TestAssureNoteParser {
 		GSNNode SubNode = TopGoal.SubNodeList.get(0);
 		assertEquals(SubNode.NodeType, GSNType.Context);
 	}
+	
+	@Test
+	public void ParseNodeName() {
+		String input = "*G:TopGoal";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		
+		assertEquals(TopGoal.LabelName, "G:TopGoal");
+	}
 }

@@ -276,7 +276,9 @@ class WikiSyntax {
 		}
 		return sb.toString();
 	}
-	static GSNType ParseNodeType(String LabelLine) {
+	
+	static int GetLabelPos (String LabelLine) {
+		/* Returns the row of the abel (e.g., 'G'). */
 		/*local*/int i;
 		for (i = 0; i < LabelLine.length(); i++) {
 			if (LabelLine.charAt(i) != '*') break;
@@ -284,6 +286,11 @@ class WikiSyntax {
 		for (; i < LabelLine.length(); i++) {
 			if (LabelLine.charAt(i) != ' ') break;
 		}
+		return i;
+	}
+	
+	static GSNType ParseNodeType(String LabelLine) {
+		/*local*/int i = WikiSyntax.GetLabelPos(LabelLine);
 		if (i < LabelLine.length()) {
 			/*local*/char ch = LabelLine.charAt(i);
 			if (ch == 'G') {
@@ -300,6 +307,21 @@ class WikiSyntax {
 			}
 		}
 		return GSNType.Undefined;
+	}
+	
+	static String ParseLabelName(String LabelLine) {
+		/*local*/int i = WikiSyntax.GetLabelPos(LabelLine);
+		/*local*/StringBuffer sb = new StringBuffer();
+		i = i + 1; // eat label
+		
+		if (i >= LabelLine.length() || LabelLine.charAt(i) != ':') return null;
+		sb.append(LabelLine.charAt(i-1));
+		
+		while(i < LabelLine.length() && LabelLine.charAt(i) != ' ') {
+			sb.append(String.valueOf(LabelLine.charAt(i)));
+			i = i + 1;
+		}
+		return sb.toString();
 	}
 
 	static String FormatNodeType(GSNType NodeType) {
@@ -422,6 +444,7 @@ class GSNNode {
 	/*field*/GSNNode ParentNode;
 	/*field*/ArrayList<GSNNode> SubNodeList;
 	/*field*/GSNType NodeType;
+	/*field*/String  LabelName;   /* e.g, G:TopGoal */
 	/*field*/String  LabelNumber; /* e.g, G1 G1.1 */
 	/*field*/int     SectionCount;
 	
@@ -433,10 +456,11 @@ class GSNNode {
 	/*field*/byte[]  Digest;
 	/*field*/HashMap<String, String> TagMap;
 
-	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType, String LabelNumber, GSNHistory[] HistoryTriple) {
+	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType,String LabelName, String LabelNumber, GSNHistory[] HistoryTriple) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
 		this.NodeType    = NodeType;	
+		this.LabelName   = LabelName;      // G:TopGoal
 		this.LabelNumber = LabelNumber;    // G1.1
 		this.SectionCount = 0;
 		this.SubNodeList = null;
@@ -461,7 +485,7 @@ class GSNNode {
 	}
 	
 	GSNNode DeepCopy(GSNDoc BaseDoc, GSNNode ParentNode) {
-		/*local*/GSNNode NewNode = new GSNNode(BaseDoc, ParentNode, /*this.GoalLevel,*/ this.NodeType, this.LabelNumber, null);
+		/*local*/GSNNode NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, null);
 		NewNode.Created = this.Created;
 		NewNode.LastModified = this.LastModified;
 		NewNode.Digest = this.Digest;
@@ -698,7 +722,7 @@ class GSNNode {
 			}
 		}
 		if (NodeType == GSNType.Strategy && Creation) {
-			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelNumber, null);
+			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, null);
 		}
 		return null;
 	}
@@ -1259,7 +1283,7 @@ class ParserContext {
 	/*field*/GSNNode LastNonContextNode;
 
 	ParserContext/*constructor*/(GSNDoc NullableDoc) {
-		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null);
+		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, null);
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;
@@ -1346,6 +1370,7 @@ class ParserContext {
 
 	GSNNode CreateNewNode(String LabelLine, HashMap<String, GSNNode> RefMap, StringReader Reader) {
 		/*local*/GSNType NodeType = WikiSyntax.ParseNodeType(LabelLine);
+		/*local*/String LabelName = WikiSyntax.ParseLabelName(LabelLine);
 		/*local*/String LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
 		/*local*/String RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
 		/*local*/GSNNode RefNode = null;
@@ -1368,7 +1393,7 @@ class ParserContext {
 		if(this.NullableDoc != null) {
 			LabelNumber = this.NullableDoc.CheckLabelNumber(ParentNode, NodeType, LabelNumber);
 		}
-		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelNumber, HistoryTriple);
+		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, HistoryTriple);
 		if(this.FirstNode == null) {
 			this.FirstNode = NewNode;
 		}
