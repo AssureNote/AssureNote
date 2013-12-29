@@ -731,7 +731,7 @@ class GSNNode {
 		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-		Writer.print(this.LabelNumber);
+		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		/*local*/String RefKey = null;
@@ -779,8 +779,8 @@ class GSNNode {
 		}
 	}
 	
-	GSNNode ReplaceSubNode(GSNNode NewNode, HashMap<String,String> LabelMap) {
-		this.MergeSubNode(NewNode, LabelMap);
+	GSNNode ReplaceSubNode(GSNNode NewNode) {
+		this.MergeSubNode(NewNode);
 		if(this.ParentNode != null) {
 			for(/*local*/int i = 0; i < this.ParentNode.SubNodeList.size(); i++) {
 				if(this.ParentNode.SubNodeList.get(i) == this) {
@@ -800,7 +800,7 @@ class GSNNode {
 		/*local*/ParserContext Parser = new ParserContext(null);
 		/*local*/GSNNode NewNode = Parser.ParseNode(Reader, null);
 		if(NewNode != null) {
-			NewNode = this.ReplaceSubNode(NewNode, null);
+			NewNode = this.ReplaceSubNode(NewNode);
 		}
 		return NewNode;
 	}
@@ -816,7 +816,7 @@ class GSNNode {
 		return false;
 	}
 	
-	void MergeSubNode(GSNNode NewNode, HashMap<String,String> LabelMap) {
+	void MergeSubNode(GSNNode NewNode) {
 		assert(this.BaseDoc != null);
 		NewNode.LastModified = null; // this.BaseDoc has Last
 		if(NewNode.LabelNumber != null) {
@@ -834,9 +834,6 @@ class GSNNode {
 		}
 		if(NewNode.LastModified == null) {
 			/*local*/String NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
-			if(LabelMap != null && this.LabelNumber != null) {
-				LabelMap.put(NewNode.GetLabel(), NewLabelNumber);
-			}
 			NewNode.LabelNumber = NewLabelNumber;
 			NewNode.Created = this.BaseDoc.DocHistory;
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
@@ -844,7 +841,7 @@ class GSNNode {
 		NewNode.BaseDoc = this.BaseDoc;
 		for(/*local*/int i = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
 			/*local*/GSNNode SubNode = NewNode.NonNullSubNodeList().get(i);
-			this.MergeSubNode(SubNode, LabelMap);
+			this.MergeSubNode(SubNode);
 		}
 	}
 
@@ -1174,8 +1171,8 @@ class GSNRecord {
 			this.MergeAsFastFoward(NewRecord);
 		}
 		else {
-			/*local*/GSNRecord Record1 = this.DeepCopy();
-//			MergeAsIncrementalAddition
+			///*local*/GSNRecord Record1 = this.DeepCopy();
+			// MergeAsIncrementalAddition
 		}
 	}
 
@@ -1195,14 +1192,13 @@ class GSNRecord {
 			/*local*/GSNDoc Doc = NewHistory != null ? NewHistory.Doc : null;
 			if(Doc != null) {
 				this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
-				this.EditingDoc.TopGoal.ReplaceSubNode(Doc.TopGoal, null);
+				this.EditingDoc.TopGoal.ReplaceSubNode(Doc.TopGoal);
 				this.CloseEditor();
 			}
 		}
 	}
 
 	public void MergeAsIncrementalAddition(int Rev1, GSNRecord Record1, int Rev2, GSNRecord Record2) {
-		/*local*/HashMap<String, String> LabelMap = new HashMap<String,String>();
 		while(Rev1 < Record1.HistoryList.size() && Rev2 < Record2.HistoryList.size()) {
 			/*local*/GSNHistory History1 = Record1.GetHistory(Rev1);
 			/*local*/GSNHistory History2 = Record2.GetHistory(Rev2);
@@ -1218,33 +1214,15 @@ class GSNRecord {
 			}
 			if(History1.CompareDate(History2) < 0) {
 				this.OpenEditor(History1.Author, History1.Role, History1.Date, History1.Process); Rev1++;
-				this.EditingDoc.TopGoal.ReplaceSubNode(History1.Doc.TopGoal, LabelMap);
+				this.EditingDoc.TopGoal.ReplaceSubNode(History1.Doc.TopGoal);
 				this.CloseEditor();
-				if(LabelMap.size() > 0) { 
-					Record1.ReplaceLabels(Rev1, Record1.HistoryList.size(), LabelMap);
-					LabelMap.clear();
-				}
 			}
 			else {
 				this.OpenEditor(History2.Author, History2.Role, History2.Date, History2.Process); Rev2++;
-				this.EditingDoc.TopGoal.ReplaceSubNode(History2.Doc.TopGoal, LabelMap);
+				this.EditingDoc.TopGoal.ReplaceSubNode(History2.Doc.TopGoal);
 				this.CloseEditor();
-				if(LabelMap.size() > 0) {
-					Record2.ReplaceLabels(Rev2, Record2.HistoryList.size(), LabelMap);
-					LabelMap.clear();
-				}
 			}
 		}
-	}
-	
-	private void ReplaceLabels(int StartRev, int EndRev, HashMap<String, String> LabelMap) {
-		for(/*local*/int i = StartRev; i < EndRev; i++) {
-			/*local*/GSNDoc Doc = this.GetHistoryDoc(i);
-			if(Doc != null) {
-				Doc.TopGoal.ReplaceLabels(LabelMap);
-			}
-		}
-		
 	}
 
 	GSNDoc GetLatestDoc() {
