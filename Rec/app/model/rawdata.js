@@ -19,7 +19,13 @@ var Rawdata = (function () {
         this.authid = null;
     }
     Rawdata.tableToObject = function (row) {
-        return new Rawdata(row.recid, row.data, JSON.parse(row.context), row.timestamp);
+        var context = null;
+        try  {
+            context = JSON.parse(row.context);
+        } catch (e) {
+            context = {};
+        }
+        return new Rawdata(row.recid, row.data, context, row.timestamp);
     };
 
     Rawdata.prototype.setMonitorInfo = function (type, location, authid) {
@@ -56,7 +62,6 @@ var RawdataDAO = (function (_super) {
 
     RawdataDAO.prototype.getRawdata = function (recid, callback) {
         var _this = this;
-        var self = this;
         async.waterfall([
             function (next) {
                 _this.con.query('SELECT * FROM rawdata WHERE recid=?', [recid], function (err, result) {
@@ -65,7 +70,7 @@ var RawdataDAO = (function (_super) {
                 });
             },
             function (rawdata, monitorid, next) {
-                self._fillRawdataWithMonitorInfo(rawdata, monitorid, next);
+                _this._fillRawdataWithMonitorInfo(rawdata, monitorid, next);
             }
         ], function (err, rawdata) {
             callback(err, rawdata);

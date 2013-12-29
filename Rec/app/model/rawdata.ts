@@ -24,7 +24,13 @@ export class Rawdata {
 	}
 
 	static tableToObject(row: any) {
-		return new Rawdata(row.recid, row.data, JSON.parse(row.context), row.timestamp);
+		var context = null;
+		try {
+			context = JSON.parse(row.context);
+		}catch(e) {
+			context = {};
+		}
+		return new Rawdata(row.recid, row.data, context, row.timestamp);
 	}
 
 	setMonitorInfo(type: string, location: string, authid: string): void {
@@ -59,7 +65,6 @@ export class RawdataDAO extends model.DAO {
 	}
 
 	getRawdata(recid: number, callback: (err: any, rawdata: Rawdata)=>void): void {
-		var self = this;
 		async.waterfall([
 			(next) => {
 				this.con.query('SELECT * FROM rawdata WHERE recid=?',
@@ -71,7 +76,7 @@ export class RawdataDAO extends model.DAO {
 				);
 			},
 			(rawdata: Rawdata, monitorid: number, next) => {
-				self._fillRawdataWithMonitorInfo(rawdata, monitorid, next);
+				this._fillRawdataWithMonitorInfo(rawdata, monitorid, next);
 			}
 		],
 		(err: any, rawdata: Rawdata) => {
