@@ -232,6 +232,10 @@ public class TestAssureNoteParser {
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
 		GSNNode TopGoal = LatestDoc.TopGoal;
+		
+		assertNull(TopGoal.LabelNumber);
+		assertNull(TopGoal.SubNodeList.get(0).LabelNumber);
+		
 		TopGoal.RenumberGoal(1, 2);
 
 		assertEquals(TopGoal.LabelNumber, "1");

@@ -35,6 +35,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import com.itextpdf.text.DocumentException;
 //endif VAJA
@@ -888,35 +890,40 @@ class GSNNode {
 		}
 	}
 
-	int RenumberGoalRecursive(int GoalCount, int NextGoalCount, HashMap<String, String> LabelMap) {
+	void RenumberGoalRecursive(int GoalCount, int NextGoalCount, HashMap<String, String> LabelMap) {
 		assert(this.IsGoal());
-		while(LabelMap.get("" + GoalCount) != null) GoalCount++;
-		this.LabelNumber = "" + GoalCount;
-		/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
-		this.ListSectionNode(BufferList);
-		/*local*/int SectionCount = 1;
-		for(/*local*/int i = 0; i < BufferList.size(); i++, SectionCount += 1) {
-			/*local*/GSNNode SectionNode = BufferList.get(i);
-			String LabelNumber = this.LabelNumber + "." + SectionCount;
-			if (LabelMap.get(LabelNumber) != null) continue;
-			SectionNode.LabelNumber = this.LabelNumber + "." + SectionCount;
+		
+		Queue<GSNNode> queue = new LinkedList<GSNNode>();
+		queue.add(this);
+		GSNNode CurrentNode;
+		while ((CurrentNode = queue.poll()) != null) {
+			while(LabelMap.get("" + GoalCount) != null) GoalCount++;
+			CurrentNode.LabelNumber = "" + GoalCount;
+			/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
+			CurrentNode.ListSectionNode(BufferList);
+			/*local*/int SectionCount = 1;
+			for(/*local*/int i = 0; i < BufferList.size(); i++, SectionCount += 1) {
+				/*local*/GSNNode SectionNode = BufferList.get(i);
+				String LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+				if (LabelMap.get(LabelNumber) != null) continue;
+				SectionNode.LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+			}
+			BufferList.clear();
+			
+			CurrentNode.ListSubGoalNode(BufferList);
+			for(/*local*/int i = 0; i < BufferList.size(); i++) {
+				/*local*/GSNNode GoalNode = BufferList.get(i);
+				queue.add(GoalNode);
+				//NextCount = GoalNode.RenumberGoalRecursive(NextGoalCount, NextCount, LabelMap);
+				NextGoalCount += 1;
+			}
 		}
-		BufferList.clear();
-		this.ListSubGoalNode(BufferList);
-		/*local*/int NextCount = NextGoalCount + BufferList.size();
-		for(/*local*/int i = 0; i < BufferList.size(); i++) {
-			/*local*/GSNNode GoalNode = BufferList.get(i);
-			NextCount = GoalNode.RenumberGoalRecursive(NextGoalCount, NextCount, LabelMap);
-			NextGoalCount += 1;
-		}
-		return NextCount;
 	}
 	
-	int RenumberGoal(int GoalCount, int NextGoalCount) {
+	void RenumberGoal(int GoalCount, int NextGoalCount) {
 		HashMap<String, String> LabelMap = new HashMap<String, String>();
 		this.ReserveLabelMap(LabelMap);
-		/*local*/int NextCount = this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
-		return NextCount;
+		this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
 	}
 	
 	ArrayList<GSNNode> SearchNode(String SearchWord) {
