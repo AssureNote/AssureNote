@@ -39,10 +39,7 @@ public class TestAssureNoteParser {
 		assertNull(TopGoal.SubNodeList);
 	}
 	
-	@Test
-	public void ParseGoalWithContext() {
-		String input = "*G\n*C";
-		
+	public void _ParseGoalWithContext(String input) {
 		GSNRecord MasterRecord = new GSNRecord();
 		MasterRecord.Parse(input);
 		
@@ -58,6 +55,12 @@ public class TestAssureNoteParser {
 		GSNNode SubNode = TopGoal.SubNodeList.get(0);
 		assertEquals(SubNode.NodeType, GSNType.Context);
 		assertNull(SubNode.SubNodeList);
+	}
+	@Test
+	public void ParseGoalWithContext() {
+		_ParseGoalWithContext("*G\n*C");
+		_ParseGoalWithContext("*G\n*J");
+		_ParseGoalWithContext("*G\n*R");
 	}
 	
 	@Test
@@ -205,9 +208,7 @@ public class TestAssureNoteParser {
 		assertEquals(SubNode.NodeType, GSNType.Context);
 	}
 	
-	@Test
-	public void ParseNodeName() {
-		String input = "*G:TopGoal";
+	public void _ParseNodeName(String input) {
 		GSNRecord MasterRecord = new GSNRecord();
 		MasterRecord.Parse(input);
 		
@@ -215,5 +216,25 @@ public class TestAssureNoteParser {
 		GSNNode TopGoal = LatestDoc.TopGoal;
 		
 		assertEquals(TopGoal.LabelName, "G:TopGoal");
+	}
+	
+	@Test
+	public void ParseNodeName() {
+		_ParseNodeName("*G:TopGoal");
+		_ParseNodeName("*  G:TopGoal");
+	}
+	
+	@Test
+	public void Renumber() {
+		String input = "*G\n*C";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		TopGoal.RenumberGoal(1, 2);
+
+		assertEquals(TopGoal.LabelNumber, "1");
+		assertEquals(TopGoal.SubNodeList.get(0).LabelNumber, "1.1");
 	}
 }

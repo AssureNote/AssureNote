@@ -833,8 +833,6 @@ class GSNNode {
 			}
 		}
 		if(NewNode.LastModified == null) {
-			/*local*/String NewLabelNumber = this.BaseDoc.CheckLabelNumber(NewNode.ParentNode, NewNode.NodeType, null);
-			NewNode.LabelNumber = NewLabelNumber;
 			NewNode.Created = this.BaseDoc.DocHistory;
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
@@ -882,34 +880,42 @@ class GSNNode {
 			}
 		}
 	}
-
-	int RenumberGoal(int GoalCount, int NextGoalCount, HashMap<String, String> LabelMap) {
-		assert(this.IsGoal());
-		/*local*/String OldLabel = this.GetLabel();
-		this.LabelNumber = "" + GoalCount;
-		if(!OldLabel.equals(this.GetLabel())) {
-			LabelMap.put(OldLabel, this.LabelNumber);
+	
+	void ReserveLabelMap(HashMap<String, String> LabelMap) {
+		if (this.LabelNumber != null) LabelMap.put(this.LabelNumber,  "exists"); // Non-null value
+		for (/*local*/int i = 0; this.SubNodeList != null && i < this.SubNodeList.size(); i++) {
+			this.SubNodeList.get(i).ReserveLabelMap(LabelMap);
 		}
+	}
+
+	int RenumberGoalRecursive(int GoalCount, int NextGoalCount, HashMap<String, String> LabelMap) {
+		assert(this.IsGoal());
+		while(LabelMap.get("" + GoalCount) != null) GoalCount++;
+		this.LabelNumber = "" + GoalCount;
 		/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
 		this.ListSectionNode(BufferList);
 		/*local*/int SectionCount = 1;
-		for(/*local*/int i = 0; i < BufferList.size(); i++) {
+		for(/*local*/int i = 0; i < BufferList.size(); i++, SectionCount += 1) {
 			/*local*/GSNNode SectionNode = BufferList.get(i);
-			OldLabel = SectionNode.GetLabel();
+			String LabelNumber = this.LabelNumber + "." + SectionCount;
+			if (LabelMap.get(LabelNumber) != null) continue;
 			SectionNode.LabelNumber = this.LabelNumber + "." + SectionCount;
-			if(!OldLabel.equals(SectionNode.GetLabel())) {
-				LabelMap.put(OldLabel, SectionNode.LabelNumber);
-			}
-			SectionCount+=1;
 		}
 		BufferList.clear();
 		this.ListSubGoalNode(BufferList);
 		/*local*/int NextCount = NextGoalCount + BufferList.size();
 		for(/*local*/int i = 0; i < BufferList.size(); i++) {
 			/*local*/GSNNode GoalNode = BufferList.get(i);
-			NextCount = GoalNode.RenumberGoal(NextGoalCount, NextCount, LabelMap);
+			NextCount = GoalNode.RenumberGoalRecursive(NextGoalCount, NextCount, LabelMap);
 			NextGoalCount += 1;
 		}
+		return NextCount;
+	}
+	
+	int RenumberGoal(int GoalCount, int NextGoalCount) {
+		HashMap<String, String> LabelMap = new HashMap<String, String>();
+		this.ReserveLabelMap(LabelMap);
+		/*local*/int NextCount = this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
 		return NextCount;
 	}
 	
@@ -1013,22 +1019,6 @@ class GSNDoc {
 		}
 	}
 
-	String CheckLabelNumber(GSNNode ParentNode, GSNType NodeType, String LabelNumber) {
-		while (LabelNumber == null || this.NodeMap.get(WikiSyntax.FormatNodeType(NodeType ) + LabelNumber) != null) {
-		//if (LabelNumber == null) {
-			if (NodeType == GSNType.Goal) {
-				this.GoalCount += 1;
-				LabelNumber = "" + this.GoalCount;
-			} else {
-				/*local*/GSNNode GoalNode = ParentNode.GetCloseGoal();
-				/*local*/GoalNode.SectionCount += 1;
-				LabelNumber = GoalNode.LabelNumber + "." + GoalNode.SectionCount;
-			}
-		}
-		return LabelNumber;
-		//return this.UniqueNumber(NodeType, LabelNumber);
-	}
-
 	void RemapNodeMap() {
 		/*local*/HashMap<String, GSNNode> NodeMap = new HashMap<String, GSNNode>();
 		if(this.TopGoal != null) {
@@ -1130,10 +1120,9 @@ class GSNRecord {
 	}
 	
 	void RenumberAll() {
-		/*local*/HashMap<String, String> LabelMap = new HashMap<String, String>();
 		/*local*/GSNDoc LatestDoc = this.GetLatestDoc();
 		if(LatestDoc!= null && LatestDoc.TopGoal != null) {
-			LatestDoc.TopGoal.RenumberGoal(1, 2, LabelMap);
+			LatestDoc.TopGoal.RenumberGoal(1, 2);
 		}
 	}
 
@@ -1367,9 +1356,6 @@ class ParserContext {
 //			if(ParentNode.GoalLevel != Level) {
 //				Reader.LogError("mismatched level", Line);
 //			}
-		}
-		if(this.NullableDoc != null) {
-			LabelNumber = this.NullableDoc.CheckLabelNumber(ParentNode, NodeType, LabelNumber);
 		}
 		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, HistoryTriple);
 		if(this.FirstNode == null) {
