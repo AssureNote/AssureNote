@@ -115,18 +115,18 @@ class Queue <E> {
 class LinkedList <E> extends Queue <E> {
 }
 
-class HashMap <string, V>{
+class HashMap <K, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
 	constructor() {
 		this.hash = {};
 	}
-	put(key: string, value: V) : void {
-		this.hash[key] = value;
+	put(key: K, value: V) : void {
+		this.hash[String(key)] = value;
 	}
 
-	get(key: string) : V {
-		return this.hash[key];
+	get(key: K) : V {
+		return this.hash[String(key)];
 	}
 
 	size() : number {

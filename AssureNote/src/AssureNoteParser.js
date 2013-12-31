@@ -439,7 +439,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.Remap = function (NodeMap) {
-        NodeMap.put(this.GetLabel(), this);
+        NodeMap.put(this.UID, this);
         for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
             var Node = this.NonNullSubNodeList().get(i);
             Node.Remap(NodeMap);
@@ -548,7 +548,7 @@ var GSNNode = (function () {
         for (var i = 0; i < this.BaseDoc.Record.HistoryList.size(); i++) {
             var NodeHistory = this.BaseDoc.Record.HistoryList.get(i);
             if (NodeHistory.Doc != null) {
-                var Node = NodeHistory.Doc.GetNode(this.GetLabel());
+                var Node = NodeHistory.Doc.GetNode(this.UID);
                 if (Node != null) {
                     if (Node.Created == this.Created) {
                         if (LastNode == null || LastNode.LastModified != this.LastModified) {
@@ -739,13 +739,13 @@ var GSNNode = (function () {
         return NewNode;
     };
 
-    GSNNode.prototype.HasSubNodeLabel = function (Label) {
-        if (Label.equals(this.GetLabel())) {
+    GSNNode.prototype.HasSubNodeUID = function (UID) {
+        if (UID == this.UID) {
             return true;
         }
         for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
             var SubNode = this.NonNullSubNodeList().get(i);
-            if (SubNode.HasSubNodeLabel(Label))
+            if (SubNode.HasSubNodeUID(UID))
                 return true;
         }
         return false;
@@ -755,9 +755,9 @@ var GSNNode = (function () {
         (this.BaseDoc != null);
         NewNode.LastModified = null;
         if (NewNode.LabelNumber != null) {
-            var Label = NewNode.GetLabel();
-            var OldNode = this.BaseDoc.GetNode(Label);
-            if (OldNode != null && this.HasSubNodeLabel(Label)) {
+            var UID = NewNode.UID;
+            var OldNode = this.BaseDoc.GetNode(UID);
+            if (OldNode != null && this.HasSubNodeUID(UID)) {
                 NewNode.Created = OldNode.Created;
                 if (Lib.EqualsDigest(OldNode.Digest, NewNode.Digest)) {
                     NewNode.LastModified = OldNode.LastModified;
@@ -927,16 +927,16 @@ var GSNDoc = (function () {
         }
     };
 
-    GSNDoc.prototype.GetNode = function (Label) {
-        return this.NodeMap.get(Label);
+    GSNDoc.prototype.GetNode = function (UID) {
+        return this.NodeMap.get(UID);
     };
 
     GSNDoc.prototype.UncheckAddNode = function (Node) {
-        this.NodeMap.put(Node.GetLabel(), Node);
+        this.NodeMap.put(Node.UID, Node);
     };
 
     GSNDoc.prototype.AddNode = function (Node) {
-        var Key = Node.GetLabel();
+        var Key = Node.UID;
         var OldNode = this.NodeMap.get(Key);
         if (OldNode != null) {
             if (Lib.EqualsDigest(OldNode.Digest, Node.Digest)) {
@@ -1539,11 +1539,11 @@ var HashMap = (function () {
         this.hash = {};
     }
     HashMap.prototype.put = function (key, value) {
-        this.hash[key] = value;
+        this.hash[String(key)] = value;
     };
 
     HashMap.prototype.get = function (key) {
-        return this.hash[key];
+        return this.hash[String(key)];
     };
 
     HashMap.prototype.size = function () {

@@ -43,7 +43,7 @@ module AssureNote {
             //Create a new GSNDoc
             //TODO input user name
             this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
-            var Node: GSNNode = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.GetLabel());
+            var Node: GSNNode = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
             console.log(NewNode);
 

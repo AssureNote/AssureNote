@@ -453,8 +453,8 @@ class GSNNode {
 		return this.SubNodeList == null ? Lib.EmptyNodeList : this.SubNodeList;
 	}
 
-	public Remap(NodeMap: HashMap<string, GSNNode>): void {
-		NodeMap.put(this.GetLabel(), this);
+	public Remap(NodeMap: HashMap<Number, GSNNode>): void {
+		NodeMap.put(this.UID, this);
 		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
 			var Node: GSNNode = this.NonNullSubNodeList().get(i);
 			Node.Remap(NodeMap);
@@ -563,7 +563,7 @@ class GSNNode {
 		for(var i: number = 0; i < this.BaseDoc.Record.HistoryList.size(); i++) {
 			var NodeHistory: GSNHistory = this.BaseDoc.Record.HistoryList.get(i);
 			if(NodeHistory.Doc != null) {
-				var Node: GSNNode = NodeHistory.Doc.GetNode(this.GetLabel());
+				var Node: GSNNode = NodeHistory.Doc.GetNode(this.UID);
 				if(Node != null) {
 					if(Node.Created == this.Created) {
 						if(LastNode == null || LastNode.LastModified != this.LastModified) {
@@ -747,13 +747,13 @@ class GSNNode {
 		return NewNode;
 	}
 	
-	HasSubNodeLabel(Label: string): boolean {
-		if(Label.equals(this.GetLabel())) {
+	HasSubNodeUID(UID: number): boolean {
+		if(UID == this.UID) {
 			return true;
 		}
 		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
 			var SubNode: GSNNode = this.NonNullSubNodeList().get(i);
-			if(SubNode.HasSubNodeLabel(Label)) return true;
+			if(SubNode.HasSubNodeUID(UID)) return true;
 		}
 		return false;
 	}
@@ -761,9 +761,9 @@ class GSNNode {
 	MergeSubNode(NewNode: GSNNode): void {(this.BaseDoc != null);
 		NewNode.LastModified = null; // this.BaseDoc has Last
 		if(NewNode.LabelNumber != null) {
-			var Label: string = NewNode.GetLabel();
-			var OldNode: GSNNode = this.BaseDoc.GetNode(Label);
-			if(OldNode != null && this.HasSubNodeLabel(Label)) {
+			var UID: number = NewNode.UID;
+			var OldNode: GSNNode = this.BaseDoc.GetNode(UID);
+			if(OldNode != null && this.HasSubNodeUID(UID)) {
 				NewNode.Created = OldNode.Created;
 				if(Lib.EqualsDigest(OldNode.Digest, NewNode.Digest)) {
 					NewNode.LastModified = OldNode.LastModified;
@@ -882,7 +882,7 @@ class GSNNode {
 class GSNDoc {
 	Record: GSNRecord;
 	TopGoal: GSNNode;
-	NodeMap: HashMap<string, GSNNode>;
+	NodeMap: HashMap<Number, GSNNode>;
 	DocTagMap: HashMap<string, string>;
 	DocHistory: GSNHistory;
 	GoalCount: number;
@@ -890,7 +890,7 @@ class GSNDoc {
 	constructor(Record: GSNRecord) {
 		this.Record = Record;
 		this.TopGoal = null;
-		this.NodeMap = new HashMap<string, GSNNode>();
+		this.NodeMap = new HashMap<Number, GSNNode>();
 		this.DocTagMap = new HashMap<string, string>();
 		this.DocHistory = null;
 		this.GoalCount = 0;
@@ -937,16 +937,16 @@ class GSNDoc {
 		}
 	}
 
-	public GetNode(Label: string): GSNNode {
-		return this.NodeMap.get(Label);
+	public GetNode(UID: number): GSNNode {
+		return this.NodeMap.get(UID);
 	}
 
 	UncheckAddNode(Node: GSNNode): void {
-		this.NodeMap.put(Node.GetLabel(), Node);
+		this.NodeMap.put(Node.UID, Node);
 	}
 
 	AddNode(Node: GSNNode): void {
-		var Key: string = Node.GetLabel();
+		var Key: number = Node.UID;
 		var OldNode: GSNNode = this.NodeMap.get(Key);
 		if (OldNode != null) {
 			if (Lib.EqualsDigest(OldNode.Digest, Node.Digest)) {
@@ -966,7 +966,7 @@ class GSNDoc {
 	}
 
 	RemapNodeMap(): void {
-		var NodeMap: HashMap<string, GSNNode> = new HashMap<string, GSNNode>();
+		var NodeMap: HashMap<Number, GSNNode> = new HashMap<Number, GSNNode>();
 		if(this.TopGoal != null) {
 			this.TopGoal.Remap(NodeMap);
 		}
@@ -1541,18 +1541,18 @@ class Queue <E> {
 class LinkedList <E> extends Queue <E> {
 }
 
-class HashMap <string, V>{
+class HashMap <K, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
 	constructor() {
 		this.hash = {};
 	}
-	put(key: string, value: V) : void {
-		this.hash[key] = value;
+	put(key: K, value: V) : void {
+		this.hash[String(key)] = value;
 	}
 
-	get(key: string) : V {
-		return this.hash[key];
+	get(key: K) : V {
+		return this.hash[String(key)];
 	}
 
 	size() : number {
