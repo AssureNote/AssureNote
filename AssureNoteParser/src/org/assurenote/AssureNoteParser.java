@@ -108,8 +108,12 @@ class Lib {
 		return Integer.parseInt(numText);
 	}
 	
-	static int hexToDec(String v) {
+	static int HexToDec(String v) {
 		return Integer.valueOf(v, 16);
+	}
+	
+	static String DecToHex(int n) {
+		return Integer.toHexString(n);
 	}
 		
 }
@@ -366,7 +370,7 @@ class WikiSyntax {
 	}
 	
 	static String ParseUID(String LabelLine) {
-		/*local*/int StartIdx = LabelLine.indexOf('&') + 1; // eat '&'
+		/*local*/int StartIdx = LabelLine.indexOf("&") + 1; // eat '&'
 		if (StartIdx == 0) return null;
 		/*local*/int EndIdx = StartIdx;
 		while(EndIdx < LabelLine.length() && LabelLine.charAt(EndIdx) != ' ') EndIdx++;
@@ -758,6 +762,8 @@ class GSNNode {
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
+		Writer.print(" &");
+		Writer.print(Lib.DecToHex(this.UID));
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		/*local*/String RefKey = null;
@@ -791,6 +797,8 @@ class GSNNode {
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
+		Writer.print(" &");
+		Writer.print(Lib.DecToHex(this.UID));
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		Writer.print(this.NodeDoc);
@@ -1372,7 +1380,7 @@ class ParserContext {
 		/*local*/GSNType NodeType = WikiSyntax.ParseNodeType(LabelLine);
 		/*local*/String LabelName = WikiSyntax.ParseLabelName(LabelLine);
 		/*local*/String LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
-		/*local*/int UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.hexToDec(WikiSyntax.ParseUID(LabelLine));
+		/*local*/int UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
 		/*local*/String RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
 		/*local*/GSNNode RefNode = null;
 		/*local*/GSNNode NewNode = null;

@@ -192,8 +192,12 @@ class Lib {
 		return Number(numText);
 	}
 
-    static hexToDec(v: string) {
+    static HexToDec(v: string) : number {
         return parseInt(v, 16);
+    }
+
+    static DecToHex(n: number) : string {
+        return n.toString(16);
     }
 }
 

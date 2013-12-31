@@ -275,7 +275,7 @@ var WikiSyntax = (function () {
     };
 
     WikiSyntax.ParseUID = function (LabelLine) {
-        var StartIdx = LabelLine.indexOf(38) + 1;
+        var StartIdx = LabelLine.indexOf("&") + 1;
         if (StartIdx == 0)
             return null;
         var EndIdx = StartIdx;
@@ -654,6 +654,8 @@ var GSNNode = (function () {
         Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
         if (this.LabelNumber != null)
             Writer.print(this.LabelNumber);
+        Writer.print(" &");
+        Writer.print(Lib.DecToHex(this.UID));
 
         // Stream.append(" ");
         // MD5.FormatDigest(this.Digest, Stream);
@@ -689,6 +691,8 @@ var GSNNode = (function () {
         Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
         if (this.LabelNumber != null)
             Writer.print(this.LabelNumber);
+        Writer.print(" &");
+        Writer.print(Lib.DecToHex(this.UID));
 
         // Stream.append(" ");
         // MD5.FormatDigest(this.Digest, Stream);
@@ -1253,7 +1257,7 @@ var ParserContext = (function () {
         var NodeType = WikiSyntax.ParseNodeType(LabelLine);
         var LabelName = WikiSyntax.ParseLabelName(LabelLine);
         var LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
-        var UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.hexToDec(WikiSyntax.ParseUID(LabelLine));
+        var UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
         var RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
         var RefNode = null;
         var NewNode = null;
@@ -1591,8 +1595,12 @@ var Lib = (function () {
         return Number(numText);
     };
 
-    Lib.hexToDec = function (v) {
+    Lib.HexToDec = function (v) {
         return parseInt(v, 16);
+    };
+
+    Lib.DecToHex = function (n) {
+        return n.toString(16);
     };
     Lib.Input = [];
     Lib.EmptyNodeList = new Array();
