@@ -240,5 +240,21 @@ public class TestAssureNoteParser {
 
 		assertEquals(TopGoal.LabelNumber, "1");
 		assertEquals(TopGoal.SubNodeList.get(0).LabelNumber, "1.1");
+		System.out.println(Integer.MAX_VALUE);
+		System.out.println(Integer.toHexString(Integer.MAX_VALUE));
+	}
+	
+	@Test
+	public void UID() {
+		String input = "*G &0\n*C:Context &ff";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		
+		assertEquals(TopGoal.UID, 0);
+		assertEquals(TopGoal.SubNodeList.get(0).LabelName, "C:Context");
+		assertEquals(TopGoal.SubNodeList.get(0).UID, 255);
 	}
 }

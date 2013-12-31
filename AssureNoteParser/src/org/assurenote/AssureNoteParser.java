@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 import com.itextpdf.text.DocumentException;
 //endif VAJA
@@ -105,6 +106,10 @@ class Lib {
 	}
 	public static int parseInt(String numText) {
 		return Integer.parseInt(numText);
+	}
+	
+	static int hexToDec(String v) {
+		return Integer.valueOf(v, 16);
 	}
 		
 }
@@ -359,6 +364,15 @@ class WikiSyntax {
 		}
 		return null;
 	}
+	
+	static String ParseUID(String LabelLine) {
+		/*local*/int StartIdx = LabelLine.indexOf('&') + 1; // eat '&'
+		if (StartIdx == 0) return null;
+		/*local*/int EndIdx = StartIdx;
+		while(EndIdx < LabelLine.length() && LabelLine.charAt(EndIdx) != ' ') EndIdx++;
+		/*local*/String UID = LabelLine.substring(StartIdx, EndIdx);
+		return UID;
+	}
 
 	public static String ParseRevisionHistory(String LabelLine) {
 		/*local*/int Loc = LabelLine.indexOf("#");
@@ -457,13 +471,16 @@ class GSNNode {
 	/*field*/boolean HasTag;
 	/*field*/byte[]  Digest;
 	/*field*/HashMap<String, String> TagMap;
+	
+	/*field*/int UID; /* Unique ID */
 
-	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType,String LabelName, String LabelNumber, GSNHistory[] HistoryTriple) {
+	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType,String LabelName, String LabelNumber, int UID, GSNHistory[] HistoryTriple) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
 		this.NodeType    = NodeType;	
 		this.LabelName   = LabelName;      // G:TopGoal
 		this.LabelNumber = LabelNumber;    // G1.1
+		this.UID = UID;
 		this.SectionCount = 0;
 		this.SubNodeList = null;
 		if (HistoryTriple != null) {
@@ -487,7 +504,7 @@ class GSNNode {
 	}
 	
 	GSNNode DeepCopy(GSNDoc BaseDoc, GSNNode ParentNode) {
-		/*local*/GSNNode NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, null);
+		/*local*/GSNNode NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, this.UID, null);
 		NewNode.Created = this.Created;
 		NewNode.LastModified = this.LastModified;
 		NewNode.Digest = this.Digest;
@@ -724,7 +741,7 @@ class GSNNode {
 			}
 		}
 		if (NodeType == GSNType.Strategy && Creation) {
-			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, null);
+			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, this.UID, null);
 		}
 		return null;
 	}
@@ -1255,14 +1272,16 @@ class ParserContext {
 	/*field*/GSNNode FirstNode;
 	/*field*/GSNNode LastGoalNode;
 	/*field*/GSNNode LastNonContextNode;
+	/*field*/Random random;
 
 	ParserContext/*constructor*/(GSNDoc NullableDoc) {
-		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, null);
+		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, -1, null);
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;
 		this.LastNonContextNode = null;
 		this.GoalStack = new ArrayList<GSNNode>();
+		this.random = new Random(System.currentTimeMillis());
 		this.SetLastNode(ParentNode);
 	}
 
@@ -1346,6 +1365,7 @@ class ParserContext {
 		/*local*/GSNType NodeType = WikiSyntax.ParseNodeType(LabelLine);
 		/*local*/String LabelName = WikiSyntax.ParseLabelName(LabelLine);
 		/*local*/String LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
+		/*local*/int UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.hexToDec(WikiSyntax.ParseUID(LabelLine));
 		/*local*/String RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
 		/*local*/GSNNode RefNode = null;
 		/*local*/GSNNode NewNode = null;
@@ -1364,7 +1384,7 @@ class ParserContext {
 //				Reader.LogError("mismatched level", Line);
 //			}
 		}
-		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, HistoryTriple);
+		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, UID, HistoryTriple);
 		if(this.FirstNode == null) {
 			this.FirstNode = NewNode;
 		}

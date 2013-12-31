@@ -7,6 +7,20 @@ class PdfConverter {
 	static main(args: string[]) {}
 }
 
+class Random {
+    constructor(seed: number) {}
+
+    nextInt() : number {
+        return Math.floor(Math.random() * 2147483647);
+    }
+}
+
+class System {
+    static currentTimeMillis() {
+        return new Date().getTime();
+    }
+}
+
 class StringBuilder {
 	str : string;
 	constructor() {
@@ -177,6 +191,10 @@ class Lib {
 	static parseInt(numText: string) : number {
 		return Number(numText);
 	}
+
+    static hexToDec(v: string) {
+        return parseInt(v, 16);
+    }
 }
 
 class Iterator<T> {//FIX ME!!
