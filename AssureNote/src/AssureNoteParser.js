@@ -231,7 +231,7 @@ var WikiSyntax = (function () {
 
         if (i >= LabelLine.length || LabelLine.charCodeAt(i) != 58)
             return null;
-        sb.append(LabelLine.charCodeAt(i - 1));
+        sb.append(LabelLine.substring(i - 1, i));
 
         while (i < LabelLine.length && LabelLine.charCodeAt(i) != 32) {
             sb.append(LabelLine.substring(i, i + 1));

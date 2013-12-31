@@ -326,7 +326,7 @@ class WikiSyntax {
 		i = i + 1; // eat label
 		
 		if (i >= LabelLine.length() || LabelLine.charAt(i) != ':') return null;
-		sb.append(LabelLine.charAt(i-1));
+		sb.append(LabelLine.substring(i-1, i));
 		
 		while(i < LabelLine.length() && LabelLine.charAt(i) != ' ') {
 			sb.append(LabelLine.substring(i, i+1));
