@@ -40,6 +40,22 @@ public class TestAssureNoteParser {
 		assertNull(TopGoal.SubNodeList);
 	}
 	
+	@Test
+	public void ParseContext() {
+		String input = "*C";
+		
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		assertNotNull(LatestDoc);
+		
+		//assertNotNull(TopGoal);
+		assertEquals(TopGoal.NodeType, GSNType.Context);
+		assertNull(TopGoal.SubNodeList);
+	}
+	
 	public void _ParseGoalWithContext(String input) {
 		GSNRecord MasterRecord = new GSNRecord();
 		MasterRecord.Parse(input);

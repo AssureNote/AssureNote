@@ -1203,7 +1203,7 @@ class ParserContext {
 		this.LastNonContextNode = null;
 		this.GoalStack = new Array<GSNNode>();
 		this.random = new Random(System.currentTimeMillis());
-		this.SetLastNode(ParentNode);
+		this.SetGoalStackAt(ParentNode);
 	}
 
 	SetLastNode(Node: GSNNode): void {
@@ -1253,15 +1253,11 @@ class ParserContext {
 			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
 			return false;
 		}
-		if (this.GoalStack.size() <= Level) {
+		if (this.LastGoalNode != null && this.GoalStack.size() <= Level) {
 			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
 			return false;
 		}
 		if (NodeType == GSNType.Context) {
-			if(this.LastNonContextNode == null) {
-				Reader.LogError("Context is not linked to Context", Line);
-				return false;				
-			}
 			return true;
 		}
 		if (NodeType == GSNType.Evidence) {
