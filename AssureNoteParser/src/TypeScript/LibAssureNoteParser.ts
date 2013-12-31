@@ -79,6 +79,28 @@ class SimpleDateFormat {
 	}
 }
 
+class Queue <E> {
+    list: E[];
+
+    constructor() {
+        this.list = [];
+    }
+
+    add(elem: E) : void {
+        this.list.push(elem);
+    }
+
+    poll() : E {
+        if (this.list.length == 0) return null;
+        var res: E = this.list[0];
+        this.list = this.list.slice(1);
+        return res;
+    }
+}
+
+class LinkedList <E> extends Queue <E> {
+}
+
 class HashMap <string, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};

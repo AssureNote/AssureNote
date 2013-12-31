@@ -313,14 +313,14 @@ class WikiSyntax {
 	
 	static String ParseLabelName(String LabelLine) {
 		/*local*/int i = WikiSyntax.GetLabelPos(LabelLine);
-		/*local*/StringBuffer sb = new StringBuffer();
+		/*local*/StringBuilder sb = new StringBuilder();
 		i = i + 1; // eat label
 		
 		if (i >= LabelLine.length() || LabelLine.charAt(i) != ':') return null;
 		sb.append(LabelLine.charAt(i-1));
 		
 		while(i < LabelLine.length() && LabelLine.charAt(i) != ' ') {
-			sb.append(String.valueOf(LabelLine.charAt(i)));
+			sb.append(LabelLine.substring(i, i+1));
 			i = i + 1;
 		}
 		return sb.toString();
@@ -893,9 +893,9 @@ class GSNNode {
 	void RenumberGoalRecursive(int GoalCount, int NextGoalCount, HashMap<String, String> LabelMap) {
 		assert(this.IsGoal());
 		
-		Queue<GSNNode> queue = new LinkedList<GSNNode>();
+		/*local*/Queue<GSNNode> queue = new LinkedList<GSNNode>();
 		queue.add(this);
-		GSNNode CurrentNode;
+		/*local*/GSNNode CurrentNode;
 		while ((CurrentNode = queue.poll()) != null) {
 			while(LabelMap.get("" + GoalCount) != null) GoalCount++;
 			CurrentNode.LabelNumber = "" + GoalCount;
@@ -904,7 +904,7 @@ class GSNNode {
 			/*local*/int SectionCount = 1;
 			for(/*local*/int i = 0; i < BufferList.size(); i++, SectionCount += 1) {
 				/*local*/GSNNode SectionNode = BufferList.get(i);
-				String LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+				/*local*/String LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
 				if (LabelMap.get(LabelNumber) != null) continue;
 				SectionNode.LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
 			}
@@ -921,7 +921,7 @@ class GSNNode {
 	}
 	
 	void RenumberGoal(int GoalCount, int NextGoalCount) {
-		HashMap<String, String> LabelMap = new HashMap<String, String>();
+		/*local*/HashMap<String, String> LabelMap = new HashMap<String, String>();
 		this.ReserveLabelMap(LabelMap);
 		this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
 	}
