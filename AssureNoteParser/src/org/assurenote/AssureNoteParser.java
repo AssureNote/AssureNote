@@ -351,8 +351,11 @@ class WikiSyntax {
 	}
 
 	static String ParseLabelNumber(String LabelLine) {
-		/*local*/int StartIdx = -1;
-		for (/*local*/int i = 0; i < LabelLine.length(); i++) {
+		/*local*/int StartIdx = WikiSyntax.GetLabelPos(LabelLine)+1;
+		if (StartIdx >= LabelLine.length() || LabelLine.charAt(StartIdx) == ':') return null;
+		for (/*local*/int i = StartIdx; i < LabelLine.length(); i++) {
+			if (Character.isWhitespace(LabelLine.charAt(i))) continue;
+			if (LabelLine.charAt(i) == '&') return null;
 			if (Character.isDigit(LabelLine.charAt(i))) {
 				StartIdx = i;
 				break;
@@ -931,14 +934,15 @@ class GSNNode {
 		while ((CurrentNode = queue.poll()) != null) {
 			while(LabelMap.get("" + GoalCount) != null) GoalCount++;
 			CurrentNode.AssignedLabelNumber = "" + GoalCount;
+			GoalCount++;
 			/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
 			CurrentNode.ListSectionNode(BufferList);
 			/*local*/int SectionCount = 1;
 			for(/*local*/int i = 0; i < BufferList.size(); i++, SectionCount += 1) {
 				/*local*/GSNNode SectionNode = BufferList.get(i);
-				/*local*/String LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+				/*local*/String LabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
 				if (LabelMap.get(LabelNumber) != null) continue;
-				SectionNode.AssignedLabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+				SectionNode.AssignedLabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
 			}
 			BufferList.clear();
 			

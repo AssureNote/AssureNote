@@ -1,8 +1,9 @@
 package org.assurenote;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -238,10 +239,27 @@ public class TestAssureNoteParser {
 		
 		TopGoal.RenumberGoal(1, 2);
 
-		assertEquals(TopGoal.LabelNumber, "1");
-		assertEquals(TopGoal.SubNodeList.get(0).LabelNumber, "1.1");
+		assertEquals(TopGoal.AssignedLabelNumber, "1");
+		assertEquals(TopGoal.SubNodeList.get(0).AssignedLabelNumber, "1.1");
 		System.out.println(Integer.MAX_VALUE);
 		System.out.println(Integer.toHexString(Integer.MAX_VALUE));
+	}
+	
+	@Test
+	public void Renumber2() {
+		String input = "*G\n*S\n**G\n**G";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopGoal = LatestDoc.TopGoal;
+		
+		assertNull(TopGoal.LabelNumber);
+		assertNull(TopGoal.SubNodeList.get(0).LabelNumber);
+		
+		TopGoal.RenumberGoal(1, 2);
+		GSNNode Strategy = TopGoal.SubNodeList.get(0);
+		assertNotEquals(Strategy.SubNodeList.get(0).AssignedLabelNumber, Strategy.SubNodeList.get(1).AssignedLabelNumber);
 	}
 	
 	@Test

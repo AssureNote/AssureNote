@@ -256,8 +256,14 @@ var WikiSyntax = (function () {
     };
 
     WikiSyntax.ParseLabelNumber = function (LabelLine) {
-        var StartIdx = -1;
-        for (var i = 0; i < LabelLine.length; i++) {
+        var StartIdx = WikiSyntax.GetLabelPos(LabelLine) + 1;
+        if (StartIdx >= LabelLine.length || LabelLine.charCodeAt(StartIdx) == 58)
+            return null;
+        for (var i = StartIdx; i < LabelLine.length; i++) {
+            if (Character.isWhitespace(LabelLine.charCodeAt(i)))
+                continue;
+            if (LabelLine.charCodeAt(i) == 38)
+                return null;
             if (Character.isDigit(LabelLine.charCodeAt(i))) {
                 StartIdx = i;
                 break;
@@ -827,15 +833,16 @@ var GSNNode = (function () {
             while (LabelMap.get("" + GoalCount) != null)
                 GoalCount++;
             CurrentNode.AssignedLabelNumber = "" + GoalCount;
+            GoalCount++;
             var BufferList = new Array();
             CurrentNode.ListSectionNode(BufferList);
             var SectionCount = 1;
             for (var i = 0; i < BufferList.size(); i++, SectionCount += 1) {
                 var SectionNode = BufferList.get(i);
-                var LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+                var LabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
                 if (LabelMap.get(LabelNumber) != null)
                     continue;
-                SectionNode.AssignedLabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+                SectionNode.AssignedLabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
             }
             BufferList.clear();
 

@@ -258,8 +258,11 @@ class WikiSyntax {
 	}
 
 	static ParseLabelNumber(LabelLine: string): string {
-		var StartIdx: number = -1;
-		for (var i: number = 0; i < LabelLine.length; i++) {
+		var StartIdx: number = WikiSyntax.GetLabelPos(LabelLine)+1;
+		if (StartIdx >= LabelLine.length || LabelLine.charCodeAt(StartIdx) == 58) return null;
+		for (var i: number = StartIdx; i < LabelLine.length; i++) {
+			if (Character.isWhitespace(LabelLine.charCodeAt(i))) continue;
+			if (LabelLine.charCodeAt(i) == 38) return null;
 			if (Character.isDigit(LabelLine.charCodeAt(i))) {
 				StartIdx = i;
 				break;
@@ -834,14 +837,15 @@ class GSNNode {
 		while ((CurrentNode = queue.poll()) != null) {
 			while(LabelMap.get("" + GoalCount) != null) GoalCount++;
 			CurrentNode.AssignedLabelNumber = "" + GoalCount;
+			GoalCount++;
 			var BufferList: Array<GSNNode> = new Array<GSNNode>();
 			CurrentNode.ListSectionNode(BufferList);
 			var SectionCount: number = 1;
 			for(var i: number = 0; i < BufferList.size(); i++, SectionCount += 1) {
 				var SectionNode: GSNNode = BufferList.get(i);
-				var LabelNumber: string = CurrentNode.LabelNumber + "." + SectionCount;
+				var LabelNumber: string = CurrentNode.GetLabelNumber() + "." + SectionCount;
 				if (LabelMap.get(LabelNumber) != null) continue;
-				SectionNode.AssignedLabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+				SectionNode.AssignedLabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
 			}
 			BufferList.clear();
 			
