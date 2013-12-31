@@ -461,7 +461,8 @@ class GSNNode {
 	/*field*/ArrayList<GSNNode> SubNodeList;
 	/*field*/GSNType NodeType;
 	/*field*/String  LabelName;   /* e.g, G:TopGoal */
-	/*field*/String  LabelNumber; /* e.g, G1 G1.1 */
+	/*field*/String  LabelNumber; /* e.g, G1 G1.1. Null-able */
+	/*field*/String  AssignedLabelNumber; /* This field is used only if LabelNumber is null */
 	/*field*/int     SectionCount;
 	
 	/*field*/GSNHistory Created;
@@ -480,6 +481,7 @@ class GSNNode {
 		this.NodeType    = NodeType;	
 		this.LabelName   = LabelName;      // G:TopGoal
 		this.LabelNumber = LabelNumber;    // G1.1
+		this.AssignedLabelNumber = "";
 		this.UID = UID;
 		this.SectionCount = 0;
 		this.SubNodeList = null;
@@ -558,7 +560,7 @@ class GSNNode {
 	}
 	
 	String GetLabel() {
-		return WikiSyntax.FormatNodeType(this.NodeType) + this.LabelNumber;
+		return WikiSyntax.FormatNodeType(this.NodeType) + this.GetLabelNumber();
 	}
 	
 	String GetHistoryTriple() {
@@ -574,6 +576,11 @@ class GSNNode {
 			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.ReplaceLabels(LabelMap);
 		}
+	}
+	
+	String GetLabelNumber() {
+		if (this.LabelNumber == null) return this.AssignedLabelNumber;
+		return this.LabelNumber;
 	}
 	
 	boolean IsModified() {
@@ -783,7 +790,7 @@ class GSNNode {
 		Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-		Writer.print(this.LabelNumber);
+		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		Writer.print(this.NodeDoc);
@@ -915,7 +922,7 @@ class GSNNode {
 		/*local*/GSNNode CurrentNode;
 		while ((CurrentNode = queue.poll()) != null) {
 			while(LabelMap.get("" + GoalCount) != null) GoalCount++;
-			CurrentNode.LabelNumber = "" + GoalCount;
+			CurrentNode.AssignedLabelNumber = "" + GoalCount;
 			/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
 			CurrentNode.ListSectionNode(BufferList);
 			/*local*/int SectionCount = 1;
@@ -923,7 +930,7 @@ class GSNNode {
 				/*local*/GSNNode SectionNode = BufferList.get(i);
 				/*local*/String LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
 				if (LabelMap.get(LabelNumber) != null) continue;
-				SectionNode.LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+				SectionNode.AssignedLabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
 			}
 			BufferList.clear();
 			

@@ -274,6 +274,17 @@ var WikiSyntax = (function () {
         return null;
     };
 
+    WikiSyntax.ParseUID = function (LabelLine) {
+        var StartIdx = LabelLine.indexOf(38) + 1;
+        if (StartIdx == 0)
+            return null;
+        var EndIdx = StartIdx;
+        while (EndIdx < LabelLine.length && LabelLine.charCodeAt(EndIdx) != 32)
+            EndIdx++;
+        var UID = LabelLine.substring(StartIdx, EndIdx);
+        return UID;
+    };
+
     WikiSyntax.ParseRevisionHistory = function (LabelLine) {
         var Loc = LabelLine.indexOf("#");
         if (Loc != -1) {
@@ -359,12 +370,14 @@ var TagUtils = (function () {
 })();
 
 var GSNNode = (function () {
-    function GSNNode(BaseDoc, ParentNode, NodeType, LabelName, LabelNumber, HistoryTriple) {
+    function GSNNode(BaseDoc, ParentNode, NodeType, LabelName, LabelNumber, UID, HistoryTriple) {
         this.BaseDoc = BaseDoc;
         this.ParentNode = ParentNode;
         this.NodeType = NodeType;
         this.LabelName = LabelName;
         this.LabelNumber = LabelNumber;
+        this.AssignedLabelNumber = "";
+        this.UID = UID;
         this.SectionCount = 0;
         this.SubNodeList = null;
         if (HistoryTriple != null) {
@@ -386,7 +399,7 @@ var GSNNode = (function () {
         }
     }
     GSNNode.prototype.DeepCopy = function (BaseDoc, ParentNode) {
-        var NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, null);
+        var NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, this.UID, null);
         NewNode.Created = this.Created;
         NewNode.LastModified = this.LastModified;
         NewNode.Digest = this.Digest;
@@ -440,7 +453,7 @@ var GSNNode = (function () {
     };
 
     GSNNode.prototype.GetLabel = function () {
-        return WikiSyntax.FormatNodeType(this.NodeType) + this.LabelNumber;
+        return WikiSyntax.FormatNodeType(this.NodeType) + this.GetLabelNumber();
     };
 
     GSNNode.prototype.GetHistoryTriple = function () {
@@ -456,6 +469,12 @@ var GSNNode = (function () {
             var Node = this.NonNullSubNodeList().get(i);
             Node.ReplaceLabels(LabelMap);
         }
+    };
+
+    GSNNode.prototype.GetLabelNumber = function () {
+        if (this.LabelNumber == null)
+            return this.AssignedLabelNumber;
+        return this.LabelNumber;
     };
 
     GSNNode.prototype.IsModified = function () {
@@ -624,7 +643,7 @@ var GSNNode = (function () {
             }
         }
         if (NodeType == GSNType.Strategy && Creation) {
-            return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, null);
+            return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, this.UID, null);
         }
         return null;
     };
@@ -668,7 +687,8 @@ var GSNNode = (function () {
         Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
         Writer.print(" ");
         Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-        Writer.print(this.LabelNumber);
+        if (this.LabelNumber != null)
+            Writer.print(this.LabelNumber);
 
         // Stream.append(" ");
         // MD5.FormatDigest(this.Digest, Stream);
@@ -802,7 +822,7 @@ var GSNNode = (function () {
         while ((CurrentNode = queue.poll()) != null) {
             while (LabelMap.get("" + GoalCount) != null)
                 GoalCount++;
-            CurrentNode.LabelNumber = "" + GoalCount;
+            CurrentNode.AssignedLabelNumber = "" + GoalCount;
             var BufferList = new Array();
             CurrentNode.ListSectionNode(BufferList);
             var SectionCount = 1;
@@ -811,7 +831,7 @@ var GSNNode = (function () {
                 var LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
                 if (LabelMap.get(LabelNumber) != null)
                     continue;
-                SectionNode.LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+                SectionNode.AssignedLabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
             }
             BufferList.clear();
 
@@ -1145,12 +1165,13 @@ var GSNRecord = (function () {
 
 var ParserContext = (function () {
     function ParserContext(NullableDoc) {
-        var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, null);
+        var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, -1, null);
         this.NullableDoc = NullableDoc;
         this.FirstNode = null;
         this.LastGoalNode = null;
         this.LastNonContextNode = null;
         this.GoalStack = new Array();
+        this.random = new Random(System.currentTimeMillis());
         this.SetLastNode(ParentNode);
     }
     ParserContext.prototype.SetLastNode = function (Node) {
@@ -1232,6 +1253,7 @@ var ParserContext = (function () {
         var NodeType = WikiSyntax.ParseNodeType(LabelLine);
         var LabelName = WikiSyntax.ParseLabelName(LabelLine);
         var LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
+        var UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.hexToDec(WikiSyntax.ParseUID(LabelLine));
         var RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
         var RefNode = null;
         var NewNode = null;
@@ -1250,7 +1272,7 @@ var ParserContext = (function () {
             //				Reader.LogError("mismatched level", Line);
             //			}
         }
-        NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, HistoryTriple);
+        NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, UID, HistoryTriple);
         if (this.FirstNode == null) {
             this.FirstNode = NewNode;
         }
@@ -1380,6 +1402,24 @@ var PdfConverter = (function () {
     PdfConverter.main = function (args) {
     };
     return PdfConverter;
+})();
+
+var Random = (function () {
+    function Random(seed) {
+    }
+    Random.prototype.nextInt = function () {
+        return Math.floor(Math.random() * 2147483647);
+    };
+    return Random;
+})();
+
+var System = (function () {
+    function System() {
+    }
+    System.currentTimeMillis = function () {
+        return new Date().getTime();
+    };
+    return System;
 })();
 
 var StringBuilder = (function () {
@@ -1549,6 +1589,10 @@ var Lib = (function () {
 
     Lib.parseInt = function (numText) {
         return Number(numText);
+    };
+
+    Lib.hexToDec = function (v) {
+        return parseInt(v, 16);
     };
     Lib.Input = [];
     Lib.EmptyNodeList = new Array();

@@ -275,6 +275,15 @@ class WikiSyntax {
 		}
 		return null;
 	}
+	
+	static ParseUID(LabelLine: string): string {
+		var StartIdx: number = LabelLine.indexOf(38) + 1; // eat 38
+		if (StartIdx == 0) return null;
+		var EndIdx: number = StartIdx;
+		while(EndIdx < LabelLine.length && LabelLine.charCodeAt(EndIdx) != 32) EndIdx++;
+		var UID: string = LabelLine.substring(StartIdx, EndIdx);
+		return UID;
+	}
 
 	public static ParseRevisionHistory(LabelLine: string): string {
 		var Loc: number = LabelLine.indexOf("#");
@@ -363,7 +372,8 @@ class GSNNode {
 	SubNodeList: Array<GSNNode>;
 	NodeType: GSNType;
 	LabelName: string;   /* e.g, G:TopGoal */
-	LabelNumber: string; /* e.g, G1 G1.1 */
+	LabelNumber: string; /* e.g, G1 G1.1. Null-able */
+	AssignedLabelNumber: string; /* This field is used only if LabelNumber is null */
 	SectionCount: number;
 	
 	Created: GSNHistory;
@@ -373,13 +383,17 @@ class GSNNode {
 	HasTag: boolean;
 	Digest: string;
 	TagMap: HashMap<string, string>;
+	
+	UID: number; /* Unique ID */
 
-	constructor(BaseDoc: GSNDoc, ParentNode: GSNNode, NodeType: GSNType,LabelName: string, LabelNumber: string, HistoryTriple: GSNHistory[]) {
+	constructor(BaseDoc: GSNDoc, ParentNode: GSNNode, NodeType: GSNType,LabelName: string, LabelNumber: string, UID: number, HistoryTriple: GSNHistory[]) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
 		this.NodeType    = NodeType;	
 		this.LabelName   = LabelName;      // G:TopGoal
 		this.LabelNumber = LabelNumber;    // G1.1
+		this.AssignedLabelNumber = "";
+		this.UID = UID;
 		this.SectionCount = 0;
 		this.SubNodeList = null;
 		if (HistoryTriple != null) {
@@ -403,7 +417,7 @@ class GSNNode {
 	}
 	
 	DeepCopy(BaseDoc: GSNDoc, ParentNode: GSNNode): GSNNode {
-		var NewNode: GSNNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, null);
+		var NewNode: GSNNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, this.UID, null);
 		NewNode.Created = this.Created;
 		NewNode.LastModified = this.LastModified;
 		NewNode.Digest = this.Digest;
@@ -457,7 +471,7 @@ class GSNNode {
 	}
 	
 	GetLabel(): string {
-		return WikiSyntax.FormatNodeType(this.NodeType) + this.LabelNumber;
+		return WikiSyntax.FormatNodeType(this.NodeType) + this.GetLabelNumber();
 	}
 	
 	GetHistoryTriple(): string {
@@ -473,6 +487,11 @@ class GSNNode {
 			var Node: GSNNode = this.NonNullSubNodeList().get(i);
 			Node.ReplaceLabels(LabelMap);
 		}
+	}
+	
+	GetLabelNumber(): string {
+		if (this.LabelNumber == null) return this.AssignedLabelNumber;
+		return this.LabelNumber;
 	}
 	
 	IsModified(): boolean {
@@ -639,7 +658,7 @@ class GSNNode {
 			}
 		}
 		if (NodeType == GSNType.Strategy && Creation) {
-			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, null);
+			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, this.UID, null);
 		}
 		return null;
 	}
@@ -681,7 +700,7 @@ class GSNNode {
 		Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
 		Writer.print(" ");
 		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-		Writer.print(this.LabelNumber);
+		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		Writer.print(this.NodeDoc);
@@ -810,7 +829,7 @@ class GSNNode {
 		var CurrentNode: GSNNode;
 		while ((CurrentNode = queue.poll()) != null) {
 			while(LabelMap.get("" + GoalCount) != null) GoalCount++;
-			CurrentNode.LabelNumber = "" + GoalCount;
+			CurrentNode.AssignedLabelNumber = "" + GoalCount;
 			var BufferList: Array<GSNNode> = new Array<GSNNode>();
 			CurrentNode.ListSectionNode(BufferList);
 			var SectionCount: number = 1;
@@ -818,7 +837,7 @@ class GSNNode {
 				var SectionNode: GSNNode = BufferList.get(i);
 				var LabelNumber: string = CurrentNode.LabelNumber + "." + SectionCount;
 				if (LabelMap.get(LabelNumber) != null) continue;
-				SectionNode.LabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
+				SectionNode.AssignedLabelNumber = CurrentNode.LabelNumber + "." + SectionCount;
 			}
 			BufferList.clear();
 			
@@ -1166,14 +1185,16 @@ class ParserContext {
 	FirstNode: GSNNode;
 	LastGoalNode: GSNNode;
 	LastNonContextNode: GSNNode;
+	random: Random;
 
 	constructor(NullableDoc: GSNDoc) {
-		var ParentNode: GSNNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, null);
+		var ParentNode: GSNNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, -1, null);
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;
 		this.LastNonContextNode = null;
 		this.GoalStack = new Array<GSNNode>();
+		this.random = new Random(System.currentTimeMillis());
 		this.SetLastNode(ParentNode);
 	}
 
@@ -1257,6 +1278,7 @@ class ParserContext {
 		var NodeType: GSNType = WikiSyntax.ParseNodeType(LabelLine);
 		var LabelName: string = WikiSyntax.ParseLabelName(LabelLine);
 		var LabelNumber: string = WikiSyntax.ParseLabelNumber(LabelLine);
+		var UID: number = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.hexToDec(WikiSyntax.ParseUID(LabelLine));
 		var RevisionHistory: string = WikiSyntax.ParseRevisionHistory(LabelLine);
 		var RefNode: GSNNode = null;
 		var NewNode: GSNNode = null;
@@ -1275,7 +1297,7 @@ class ParserContext {
 //				Reader.LogError("mismatched level", Line);
 //			}
 		}
-		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, HistoryTriple);
+		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, UID, HistoryTriple);
 		if(this.FirstNode == null) {
 			this.FirstNode = NewNode;
 		}
@@ -1401,6 +1423,20 @@ declare function unescape(str: string) : string;
 class PdfConverter {
 	constructor () {}
 	static main(args: string[]) {}
+}
+
+class Random {
+    constructor(seed: number) {}
+
+    nextInt() : number {
+        return Math.floor(Math.random() * 2147483647);
+    }
+}
+
+class System {
+    static currentTimeMillis() {
+        return new Date().getTime();
+    }
 }
 
 class StringBuilder {
@@ -1573,6 +1609,10 @@ class Lib {
 	static parseInt(numText: string) : number {
 		return Number(numText);
 	}
+
+    static hexToDec(v: string) {
+        return parseInt(v, 16);
+    }
 }
 
 class Iterator<T> {//FIX ME!!
