@@ -724,7 +724,7 @@ var GSNNode = (function () {
             }
         } else {
             (NewNode.IsGoal());
-            this.BaseDoc.TopGoal = NewNode;
+            this.BaseDoc.TopNode = NewNode;
         }
         return NewNode;
     };
@@ -880,7 +880,7 @@ var GSNNode = (function () {
 var GSNDoc = (function () {
     function GSNDoc(Record) {
         this.Record = Record;
-        this.TopGoal = null;
+        this.TopNode = null;
         this.NodeMap = new HashMap();
         this.DocTagMap = new HashMap();
         this.DocHistory = null;
@@ -891,8 +891,8 @@ var GSNDoc = (function () {
         NewDoc.GoalCount = this.GoalCount;
         NewDoc.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, NewDoc);
         NewDoc.DocTagMap = this.DuplicateTagMap(this.DocTagMap);
-        if (this.TopGoal != null) {
-            NewDoc.TopGoal = this.TopGoal.DeepCopy(NewDoc, null);
+        if (this.TopNode != null) {
+            NewDoc.TopNode = this.TopNode.DeepCopy(NewDoc, null);
         }
         return NewDoc;
     };
@@ -946,7 +946,7 @@ var GSNDoc = (function () {
         this.NodeMap.put(Key, Node);
         if (Node.NodeType == GSNType.Goal) {
             if (Node.GetGoalLevel() == 1) {
-                this.TopGoal = Node;
+                this.TopNode = Node;
             }
             var num = WikiSyntax.ParseInt(Node.LabelNumber, 0);
             if (num > this.GoalCount) {
@@ -957,8 +957,8 @@ var GSNDoc = (function () {
 
     GSNDoc.prototype.RemapNodeMap = function () {
         var NodeMap = new HashMap();
-        if (this.TopGoal != null) {
-            this.TopGoal.Remap(NodeMap);
+        if (this.TopNode != null) {
+            this.TopNode.Remap(NodeMap);
         }
         this.NodeMap = NodeMap;
     };
@@ -972,9 +972,9 @@ var GSNDoc = (function () {
     };
 
     GSNDoc.prototype.FormatDoc = function (NodeRef, Stream) {
-        if (this.TopGoal != null) {
+        if (this.TopNode != null) {
             Stream.println("Revision:: " + this.DocHistory.Rev);
-            this.TopGoal.FormatNode(NodeRef, Stream);
+            this.TopNode.FormatNode(NodeRef, Stream);
         }
     };
     return GSNDoc;
@@ -1046,14 +1046,14 @@ var GSNRecord = (function () {
         while (Reader.HasNext()) {
             var Doc = new GSNDoc(this);
             var Parser = new ParserContext(Doc);
-            Doc.TopGoal = Parser.ParseNode(Reader, RefMap);
+            Doc.TopNode = Parser.ParseNode(Reader, RefMap);
         }
     };
 
     GSNRecord.prototype.RenumberAll = function () {
         var LatestDoc = this.GetLatestDoc();
-        if (LatestDoc != null && LatestDoc.TopGoal != null) {
-            LatestDoc.TopGoal.RenumberGoal(1, 2);
+        if (LatestDoc != null && LatestDoc.TopNode != null) {
+            LatestDoc.TopNode.RenumberGoal(1, 2);
         }
     };
 
@@ -1110,7 +1110,7 @@ var GSNRecord = (function () {
             var Doc = NewHistory != null ? NewHistory.Doc : null;
             if (Doc != null) {
                 this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
-                this.EditingDoc.TopGoal.ReplaceSubNode(Doc.TopGoal);
+                this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode);
                 this.CloseEditor();
             }
         }
@@ -1135,12 +1135,12 @@ var GSNRecord = (function () {
             if (History1.CompareDate(History2) < 0) {
                 this.OpenEditor(History1.Author, History1.Role, History1.Date, History1.Process);
                 Rev1++;
-                this.EditingDoc.TopGoal.ReplaceSubNode(History1.Doc.TopGoal);
+                this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode);
                 this.CloseEditor();
             } else {
                 this.OpenEditor(History2.Author, History2.Role, History2.Date, History2.Process);
                 Rev2++;
-                this.EditingDoc.TopGoal.ReplaceSubNode(History2.Doc.TopGoal);
+                this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode);
                 this.CloseEditor();
             }
         }
@@ -1387,7 +1387,7 @@ var AssureNoteParser = (function () {
             //AssureNoteParser.merge(argv[0], argv[1]);
             var MasterRecord = new GSNRecord();
             MasterRecord.Parse(Lib.ReadFile(argv[0]));
-            var NewNode = MasterRecord.GetLatestDoc().TopGoal.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+            var NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
             var Writer = new StringWriter();
             NewNode.FormatNode(new HashMap(), Writer);
 

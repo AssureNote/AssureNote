@@ -48,7 +48,7 @@ module AssureNote {
             console.log(NewNode);
 
             if (NewNode) {
-                var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
+                var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
                 TopGoal.RenumberGoal(1, 2);
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);

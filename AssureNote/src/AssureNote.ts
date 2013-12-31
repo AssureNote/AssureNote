@@ -108,7 +108,7 @@ module AssureNote {
 			this.MasterRecord.Parse(WGSN);
 
 			var LatestDoc = this.MasterRecord.GetLatestDoc();
-			var TopGoalNode = LatestDoc.TopGoal;
+			var TopGoalNode = LatestDoc.TopNode;
 
 			this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
 			this.PictgramPanel.SetFoldedAllGoalNode(this.PictgramPanel.MasterView);

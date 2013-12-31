@@ -33,7 +33,7 @@ var AssureNote;
         FullScreenEditorPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
             var Label;
             if (Args.length < 1) {
-                Label = AssureNoteApp.MasterRecord.GetLatestDoc().TopGoal.GetLabel();
+                Label = AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel();
             } else {
                 Label = Args[0].toUpperCase();
             }

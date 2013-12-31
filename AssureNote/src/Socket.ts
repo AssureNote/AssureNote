@@ -98,7 +98,7 @@ module AssureNote {
         }
 
         UpdateWGSN() {
-            var TopGoal: GSNNode = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopGoal;
+            var TopGoal: GSNNode = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode;
             var Writer = new StringWriter();
             TopGoal.FormatSubNode(1, Writer);
             var WGSN: string = Writer.toString();

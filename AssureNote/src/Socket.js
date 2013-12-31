@@ -96,7 +96,7 @@ var AssureNote;
         };
 
         SocketManager.prototype.UpdateWGSN = function () {
-            var TopGoal = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopGoal;
+            var TopGoal = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode;
             var Writer = new StringWriter();
             TopGoal.FormatSubNode(1, Writer);
             var WGSN = Writer.toString();
