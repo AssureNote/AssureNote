@@ -7,6 +7,20 @@ class PdfConverter {
 	static main(args: string[]) {}
 }
 
+class Random {
+    constructor(seed: number) {}
+
+    nextInt() : number {
+        return Math.floor(Math.random() * 2147483647);
+    }
+}
+
+class System {
+    static currentTimeMillis() {
+        return new Date().getTime();
+    }
+}
+
 class StringBuilder {
 	str : string;
 	constructor() {
@@ -79,18 +93,40 @@ class SimpleDateFormat {
 	}
 }
 
-class HashMap <string, V>{
+class Queue <E> {
+    list: E[];
+
+    constructor() {
+        this.list = [];
+    }
+
+    add(elem: E) : void {
+        this.list.push(elem);
+    }
+
+    poll() : E {
+        if (this.list.length == 0) return null;
+        var res: E = this.list[0];
+        this.list = this.list.slice(1);
+        return res;
+    }
+}
+
+class LinkedList <E> extends Queue <E> {
+}
+
+class HashMap <K, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
 	constructor() {
 		this.hash = {};
 	}
-	put(key: string, value: V) : void {
-		this.hash[key] = value;
+	put(key: K, value: V) : void {
+		this.hash[String(key)] = value;
 	}
 
-	get(key: string) : V {
-		return this.hash[key];
+	get(key: K) : V {
+		return this.hash[String(key)];
 	}
 
 	size() : number {
@@ -155,6 +191,14 @@ class Lib {
 	static parseInt(numText: string) : number {
 		return Number(numText);
 	}
+
+    static HexToDec(v: string) : number {
+        return parseInt(v, 16);
+    }
+
+    static DecToHex(n: number) : string {
+        return n.toString(16);
+    }
 }
 
 class Iterator<T> {//FIX ME!!

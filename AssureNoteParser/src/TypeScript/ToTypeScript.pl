@@ -116,7 +116,8 @@ $src =~ s/(?:$Attr*) ($Type)\s+($Sym)((?:\[\s*\d*\s*\])?)/$2: $1$3/g;
 $src =~ s/=\s*{(.*?)}/= \[$1\]/g;
 
 # Types
-$src =~ s/(?!")\b(?:char|int|long|float|double|Charactor|Integer|Long|Float|Double)\b(?!")/number/g;
+$src =~ s/(?!")\b(?:char|int|long|float|double|Charactor)\b(?!")/number/g;
+$src =~ s/(?!")\b(?:Charactor|Integer|Long|Float|Double)\b(?!")/Number/g;
 $src =~ s/\.(?:int|long|float|double|)Value\(\)//g;
 $src =~ s/(?!")\bString\b/string/g;
 $src =~ s/\bArrayList<\?>/any/g;

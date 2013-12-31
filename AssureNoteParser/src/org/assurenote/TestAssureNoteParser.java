@@ -1,8 +1,9 @@
 package org.assurenote;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -31,33 +32,52 @@ public class TestAssureNoteParser {
 		MasterRecord.Parse(input);
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
-		GSNNode TopGoal = LatestDoc.TopGoal;
+		GSNNode TopNode = LatestDoc.TopNode;
 		assertNotNull(LatestDoc);
 		
-		assertNotNull(TopGoal);
-		assertEquals(TopGoal.NodeType, GSNType.Goal);
-		assertNull(TopGoal.SubNodeList);
+		assertNotNull(TopNode);
+		assertEquals(TopNode.NodeType, GSNType.Goal);
+		assertNull(TopNode.SubNodeList);
 	}
 	
 	@Test
-	public void ParseGoalWithContext() {
-		String input = "*G\n*C";
+	public void ParseContext() {
+		String input = "*C";
 		
 		GSNRecord MasterRecord = new GSNRecord();
 		MasterRecord.Parse(input);
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
-		GSNNode TopGoal = LatestDoc.TopGoal;
+		GSNNode TopNode = LatestDoc.TopNode;
 		assertNotNull(LatestDoc);
 		
-		assertNotNull(TopGoal);
-		assertEquals(TopGoal.NodeType, GSNType.Goal);
-		assertNotNull(TopGoal.SubNodeList);
-		assertEquals(TopGoal.SubNodeList.size(), 1);
+		//assertNotNull(TopNode);
+		assertEquals(TopNode.NodeType, GSNType.Context);
+		assertNull(TopNode.SubNodeList);
+	}
+	
+	public void _ParseGoalWithContext(String input) {
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
 		
-		GSNNode SubNode = TopGoal.SubNodeList.get(0);
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		assertNotNull(LatestDoc);
+		
+		assertNotNull(TopNode);
+		assertEquals(TopNode.NodeType, GSNType.Goal);
+		assertNotNull(TopNode.SubNodeList);
+		assertEquals(TopNode.SubNodeList.size(), 1);
+		
+		GSNNode SubNode = TopNode.SubNodeList.get(0);
 		assertEquals(SubNode.NodeType, GSNType.Context);
 		assertNull(SubNode.SubNodeList);
+	}
+	@Test
+	public void ParseGoalWithContext() {
+		_ParseGoalWithContext("*G\n*C");
+		_ParseGoalWithContext("*G\n*J");
+		_ParseGoalWithContext("*G\n*R");
 	}
 	
 	@Test
@@ -68,15 +88,15 @@ public class TestAssureNoteParser {
 		MasterRecord.Parse(input);
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
-		GSNNode TopGoal = LatestDoc.TopGoal;
+		GSNNode TopNode = LatestDoc.TopNode;
 		assertNotNull(LatestDoc);
 		
-		assertNotNull(TopGoal);
-		assertEquals(TopGoal.NodeType, GSNType.Goal);
-		assertNotNull(TopGoal.SubNodeList);
-		assertEquals(TopGoal.SubNodeList.size(), 1);
+		assertNotNull(TopNode);
+		assertEquals(TopNode.NodeType, GSNType.Goal);
+		assertNotNull(TopNode.SubNodeList);
+		assertEquals(TopNode.SubNodeList.size(), 1);
 		
-		GSNNode SubNode = TopGoal.SubNodeList.get(0);
+		GSNNode SubNode = TopNode.SubNodeList.get(0);
 		assertEquals(SubNode.NodeType, GSNType.Strategy);
 		assertNotNull(SubNode.SubNodeList);
 		assertEquals(SubNode.SubNodeList.size(), 1);
@@ -94,10 +114,10 @@ public class TestAssureNoteParser {
 		MasterRecord.Parse(input);
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
-		GSNNode TopGoal = LatestDoc.TopGoal;
+		GSNNode TopNode = LatestDoc.TopNode;
 		GSNHistory History = LatestDoc.DocHistory;
 		
-		assertNotNull(TopGoal);
+		assertNotNull(TopNode);
 		
 		assertNotNull(History);
 		assertEquals(History.Author, "test");
@@ -121,9 +141,9 @@ public class TestAssureNoteParser {
 			
 			GSNRecord MasterRecord = new GSNRecord();
 			MasterRecord.Parse(Lib.ReadFile(path + file.getName()));
-			GSNNode TopGoal = MasterRecord.GetLatestDoc().TopGoal;
+			GSNNode TopNode = MasterRecord.GetLatestDoc().TopNode;
 			
-			assertNotNull(TopGoal);
+			assertNotNull(TopNode);
 		}
 	}
 	
@@ -151,20 +171,20 @@ public class TestAssureNoteParser {
 		MasterRecord.Parse(input); 
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
-		GSNNode TopGoal = LatestDoc.TopGoal;
+		GSNNode TopNode = LatestDoc.TopNode;
 		
-		assertNotNull(TopGoal);
-		assertNotNull(TopGoal.SubNodeList);
+		assertNotNull(TopNode);
+		assertNotNull(TopNode.SubNodeList);
 		
-		System.out.println(TopGoal.SubNodeList.size());
-		assertEquals(TopGoal.SubNodeList.size(), 2);
+		System.out.println(TopNode.SubNodeList.size());
+		assertEquals(TopNode.SubNodeList.size(), 2);
 		
-		assertEquals(TopGoal.SubNodeList.get(0).NodeType, GSNType.Strategy);
-		assertEquals(TopGoal.SubNodeList.get(1).NodeType, GSNType.Strategy);
-		assertEquals(TopGoal.SubNodeList.get(0).SubNodeList.size(), 1);
-		assertEquals(TopGoal.SubNodeList.get(1).SubNodeList.size(), 1);
-		assertEquals(TopGoal.SubNodeList.get(0).SubNodeList.get(0).NodeType, GSNType.Goal);
-		assertEquals(TopGoal.SubNodeList.get(1).SubNodeList.get(0).NodeType, GSNType.Goal);
+		assertEquals(TopNode.SubNodeList.get(0).NodeType, GSNType.Strategy);
+		assertEquals(TopNode.SubNodeList.get(1).NodeType, GSNType.Strategy);
+		assertEquals(TopNode.SubNodeList.get(0).SubNodeList.size(), 1);
+		assertEquals(TopNode.SubNodeList.get(1).SubNodeList.size(), 1);
+		assertEquals(TopNode.SubNodeList.get(0).SubNodeList.get(0).NodeType, GSNType.Goal);
+		assertEquals(TopNode.SubNodeList.get(1).SubNodeList.get(0).NodeType, GSNType.Goal);
 	}
 	
 	@Test
@@ -175,14 +195,14 @@ public class TestAssureNoteParser {
 		MasterRecord.Parse(input);
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
-		GSNNode TopGoal = LatestDoc.TopGoal;
+		GSNNode TopNode = LatestDoc.TopNode;
 		assertNotNull(LatestDoc);
 		
-		assertNotNull(TopGoal);
-		assertEquals(TopGoal.NodeType, GSNType.Goal);
-		assertNull(TopGoal.SubNodeList);
-		System.out.println(TopGoal.NodeDoc);
-		assertEquals(TopGoal.NodeDoc, "\nhi, all");
+		assertNotNull(TopNode);
+		assertEquals(TopNode.NodeType, GSNType.Goal);
+		assertNull(TopNode.SubNodeList);
+		System.out.println(TopNode.NodeDoc);
+		assertEquals(TopNode.NodeDoc, "\nhi, all");
 	}
 	
 	@Test
@@ -193,15 +213,82 @@ public class TestAssureNoteParser {
 		MasterRecord.Parse(input);
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
-		GSNNode TopGoal = LatestDoc.TopGoal;
+		GSNNode TopNode = LatestDoc.TopNode;
 		assertNotNull(LatestDoc);
 		
-		assertNotNull(TopGoal);
-		assertNotNull(TopGoal.SubNodeList);
-		assertEquals(TopGoal.NodeDoc, "\n**S");
-		assertEquals(TopGoal.SubNodeList.size(), 1);
+		assertNotNull(TopNode);
+		assertNotNull(TopNode.SubNodeList);
+		assertEquals(TopNode.NodeDoc, "\n**S");
+		assertEquals(TopNode.SubNodeList.size(), 1);
 		
-		GSNNode SubNode = TopGoal.SubNodeList.get(0);
+		GSNNode SubNode = TopNode.SubNodeList.get(0);
 		assertEquals(SubNode.NodeType, GSNType.Context);
+	}
+	
+	public void _ParseNodeName(String input) {
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertEquals(TopNode.LabelName, "G:TopNode");
+	}
+	
+	@Test
+	public void ParseNodeName() {
+		_ParseNodeName("*G:TopNode");
+		_ParseNodeName("*  G:TopNode");
+	}
+	
+	@Test
+	public void Renumber() {
+		String input = "*G\n*C";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNull(TopNode.LabelNumber);
+		assertNull(TopNode.SubNodeList.get(0).LabelNumber);
+		
+		TopNode.RenumberGoal(1, 2);
+
+		assertEquals(TopNode.AssignedLabelNumber, "1");
+		assertEquals(TopNode.SubNodeList.get(0).AssignedLabelNumber, "1.1");
+		System.out.println(Integer.MAX_VALUE);
+		System.out.println(Integer.toHexString(Integer.MAX_VALUE));
+	}
+	
+	@Test
+	public void Renumber2() {
+		String input = "*G\n*S\n**G\n**G";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNull(TopNode.LabelNumber);
+		assertNull(TopNode.SubNodeList.get(0).LabelNumber);
+		
+		TopNode.RenumberGoal(1, 2);
+		GSNNode Strategy = TopNode.SubNodeList.get(0);
+		assertNotEquals(Strategy.SubNodeList.get(0).AssignedLabelNumber, Strategy.SubNodeList.get(1).AssignedLabelNumber);
+	}
+	
+	@Test
+	public void UID() {
+		String input = "*G &0\n*C:Context &ff";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertEquals(TopNode.UID, 0);
+		assertEquals(TopNode.SubNodeList.get(0).LabelName, "C:Context");
+		assertEquals(TopNode.SubNodeList.get(0).UID, 255);
 	}
 }

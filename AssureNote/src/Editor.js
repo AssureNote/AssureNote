@@ -46,12 +46,13 @@ var AssureNote;
             //Create a new GSNDoc
             //TODO input user name
             this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
-            var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.GetLabel());
+            var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode = Node.ReplaceSubNodeAsText(WGSN);
             console.log(NewNode);
 
             if (NewNode) {
-                var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopGoal;
+                var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
+                TopGoal.RenumberGoal(1, 2);
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
