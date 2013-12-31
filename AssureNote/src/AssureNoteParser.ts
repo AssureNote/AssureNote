@@ -669,7 +669,11 @@ class GSNNode {
 	FormatNode(RefMap: HashMap<string, GSNNode>, Writer: StringWriter): void {
 		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
 		Writer.print(" ");
-		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+		if (this.LabelName != null) {
+			Writer.print(this.LabelName);
+		} else {
+			Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+		}
 		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
 		Writer.print(" &");
 		Writer.print(Lib.DecToHex(this.UID));
@@ -704,7 +708,11 @@ class GSNNode {
 	FormatSubNode(GoalLevel: number, Writer: StringWriter): void {
 		Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
 		Writer.print(" ");
-		Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+		if (this.LabelName != null) {
+			Writer.print(this.LabelName);
+		} else {
+			Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+		}
 		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
 		Writer.print(" &");
 		Writer.print(Lib.DecToHex(this.UID));

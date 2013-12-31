@@ -657,7 +657,11 @@ var GSNNode = (function () {
     GSNNode.prototype.FormatNode = function (RefMap, Writer) {
         Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
         Writer.print(" ");
-        Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+        if (this.LabelName != null) {
+            Writer.print(this.LabelName);
+        } else {
+            Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+        }
         if (this.LabelNumber != null)
             Writer.print(this.LabelNumber);
         Writer.print(" &");
@@ -694,7 +698,11 @@ var GSNNode = (function () {
     GSNNode.prototype.FormatSubNode = function (GoalLevel, Writer) {
         Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
         Writer.print(" ");
-        Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+        if (this.LabelName != null) {
+            Writer.print(this.LabelName);
+        } else {
+            Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+        }
         if (this.LabelNumber != null)
             Writer.print(this.LabelNumber);
         Writer.print(" &");
