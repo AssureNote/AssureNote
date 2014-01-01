@@ -17,22 +17,26 @@ module AssureNote {
             return div.outerHTML;
         }
 
-        Supplant(str: string, map: any) {
+        Supplant(str: string, LabelMap: any, TagMap: any) {
             return str.replace(/\[([^\[\]]*)\]/g,
                 (v: string, b: string) => {
-                    var value = map[b];
+                    var value = TagMap[b];
                     if ((typeof value === 'string' && value != '') || typeof value === 'number') {
                         return this.Style(value, 'node-variable');
-                    } else {
-                        return this.Style(v, 'node-variable-undefined');
                     }
+                    value = LabelMap[b];
+                    if (typeof value === 'string' && value != '') {
+                        return this.Style(value, 'node-variable');
+                    }
+                    return this.Style(v, 'node-variable-undefined');
                 }
             );
         }
 
         RenderHTML(NodeDoc: string, Model: GSNNode): string {
             var Map: HashMap<String, String> = Model.GetTagMapWithLexicalScope();
-            return this.Supplant(NodeDoc, Map ? Map.hash : {});
+            var LabelMap: HashMap<String, String> = Model.BaseDoc.GetLabelMap();
+            return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
         }
 	}
 }

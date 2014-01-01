@@ -985,6 +985,22 @@ var GSNDoc = (function () {
             this.TopNode.FormatNode(NodeRef, Stream);
         }
     };
+
+    GSNDoc.prototype.GetLabelMap = function () {
+        var LabelMap = new HashMap();
+        var CurrentNode;
+        var queue = new LinkedList();
+        queue.add(this.TopNode);
+        while ((CurrentNode = queue.poll()) != null) {
+            if (CurrentNode.LabelName != null) {
+                LabelMap.put(CurrentNode.LabelName, CurrentNode.GetLabel());
+            }
+            for (var i = 0; CurrentNode.SubNodeList != null && i < CurrentNode.SubNodeList.size(); i++) {
+                queue.add(CurrentNode.SubNodeList.get(i));
+            }
+        }
+        return LabelMap;
+    };
     return GSNDoc;
 })();
 

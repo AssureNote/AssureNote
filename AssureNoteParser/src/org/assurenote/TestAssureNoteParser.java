@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.HashMap;
 
 import org.junit.Test;
 import org.junit.Ignore;
@@ -290,5 +291,21 @@ public class TestAssureNoteParser {
 		assertEquals(TopNode.UID, 0);
 		assertEquals(TopNode.SubNodeList.get(0).LabelName, "C:Context");
 		assertEquals(TopNode.SubNodeList.get(0).UID, 255);
+	}
+	
+	@Test
+	public void GetLabelMap() {
+		String input = "*G:TopGoal\n*C:SubNode";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		TopNode.RenumberGoal(1, 2);
+		HashMap<String, String> LabelMap = LatestDoc.GetLabelMap();
+		
+		assertEquals(LabelMap.size(), 2);
+		assertEquals(LabelMap.get("G:TopGoal"), "G1");
+		assertEquals(LabelMap.get("C:SubNode"), "C1.1");
 	}
 }

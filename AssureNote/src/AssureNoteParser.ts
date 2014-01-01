@@ -995,6 +995,22 @@ class GSNDoc {
 		}
 	}
 	
+	GetLabelMap(): HashMap<string, string> {
+		var LabelMap: HashMap<string, string> = new HashMap<string, string>();
+		var CurrentNode: GSNNode;
+		var queue: Queue<GSNNode> = new LinkedList<GSNNode>();
+		queue.add(this.TopNode);
+		while ((CurrentNode = queue.poll()) != null) {
+			if (CurrentNode.LabelName != null) {
+				LabelMap.put(CurrentNode.LabelName, CurrentNode.GetLabel());
+			}
+			for (var i: number = 0; CurrentNode.SubNodeList != null && i < CurrentNode.SubNodeList.size(); i++) {
+				queue.add(CurrentNode.SubNodeList.get(i));
+			}
+		}
+		return LabelMap;
+	}
+	
 }
 
 

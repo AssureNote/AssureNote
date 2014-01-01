@@ -121,11 +121,7 @@ var AssureNote;
                 div.id = this.NodeView.Label;
 
                 var h4 = document.createElement("h4");
-                if (this.NodeView.Model.LabelName) {
-                    h4.textContent = this.NodeView.Model.LabelName;
-                } else {
-                    h4.textContent = this.NodeView.Label;
-                }
+                h4.textContent = this.NodeView.Label;
 
                 var p = document.createElement("p");
                 p.innerHTML = manager.InvokeHTMLRenderPlugin(this.NodeView.NodeDoc.trim(), this.NodeView.Model);

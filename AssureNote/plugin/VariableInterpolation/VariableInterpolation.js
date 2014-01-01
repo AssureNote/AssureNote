@@ -23,21 +23,25 @@ var AssureNote;
             return div.outerHTML;
         };
 
-        VariableInterpolationPlugin.prototype.Supplant = function (str, map) {
+        VariableInterpolationPlugin.prototype.Supplant = function (str, LabelMap, TagMap) {
             var _this = this;
             return str.replace(/\[([^\[\]]*)\]/g, function (v, b) {
-                var value = map[b];
+                var value = TagMap[b];
                 if ((typeof value === 'string' && value != '') || typeof value === 'number') {
                     return _this.Style(value, 'node-variable');
-                } else {
-                    return _this.Style(v, 'node-variable-undefined');
                 }
+                value = LabelMap[b];
+                if (typeof value === 'string' && value != '') {
+                    return _this.Style(value, 'node-variable');
+                }
+                return _this.Style(v, 'node-variable-undefined');
             });
         };
 
         VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc, Model) {
             var Map = Model.GetTagMapWithLexicalScope();
-            return this.Supplant(NodeDoc, Map ? Map.hash : {});
+            var LabelMap = Model.BaseDoc.GetLabelMap();
+            return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
         };
         return VariableInterpolationPlugin;
     })(AssureNote.Plugin);

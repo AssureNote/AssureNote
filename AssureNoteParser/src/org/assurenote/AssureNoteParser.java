@@ -1093,6 +1093,22 @@ class GSNDoc {
 		}
 	}
 	
+	HashMap<String, String> GetLabelMap() {
+		/*local*/HashMap<String, String> LabelMap = new HashMap<String, String>();
+		/*local*/GSNNode CurrentNode;
+		/*local*/Queue<GSNNode> queue = new LinkedList<GSNNode>();
+		queue.add(this.TopNode);
+		while ((CurrentNode = queue.poll()) != null) {
+			if (CurrentNode.LabelName != null) {
+				LabelMap.put(CurrentNode.LabelName, CurrentNode.GetLabel());
+			}
+			for (/*local*/int i = 0; CurrentNode.SubNodeList != null && i < CurrentNode.SubNodeList.size(); i++) {
+				queue.add(CurrentNode.SubNodeList.get(i));
+			}
+		}
+		return LabelMap;
+	}
+	
 }
 
 
