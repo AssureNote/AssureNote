@@ -44,12 +44,19 @@ module AssureNote {
             var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName
             var Extention = Filename.split(".").pop();
             var StringToWrite: string = "";
-            if (Extention == "wgsn") {
-                var Writer = new StringWriter();
-                this.App.MasterRecord.FormatRecord(Writer);
-                StringToWrite = Writer.toString()
-            } else if (Extention == "dcase_model") {
-                StringToWrite = this.ConvertToDCaseXML(this.App.MasterRecord.GetLatestDoc().TopNode);
+            switch (Extention) {
+                case "dcase_model":
+                    StringToWrite = this.ConvertToDCaseXML(this.App.MasterRecord.GetLatestDoc().TopNode);
+                    break;
+                default:
+                    if (Extention != "wgsn") {
+                        Extention = "wgsn";
+                        Filename += ".wgsn";
+                    }
+                    var Writer = new StringWriter();
+                    this.App.MasterRecord.FormatRecord(Writer);
+                    StringToWrite = Writer.toString()
+                    break;
             }
             AssureNote.AssureNoteUtils.SaveAs(StringToWrite, Filename);
         }
