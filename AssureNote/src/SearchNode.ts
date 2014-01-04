@@ -25,7 +25,6 @@ module AssureNote {
 		Search(TargetView: NodeView, IsTurn: boolean, SearchWord?: string): void {
 			var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
 			var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-			this.AssureNoteApp.DebugP("Keyword is "+ SearchWord);
 			if (SearchWord != null) {
 				this.SearchWord = SearchWord;
 
@@ -42,7 +41,10 @@ module AssureNote {
 
                 this.IsMoving = true;
                 this.Searching = true;
-				this.SetAllNodesColor(ViewMap, ColorStyle.Searched);
+                this.CreateHitNodeView(ViewMap);
+                ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
+
+                this.SetAllNodesColor(ViewMap, ColorStyle.Searched);
 				this.SetDestination(this.HitNodes[0], ViewMap);
                 ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
 				this.MoveToNext(ViewPort, () => {
@@ -81,6 +83,22 @@ module AssureNote {
 			}
 		}
 
+        private CreateHitNodeView(ViewMap: { [index: string]: NodeView }): void {
+            for (var i = 0; i < this.HitNodes.length; i++) {
+                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+                while (Node != null) {
+                    Node.IsFolded = false;
+                    Node = Node.Parent;
+                }
+            }
+
+            var TopGoal = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode;
+            var NewNodeView: NodeView = new NodeView(TopGoal, true);
+            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
+            this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
+            this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+        }
+
         IsSearching(): boolean {
             return this.Searching;
         }
@@ -93,20 +111,13 @@ module AssureNote {
             this.Searching = false;
 		}
 
-		CheckInput(ViewMap: { [index: string]: NodeView }, SearchWord: string): boolean {
-			if (SearchWord == this.SearchWord && this.HitNodes.length > 1) {
-				return false;
-			} else {
-				this.SetAllNodesColor(ViewMap, ColorStyle.Default);
-				this.HitNodes = [];
-				return true;
-			}
-		}
-
         private SetAllNodesColor(ViewMap: { [index: string]: NodeView }, ColorCode: string): void {
             for (var i = 0; i < this.HitNodes.length; i++) {
                 var Label: string = this.HitNodes[i].GetLabel();
-                ViewMap[Label].GetShape().ChangeColorStyle(ColorCode);
+                var Node = ViewMap[Label];
+                if (Node != null) {
+                    Node.GetShape().ChangeColorStyle(ColorCode);
+                }
             }
         }
 

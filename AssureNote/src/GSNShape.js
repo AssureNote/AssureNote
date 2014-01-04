@@ -350,7 +350,9 @@ var AssureNote;
 
         GSNGoalShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
             _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyRect != null) {
+                this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            }
         };
         return GSNGoalShape;
     })(GSNShape);
@@ -382,7 +384,9 @@ var AssureNote;
 
         GSNContextShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
             _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyRect != null) {
+                this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            }
         };
         return GSNContextShape;
     })(GSNShape);
@@ -426,7 +430,9 @@ var AssureNote;
 
         GSNStrategyShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
             _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            this.BodyPolygon.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyPolygon != null) {
+                this.BodyPolygon.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            }
         };
         return GSNStrategyShape;
     })(GSNShape);
@@ -464,7 +470,9 @@ var AssureNote;
 
         GSNEvidenceShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
             _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            this.BodyEllipse.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyEllipse != null) {
+                this.BodyEllipse.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            }
         };
         return GSNEvidenceShape;
     })(GSNShape);

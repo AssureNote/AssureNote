@@ -356,7 +356,9 @@ module AssureNote {
 
         ChangeColorStyle(ColorStyleCode: string): void {
             super.ChangeColorStyle(ColorStyleCode);
-            this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyRect != null) {
+                this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            }
         }
     }
 
@@ -384,7 +386,9 @@ module AssureNote {
 
         ChangeColorStyle(ColorStyleCode: string): void {
             super.ChangeColorStyle(ColorStyleCode);
-            this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyRect != null) {
+                this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            }
         }
 
     }
@@ -425,7 +429,9 @@ module AssureNote {
 
         ChangeColorStyle(ColorStyleCode: string): void {
             super.ChangeColorStyle(ColorStyleCode);
-            this.BodyPolygon.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyPolygon != null) {
+                this.BodyPolygon.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            }
         }
 
     }
@@ -460,7 +466,9 @@ module AssureNote {
 
         ChangeColorStyle(ColorStyleCode: string): void {
             super.ChangeColorStyle(ColorStyleCode);
-            this.BodyEllipse.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            if (this.BodyEllipse != null) {
+                this.BodyEllipse.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            }
         }
     }
 }
