@@ -50,9 +50,102 @@ var AssureNote;
         };
 
         SaveCommand.prototype.Invoke = function (Target, Params) {
-            var Writer = new StringWriter();
-            this.App.MasterRecord.FormatRecord(Writer);
-            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Params.length > 0 ? Params[0] : this.App.WGSNName);
+            var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName;
+            var Extention = Filename.split(".").pop();
+            var StringToWrite = "";
+            switch (Extention) {
+                case "dcase_model":
+                    StringToWrite = this.ConvertToDCaseXML(this.App.MasterRecord.GetLatestDoc().TopNode);
+                    break;
+                default:
+                    if (Extention != "wgsn") {
+                        Extention = "wgsn";
+                        Filename += ".wgsn";
+                    }
+                    var Writer = new StringWriter();
+                    this.App.MasterRecord.FormatRecord(Writer);
+                    StringToWrite = Writer.toString();
+                    break;
+            }
+            AssureNote.AssureNoteUtils.SaveAs(StringToWrite, Filename);
+        };
+
+        SaveCommand.prototype.ConvertToDCaseXML = function (root) {
+            var dcaseNS = "http://www.dependable-os.net/2013/11/dcase_model/";
+            var xsiNS = "http://www.w3.org/2001/XMLSchema-instance";
+
+            var DCaseArgumentXML = document.createElementNS(dcaseNS, "dcase:Argument");
+            DCaseArgumentXML.setAttribute("xmlns:dcase", dcaseNS);
+            DCaseArgumentXML.setAttribute("xmlns:xsi", xsiNS);
+            DCaseArgumentXML.setAttribute("id", "_6A0EENScEeKCdP-goLYu9g");
+
+            var NodeFragment = document.createDocumentFragment();
+            var LinkFragment = document.createDocumentFragment();
+
+            function NodeTypeToString(type) {
+                switch (type) {
+                    case GSNType.Goal:
+                        return "Goal";
+                    case GSNType.Strategy:
+                        return "Strategy";
+                    case GSNType.Evidence:
+                        return "Evidence";
+                    case GSNType.Context:
+                        return "Context";
+                    default:
+                        return "";
+                }
+            }
+
+            var linkIdCounter = 0;
+
+            function CreateNewLinkId() {
+                linkIdCounter++;
+                return "LINK_" + linkIdCounter;
+            }
+
+            function convert(node) {
+                var Label = node.GetLabel();
+
+                var NodeXML = document.createElementNS(dcaseNS, "rootBasicNode");
+                NodeXML.setAttribute("xsi:type", "dcase:" + NodeTypeToString(node.NodeType));
+                NodeXML.setAttribute("id", Label);
+                NodeXML.setAttribute("name", Label);
+                NodeXML.setAttribute("desc", node.NodeDoc.replace(/^\s*(.*?)\s*$/, "$1").replace(/\r/g, "&#xD;").replace(/\n/g, "&#xA;"));
+
+                NodeFragment.appendChild(NodeXML);
+
+                if (node.ParentNode != null && node != root) {
+                    var linkId = CreateNewLinkId();
+                    var ParentLable = node.ParentNode.GetLabel();
+                    var LinkXML = document.createElementNS(dcaseNS, "rootBasicLink");
+                    if (node.NodeType == GSNType.Context) {
+                        LinkXML.setAttribute("xsi:type", "dcase:InContextOf");
+                    } else {
+                        LinkXML.setAttribute("xsi:type", "dcase:SupportedBy");
+                    }
+                    LinkXML.setAttribute("id", linkId);
+                    LinkXML.setAttribute("name", linkId);
+                    LinkXML.setAttribute("source", "#" + ParentLable);
+                    LinkXML.setAttribute("target", "#" + Label);
+
+                    LinkFragment.appendChild(LinkXML);
+                }
+                if (node.SubNodeList) {
+                    for (var i = 0; i < node.SubNodeList.length; i++) {
+                        convert(node.SubNodeList[i]);
+                    }
+                }
+            }
+
+            convert(root);
+
+            DCaseArgumentXML.appendChild(NodeFragment);
+            DCaseArgumentXML.appendChild(LinkFragment);
+
+            var DummyNode = document.createElement("div");
+            DummyNode.appendChild(DCaseArgumentXML);
+            return '<?xml version="1.0" encoding="UTF-8"?>\n' + DummyNode.innerHTML.replace(/>/g, ">\n").replace(/&amp;#x/g, "&#x");
         };
         return SaveCommand;
     })(Command);
