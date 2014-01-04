@@ -122,7 +122,7 @@ module AssureNote {
             this.PictgramPanel.Viewport.SetOffset(WX, WY);
 		}
 
-		ProcessDroppedFiles(Files: File[]): void {
+		LoadFiles(Files: File[]): void {
 			if (Files[0]) {
 				var reader = new FileReader();
 				reader.onerror = (event: Event) => {

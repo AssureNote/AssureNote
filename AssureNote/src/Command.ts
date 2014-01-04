@@ -258,7 +258,7 @@ module AssureNote {
 
         public Invoke(FocusedView: NodeView, Params: any[]) {
             $("#file-open-dialog").change((e: Event) => {
-                this.App.ProcessDroppedFiles(<any>(<HTMLInputElement>e.srcElement).files);
+                this.App.LoadFiles(<any>(<HTMLInputElement>e.srcElement).files);
             });
             $("#file-open-dialog").click();
         }

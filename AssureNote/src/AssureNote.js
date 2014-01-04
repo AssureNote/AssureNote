@@ -107,7 +107,7 @@ var AssureNote;
             this.PictgramPanel.Viewport.SetOffset(WX, WY);
         };
 
-        AssureNoteApp.prototype.ProcessDroppedFiles = function (Files) {
+        AssureNoteApp.prototype.LoadFiles = function (Files) {
             var _this = this;
             if (Files[0]) {
                 var reader = new FileReader();
