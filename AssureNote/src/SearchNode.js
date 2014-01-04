@@ -16,7 +16,6 @@ var AssureNote;
             var _this = this;
             var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
             var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.AssureNoteApp.DebugP("Keyword is " + SearchWord);
             if (SearchWord != null) {
                 this.SearchWord = SearchWord;
 
@@ -33,6 +32,9 @@ var AssureNote;
 
                 this.IsMoving = true;
                 this.Searching = true;
+                this.CreateHitNodeView(ViewMap);
+                ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
+
                 this.SetAllNodesColor(ViewMap, AssureNote.ColorStyle.Searched);
                 this.SetDestination(this.HitNodes[0], ViewMap);
                 ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.SearchHighlight);
@@ -71,6 +73,22 @@ var AssureNote;
             }
         };
 
+        Search.prototype.CreateHitNodeView = function (ViewMap) {
+            for (var i = 0; i < this.HitNodes.length; i++) {
+                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+                while (Node != null) {
+                    Node.IsFolded = false;
+                    Node = Node.Parent;
+                }
+            }
+
+            var TopGoal = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode;
+            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
+            this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
+            this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+        };
+
         Search.prototype.IsSearching = function () {
             return this.Searching;
         };
@@ -81,16 +99,6 @@ var AssureNote;
             this.NodeIndex = 0;
             this.SearchWord = "";
             this.Searching = false;
-        };
-
-        Search.prototype.CheckInput = function (ViewMap, SearchWord) {
-            if (SearchWord == this.SearchWord && this.HitNodes.length > 1) {
-                return false;
-            } else {
-                this.SetAllNodesColor(ViewMap, AssureNote.ColorStyle.Default);
-                this.HitNodes = [];
-                return true;
-            }
         };
 
         Search.prototype.SetAllNodesColor = function (ViewMap, ColorCode) {
