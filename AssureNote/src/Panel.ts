@@ -112,7 +112,16 @@ module AssureNote {
                         } else if (!this.CmdLine.IsVisible && this.Search.IsSearching()) {
                             this.Search.Search(this.MasterView, event.shiftKey);
                         }
-						break;
+                        break;
+                    case 27: /*Esc*/
+                        if (this.Search.IsSearching()) {
+                            this.Search.ResetParam();
+                        }
+                        if (this.CmdLine.IsVisible) {
+                            this.CmdLine.Hide();
+                            this.CmdLine.Clear();
+                        }
+                        break;
 				}
 			});
 

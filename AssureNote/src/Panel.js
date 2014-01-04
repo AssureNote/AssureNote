@@ -97,6 +97,15 @@ var AssureNote;
                             _this.Search.Search(_this.MasterView, event.shiftKey);
                         }
                         break;
+                    case 27:
+                        if (_this.Search.IsSearching()) {
+                            _this.Search.ResetParam();
+                        }
+                        if (_this.CmdLine.IsVisible) {
+                            _this.CmdLine.Hide();
+                            _this.CmdLine.Clear();
+                        }
+                        break;
                 }
             });
 
