@@ -13,8 +13,7 @@ module AssureNote {
             return "";
         }
 
-        public Invoke(ForcusedView: NodeView, Params: any[]) {
-
+        public Invoke(CommandName: string, ForcusedView: NodeView, Params: any[]) {
         }
     }
 
@@ -23,7 +22,26 @@ module AssureNote {
             super(App);
         }
 
-        public Invoke(Target: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+            var Label = CommandName.toUpperCase();
+            if (this.App.PictgramPanel.ViewMap == null) {
+                this.App.DebugP("Jump is diabled.");
+                return;
+            }
+            var Node = this.App.PictgramPanel.ViewMap[Label];
+            if (CommandName == "" && Node == null) {
+                Label = this.App.PictgramPanel.FocusedLabel;
+                Node = this.App.PictgramPanel.ViewMap[Label];
+            }
+            if (Node != null) {
+                if ($("#" + Label.replace(/\./g, "\\.")).length > 0) { //FIXME use IsVisible
+                    this.App.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+                } else {
+                    this.App.DebugP("Invisible node " + Label + " Selected.");
+                }
+                return;
+            }
+            this.App.DebugP("undefined command: " + CommandName);
         }
     }
 
@@ -40,7 +58,7 @@ module AssureNote {
             return "Save";
         }
 
-        public Invoke(Target: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
             var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName
             var Extention = Filename.split(".").pop();
             var StringToWrite: string = "";
@@ -153,7 +171,7 @@ module AssureNote {
             return "New";
         }
 
-        public Invoke(FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], "* G1");
             } else {
@@ -181,7 +199,7 @@ module AssureNote {
             return "Unfold All";
         }
 
-        public Invoke(FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = (TargetView: NodeView) => {
                 TargetView.IsFolded = false;
@@ -207,7 +225,7 @@ module AssureNote {
             return "Set Color...";
         }
 
-        public Invoke(FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (Params.length > 1) {
                 var TargetLabel = Params[0];
                 var Color = Params[1];
@@ -236,7 +254,7 @@ module AssureNote {
             return "Set Scale...";
         }
 
-        public Invoke(FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetScale(<number><any>Params[0] - 0);
             }
@@ -256,7 +274,7 @@ module AssureNote {
             return "Open...";
         }
 
-        public Invoke(FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             $("#file-open-dialog").change((e: Event) => {
                 this.App.LoadFiles(<any>(<HTMLInputElement>e.srcElement).files);
             });
@@ -277,7 +295,7 @@ module AssureNote {
             return "Help";
         }
 
-        public Invoke(FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
             alert(
                 "new [name]\n    create new file\n" +

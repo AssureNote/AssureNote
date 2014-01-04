@@ -56,37 +56,7 @@ var AssureNote;
             }
 
             var Command = this.FindCommandByCommandLineName(CommandName);
-            Command.Invoke(this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
-            //var BuiltinCommand = this.Commands.GetFunction(MethodName);
-            //if (BuiltinCommand != null) {
-            //	BuiltinCommand(this, ParsedCommand.GetArgs());
-            //	return;
-            //}
-            //var Plugin = this.PluginManager.GetCommandPlugin(MethodName);
-            //if (Plugin != null) {
-            //	Plugin.ExecCommand(this, ParsedCommand.GetArgs());
-            //} else {
-            //    //TODO split jump-node function
-            //	var Label = MethodName.toUpperCase();
-            //	if (this.PictgramPanel.ViewMap == null) {
-            //		this.DebugP("Jump is diabled.");
-            //		return;
-            //	}
-            //    var Node = this.PictgramPanel.ViewMap[Label];
-            //    if (MethodName == "" && Node == null) {
-            //        Label = this.PictgramPanel.FocusedLabel;
-            //        Node = this.PictgramPanel.ViewMap[Label];
-            //    }
-            //    if (Node != null) {
-            //        if ($("#" + Label.replace(/\./g,"\\.")).length > 0) { //FIXME use IsVisible
-            //            this.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
-            //        } else {
-            //            this.DebugP("Invisible node " + Label + " Selected.");
-            //        }
-            //        return;
-            //    }
-            //	this.DebugP("undefined command: " + MethodName);
-            //}
+            Command.Invoke(CommandName, this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
         };
 
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {

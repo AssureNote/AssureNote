@@ -19,7 +19,7 @@ var AssureNote;
             return "";
         };
 
-        Command.prototype.Invoke = function (ForcusedView, Params) {
+        Command.prototype.Invoke = function (CommandName, ForcusedView, Params) {
         };
         return Command;
     })();
@@ -30,7 +30,26 @@ var AssureNote;
         function CommandMissingCommand(App) {
             _super.call(this, App);
         }
-        CommandMissingCommand.prototype.Invoke = function (Target, Params) {
+        CommandMissingCommand.prototype.Invoke = function (CommandName, Target, Params) {
+            var Label = CommandName.toUpperCase();
+            if (this.App.PictgramPanel.ViewMap == null) {
+                this.App.DebugP("Jump is diabled.");
+                return;
+            }
+            var Node = this.App.PictgramPanel.ViewMap[Label];
+            if (CommandName == "" && Node == null) {
+                Label = this.App.PictgramPanel.FocusedLabel;
+                Node = this.App.PictgramPanel.ViewMap[Label];
+            }
+            if (Node != null) {
+                if ($("#" + Label.replace(/\./g, "\\.")).length > 0) {
+                    this.App.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+                } else {
+                    this.App.DebugP("Invisible node " + Label + " Selected.");
+                }
+                return;
+            }
+            this.App.DebugP("undefined command: " + CommandName);
         };
         return CommandMissingCommand;
     })(Command);
@@ -49,7 +68,7 @@ var AssureNote;
             return "Save";
         };
 
-        SaveCommand.prototype.Invoke = function (Target, Params) {
+        SaveCommand.prototype.Invoke = function (CommandName, Target, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName;
             var Extention = Filename.split(".").pop();
             var StringToWrite = "";
@@ -164,7 +183,7 @@ var AssureNote;
             return "New";
         };
 
-        NewCommand.prototype.Invoke = function (FocusedView, Params) {
+        NewCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], "* G1");
             } else {
@@ -194,7 +213,7 @@ var AssureNote;
             return "Unfold All";
         };
 
-        UnfoldAllCommand.prototype.Invoke = function (FocusedView, Params) {
+        UnfoldAllCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = function (TargetView) {
                 TargetView.IsFolded = false;
@@ -222,7 +241,7 @@ var AssureNote;
             return "Set Color...";
         };
 
-        SetColorCommand.prototype.Invoke = function (FocusedView, Params) {
+        SetColorCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 1) {
                 var TargetLabel = Params[0];
                 var Color = Params[1];
@@ -253,7 +272,7 @@ var AssureNote;
             return "Set Scale...";
         };
 
-        SetScaleCommand.prototype.Invoke = function (FocusedView, Params) {
+        SetScaleCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetScale(Params[0] - 0);
             }
@@ -275,7 +294,7 @@ var AssureNote;
             return "Open...";
         };
 
-        OpenCommand.prototype.Invoke = function (FocusedView, Params) {
+        OpenCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             var _this = this;
             $("#file-open-dialog").change(function (e) {
                 _this.App.LoadFiles((e.srcElement).files);
@@ -299,7 +318,7 @@ var AssureNote;
             return "Help";
         };
 
-        HelpCommand.prototype.Invoke = function (FocusedView, Params) {
+        HelpCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
             alert("new [name]\n    create new file\n" + "open\n" + "e\n    open file\n" + "save [name]\n" + "w [name]\n    save editing file\n" + "help\n    show this message\n" + "");
         };
