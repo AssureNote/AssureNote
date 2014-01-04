@@ -263,4 +263,30 @@ module AssureNote {
             $("#file-open-dialog").click();
         }
     }
+
+    export class HelpCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["help"];
+        }
+
+        public GetDisplayName(): string {
+            return "Help";
+        }
+
+        public Invoke(FocusedView: NodeView, Params: any[]) {
+            // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
+            alert(
+                "new [name]\n    create new file\n" +
+                "open\n" +
+                "e\n    open file\n" +
+                "save [name]\n" +
+                "w [name]\n    save editing file\n" +
+                "help\n    show this message\n" +
+                "");
+        }
+    }
 }

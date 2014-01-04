@@ -31,6 +31,7 @@ module AssureNote {
             this.RegistCommand(new UnfoldAllCommand(this));
             this.RegistCommand(new SetColorCommand(this));
             this.RegistCommand(new SetScaleCommand(this));
+            this.RegistCommand(new HelpCommand(this));
 		}
 
         public RegistCommand(Command: Command) {
