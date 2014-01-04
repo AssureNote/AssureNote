@@ -120,7 +120,7 @@ var AssureNote;
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     event.stopPropagation();
                     event.preventDefault();
-                    _this.AssureNoteApp.ProcessDroppedFiles(((event.originalEvent).dataTransfer).files);
+                    _this.AssureNoteApp.LoadFiles(((event.originalEvent).dataTransfer).files);
                 }
             });
 

@@ -31,6 +31,7 @@ module AssureNote {
             this.RegistCommand(new UnfoldAllCommand(this));
             this.RegistCommand(new SetColorCommand(this));
             this.RegistCommand(new SetScaleCommand(this));
+            this.RegistCommand(new HelpCommand(this));
 		}
 
         public RegistCommand(Command: Command) {
@@ -122,7 +123,7 @@ module AssureNote {
             this.PictgramPanel.Viewport.SetOffset(WX, WY);
 		}
 
-		ProcessDroppedFiles(Files: File[]): void {
+		LoadFiles(Files: File[]): void {
 			if (Files[0]) {
 				var reader = new FileReader();
 				reader.onerror = (event: Event) => {

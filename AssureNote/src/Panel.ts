@@ -140,7 +140,7 @@ module AssureNote {
 					if (this.AssureNoteApp.PluginPanel.IsVisible) {
 						event.stopPropagation();
 						event.preventDefault();
-						this.AssureNoteApp.ProcessDroppedFiles((<any>(<any>event.originalEvent).dataTransfer).files);
+						this.AssureNoteApp.LoadFiles((<any>(<any>event.originalEvent).dataTransfer).files);
 					}
                 });
 

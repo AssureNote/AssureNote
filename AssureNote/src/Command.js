@@ -278,12 +278,33 @@ var AssureNote;
         OpenCommand.prototype.Invoke = function (FocusedView, Params) {
             var _this = this;
             $("#file-open-dialog").change(function (e) {
-                _this.App.ProcessDroppedFiles((e.srcElement).files);
+                _this.App.LoadFiles((e.srcElement).files);
             });
             $("#file-open-dialog").click();
         };
         return OpenCommand;
     })(Command);
     AssureNote.OpenCommand = OpenCommand;
+
+    var HelpCommand = (function (_super) {
+        __extends(HelpCommand, _super);
+        function HelpCommand(App) {
+            _super.call(this, App);
+        }
+        HelpCommand.prototype.GetCommandLineNames = function () {
+            return ["help"];
+        };
+
+        HelpCommand.prototype.GetDisplayName = function () {
+            return "Help";
+        };
+
+        HelpCommand.prototype.Invoke = function (FocusedView, Params) {
+            // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
+            alert("new [name]\n    create new file\n" + "open\n" + "e\n    open file\n" + "save [name]\n" + "w [name]\n    save editing file\n" + "help\n    show this message\n" + "");
+        };
+        return HelpCommand;
+    })(Command);
+    AssureNote.HelpCommand = HelpCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

@@ -18,6 +18,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.UnfoldAllCommand(this));
             this.RegistCommand(new AssureNote.SetColorCommand(this));
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
+            this.RegistCommand(new AssureNote.HelpCommand(this));
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             var Names = Command.GetCommandLineNames();
@@ -107,7 +108,7 @@ var AssureNote;
             this.PictgramPanel.Viewport.SetOffset(WX, WY);
         };
 
-        AssureNoteApp.prototype.ProcessDroppedFiles = function (Files) {
+        AssureNoteApp.prototype.LoadFiles = function (Files) {
             var _this = this;
             if (Files[0]) {
                 var reader = new FileReader();
