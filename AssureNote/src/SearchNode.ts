@@ -4,12 +4,13 @@ module AssureNote {
 
 	export class Search {
 
-		SearchWord: string;
-		DestinationX: number;
-		DestinationY: number;
-		NodeIndex: number;
-		IsMoving: boolean;
-		HitNodes: GSNNode[];
+		private SearchWord: string;
+		private DestinationX: number;
+		private DestinationY: number;
+		private NodeIndex: number;
+		private IsMoving: boolean;
+        private HitNodes: GSNNode[];
+        private Searching: boolean;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			this.SearchWord = "";
@@ -18,6 +19,7 @@ module AssureNote {
 			this.NodeIndex = 0;
 			this.IsMoving = false;
             this.HitNodes = [];
+            this.Searching = false;
 		}
 
 		Search(TargetView: NodeView, IsTurn: boolean, SearchWord?: string): void {
@@ -38,8 +40,9 @@ module AssureNote {
 					return;
 				}
 
-				this.IsMoving = true;
-				this.SetAllNodesColor(this.HitNodes, ViewMap, ColorStyle.Searched);
+                this.IsMoving = true;
+                this.Searching = true;
+				this.SetAllNodesColor(ViewMap, ColorStyle.Searched);
 				this.SetDestination(this.HitNodes[0], ViewMap);
                 ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
 				this.MoveToNext(ViewPort, () => {
@@ -78,25 +81,31 @@ module AssureNote {
 			}
 		}
 
-		private ResetParam(): void {
-			this.HitNodes = [];
+        IsSearching(): boolean {
+            return this.Searching;
+        }
+
+		ResetParam(): void {
+            this.SetAllNodesColor(this.AssureNoteApp.PictgramPanel.ViewMap, ColorStyle.Default);
+            this.HitNodes = [];
 			this.NodeIndex = 0;
-			this.SearchWord = "";
+            this.SearchWord = "";
+            this.Searching = false;
 		}
 
 		CheckInput(ViewMap: { [index: string]: NodeView }, SearchWord: string): boolean {
 			if (SearchWord == this.SearchWord && this.HitNodes.length > 1) {
 				return false;
 			} else {
-				this.SetAllNodesColor(this.HitNodes, ViewMap, ColorStyle.Default);
+				this.SetAllNodesColor(ViewMap, ColorStyle.Default);
 				this.HitNodes = [];
 				return true;
 			}
 		}
 
-        private SetAllNodesColor(HitNodes: GSNNode[], ViewMap: { [index: string]: NodeView }, ColorCode: string): void {
-            for (var i = 0; i < HitNodes.length; i++) {
-                var Label: string = HitNodes[i].GetLabel();
+        private SetAllNodesColor(ViewMap: { [index: string]: NodeView }, ColorCode: string): void {
+            for (var i = 0; i < this.HitNodes.length; i++) {
+                var Label: string = this.HitNodes[i].GetLabel();
                 ViewMap[Label].GetShape().ChangeColorStyle(ColorCode);
             }
         }
@@ -107,8 +116,8 @@ module AssureNote {
 			}
 			var TargetView = ViewMap[HitNode.GetLabel()];
             var Viewport = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.DestinationX = Viewport.PageXFromGX(TargetView.GetGX());
-            this.DestinationY = Viewport.PageYFromGY(TargetView.GetGY());
+            this.DestinationX = Viewport.PageXFromGX(TargetView.GetCenterGX());
+            this.DestinationY = Viewport.PageYFromGY(TargetView.GetCenterGY());
 			return;
 		}
 
@@ -142,7 +151,7 @@ module AssureNote {
 					return;
 				}
 			}
-    		move();
+            move();
 		}
 	}
 }

@@ -91,26 +91,27 @@ module AssureNote {
 							break;
 						}
 					case 186: /*:*/
-						this.CmdLine.Show();
-						break;
 					case 191: /*/*/
-						this.CmdLine.Show();
-                        break;
                     case 219: /*@*/
+                        if (this.Search.IsSearching()) {
+                            this.Search.ResetParam();
+                        }
                         this.CmdLine.Show();
                         break;
 					case 13: /*Enter*/
-						if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
-							var ParsedCommand = new CommandParser();
-							ParsedCommand.Parse(this.CmdLine.GetValue());
-							if (ParsedCommand.GetMethod() == "search") {
-								this.Search.Search(this.MasterView, true/*FIXME*/, ParsedCommand.GetArgs()[0]);
-							}
-							this.AssureNoteApp.ExecCommand(ParsedCommand);
-							this.CmdLine.Hide();
-							this.CmdLine.Clear();
-							return false;
-						}
+                        if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
+                            var ParsedCommand = new CommandParser();
+                            ParsedCommand.Parse(this.CmdLine.GetValue());
+                            if (ParsedCommand.GetMethod() == "search") {
+                                this.Search.Search(this.MasterView, true/*FIXME*/, ParsedCommand.GetArgs()[0]);
+                            }
+                            this.AssureNoteApp.ExecCommand(ParsedCommand);
+                            this.CmdLine.Hide();
+                            this.CmdLine.Clear();
+                            return false;
+                        } else if (!this.CmdLine.IsVisible && this.Search.IsSearching()) {
+                            this.Search.Search(this.MasterView, event.shiftKey);
+                        }
 						break;
 				}
 			});

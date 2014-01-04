@@ -75,12 +75,11 @@ var AssureNote;
                             break;
                         }
                     case 186:
-                        _this.CmdLine.Show();
-                        break;
                     case 191:
-                        _this.CmdLine.Show();
-                        break;
                     case 219:
+                        if (_this.Search.IsSearching()) {
+                            _this.Search.ResetParam();
+                        }
                         _this.CmdLine.Show();
                         break;
                     case 13:
@@ -94,6 +93,8 @@ var AssureNote;
                             _this.CmdLine.Hide();
                             _this.CmdLine.Clear();
                             return false;
+                        } else if (!_this.CmdLine.IsVisible && _this.Search.IsSearching()) {
+                            _this.Search.Search(_this.MasterView, event.shiftKey);
                         }
                         break;
                 }
