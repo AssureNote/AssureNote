@@ -88,7 +88,7 @@ var AssureNote;
                             var ParsedCommand = new AssureNote.CommandParser();
                             ParsedCommand.Parse(_this.CmdLine.GetValue());
                             if (ParsedCommand.GetMethod() == "search") {
-                                _this.Search.Search(_this.MasterView, ParsedCommand.GetArgs()[0]);
+                                _this.Search.Search(_this.MasterView, true, ParsedCommand.GetArgs()[0]);
                             }
                             _this.AssureNoteApp.ExecCommand(ParsedCommand);
                             _this.CmdLine.Hide();

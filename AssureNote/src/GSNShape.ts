@@ -15,7 +15,7 @@ module AssureNote {
         ShapeGroup: SVGGElement;
         ArrowPath: SVGPathElement;
         Content: HTMLElement;
-        ColorClassName: string = ColorStyle.Default;
+        ColorStyle: string = "";
         private NodeWidth: number;
         private NodeHeight: number;
         private HeadBoundingBox: Rect; // Head is the node and Left and Right.
@@ -307,6 +307,10 @@ module AssureNote {
                     return new Point(0, 0);
             }
         }
+
+        ChangeColorStyle(ColorStyleCode: string): void {
+            this.ColorStyle = (ColorStyleCode != ColorStyle.Default) ? ColorStyleCode : "";
+        }
     }
 
     export class GSNGoalShape extends GSNShape {
@@ -317,11 +321,11 @@ module AssureNote {
         PrerenderSVGContent(): void {
             super.PrerenderSVGContent();
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", this.ColorClassName);
+            this.BodyRect.setAttribute("class", ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
                 this.ModuleRect = AssureNoteUtils.CreateSVGElement("rect");
-                this.ModuleRect.setAttribute("class", this.ColorClassName);
+                this.ModuleRect.setAttribute("class", ColorStyle.Default);
                 this.ModuleRect.setAttribute("width", "80px");
                 this.ModuleRect.setAttribute("height", "13px");
                 this.ModuleRect.setAttribute("y", "-13px");
@@ -330,7 +334,7 @@ module AssureNote {
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
                 this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("polygon");
                 this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
-                this.UndevelopedSymbol.setAttribute("class", this.ColorClassName);
+                this.UndevelopedSymbol.setAttribute("class", ColorStyle.Default);
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
         }
@@ -350,6 +354,10 @@ module AssureNote {
             this.Content.className = "node node-goal";
         }
 
+        ChangeColorStyle(ColorStyleCode: string): void {
+            super.ChangeColorStyle(ColorStyleCode);
+            this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+        }
     }
 
     export class GSNContextShape extends GSNShape {
@@ -358,7 +366,7 @@ module AssureNote {
         PrerenderSVGContent(): void {
             super.PrerenderSVGContent();
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", this.ColorClassName);
+            this.BodyRect.setAttribute("class", ColorStyle.Default);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
             this.BodyRect.setAttribute("rx", "10");
             this.BodyRect.setAttribute("ry", "10");
@@ -374,6 +382,11 @@ module AssureNote {
             this.Content.className = "node node-context";
         }
 
+        ChangeColorStyle(ColorStyleCode: string): void {
+            super.ChangeColorStyle(ColorStyleCode);
+            this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+        }
+
     }
 
     export class GSNStrategyShape extends GSNShape {
@@ -383,7 +396,7 @@ module AssureNote {
         PrerenderSVGContent(): void {
             super.PrerenderSVGContent();
             this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
-            this.BodyPolygon.setAttribute("class", this.ColorClassName);
+            this.BodyPolygon.setAttribute("class", ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyPolygon);
         }
 
@@ -410,6 +423,10 @@ module AssureNote {
             }
         }
 
+        ChangeColorStyle(ColorStyleCode: string): void {
+            super.ChangeColorStyle(ColorStyleCode);
+            this.BodyPolygon.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+        }
 
     }
 
@@ -419,7 +436,7 @@ module AssureNote {
         PrerenderSVGContent(): void {
             super.PrerenderSVGContent();
             this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
-            this.BodyEllipse.setAttribute("class", this.ColorClassName);
+            this.BodyEllipse.setAttribute("class", ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyEllipse);
         }
 
@@ -439,6 +456,11 @@ module AssureNote {
 
         UpdateHtmlClass() {
             this.Content.className = "node node-evidence";
+        }
+
+        ChangeColorStyle(ColorStyleCode: string): void {
+            super.ChangeColorStyle(ColorStyleCode);
+            this.BodyEllipse.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
         }
     }
 }

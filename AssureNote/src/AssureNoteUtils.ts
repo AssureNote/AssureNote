@@ -170,6 +170,7 @@ module AssureNote{
         static Default: string = "assurenote-default";
         static ToDo: string = "assurenote-todo";
         static Searched: string = "assurenote-search";
+        static SearchHighlight: string = "assurenote-search-highlight";
         static Danger: string = "assurenote-danger";
     }
 

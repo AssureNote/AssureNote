@@ -79,7 +79,7 @@ module AssureNote {
                 event.preventDefault();
 			});
 
-			this.CmdLine = new CommandLine();
+            this.CmdLine = new CommandLine();
             this.Search = new Search(AssureNoteApp);
             document.addEventListener("keydown", (event: KeyboardEvent) => {
 				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
@@ -104,7 +104,7 @@ module AssureNote {
 							var ParsedCommand = new CommandParser();
 							ParsedCommand.Parse(this.CmdLine.GetValue());
 							if (ParsedCommand.GetMethod() == "search") {
-								this.Search.Search(this.MasterView, ParsedCommand.GetArgs()[0]);
+								this.Search.Search(this.MasterView, true/*FIXME*/, ParsedCommand.GetArgs()[0]);
 							}
 							this.AssureNoteApp.ExecCommand(ParsedCommand);
 							this.CmdLine.Hide();

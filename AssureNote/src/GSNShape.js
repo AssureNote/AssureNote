@@ -18,7 +18,7 @@ var AssureNote;
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
-            this.ColorClassName = AssureNote.ColorStyle.Default;
+            this.ColorStyle = "";
             this.GX = null;
             this.GY = null;
             this.PreviousAnimateElement = null;
@@ -296,6 +296,10 @@ var AssureNote;
                     return new AssureNote.Point(0, 0);
             }
         };
+
+        GSNShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
+            this.ColorStyle = (ColorStyleCode != AssureNote.ColorStyle.Default) ? ColorStyleCode : "";
+        };
         GSNShape.ArrowPathMaster = null;
 
         GSNShape.CSSAnimationDefinitionCount = 0;
@@ -311,11 +315,11 @@ var AssureNote;
         GSNGoalShape.prototype.PrerenderSVGContent = function () {
             _super.prototype.PrerenderSVGContent.call(this);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", this.ColorClassName);
+            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
                 this.ModuleRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-                this.ModuleRect.setAttribute("class", this.ColorClassName);
+                this.ModuleRect.setAttribute("class", AssureNote.ColorStyle.Default);
                 this.ModuleRect.setAttribute("width", "80px");
                 this.ModuleRect.setAttribute("height", "13px");
                 this.ModuleRect.setAttribute("y", "-13px");
@@ -324,7 +328,7 @@ var AssureNote;
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
                 this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
                 this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
-                this.UndevelopedSymbol.setAttribute("class", this.ColorClassName);
+                this.UndevelopedSymbol.setAttribute("class", AssureNote.ColorStyle.Default);
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
         };
@@ -343,6 +347,11 @@ var AssureNote;
         GSNGoalShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-goal";
         };
+
+        GSNGoalShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
+            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
+            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+        };
         return GSNGoalShape;
     })(GSNShape);
     AssureNote.GSNGoalShape = GSNGoalShape;
@@ -355,7 +364,7 @@ var AssureNote;
         GSNContextShape.prototype.PrerenderSVGContent = function () {
             _super.prototype.PrerenderSVGContent.call(this);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", this.ColorClassName);
+            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
             this.BodyRect.setAttribute("rx", "10");
             this.BodyRect.setAttribute("ry", "10");
@@ -370,6 +379,11 @@ var AssureNote;
         GSNContextShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-context";
         };
+
+        GSNContextShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
+            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
+            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+        };
         return GSNContextShape;
     })(GSNShape);
     AssureNote.GSNContextShape = GSNContextShape;
@@ -383,7 +397,7 @@ var AssureNote;
         GSNStrategyShape.prototype.PrerenderSVGContent = function () {
             _super.prototype.PrerenderSVGContent.call(this);
             this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
-            this.BodyPolygon.setAttribute("class", this.ColorClassName);
+            this.BodyPolygon.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyPolygon);
         };
 
@@ -409,6 +423,11 @@ var AssureNote;
                     return new AssureNote.Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
             }
         };
+
+        GSNStrategyShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
+            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
+            this.BodyPolygon.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+        };
         return GSNStrategyShape;
     })(GSNShape);
     AssureNote.GSNStrategyShape = GSNStrategyShape;
@@ -421,7 +440,7 @@ var AssureNote;
         GSNEvidenceShape.prototype.PrerenderSVGContent = function () {
             _super.prototype.PrerenderSVGContent.call(this);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
-            this.BodyEllipse.setAttribute("class", this.ColorClassName);
+            this.BodyEllipse.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyEllipse);
         };
 
@@ -441,6 +460,11 @@ var AssureNote;
 
         GSNEvidenceShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-evidence";
+        };
+
+        GSNEvidenceShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
+            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
+            this.BodyEllipse.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
         };
         return GSNEvidenceShape;
     })(GSNShape);
