@@ -17,7 +17,7 @@
 </head>
 <body style="overflow: hidden; margin: 0px;">
 	<div id="assure-note" style="width: 100%; height: 100%;">
-        <input id="file-open-dialog" type="file" accept=".wgsn" style="display:none;"/>
+        <input id="file-open-dialog" type="file" accept=".wgsn,.dcase_model" style="display:none;"/>
         <div id="auto-expand-area"></div>
 		<svg id="svglayer-box" xmlns="http://www.w3.org/2000/svg" version="1.1" style="top: 0px; left: 0px; width: 100%; height: 100%; position: absolute">
 			<g id="svg-layer" transform="translate(0,0)">
@@ -123,7 +123,8 @@
 	<script type="text/javascript" src="lib/socket.io.js"></script>
 
     <script type="text/javascript" src="src/AssureNoteUtils.js"></script>
-	<script type="text/javascript" src="src/AssureNoteParser.js"></script>
+    <script type="text/javascript" src="src/AssureNoteParser.js"></script>
+    <script type="text/javascript" src="src/DCaseModelXMLParser.js"></script>
     <script type="text/javascript" src="src/CommandLine.js"></script>
 	<script type="text/javascript" src="src/Command.js"></script>
     <script type="text/javascript" src="src/GSNShape.js"></script>

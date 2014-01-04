@@ -1,6 +1,7 @@
 ///<reference path='SideMenu.ts'/>
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
+///<reference path='DCaseModelXMLParser.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
 
@@ -103,11 +104,19 @@ module AssureNote {
 			//}
 		}
 
-		LoadNewWGSN(Name: string, WGSN: string): void {
+        LoadNewWGSN(Name: string, WGSN: string): void {
+            var Extention = Name.split(".").pop();
 			this.WGSNName = Name;
-			this.MasterRecord = new GSNRecord();
-			this.MasterRecord.Parse(WGSN);
-
+            this.MasterRecord = new GSNRecord();
+            switch (Extention) {
+                case "dcase_model":
+                    new DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
+                    break;
+                default:
+                case "wgsn":
+                    this.MasterRecord.Parse(WGSN);
+                    break;
+            }
 			var LatestDoc = this.MasterRecord.GetLatestDoc();
 			var TopGoalNode = LatestDoc.TopNode;
 

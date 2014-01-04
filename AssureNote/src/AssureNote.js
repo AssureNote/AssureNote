@@ -1,6 +1,7 @@
 ///<reference path='SideMenu.ts'/>
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
+///<reference path='DCaseModelXMLParser.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
@@ -89,10 +90,18 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
+            var Extention = Name.split(".").pop();
             this.WGSNName = Name;
             this.MasterRecord = new GSNRecord();
-            this.MasterRecord.Parse(WGSN);
-
+            switch (Extention) {
+                case "dcase_model":
+                    new AssureNote.DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
+                    break;
+                default:
+                case "wgsn":
+                    this.MasterRecord.Parse(WGSN);
+                    break;
+            }
             var LatestDoc = this.MasterRecord.GetLatestDoc();
             var TopGoalNode = LatestDoc.TopNode;
 

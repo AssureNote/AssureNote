@@ -68,6 +68,7 @@
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
     <TypeScriptCompile Include="src\AssureNoteUtils.ts" />
     <TypeScriptCompile Include="src\Command.ts" />
+    <TypeScriptCompile Include="src\DCaseModelXMLParser.ts" />
     <TypeScriptCompile Include="src\Editor.ts" />
     <TypeScriptCompile Include="src\GSNShape.ts" />
     <TypeScriptCompile Include="src\MenuBar.ts" />
