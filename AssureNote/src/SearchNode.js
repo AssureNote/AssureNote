@@ -104,7 +104,10 @@ var AssureNote;
         Search.prototype.SetAllNodesColor = function (ViewMap, ColorCode) {
             for (var i = 0; i < this.HitNodes.length; i++) {
                 var Label = this.HitNodes[i].GetLabel();
-                ViewMap[Label].GetShape().ChangeColorStyle(ColorCode);
+                var Node = ViewMap[Label];
+                if (Node != null) {
+                    Node.GetShape().ChangeColorStyle(ColorCode);
+                }
             }
         };
 
