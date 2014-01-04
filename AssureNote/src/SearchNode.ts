@@ -116,8 +116,8 @@ module AssureNote {
 			}
 			var TargetView = ViewMap[HitNode.GetLabel()];
             var Viewport = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.DestinationX = Viewport.PageXFromGX(TargetView.GetCenterGX());
-            this.DestinationY = Viewport.PageYFromGY(TargetView.GetCenterGY());
+            this.DestinationX = Viewport.GetPageCenterX() - TargetView.GetCenterGX();
+            this.DestinationY = Viewport.GetPageCenterY() - TargetView.GetCenterGY();
 			return;
 		}
 
