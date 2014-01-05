@@ -172,7 +172,7 @@ module AssureNote {
             };
             this.Viewport.ScrollManager.OnStartDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").show(100);
-                (<any>$("#top-menu")).dropdown("hide");
+                (<any>$(".dropdown.open > .dropdown-toggle")).dropdown("toggle");
             };
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").hide(100);

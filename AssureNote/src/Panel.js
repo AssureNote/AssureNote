@@ -152,7 +152,7 @@ var AssureNote;
             };
             this.Viewport.ScrollManager.OnStartDrag = function (Viewport) {
                 $("#auto-expand-area").show(100);
-                ($("#top-menu")).dropdown("hide");
+                ($(".dropdown.open > .dropdown-toggle")).dropdown("toggle");
             };
             this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
                 $("#auto-expand-area").hide(100);

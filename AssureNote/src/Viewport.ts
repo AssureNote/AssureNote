@@ -37,8 +37,11 @@ module AssureNote {
 		private StartDrag(InitialX: number, InitialY: number) {
 			this.CurrentX = InitialX;
             this.CurrentY = InitialY;
-            if (this.OnStartDrag) {
-                this.OnStartDrag(this.Viewport);
+            try {
+                if (this.OnStartDrag) {
+                    this.OnStartDrag(this.Viewport);
+                }
+            } catch (e) {
             }
 		}
 
@@ -88,8 +91,11 @@ module AssureNote {
         private EndDrag() {
             this.MainPointerID = null;
             this.Viewport.SetEventMapLayerPosition(false);
-            if (this.OnEndDrag) {
-                this.OnEndDrag(this.Viewport);
+            try {
+                if (this.OnEndDrag) {
+                    this.OnEndDrag(this.Viewport);
+                }
+            } catch (e) {
             }
         }
 
@@ -109,8 +115,8 @@ module AssureNote {
                     this.timer = null;
                     var mainPointer = this.Pointers[0];
                     this.MainPointerID = mainPointer.identifier;
-                    this.StartDrag(mainPointer.pageX, mainPointer.pageY);
                     this.Viewport.SetEventMapLayerPosition(true);
+                    this.StartDrag(mainPointer.pageX, mainPointer.pageY);
 				} else {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
