@@ -760,7 +760,7 @@ class GSNNode {
 		return null;
 	}
 
-	void FormatNode(HashMap<String, GSNNode> RefMap, StringWriter Writer) {
+	void FormatNode(StringWriter Writer) {
 		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
 		Writer.print(" ");
 		if (this.LabelName != null) {
@@ -773,28 +773,17 @@ class GSNNode {
 		Writer.print(Lib.DecToHex(this.UID));
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
-		/*local*/String RefKey = null;
-		/*local*/GSNNode RefNode = null;
 		if (this.Created != null) {
 			/*local*/String HistoryTriple = this.GetHistoryTriple();
 			Writer.print(" " + HistoryTriple);
-			RefKey = WikiSyntax.FormatRefKey(this.NodeType, this.LabelNumber, HistoryTriple);
-			RefNode = RefMap.get(RefKey);
 		}
-		if (RefNode == null) {
-			Writer.print(this.NodeDoc);
-			if (this.Digest != null) {
-				Writer.newline();
-			}
-			if (RefKey != null) {
-				RefMap.put(RefKey, this);
-			}
-		} else {
+		Writer.print(this.NodeDoc);
+		if (this.Digest != null) {
 			Writer.newline();
 		}
 		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
 			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
-			Node.FormatNode(RefMap, Writer);
+			Node.FormatNode(Writer);
 		}
 	}
 
@@ -1086,10 +1075,10 @@ class GSNDoc {
 		this.RemapNodeMap();
 	}
 	
-	void FormatDoc(HashMap<String, GSNNode> NodeRef, StringWriter Stream) {
+	void FormatDoc(StringWriter Stream) {
 		if (this.TopNode != null) {
 			Stream.println("Revision:: " + this.DocHistory.Rev);
-			this.TopNode.FormatNode(NodeRef, Stream);
+			this.TopNode.FormatNode(Stream);
 		}
 	}
 	
@@ -1299,7 +1288,6 @@ class GSNRecord {
 
 	public void FormatRecord(StringWriter Writer) {
 		/*local*/int DocCount = 0;
-		/*local*/HashMap<String, GSNNode> RefMap = new HashMap<String, GSNNode>();
 		TagUtils.FormatHistoryTag(this.HistoryList, Writer);
 		for (/*local*/int i = 0; i < this.HistoryList.size(); i++) {
 			/*local*/GSNDoc Doc = this.GetHistoryDoc(i);
@@ -1307,7 +1295,7 @@ class GSNRecord {
 				if(DocCount > 0) {
 					Writer.println(Lib.VersionDelim);
 				}
-				Doc.FormatDoc(RefMap, Writer);
+				Doc.FormatDoc(Writer);
 				DocCount += 1;
 			}
 		}
@@ -1538,7 +1526,7 @@ public class AssureNoteParser {
 			MasterRecord.Parse(Lib.ReadFile(argv[0]));
 			/*local*/GSNNode NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
 			/*local*/StringWriter Writer = new StringWriter();
-			NewNode.FormatNode(new HashMap<String, GSNNode>(), Writer);
+			NewNode.FormatNode(Writer);
 			//MasterRecord.FormatRecord(Writer);
 			System.out.println(Writer.toString());
 		}

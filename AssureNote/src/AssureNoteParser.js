@@ -654,7 +654,7 @@ var GSNNode = (function () {
         return null;
     };
 
-    GSNNode.prototype.FormatNode = function (RefMap, Writer) {
+    GSNNode.prototype.FormatNode = function (Writer) {
         Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
         Writer.print(" ");
         if (this.LabelName != null) {
@@ -667,30 +667,17 @@ var GSNNode = (function () {
         Writer.print(" &");
         Writer.print(Lib.DecToHex(this.UID));
 
-        // Stream.append(" ");
-        // MD5.FormatDigest(this.Digest, Stream);
-        var RefKey = null;
-        var RefNode = null;
         if (this.Created != null) {
             var HistoryTriple = this.GetHistoryTriple();
             Writer.print(" " + HistoryTriple);
-            RefKey = WikiSyntax.FormatRefKey(this.NodeType, this.LabelNumber, HistoryTriple);
-            RefNode = RefMap.get(RefKey);
         }
-        if (RefNode == null) {
-            Writer.print(this.NodeDoc);
-            if (this.Digest != null) {
-                Writer.newline();
-            }
-            if (RefKey != null) {
-                RefMap.put(RefKey, this);
-            }
-        } else {
+        Writer.print(this.NodeDoc);
+        if (this.Digest != null) {
             Writer.newline();
         }
         for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
             var Node = this.NonNullSubNodeList().get(i);
-            Node.FormatNode(RefMap, Writer);
+            Node.FormatNode(Writer);
         }
     };
 
@@ -979,10 +966,10 @@ var GSNDoc = (function () {
         this.RemapNodeMap();
     };
 
-    GSNDoc.prototype.FormatDoc = function (NodeRef, Stream) {
+    GSNDoc.prototype.FormatDoc = function (Stream) {
         if (this.TopNode != null) {
             Stream.println("Revision:: " + this.DocHistory.Rev);
-            this.TopNode.FormatNode(NodeRef, Stream);
+            this.TopNode.FormatNode(Stream);
         }
     };
 
@@ -1188,7 +1175,6 @@ var GSNRecord = (function () {
 
     GSNRecord.prototype.FormatRecord = function (Writer) {
         var DocCount = 0;
-        var RefMap = new HashMap();
         TagUtils.FormatHistoryTag(this.HistoryList, Writer);
         for (var i = 0; i < this.HistoryList.size(); i++) {
             var Doc = this.GetHistoryDoc(i);
@@ -1196,7 +1182,7 @@ var GSNRecord = (function () {
                 if (DocCount > 0) {
                     Writer.println(Lib.VersionDelim);
                 }
-                Doc.FormatDoc(RefMap, Writer);
+                Doc.FormatDoc(Writer);
                 DocCount += 1;
             }
         }
@@ -1419,7 +1405,7 @@ var AssureNoteParser = (function () {
             MasterRecord.Parse(Lib.ReadFile(argv[0]));
             var NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
             var Writer = new StringWriter();
-            NewNode.FormatNode(new HashMap(), Writer);
+            NewNode.FormatNode(Writer);
 
             //MasterRecord.FormatRecord(Writer);
             console.log(Writer.toString());
