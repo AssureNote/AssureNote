@@ -333,7 +333,7 @@ module AssureNote {
 
         MoveTo(logicalOffsetX: number, logicalOffsetY: number, scale: number, duration: number): void {
             if (duration <= 0) {
-                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
                 return;
             }
 

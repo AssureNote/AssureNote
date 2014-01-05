@@ -328,7 +328,7 @@ var AssureNote;
         ViewportManager.prototype.MoveTo = function (logicalOffsetX, logicalOffsetY, scale, duration) {
             var _this = this;
             if (duration <= 0) {
-                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
                 return;
             }
 
