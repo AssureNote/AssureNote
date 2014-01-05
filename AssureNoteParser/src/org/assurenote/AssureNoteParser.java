@@ -505,7 +505,7 @@ class GSNNode {
 			this.LastModified = this.Created;
 		}
 		this.Digest = null;
-		this.NodeDoc = Lib.LineFeed;
+		this.NodeDoc = Lib.LineFeed.trim();
 		this.HasTag = false;
 		if (this.ParentNode != null) {
 			ParentNode.AppendSubNode(this);
@@ -614,10 +614,10 @@ class GSNNode {
 		}
 		if (LineCount > 0) {
 			this.Digest = md.digest();
-			this.NodeDoc = Writer.toString();
+			this.NodeDoc = Writer.toString().trim();
 		} else {
 			this.Digest = null;
-			this.NodeDoc = Lib.LineFeed;
+			this.NodeDoc = Lib.LineFeed.trim();
 		}
 		if(!Lib.EqualsDigest(OldDigest, this.Digest) && this.BaseDoc != null) {
 			this.LastModified = this.BaseDoc.DocHistory;
@@ -777,10 +777,12 @@ class GSNNode {
 			/*local*/String HistoryTriple = this.GetHistoryTriple();
 			Writer.print(" " + HistoryTriple);
 		}
-		Writer.print(this.NodeDoc);
-		if (this.Digest != null) {
+		Writer.newline();
+		if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
+		Writer.newline();
 		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
 			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
 			Node.FormatNode(Writer);
@@ -801,10 +803,12 @@ class GSNNode {
 		Writer.print(Lib.DecToHex(this.UID));
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
-		Writer.print(this.NodeDoc);
-		if (this.Digest != null) {
+		Writer.newline();
+		if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
+		Writer.newline();
 		if (this.NonNullSubNodeList() != null) {
 			for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
 				/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);

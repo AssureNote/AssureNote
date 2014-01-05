@@ -35,7 +35,7 @@ module AssureNote {
 				}
 				var Writer = new StringWriter();
 				TargetView.Model.FormatSubNode(1, Writer);
-                this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
 			} else {
 				AssureNoteApp.DebugP(Label + " not found.");
 			}
@@ -49,7 +49,7 @@ module AssureNote {
 				(event: Event, TargetView: NodeView) => {
 					var Writer = new StringWriter();
 					TargetView.Model.FormatSubNode(1, Writer);
-                    this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
+                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
 			});
         }
 

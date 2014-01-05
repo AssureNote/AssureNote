@@ -203,7 +203,7 @@ public class TestAssureNoteParser {
 		assertEquals(TopNode.NodeType, GSNType.Goal);
 		assertNull(TopNode.SubNodeList);
 		System.out.println(TopNode.NodeDoc);
-		assertEquals(TopNode.NodeDoc, "\nhi, all");
+		assertEquals(TopNode.NodeDoc, "hi, all");
 	}
 	
 	@Test
@@ -219,7 +219,7 @@ public class TestAssureNoteParser {
 		
 		assertNotNull(TopNode);
 		assertNotNull(TopNode.SubNodeList);
-		assertEquals(TopNode.NodeDoc, "\n**S");
+		assertEquals(TopNode.NodeDoc, "**S");
 		assertEquals(TopNode.SubNodeList.size(), 1);
 		
 		GSNNode SubNode = TopNode.SubNodeList.get(0);

@@ -46,7 +46,7 @@ var AssureNote;
                 }
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
-                this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
             } else {
                 AssureNoteApp.DebugP(Label + " not found.");
             }
@@ -60,7 +60,7 @@ var AssureNote;
             return new AssureNote.MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
-                _this.EditorUtil.EnableEditor(Writer.toString(), TargetView);
+                _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
             });
         };
 

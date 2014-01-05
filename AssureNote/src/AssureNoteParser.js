@@ -398,7 +398,7 @@ var GSNNode = (function () {
             this.LastModified = this.Created;
         }
         this.Digest = null;
-        this.NodeDoc = Lib.LineFeed;
+        this.NodeDoc = Lib.LineFeed.trim();
         this.HasTag = false;
         if (this.ParentNode != null) {
             ParentNode.AppendSubNode(this);
@@ -507,10 +507,10 @@ var GSNNode = (function () {
         }
         if (LineCount > 0) {
             this.Digest = md.digest();
-            this.NodeDoc = Writer.toString();
+            this.NodeDoc = Writer.toString().trim();
         } else {
             this.Digest = null;
-            this.NodeDoc = Lib.LineFeed;
+            this.NodeDoc = Lib.LineFeed.trim();
         }
         if (!Lib.EqualsDigest(OldDigest, this.Digest) && this.BaseDoc != null) {
             this.LastModified = this.BaseDoc.DocHistory;
@@ -671,10 +671,12 @@ var GSNNode = (function () {
             var HistoryTriple = this.GetHistoryTriple();
             Writer.print(" " + HistoryTriple);
         }
-        Writer.print(this.NodeDoc);
-        if (this.Digest != null) {
+        Writer.newline();
+        if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+            Writer.print(this.NodeDoc);
             Writer.newline();
         }
+        Writer.newline();
         for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
             var Node = this.NonNullSubNodeList().get(i);
             Node.FormatNode(Writer);
@@ -697,10 +699,12 @@ var GSNNode = (function () {
 
         // Stream.append(" ");
         // MD5.FormatDigest(this.Digest, Stream);
-        Writer.print(this.NodeDoc);
-        if (this.Digest != null) {
+        Writer.newline();
+        if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+            Writer.print(this.NodeDoc);
             Writer.newline();
         }
+        Writer.newline();
         if (this.NonNullSubNodeList() != null) {
             for (var i = 0; i < this.NonNullSubNodeList().size(); i++) {
                 var Node = this.NonNullSubNodeList().get(i);
