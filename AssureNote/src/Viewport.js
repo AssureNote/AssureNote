@@ -10,10 +10,6 @@ var AssureNote;
     var ScrollManager = (function () {
         function ScrollManager(Viewport) {
             this.Viewport = Viewport;
-            this.InitialOffsetX = 0;
-            this.InitialOffsetY = 0;
-            this.InitialX = 0;
-            this.InitialY = 0;
             this.CurrentX = 0;
             this.CurrentY = 0;
             this.Dx = 0;
@@ -24,14 +20,7 @@ var AssureNote;
             this.ANIMATE_THRESHOLD = 5;
             this.SPEED_MAX = 100;
         }
-        ScrollManager.prototype.SetInitialOffset = function (InitialOffsetX, InitialOffsetY) {
-            this.InitialOffsetX = InitialOffsetX;
-            this.InitialOffsetY = InitialOffsetY;
-        };
-
         ScrollManager.prototype.StartDrag = function (InitialX, InitialY) {
-            this.InitialX = InitialX;
-            this.InitialY = InitialY;
             this.CurrentX = InitialX;
             this.CurrentY = InitialY;
             if (this.OnStartDrag) {
@@ -55,12 +44,12 @@ var AssureNote;
             }
         };
 
-        ScrollManager.prototype.CalcOffsetX = function () {
-            return this.CurrentX - this.InitialX + this.InitialOffsetX;
+        ScrollManager.prototype.CalcOffsetDX = function () {
+            return this.Dx;
         };
 
-        ScrollManager.prototype.CalcOffsetY = function () {
-            return this.CurrentY - this.InitialY + this.InitialOffsetY;
+        ScrollManager.prototype.CalcOffsetDY = function () {
+            return this.Dy;
         };
 
         ScrollManager.prototype.GetMainPointer = function () {
@@ -104,14 +93,13 @@ var AssureNote;
                     this.timer = null;
                     var mainPointer = this.Pointers[0];
                     this.MainPointerID = mainPointer.identifier;
-                    this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
                     this.StartDrag(mainPointer.pageX, mainPointer.pageY);
                     this.Viewport.SetEventMapLayerPosition(true);
                 } else {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
+                        Screen.SetOffset(Screen.GetOffsetX() + this.CalcOffsetDX(), Screen.GetOffsetY() + this.CalcOffsetDY());
                     } else {
                         this.EndDrag();
                     }
@@ -130,7 +118,7 @@ var AssureNote;
                         _this.CurrentY += _this.Dy;
                         _this.Dx *= 0.95;
                         _this.Dy *= 0.95;
-                        Screen.SetOffset(_this.CalcOffsetX(), _this.CalcOffsetY());
+                        Screen.SetOffset(Screen.GetOffsetX() + _this.CalcOffsetDX(), Screen.GetOffsetY() + _this.CalcOffsetDY());
                     }, 16);
                 }
                 this.EndDrag();
@@ -276,19 +264,19 @@ var AssureNote;
         };
 
         ViewportManager.prototype.PageXFromGX = function (GX) {
-            return (this.GetLogicalOffsetX() - GX) * this.Scale + this.GetPageCenterX();
+            return this.GetOffsetX() + this.Scale * GX;
         };
 
         ViewportManager.prototype.PageYFromGY = function (GY) {
-            return (this.GetLogicalOffsetY() - GY) * this.Scale + this.GetPageCenterY();
+            return this.GetOffsetY() + this.Scale * GY;
         };
 
         ViewportManager.prototype.GXFromPageX = function (PageX) {
-            return (PageX - this.GetPageCenterX()) / this.Scale + this.GetPageCenterX() - this.GetLogicalOffsetX();
+            return (PageX - this.GetOffsetX()) / this.Scale;
         };
 
         ViewportManager.prototype.GYFromPageY = function (PageY) {
-            return (PageY - this.GetPageCenterY()) / this.Scale + this.GetPageCenterY() - this.GetLogicalOffsetY();
+            return (PageY - this.GetOffsetY()) / this.Scale;
         };
 
         ViewportManager.prototype.ConvertRectGlobalXYFromPageXY = function (PageRect) {
@@ -337,19 +325,18 @@ var AssureNote;
             this.SetOffset(NewOffsetX, NewOffsetY);
         };
 
-        ViewportManager.prototype.MoveTo = function (logicalOffsetX, logicalOffsetY, duration) {
+        ViewportManager.prototype.MoveTo = function (logicalOffsetX, logicalOffsetY, scale, duration) {
             var _this = this;
             if (duration <= 0) {
                 this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
                 return;
             }
-            var initialX = this.GetOffsetX();
-            var initialY = this.GetOffsetY();
 
-            var VX = (logicalOffsetX - initialX) / duration;
-            var VY = (logicalOffsetY - initialY) / duration;
+            var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
+            var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
+            var VS = (scale - this.GetScale()) / duration;
 
-            if (VY == 0 && VX == 0) {
+            if (VY == 0 && VX == 0 && VS == 0) {
                 return;
             }
 
@@ -358,19 +345,21 @@ var AssureNote;
                 this.AnimationFrameTimerHandle = 0;
             }
 
-            var startTime = performance.now();
+            var lastTime = performance.now();
+            var startTime = lastTime;
 
             var update = function () {
                 var currentTime = performance.now();
-                var deltaT = currentTime - startTime;
-
-                if (deltaT < duration) {
-                    var currentX = initialX + VX * deltaT;
-                    var currentY = initialY + VY * deltaT;
-                    _this.SetLogicalOffset(currentX, currentY, 1);
+                var deltaT = currentTime - lastTime;
+                lastTime = currentTime;
+                var currentX = _this.GetLogicalOffsetX();
+                var currentY = _this.GetLogicalOffsetY();
+                var currentS = _this.GetScale();
+                if (currentTime - startTime < duration) {
+                    _this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
                     _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
-                    _this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                    _this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
                     return;
                 }
             };

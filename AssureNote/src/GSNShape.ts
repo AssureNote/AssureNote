@@ -190,9 +190,10 @@ module AssureNote {
             var AnimationName: string = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
             if (this.PreviousAnimateElement) {
                 this.RemoveAnimateElement(this.PreviousAnimateElement);
-                this.PreviousAnimateElement = null
-                        }
-            var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s ease-out";
+                this.PreviousAnimateElement = null;
+            }
+                        
+            var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s linear";
             this.Content.style["animation"] = AnimationStyleString;
             this.Content.style["MozAnimation"] = AnimationStyleString;
             this.Content.style["webkitAnimation"] = AnimationStyleString;

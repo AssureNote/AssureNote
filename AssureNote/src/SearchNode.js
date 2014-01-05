@@ -123,7 +123,7 @@ var AssureNote;
         };
 
         Search.prototype.MoveToNext = function (ViewPort, Callback) {
-            ViewPort.MoveTo(this.DestinationX, this.DestinationY, 100);
+            ViewPort.MoveTo(this.DestinationX, this.DestinationY, ViewPort.GetScale(), 100);
             Callback();
         };
         return Search;

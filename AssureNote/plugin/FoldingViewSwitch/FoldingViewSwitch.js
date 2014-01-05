@@ -41,9 +41,10 @@ var AssureNote;
                 var wx1 = TargetView.GetGX();
                 var wy1 = TargetView.GetGY();
                 var ViewPort = _this.AssureNoteApp.PictgramPanel.Viewport;
-                var OffX0 = ViewPort.GetOffsetX();
-                var OffY0 = ViewPort.GetOffsetY();
-                _this.AssureNoteApp.PictgramPanel.Viewport.MoveTo(OffX0 + wx0 - wx1, OffY0 + wy0 - wy1, 300);
+                var OffX0 = ViewPort.GetLogicalOffsetX();
+                var OffY0 = ViewPort.GetLogicalOffsetY();
+                var Scale = ViewPort.GetScale();
+                ViewPort.MoveTo(OffX0 + Scale * (wx0 - wx1), OffY0 + Scale * (wy0 - wy1), Scale, 300);
             };
         }
         FoldingViewSwitchPlugin.prototype.ExecDoubleClicked = function (NodeView) {

@@ -19,10 +19,6 @@ document.createSVGElement = function (name: string): Element {
 module AssureNote {
 
 	export class ScrollManager {
-        private InitialOffsetX: number = 0;
-        private InitialOffsetY: number = 0;
-        private InitialX: number = 0;
-        private InitialY: number = 0;
         private CurrentX: number = 0;
         private CurrentY: number = 0;
         private Dx: number = 0;
@@ -38,14 +34,7 @@ module AssureNote {
         constructor(private Viewport: ViewportManager) {
         }
 
-		private SetInitialOffset(InitialOffsetX: number, InitialOffsetY: number) {
-			this.InitialOffsetX = InitialOffsetX;
-			this.InitialOffsetY = InitialOffsetY;
-		}
-
 		private StartDrag(InitialX: number, InitialY: number) {
-			this.InitialX = InitialX;
-			this.InitialY = InitialY;
 			this.CurrentX = InitialX;
             this.CurrentY = InitialY;
             if (this.OnStartDrag) {
@@ -69,12 +58,12 @@ module AssureNote {
             }
 		}
 
-		private CalcOffsetX(): number {
-			return this.CurrentX - this.InitialX + this.InitialOffsetX;
+		private CalcOffsetDX(): number {
+            return this.Dx;
 		}
 
-		private CalcOffsetY(): number {
-			return this.CurrentY - this.InitialY + this.InitialOffsetY;
+		private CalcOffsetDY(): number {
+            return this.Dy;
 		}
 
 		private GetMainPointer(): Pointer {
@@ -120,14 +109,13 @@ module AssureNote {
                     this.timer = null;
                     var mainPointer = this.Pointers[0];
                     this.MainPointerID = mainPointer.identifier;
-                    this.SetInitialOffset(Screen.GetOffsetX(), Screen.GetOffsetY());
                     this.StartDrag(mainPointer.pageX, mainPointer.pageY);
                     this.Viewport.SetEventMapLayerPosition(true);
 				} else {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
+                        Screen.SetOffset(Screen.GetOffsetX() + this.CalcOffsetDX(), Screen.GetOffsetY() + this.CalcOffsetDY());
                     } else {
                         this.EndDrag();
                     }
@@ -146,7 +134,7 @@ module AssureNote {
 						this.CurrentY += this.Dy;
 						this.Dx *= 0.95;
 						this.Dy *= 0.95;
-						Screen.SetOffset(this.CalcOffsetX(), this.CalcOffsetY());
+                        Screen.SetOffset(Screen.GetOffsetX() + this.CalcOffsetDX(), Screen.GetOffsetY() + this.CalcOffsetDY());
 					}, 16);
 				}
                 this.EndDrag();
@@ -280,19 +268,19 @@ module AssureNote {
         }
 
         PageXFromGX(GX: number) {
-            return (this.GetLogicalOffsetX() - GX) * this.Scale + this.GetPageCenterX();
+            return this.GetOffsetX() + this.Scale * GX;
         }
 
         PageYFromGY(GY: number) {
-            return (this.GetLogicalOffsetY() - GY) * this.Scale + this.GetPageCenterY();
+            return this.GetOffsetY() + this.Scale * GY;
         }
 
-		GXFromPageX(PageX: number): number {
-            return (PageX - this.GetPageCenterX()) / this.Scale + this.GetPageCenterX() - this.GetLogicalOffsetX();
+        GXFromPageX(PageX: number): number {
+            return (PageX - this.GetOffsetX()) / this.Scale;
 		}
 
 		GYFromPageY(PageY: number): number {
-            return (PageY - this.GetPageCenterY()) / this.Scale + this.GetPageCenterY() - this.GetLogicalOffsetY();
+            return (PageY - this.GetOffsetY()) / this.Scale;
         }
 
         ConvertRectGlobalXYFromPageXY(PageRect: Rect): Rect {
@@ -343,18 +331,17 @@ module AssureNote {
 
         private AnimationFrameTimerHandle: number = 0;
 
-        MoveTo(logicalOffsetX: number, logicalOffsetY: number, duration: number): void {
+        MoveTo(logicalOffsetX: number, logicalOffsetY: number, scale: number, duration: number): void {
             if (duration <= 0) {
                 this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
                 return;
             }
-            var initialX = this.GetOffsetX();
-            var initialY = this.GetOffsetY();
 
-            var VX = (logicalOffsetX - initialX) / duration;
-            var VY = (logicalOffsetY - initialY) / duration;
+            var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
+            var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
+            var VS = (scale - this.GetScale()) / duration;
 
-            if (VY == 0 && VX == 0) {
+            if (VY == 0 && VX == 0 && VS == 0) {
                 return;
             }
 
@@ -363,19 +350,21 @@ module AssureNote {
                 this.AnimationFrameTimerHandle = 0;
             }
 
-            var startTime: number = performance.now();
+            var lastTime: number = performance.now();
+            var startTime = lastTime; 
 
             var update: any = () => {
                 var currentTime: number = performance.now();
-                var deltaT = currentTime - startTime;
-
-                if (deltaT < duration) {
-                    var currentX = initialX + VX * deltaT;
-                    var currentY = initialY + VY * deltaT;
-                    this.SetLogicalOffset(currentX, currentY, 1);
+                var deltaT = currentTime - lastTime;
+                lastTime = currentTime;
+                var currentX = this.GetLogicalOffsetX();
+                var currentY = this.GetLogicalOffsetY();
+                var currentS = this.GetScale();
+                if (currentTime - startTime < duration) {
+                    this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
                     this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
-                    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
                     return;
                 }
             }
