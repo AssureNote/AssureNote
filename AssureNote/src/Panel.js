@@ -278,6 +278,9 @@ var AssureNote;
             });
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
+            $("#plugin-layer").on('mousewheel', function (event) {
+                event.stopPropagation();
+            });
         }
         PluginPanel.prototype.Clear = function () {
         };

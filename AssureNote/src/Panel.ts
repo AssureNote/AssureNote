@@ -296,6 +296,7 @@ module AssureNote {
             });
             this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
+            $("#plugin-layer").on('mousewheel', (event: MouseWheelEvent) => { event.stopPropagation(); });
         }
 
 		Clear(): void {
