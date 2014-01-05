@@ -58,29 +58,6 @@ module AssureNote {
 				source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
 				onReady: refresh,
 			});
-
-				//switch (thisNodeType) {
-				//	case AssureIt.NodeType.Goal:
-				//		if (!hasContext) {
-				//			this.menu.append('<a href="#" ><img id="context"  src="' + this.serverApi.basepath + 'images/context.png" title="Context" alt="context" /></a>');
-				//		}
-				//		this.menu.append('<a href="#" ><img id="strategy" src="' + this.serverApi.basepath + 'images/strategy.png" title="Strategy" alt="strategy" /></a>');
-				//		this.menu.append('<a href="#" ><img id="evidence" src="' + this.serverApi.basepath + 'images/evidence.png" title="Evidence" alt="evidence" /></a>');
-				//		break;
-				//	case AssureIt.NodeType.Strategy:
-				//		this.menu.append('<a href="#" ><img id="goal"     src="' + this.serverApi.basepath + 'images/goal.png" title="Goal" alt="goal" /></a>');
-				//		if (!hasContext) {
-				//			this.menu.append('<a href="#" ><img id="context"  src="' + this.serverApi.basepath + 'images/context.png" title="Context" alt="context" /></a>');
-				//		}
-				//		break;
-				//	case AssureIt.NodeType.Evidence:
-				//		if (!hasContext) {
-				//			this.menu.append('<a href="#" ><img id="context"  src="' + this.serverApi.basepath + 'images/context.png" title="Context" alt="context" /></a>');
-				//		}
-				//		break;
-				//	default:
-				//		break;
-				//}
 		}
 
 		Remove(): void {

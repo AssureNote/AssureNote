@@ -1,4 +1,3 @@
-///<reference path='SideMenu.ts'/>
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
@@ -63,6 +62,33 @@ module AssureNote {
             return this.Commands[Name] || this.DefaultCommand;
         }
 
+        ExecTopMenu(Id: string): void {
+            var Command = null;
+            var Args = [];
+            switch (Id) {
+                case "create-wgsn-menu":
+                    Command = this.FindCommandByCommandLineName("new");
+                    break;
+                case "open-menu":
+                    Command = this.FindCommandByCommandLineName("open");
+                    break;
+                case "save-wgsn-menu":
+                    Command = this.FindCommandByCommandLineName("w");
+                    break;
+                case "save-xmi-menu":
+                    Command = this.FindCommandByCommandLineName("w");
+                    if (this.WGSNName.match(/\./) == null) {
+                        Args = [this.WGSNName + ".dcase_model"];
+                    } else {
+                        Args = [this.WGSNName.replace(/\..*/, ".dcase_model")];
+                    }
+                    break;
+            }
+            if (Command != null) {
+                Command.Invoke(Id/*FIXME*/, this.PictgramPanel.MasterView, Args);
+            }
+        }
+
 		ExecCommand(ParsedCommand: CommandParser): void {
 			var CommandName = ParsedCommand.GetMethod();
 			if (CommandName == "search") {
@@ -84,6 +110,7 @@ module AssureNote {
                 default:
                 case "wgsn":
                     this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord.RenumberAll();
                     break;
             }
 			var LatestDoc = this.MasterRecord.GetLatestDoc();

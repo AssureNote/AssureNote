@@ -1,4 +1,3 @@
-///<reference path='SideMenu.ts'/>
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
@@ -49,6 +48,33 @@ var AssureNote;
             return this.Commands[Name] || this.DefaultCommand;
         };
 
+        AssureNoteApp.prototype.ExecTopMenu = function (Id) {
+            var Command = null;
+            var Args = [];
+            switch (Id) {
+                case "create-wgsn-menu":
+                    Command = this.FindCommandByCommandLineName("new");
+                    break;
+                case "open-menu":
+                    Command = this.FindCommandByCommandLineName("open");
+                    break;
+                case "save-wgsn-menu":
+                    Command = this.FindCommandByCommandLineName("w");
+                    break;
+                case "save-xmi-menu":
+                    Command = this.FindCommandByCommandLineName("w");
+                    if (this.WGSNName.match(/\./) == null) {
+                        Args = [this.WGSNName + ".dcase_model"];
+                    } else {
+                        Args = [this.WGSNName.replace(/\..*/, ".dcase_model")];
+                    }
+                    break;
+            }
+            if (Command != null) {
+                Command.Invoke(Id, this.PictgramPanel.MasterView, Args);
+            }
+        };
+
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
             var CommandName = ParsedCommand.GetMethod();
             if (CommandName == "search") {
@@ -70,6 +96,7 @@ var AssureNote;
                 default:
                 case "wgsn":
                     this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord.RenumberAll();
                     break;
             }
             var LatestDoc = this.MasterRecord.GetLatestDoc();

@@ -173,6 +173,14 @@ module AssureNote {
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").hide(300);
             };
+
+            $("#menu").click((event: MouseEvent) => {
+                var id = (<any>event.srcElement).id;
+                if (id == "" || id == null) {
+                    return;
+                }
+                this.AssureNoteApp.ExecTopMenu(id);
+            });
 		}
 
 		SetFoldedAllGoalNode(NodeView: NodeView): void {
