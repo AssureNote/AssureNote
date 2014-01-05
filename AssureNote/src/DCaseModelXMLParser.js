@@ -70,6 +70,9 @@ var AssureNote;
                 var node = new GSNNode(_this.Doc, null, _this.Text2NodeTypeMap[NodeType], Label, index, UID, null);
                 node.NodeDoc = Statement;
                 _this.nodes[Id] = node;
+
+                /* TODO Need to remove this code */
+                node.ParentNode = new GSNNode(null, null, GSNType.Goal, null, null, -1, null);
             });
 
             $XML.find("rootBasicLink").each(function (index, elem) {
