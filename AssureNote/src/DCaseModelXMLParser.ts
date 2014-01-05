@@ -9,8 +9,8 @@ module AssureNote {
 
     export class DCaseModelXMLParser {
         private Doc: GSNDoc;
-        private nodes: any = {};
-        private links: any = {};
+        private nodes: { [index: string]: GSNNode } = {};
+        private links: { [index: string]: DCaseLink } = {};
         private Text2NodeTypeMap: any = { "Goal": GSNType.Goal, "Strategy": GSNType.Strategy, "Context": GSNType.Context, "Pattern": GSNType.Context, "Evidence": GSNType.Evidence };
         private RootNodeId: string;
 
@@ -72,15 +72,13 @@ module AssureNote {
             });
 
             $XML.find("rootBasicLink").each((index: any, elem: Element) => {
-                var Id: any = elem.getAttribute("id");
-                var source: string = elem.getAttribute("source").substring(1); // #abc -> abc
-                var target: string = elem.getAttribute("target").substring(1); // #abc -> abc
-                var link: DCaseLink = new DCaseLink(source, target);
-
-                this.links[Id] = link;
+                var LinkId: any = elem.getAttribute("id");
+                var SourceNodeId: string = elem.getAttribute("source").substring(1); // #abc -> abc
+                var TargetNodeId: string = elem.getAttribute("target").substring(1); // #abc -> abc
+                this.links[LinkId] = new DCaseLink(SourceNodeId, TargetNodeId);
             });
             this.Doc.TopNode = this.MakeTree(this.RootNodeId);
-            this.Doc.TopNode.RenumberGoal(1, 2);
+            this.Doc.RenumberAll();
         }
     }
 }
