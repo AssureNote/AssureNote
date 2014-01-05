@@ -174,7 +174,7 @@ module AssureNote {
                 $("#auto-expand-area").hide(300);
             };
 
-            $("#menu").click((event: MouseEvent) => {
+            $("#top-menu").click((event: MouseEvent) => {
                 var id = (<any>event.srcElement).id;
                 if (id == "" || id == null) {
                     return;

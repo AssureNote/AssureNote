@@ -154,7 +154,7 @@ var AssureNote;
                 $("#auto-expand-area").hide(300);
             };
 
-            $("#menu").click(function (event) {
+            $("#top-menu").click(function (event) {
                 var id = (event.srcElement).id;
                 if (id == "" || id == null) {
                     return;
