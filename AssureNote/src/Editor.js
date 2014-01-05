@@ -22,7 +22,6 @@ var AssureNote;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
             (this.TextArea).setValue(WGSN);
-            this.TextArea.focus();
             this.Element.off("blur");
             this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", function (e) {
@@ -37,6 +36,7 @@ var AssureNote;
                 _this.DisableEditor(NodeView);
             });
             this.TextArea.refresh();
+            this.TextArea.focus();
         };
 
         EditorUtil.prototype.DisableEditor = function (OldNodeView) {
