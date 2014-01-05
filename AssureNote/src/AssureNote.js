@@ -70,6 +70,7 @@ var AssureNote;
                 default:
                 case "wgsn":
                     this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord.RenumberAll();
                     break;
             }
             var LatestDoc = this.MasterRecord.GetLatestDoc();
