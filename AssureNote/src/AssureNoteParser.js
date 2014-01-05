@@ -1044,6 +1044,9 @@ var GSNRecord = (function () {
                 this.HistoryList.add(null);
             }
             this.HistoryList.set(Rev, History);
+            if (Doc != null) {
+                Doc.DocHistory = History;
+            }
         }
     };
 

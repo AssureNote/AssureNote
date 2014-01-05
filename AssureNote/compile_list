@@ -13,7 +13,6 @@ src/NodeView.ts
 src/Panel.ts
 src/Plugin.ts
 src/SearchNode.ts
-src/SideMenu.ts
 src/Socket.ts
 src/Viewport.ts
 
