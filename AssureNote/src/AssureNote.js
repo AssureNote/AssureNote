@@ -123,6 +123,9 @@ var AssureNote;
             var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
             this.PictgramPanel.Viewport.SetScale(1);
             this.PictgramPanel.Viewport.SetOffset(WX, WY);
+
+            $("#filename-view").text(Name);
+            $("title").text("AssureNote - " + Name);
         };
 
         AssureNoteApp.prototype.LoadFiles = function (Files) {
