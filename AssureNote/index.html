@@ -31,46 +31,48 @@
             <div class="navbar navbar-default">
                 <div class="navbar-collapse">
                     <a href="#" class="logo-fixed"><img id="logo" src="images/logo.png" alt="AssureNote" /></a>
-                    <button type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default">
-                        &nbsp;<span class="glyphicon glyphicon-file"></span>&nbsp;
-                        File
-                        &nbsp;<span class="caret"></span>
-                    </button>
-                    <ul id="top-menu" role="menu" style="right: auto; width: 250px;" oncontextmenu="return false" class="dropdown-menu">
-                        <li>
-                            <a id="create-wgsn-menu" href="#">
-                                <span class="glyphicon glyphicon-plus"></span>&nbsp;
-                                New...
-                            </a>
-                        </li>
-                        <li>
-                            <a id="open-menu" href="#">
-                                <span class="glyphicon glyphicon-folder-open"></span>&nbsp;
-                                Open...
-                            </a>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <a href="#">
-                                <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
-                                Save As
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a id="save-wgsn-menu" href="#">
-                                        <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
-                                        *.wgsn...
-                                    </a>
-                                </li>
-                                <li>
-                                    <a id="save-xmi-menu" href="#">
-                                        <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
-                                        *.dcase_model...
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <span id="filename-view"></span>
+                    <div class="dropdown">
+                        <button type="button" id="file-menu-button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
+                            &nbsp;<span class="glyphicon glyphicon-file"></span>&nbsp;
+                            File
+                            &nbsp;<span class="caret"></span>
+                        </button>
+                        <ul id="top-menu" role="menu" style="right: auto; width: 250px;" oncontextmenu="return false" class="dropdown-menu">
+                            <li>
+                                <a id="create-wgsn-menu" href="#">
+                                    <span class="glyphicon glyphicon-plus"></span>&nbsp;
+                                    New...
+                                </a>
+                            </li>
+                            <li>
+                                <a id="open-menu" href="#">
+                                    <span class="glyphicon glyphicon-folder-open"></span>&nbsp;
+                                    Open...
+                                </a>
+                            </li>
+                            <li class="dropdown-submenu">
+                                <a href="#">
+                                    <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
+                                    Save As
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a id="save-wgsn-menu" href="#">
+                                            <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
+                                            *.wgsn...
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a id="save-xmi-menu" href="#">
+                                            <span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
+                                            *.dcase_model...
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <span id="filename-view"></span>
+                    </div>
                 </div>
             </div>
 

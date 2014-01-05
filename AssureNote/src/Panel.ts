@@ -154,6 +154,9 @@ module AssureNote {
                 });
 
             this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
+                if (!this.MasterView) {
+                    return;
+                }
                 var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
                 this.MasterView.TraverseVisibleNode((Node: NodeView) => {
                     if (Node.IsFolded) {
@@ -169,6 +172,7 @@ module AssureNote {
             };
             this.Viewport.ScrollManager.OnStartDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").show(100);
+                (<any>$("#top-menu")).dropdown("hide");
             };
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").hide(100);
@@ -181,6 +185,8 @@ module AssureNote {
                 }
                 this.AssureNoteApp.ExecTopMenu(id);
             });
+
+            (<any>$(".dropdown-toggle")).dropdown();
 		}
 
 		SetFoldedAllGoalNode(NodeView: NodeView): void {

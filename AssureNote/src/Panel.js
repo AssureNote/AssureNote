@@ -134,6 +134,9 @@ var AssureNote;
             });
 
             this.Viewport.ScrollManager.OnDragged = function (Viewport) {
+                if (!_this.MasterView) {
+                    return;
+                }
                 var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
                 _this.MasterView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded) {
@@ -149,6 +152,7 @@ var AssureNote;
             };
             this.Viewport.ScrollManager.OnStartDrag = function (Viewport) {
                 $("#auto-expand-area").show(100);
+                ($("#top-menu")).dropdown("hide");
             };
             this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
                 $("#auto-expand-area").hide(100);
@@ -161,6 +165,8 @@ var AssureNote;
                 }
                 _this.AssureNoteApp.ExecTopMenu(id);
             });
+
+            ($(".dropdown-toggle")).dropdown();
         }
         PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
             var _this = this;
