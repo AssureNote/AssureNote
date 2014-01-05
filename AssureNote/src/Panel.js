@@ -138,7 +138,7 @@ var AssureNote;
                 _this.MasterView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
-                        var DY = HitBoxCenter.Y - Node.GetCenterGY() / 3;
+                        var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetScale();
                         if (DX * DX + DY * DY < R * R) {
                             _this.AssureNoteApp.ExecDoubleClicked(Node);
@@ -148,10 +148,10 @@ var AssureNote;
                 });
             };
             this.Viewport.ScrollManager.OnStartDrag = function (Viewport) {
-                $("#auto-expand-area").show(300);
+                $("#auto-expand-area").show(100);
             };
             this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
-                $("#auto-expand-area").hide(300);
+                $("#auto-expand-area").hide(100);
             };
 
             $("#top-menu").click(function (event) {

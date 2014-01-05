@@ -158,7 +158,7 @@ module AssureNote {
                 this.MasterView.TraverseVisibleNode((Node: NodeView) => {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
-                        var DY = HitBoxCenter.Y - Node.GetCenterGY() / 3;
+                        var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / this.Viewport.GetScale();
                         if (DX * DX + DY * DY < R * R) {
                             this.AssureNoteApp.ExecDoubleClicked(Node);
@@ -168,10 +168,10 @@ module AssureNote {
                 });
             };
             this.Viewport.ScrollManager.OnStartDrag = (Viewport: ViewportManager) => {
-                $("#auto-expand-area").show(300);
+                $("#auto-expand-area").show(100);
             };
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
-                $("#auto-expand-area").hide(300);
+                $("#auto-expand-area").hide(100);
             };
 
             $("#top-menu").click((event: MouseEvent) => {
