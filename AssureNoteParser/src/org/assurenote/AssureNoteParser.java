@@ -1109,6 +1109,12 @@ class GSNDoc {
 		return LabelMap;
 	}
 	
+	void RenumberAll() {
+		if (this.TopNode != null) {
+			this.TopNode.RenumberGoal(1,  2);
+		}
+	}
+	
 }
 
 
@@ -1189,7 +1195,7 @@ class GSNRecord {
 	void RenumberAll() {
 		/*local*/GSNDoc LatestDoc = this.GetLatestDoc();
 		if(LatestDoc!= null && LatestDoc.TopNode != null) {
-			LatestDoc.TopNode.RenumberGoal(1, 2);
+			LatestDoc.RenumberAll();
 		}
 	}
 

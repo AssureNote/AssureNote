@@ -307,5 +307,12 @@ public class TestAssureNoteParser {
 		assertEquals(LabelMap.size(), 2);
 		assertEquals(LabelMap.get("G:TopGoal"), "G1");
 		assertEquals(LabelMap.get("C:SubNode"), "C1.1");
+		
+		LatestDoc.RenumberAll();
+		LabelMap = LatestDoc.GetLabelMap();
+		
+		assertEquals(LabelMap.size(), 2);
+		assertEquals(LabelMap.get("G:TopGoal"), "G1");
+		assertEquals(LabelMap.get("C:SubNode"), "C1.1");
 	}
 }

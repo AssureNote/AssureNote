@@ -1001,6 +1001,12 @@ var GSNDoc = (function () {
         }
         return LabelMap;
     };
+
+    GSNDoc.prototype.RenumberAll = function () {
+        if (this.TopNode != null) {
+            this.TopNode.RenumberGoal(1, 2);
+        }
+    };
     return GSNDoc;
 })();
 
@@ -1077,7 +1083,7 @@ var GSNRecord = (function () {
     GSNRecord.prototype.RenumberAll = function () {
         var LatestDoc = this.GetLatestDoc();
         if (LatestDoc != null && LatestDoc.TopNode != null) {
-            LatestDoc.TopNode.RenumberGoal(1, 2);
+            LatestDoc.RenumberAll();
         }
     };
 
