@@ -339,6 +339,47 @@ module AssureNote {
             var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X * this.Scale));
             var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y * this.Scale));
 			this.SetOffset(NewOffsetX, NewOffsetY);
-		}
+        }
+
+        private AnimationFrameTimerHandle: number = 0;
+
+        MoveTo(logicalOffsetX: number, logicalOffsetY: number, duration: number): void {
+            if (duration <= 0) {
+                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                return;
+            }
+            var initialX = this.GetOffsetX();
+            var initialY = this.GetOffsetY();
+
+            var VX = (logicalOffsetX - initialX) / duration;
+            var VY = (logicalOffsetY - initialY) / duration;
+
+            if (VY == 0 && VX == 0) {
+                return;
+            }
+
+            if (this.AnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.AnimationFrameTimerHandle);
+                this.AnimationFrameTimerHandle = 0;
+            }
+
+            var startTime: number = performance.now();
+
+            var update: any = () => {
+                var currentTime: number = performance.now();
+                var deltaT = currentTime - startTime;
+
+                if (deltaT < duration) {
+                    var currentX = initialX + VX * deltaT;
+                    var currentY = initialY + VY * deltaT;
+                    this.SetLogicalOffset(currentX, currentY, 1);
+                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                    return;
+                }
+            }
+            update();
+        }
 	}
 }

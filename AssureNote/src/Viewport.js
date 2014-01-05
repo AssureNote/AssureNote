@@ -165,6 +165,7 @@ var AssureNote;
             this.LogicalOffsetY = 0;
             this.Scale = 1.0;
             this.IsEventMapUpper = false;
+            this.AnimationFrameTimerHandle = 0;
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
@@ -334,6 +335,46 @@ var AssureNote;
             var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X * this.Scale));
             var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y * this.Scale));
             this.SetOffset(NewOffsetX, NewOffsetY);
+        };
+
+        ViewportManager.prototype.MoveTo = function (logicalOffsetX, logicalOffsetY, duration) {
+            var _this = this;
+            if (duration <= 0) {
+                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                return;
+            }
+            var initialX = this.GetOffsetX();
+            var initialY = this.GetOffsetY();
+
+            var VX = (logicalOffsetX - initialX) / duration;
+            var VY = (logicalOffsetY - initialY) / duration;
+
+            if (VY == 0 && VX == 0) {
+                return;
+            }
+
+            if (this.AnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.AnimationFrameTimerHandle);
+                this.AnimationFrameTimerHandle = 0;
+            }
+
+            var startTime = performance.now();
+
+            var update = function () {
+                var currentTime = performance.now();
+                var deltaT = currentTime - startTime;
+
+                if (deltaT < duration) {
+                    var currentX = initialX + VX * deltaT;
+                    var currentY = initialY + VY * deltaT;
+                    _this.SetLogicalOffset(currentX, currentY, 1);
+                    _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    _this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
+                    return;
+                }
+            };
+            update();
         };
         return ViewportManager;
     })();

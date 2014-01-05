@@ -123,36 +123,8 @@ var AssureNote;
         };
 
         Search.prototype.MoveToNext = function (ViewPort, Callback) {
-            this.Move(this.DestinationX, this.DestinationY, 100, ViewPort);
+            ViewPort.MoveTo(this.DestinationX, this.DestinationY, 100);
             Callback();
-        };
-
-        Search.prototype.Move = function (logicalOffsetX, logicalOffsetY, duration, ViewPort) {
-            var cycle = 1000 / 30;
-            var cycles = duration / cycle;
-            var initialX = ViewPort.GetOffsetX();
-            var initialY = ViewPort.GetOffsetY();
-
-            var deltaX = (logicalOffsetX - initialX) / cycles;
-            var deltaY = (logicalOffsetY - initialY) / cycles;
-
-            var currentX = initialX;
-            var currentY = initialY;
-            var count = 0;
-
-            var move = function () {
-                if (count < cycles) {
-                    count += 1;
-                    currentX += deltaX;
-                    currentY += deltaY;
-                    ViewPort.SetLogicalOffset(currentX, currentY, 1);
-                    setTimeout(move, cycle);
-                } else {
-                    ViewPort.SetLogicalOffset(logicalOffsetX, logicalOffsetY, 1);
-                    return;
-                }
-            };
-            move();
         };
         return Search;
     })();
