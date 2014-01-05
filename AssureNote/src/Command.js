@@ -69,7 +69,7 @@ var AssureNote;
         };
 
         SaveCommand.prototype.Invoke = function (CommandName, Target, Params) {
-            var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName;
+            var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             var Extention = Filename.split(".").pop();
             var StringToWrite = "";
             switch (Extention) {

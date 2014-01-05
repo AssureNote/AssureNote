@@ -59,7 +59,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
-            var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName;
+            var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             var Extention = Filename.split(".").pop();
             var StringToWrite: string = "";
             switch (Extention) {
