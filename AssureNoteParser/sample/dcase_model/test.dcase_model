@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dcase:Argument xmlns:dcase="http://www.dependable-os.net/2013/11/dcase_model/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="_6A0EENScEeKCdP-goLYu9g">
+<rootBasicNode xsi:type="dcase:Goal" id="G1" name="G1" desc="System is dependable.">
+</rootBasicNode>
+<rootBasicNode xsi:type="dcase:Context" id="C1.1" name="C1.1" desc="System is aspen">
+</rootBasicNode>
+<rootBasicLink xsi:type="dcase:InContextOf" id="LINK_1" name="LINK_1" source="#G1" target="#C1.1">
+</rootBasicLink>
+</dcase:Argument>

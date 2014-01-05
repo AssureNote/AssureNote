@@ -73,15 +73,13 @@ var AssureNote;
             });
 
             $XML.find("rootBasicLink").each(function (index, elem) {
-                var Id = elem.getAttribute("id");
-                var source = elem.getAttribute("source").substring(1);
-                var target = elem.getAttribute("target").substring(1);
-                var link = new DCaseLink(source, target);
-
-                _this.links[Id] = link;
+                var LinkId = elem.getAttribute("id");
+                var SourceNodeId = elem.getAttribute("source").substring(1);
+                var TargetNodeId = elem.getAttribute("target").substring(1);
+                _this.links[LinkId] = new DCaseLink(SourceNodeId, TargetNodeId);
             });
             this.Doc.TopNode = this.MakeTree(this.RootNodeId);
-            this.Doc.TopNode.RenumberGoal(1, 2);
+            this.Doc.RenumberAll();
         };
         return DCaseModelXMLParser;
     })();

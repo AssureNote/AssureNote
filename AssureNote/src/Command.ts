@@ -59,7 +59,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
-            var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName
+            var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             var Extention = Filename.split(".").pop();
             var StringToWrite: string = "";
             switch (Extention) {
@@ -106,27 +106,21 @@ module AssureNote {
                 }
             }
 
-            var linkIdCounter: number = 0;
-
-            function CreateNewLinkId(): string {
-                linkIdCounter++;
-                return "LINK_" + linkIdCounter;
-            }
-
-            function convert(node: GSNNode): void {
-                var Label = node.GetLabel();
+            function Convert(node: GSNNode): void {
+                var Label: string = node.GetLabel();
+                var UID: string = node.UID.toString();
 
                 var NodeXML = document.createElementNS(dcaseNS, "rootBasicNode");
                 NodeXML.setAttribute("xsi:type", "dcase:" + NodeTypeToString(node.NodeType));
-                NodeXML.setAttribute("id", Label); // label is also regarded as id in AssureNote
+                NodeXML.setAttribute("id", UID); // label is also regarded as id in AssureNote
                 NodeXML.setAttribute("name", Label);
                 NodeXML.setAttribute("desc", node.NodeDoc.replace(/^\s*(.*?)\s*$/, "$1").replace(/\r/g, "&#xD;").replace(/\n/g, "&#xA;"));
 
                 NodeFragment.appendChild(NodeXML);
 
                 if (node.ParentNode != null && node != root) {
-                    var linkId: string = CreateNewLinkId();
-                    var ParentLable: string = node.ParentNode.GetLabel();
+                    var ParentUID: string = node.ParentNode.UID.toString();
+                    var linkId: string = "LINK_" + ParentUID + "_" + UID;
                     var LinkXML: Element = document.createElementNS(dcaseNS, "rootBasicLink");
                     if (node.NodeType == GSNType.Context) {
                         LinkXML.setAttribute("xsi:type", "dcase:InContextOf");
@@ -135,19 +129,19 @@ module AssureNote {
                     }
                     LinkXML.setAttribute("id", linkId);
                     LinkXML.setAttribute("name", linkId);
-                    LinkXML.setAttribute("source", "#" + ParentLable);
-                    LinkXML.setAttribute("target", "#" + Label);
+                    LinkXML.setAttribute("source", "#" + ParentUID);
+                    LinkXML.setAttribute("target", "#" + UID);
 
                     LinkFragment.appendChild(LinkXML);
                 }
                 if (node.SubNodeList) {
                     for (var i: number = 0; i < node.SubNodeList.length; i++) {
-                        convert(node.SubNodeList[i]);
+                        Convert(node.SubNodeList[i]);
                     }
                 }
             }
 
-            convert(root);
+            Convert(root);
 
             DCaseArgumentXML.appendChild(NodeFragment);
             DCaseArgumentXML.appendChild(LinkFragment);

@@ -1,4 +1,3 @@
-///<reference path='SideMenu.ts'/>
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
@@ -63,6 +62,44 @@ module AssureNote {
             return this.Commands[Name] || this.DefaultCommand;
         }
 
+        ExecTopMenu(Id: string): void {
+            var Command = null;
+            var Args = [];
+            switch (Id) {
+                case "create-wgsn-menu":
+                    Command = this.FindCommandByCommandLineName("new");
+                    break;
+                case "open-menu":
+                    Command = this.FindCommandByCommandLineName("open");
+                    break;
+                case "save-wgsn-menu":
+                    Command = this.FindCommandByCommandLineName("w");
+                    var Name = prompt("Enter the file name");
+                    if (Name == null) {
+                        return;
+                    }
+                    if (Name != "") {
+                        Args = [Name.replace(/(\.\w+)?$/, ".wgsn")];
+                    }
+                    break;
+                case "save-xmi-menu":
+                    Command = this.FindCommandByCommandLineName("w");
+                    var Name = prompt("Enter the file name");
+                    if (Name == null) {
+                        return;
+                    }
+                    if (Name == "") {
+                        Args = [this.WGSNName.replace(/(\.\w+)?$/, ".dcase_model")];
+                    } else {
+                        Args = [Name.replace(/(\.\w+)?$/, ".dcase_model")];
+                    }
+                    break;
+            }
+            if (Command != null) {
+                Command.Invoke(Id/*FIXME*/, this.PictgramPanel.MasterView, Args);
+            }
+        }
+
 		ExecCommand(ParsedCommand: CommandParser): void {
 			var CommandName = ParsedCommand.GetMethod();
 			if (CommandName == "search") {
@@ -84,6 +121,7 @@ module AssureNote {
                 default:
                 case "wgsn":
                     this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord.RenumberAll();
                     break;
             }
 			var LatestDoc = this.MasterRecord.GetLatestDoc();
