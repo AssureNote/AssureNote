@@ -60,13 +60,24 @@ var AssureNote;
                     break;
                 case "save-wgsn-menu":
                     Command = this.FindCommandByCommandLineName("w");
+                    var Name = prompt("Enter the file name");
+                    if (Name == null) {
+                        return;
+                    }
+                    if (Name != "") {
+                        Args = [Name.replace(/(\.\w+)?$/, ".wgsn")];
+                    }
                     break;
                 case "save-xmi-menu":
                     Command = this.FindCommandByCommandLineName("w");
-                    if (this.WGSNName.match(/\./) == null) {
-                        Args = [this.WGSNName + ".dcase_model"];
+                    var Name = prompt("Enter the file name");
+                    if (Name == null) {
+                        return;
+                    }
+                    if (Name == "") {
+                        Args = [this.WGSNName.replace(/(\.\w+)?$/, ".dcase_model")];
                     } else {
-                        Args = [this.WGSNName.replace(/\..*/, ".dcase_model")];
+                        Args = [Name.replace(/(\.\w+)?$/, ".dcase_model")];
                     }
                     break;
             }
