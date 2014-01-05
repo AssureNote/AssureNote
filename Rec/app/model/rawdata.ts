@@ -17,10 +17,17 @@ export class Rawdata {
 	location: string;
 	authid: string;
 
-	constructor(public recid: number, public data: number, public context: Object, public timestamp: Date) {
+	constructor(public recid: number, public data: number, public context: Object, public timestamp: string) {
 		this.type = null;
 		this.location = null;
 		this.authid = null;
+	}
+
+	static GetTimeString(d: Date): string {
+		var yy = d.getFullYear();
+		var mm = d.getMonth() < 9 ? "0" + (d.getMonth() + 1): <any>(d.getMonth() + 1);
+		var dd = d.getDate() < 10? "0" + d.getDate(): <any>d.getDate();
+		return yy + "/" + mm + "/" + dd + " " + d.toLocaleTimeString();
 	}
 
 	static tableToObject(row: any) {
@@ -30,7 +37,7 @@ export class Rawdata {
 		}catch(e) {
 			context = {};
 		}
-		return new Rawdata(row.recid, row.data, context, row.timestamp);
+		return new Rawdata(row.recid, row.data, context, Rawdata.GetTimeString(row.timestamp));
 	}
 
 	setMonitorInfo(type: string, location: string, authid: string): void {

@@ -18,6 +18,13 @@ var Rawdata = (function () {
         this.location = null;
         this.authid = null;
     }
+    Rawdata.GetTimeString = function (d) {
+        var yy = d.getFullYear();
+        var mm = d.getMonth() < 9 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
+        var dd = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
+        return yy + "/" + mm + "/" + dd + " " + d.toLocaleTimeString();
+    };
+
     Rawdata.tableToObject = function (row) {
         var context = null;
         try  {
@@ -25,7 +32,7 @@ var Rawdata = (function () {
         } catch (e) {
             context = {};
         }
-        return new Rawdata(row.recid, row.data, context, row.timestamp);
+        return new Rawdata(row.recid, row.data, context, Rawdata.GetTimeString(row.timestamp));
     };
 
     Rawdata.prototype.setMonitorInfo = function (type, location, authid) {
