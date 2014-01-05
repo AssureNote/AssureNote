@@ -256,7 +256,7 @@ module AssureNote {
         private ForEachSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {
             if (SubNodes != null) {
                 for (var i = 0; i < SubNodes.length; i++) {
-                    if (!Action(SubNodes[i])) {
+                    if (Action(SubNodes[i]) === false) {
                         return false;
                     }
                 }
@@ -288,7 +288,7 @@ module AssureNote {
             }
             else {
                 this.ForEachAllSubNodes((SubNode: NodeView) => {
-                    SubNode.ClearAnimationCache();
+                    SubNode.ClearAnimationCache(false);
                 });
             }
         }

@@ -246,7 +246,7 @@ var AssureNote;
         NodeView.prototype.ForEachSubNode = function (SubNodes, Action) {
             if (SubNodes != null) {
                 for (var i = 0; i < SubNodes.length; i++) {
-                    if (!Action(SubNodes[i])) {
+                    if (Action(SubNodes[i]) === false) {
                         return false;
                     }
                 }
@@ -280,7 +280,7 @@ var AssureNote;
                 });
             } else {
                 this.ForEachAllSubNodes(function (SubNode) {
-                    SubNode.ClearAnimationCache();
+                    SubNode.ClearAnimationCache(false);
                 });
             }
         };

@@ -167,33 +167,7 @@ var AssureNote;
                     div.style.left = x + "px";
                     div.style.top = y + "px";
                     if (Duration > 0) {
-                        var AnimationName = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
-                        if (this.PreviousAnimateElement) {
-                            this.RemoveAnimateElement(this.PreviousAnimateElement);
-                            this.PreviousAnimateElement = null;
-                        }
-                        var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s ease-out";
-                        this.Content.style["animation"] = AnimationStyleString;
-                        this.Content.style["MozAnimation"] = AnimationStyleString;
-                        this.Content.style["webkitAnimation"] = AnimationStyleString;
-                        this.Content.style["msAnimation"] = AnimationStyleString;
-                        var AnimateElement;
-                        if (this.GX == null || this.GY == null) {
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-webkit-", AnimationName));
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-moz-", AnimationName));
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-ms-", AnimationName));
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("", AnimationName));
-                            AnimateElement = AssureNote.AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
-                        } else {
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
-                            AnimateElement = AssureNote.AssureNoteUtils.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
-                        }
-                        this.ShapeGroup.appendChild(AnimateElement);
-                        AnimateElement.beginElement();
-                        this.PreviousAnimateElement = AnimateElement;
+                        this.MoveTo(x, y, Duration, CSSAnimationBuffer);
                     }
                 }
                 var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
@@ -202,6 +176,36 @@ var AssureNote;
             }
             this.GX = x;
             this.GY = y;
+        };
+
+        GSNShape.prototype.MoveTo = function (x, y, Duration, CSSAnimationBuffer) {
+            var AnimationName = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
+            if (this.PreviousAnimateElement) {
+                this.RemoveAnimateElement(this.PreviousAnimateElement);
+                this.PreviousAnimateElement = null;
+            }
+            var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s ease-out";
+            this.Content.style["animation"] = AnimationStyleString;
+            this.Content.style["MozAnimation"] = AnimationStyleString;
+            this.Content.style["webkitAnimation"] = AnimationStyleString;
+            this.Content.style["msAnimation"] = AnimationStyleString;
+            var AnimateElement;
+            if (this.GX == null || this.GY == null) {
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-webkit-", AnimationName));
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-moz-", AnimationName));
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-ms-", AnimationName));
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSFadeinAnimationDefinition("", AnimationName));
+                AnimateElement = AssureNote.AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
+            } else {
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
+                CSSAnimationBuffer.push(AssureNote.AssureNoteUtils.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
+                AnimateElement = AssureNote.AssureNoteUtils.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
+            }
+            this.ShapeGroup.appendChild(AnimateElement);
+            AnimateElement.beginElement();
+            this.PreviousAnimateElement = AnimateElement;
         };
 
         GSNShape.prototype.ClearAnimationCache = function () {

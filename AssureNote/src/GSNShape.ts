@@ -175,33 +175,7 @@ module AssureNote {
                     div.style.left = x + "px";
                     div.style.top = y + "px";
                     if (Duration > 0) {
-                        var AnimationName: string = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
-                        if (this.PreviousAnimateElement) {
-                            this.RemoveAnimateElement(this.PreviousAnimateElement);
-                            this.PreviousAnimateElement = null
-                        }
-                        var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s ease-out";
-                        this.Content.style["animation"] = AnimationStyleString;
-                        this.Content.style["MozAnimation"] = AnimationStyleString;
-                        this.Content.style["webkitAnimation"] = AnimationStyleString;
-                        this.Content.style["msAnimation"] = AnimationStyleString;
-                        var AnimateElement: any;
-                        if (this.GX == null || this.GY == null) {
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-webkit-", AnimationName));
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-moz-", AnimationName));
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-ms-", AnimationName));
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("", AnimationName));
-                            AnimateElement = AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
-                        } else {
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
-                            CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
-                            AnimateElement = AssureNoteUtils.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
-                        }
-                        this.ShapeGroup.appendChild(AnimateElement);
-                        AnimateElement.beginElement();
-                        this.PreviousAnimateElement = AnimateElement;
+                        this.MoveTo(x, y, Duration, CSSAnimationBuffer);
                     }
                 }
                 var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
@@ -210,6 +184,36 @@ module AssureNote {
             }
             this.GX = x;
             this.GY = y;
+        }
+
+        private MoveTo(x: number, y: number, Duration: number, CSSAnimationBuffer: string[]): void {
+            var AnimationName: string = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
+            if (this.PreviousAnimateElement) {
+                this.RemoveAnimateElement(this.PreviousAnimateElement);
+                this.PreviousAnimateElement = null
+                        }
+            var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s ease-out";
+            this.Content.style["animation"] = AnimationStyleString;
+            this.Content.style["MozAnimation"] = AnimationStyleString;
+            this.Content.style["webkitAnimation"] = AnimationStyleString;
+            this.Content.style["msAnimation"] = AnimationStyleString;
+            var AnimateElement: any;
+            if (this.GX == null || this.GY == null) {
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-webkit-", AnimationName));
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-moz-", AnimationName));
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-ms-", AnimationName));
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("", AnimationName));
+                AnimateElement = AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
+            } else {
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
+                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
+                AnimateElement = AssureNoteUtils.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
+            }
+            this.ShapeGroup.appendChild(AnimateElement);
+            AnimateElement.beginElement();
+            this.PreviousAnimateElement = AnimateElement;
         }
 
         ClearAnimationCache(): void {
