@@ -179,7 +179,8 @@ module AssureNote {
             };
 
             $("#top-menu").click((event: MouseEvent) => {
-                var id = (<any>event.srcElement).id;
+                var target = (<any>event.target) || (<any>event.srcElement);
+                var id = target.id;
                 if (id == "" || id == null) {
                     return;
                 }

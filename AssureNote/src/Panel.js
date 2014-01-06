@@ -159,7 +159,8 @@ var AssureNote;
             };
 
             $("#top-menu").click(function (event) {
-                var id = (event.srcElement).id;
+                var target = (event.target) || (event.srcElement);
+                var id = target.id;
                 if (id == "" || id == null) {
                     return;
                 }
