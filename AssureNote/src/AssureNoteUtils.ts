@@ -8,7 +8,7 @@ module AssureNote{
         }
 
         export function GetNodeLabelFromEvent(event: Event): string {
-            var element = <HTMLElement>event.srcElement;
+            var element = <HTMLElement>event.target || <HTMLElement>event.srcElement;
             while (element != null) {
                 if (element.id != "") {
                     return element.id;

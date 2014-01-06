@@ -8,7 +8,7 @@ var AssureNote;
         AssureNoteUtils.SaveAs = SaveAs;
 
         function GetNodeLabelFromEvent(event) {
-            var element = event.srcElement;
+            var element = event.target || event.srcElement;
             while (element != null) {
                 if (element.id != "") {
                     return element.id;
