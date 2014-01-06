@@ -122,6 +122,13 @@ var AssureNote;
             return "@" + Prefix + "keyframes " + Name + " { 0% { opacity: 0; } }";
         }
         AssureNoteUtils.CreateCSSFadeinAnimationDefinition = CreateCSSFadeinAnimationDefinition;
+
+        var element = document.createElement('div');
+        function HTMLEncode(text) {
+            element.innerText = text;
+            return element.innerHTML;
+        }
+        AssureNoteUtils.HTMLEncode = HTMLEncode;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
