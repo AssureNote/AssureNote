@@ -362,17 +362,16 @@ module AssureNote {
             var update: any = () => {
                 var currentTime: number = performance.now();
                 var deltaT = currentTime - lastTime;
-                lastTime = currentTime;
                 var currentX = this.GetLogicalOffsetX();
                 var currentY = this.GetLogicalOffsetY();
                 var currentS = this.GetScale();
                 if (currentTime - startTime < duration) {
-                    this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
                     this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
-                    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
-                    return;
+                    deltaT = duration - (lastTime - startTime);
                 }
+                this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+                lastTime = currentTime;
             }
             update();
         }

@@ -357,17 +357,16 @@ var AssureNote;
             var update = function () {
                 var currentTime = performance.now();
                 var deltaT = currentTime - lastTime;
-                lastTime = currentTime;
                 var currentX = _this.GetLogicalOffsetX();
                 var currentY = _this.GetLogicalOffsetY();
                 var currentS = _this.GetScale();
                 if (currentTime - startTime < duration) {
-                    _this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
                     _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
-                    _this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
-                    return;
+                    deltaT = duration - (lastTime - startTime);
                 }
+                _this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+                lastTime = currentTime;
             };
             update();
         };

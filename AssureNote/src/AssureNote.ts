@@ -63,6 +63,7 @@ module AssureNote {
         }
 
         ExecTopMenu(Id: string): void {
+            // temporary code
             var Command = null;
             var Args = [];
             switch (Id) {
@@ -72,24 +73,33 @@ module AssureNote {
                 case "open-menu":
                     Command = this.FindCommandByCommandLineName("open");
                     break;
-                case "save-wgsn-menu":
+                case "save-menu":
+                    var DefaultName = this.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
                     Command = this.FindCommandByCommandLineName("w");
-                    var Name = prompt("Enter the file name");
-                    if (Name == null) {
-                        return;
-                    }
-                    if (Name != "") {
-                        Args = [Name.replace(/(\.\w+)?$/, ".wgsn")];
-                    }
+                    Args = [DefaultName];
                     break;
-                case "save-xmi-menu":
+                case "save-wgsn-menu":
+                    var DefaultName = this.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
                     Command = this.FindCommandByCommandLineName("w");
-                    var Name = prompt("Enter the file name");
+                    var Name = prompt("Enter the file name", DefaultName);
                     if (Name == null) {
                         return;
                     }
                     if (Name == "") {
-                        Args = [this.WGSNName.replace(/(\.\w+)?$/, ".dcase_model")];
+                        Args = [DefaultName];
+                    } else {
+                        Args = [Name.replace(/(\.\w+)?$/, ".wgsn")];
+                    }
+                    break;
+                case "save-dcasemodel-menu":
+                    var DefaultName = this.WGSNName.replace(/(\.\w+)?$/, ".dcase_model");
+                    Command = this.FindCommandByCommandLineName("w");
+                    var Name = prompt("Enter the file name", DefaultName);
+                    if (Name == null) {
+                        return;
+                    }
+                    if (Name == "") {
+                        Args = [DefaultName];
                     } else {
                         Args = [Name.replace(/(\.\w+)?$/, ".dcase_model")];
                     }
