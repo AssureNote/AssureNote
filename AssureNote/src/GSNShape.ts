@@ -134,7 +134,7 @@ module AssureNote {
 
         PrerenderContent(manager: PluginManager) {
             this.PrerenderHTMLContent(manager);
-            this.PrerenderSVGContent();
+            this.PrerenderSVGContent(manager);
         }
 
         Render(HtmlContentFragment: DocumentFragment, SvgNodeFragment: DocumentFragment, SvgConnectionFragment: DocumentFragment): void {
@@ -236,10 +236,11 @@ module AssureNote {
             }
         }
 
-        PrerenderSVGContent(): void {
+        PrerenderSVGContent(manager: PluginManager): void {
             this.ShapeGroup = AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ArrowPath = GSNShape.CreateArrowPath();
+            manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         }
 
         private OldArrowPath: string;
@@ -323,8 +324,8 @@ module AssureNote {
         ModuleRect: SVGRectElement;
         UndevelopedSymbol: SVGPolygonElement;
 
-        PrerenderSVGContent(): void {
-            super.PrerenderSVGContent();
+        PrerenderSVGContent(manager: PluginManager): void {
+            super.PrerenderSVGContent(manager);
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
             this.BodyRect.setAttribute("class", ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyRect);
@@ -370,8 +371,8 @@ module AssureNote {
     export class GSNContextShape extends GSNShape {
         BodyRect: SVGRectElement;
 
-        PrerenderSVGContent(): void {
-            super.PrerenderSVGContent();
+        PrerenderSVGContent(manager: PluginManager): void {
+            super.PrerenderSVGContent(manager);
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
             this.BodyRect.setAttribute("class", ColorStyle.Default);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
@@ -402,8 +403,8 @@ module AssureNote {
         BodyPolygon: SVGPolygonElement;
         delta: number = 20;
 
-        PrerenderSVGContent(): void {
-            super.PrerenderSVGContent();
+        PrerenderSVGContent(manager: PluginManager): void {
+            super.PrerenderSVGContent(manager);
             this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
             this.BodyPolygon.setAttribute("class", ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyPolygon);
@@ -445,8 +446,8 @@ module AssureNote {
         private BodyEllipse: SVGEllipseElement;
         private ClientHeight: number;
 
-        PrerenderSVGContent(): void {
-            super.PrerenderSVGContent();
+        PrerenderSVGContent(manager: PluginManager): void {
+            super.PrerenderSVGContent(manager);
             this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
             this.BodyEllipse.setAttribute("class", ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyEllipse);

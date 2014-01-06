@@ -39,6 +39,10 @@ module AssureNote {
             /* Do nothing */
             return NodeDoc;
         }
+
+        RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
+            /* Do nothing */
+        }
     }
 
 
@@ -111,5 +115,10 @@ module AssureNote {
             return NodeDoc;
         }
 
+        InvokeSVGRenderPlugin(ShapeGroup: SVGGElement, NodeView: NodeView): void {
+            $.each(this.PluginMap, (key: string, value: Plugin) => {
+                value.RenderSVG(ShapeGroup, NodeView);
+            });
+        }
 	}
 }

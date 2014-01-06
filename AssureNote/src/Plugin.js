@@ -33,6 +33,10 @@ var AssureNote;
             /* Do nothing */
             return NodeDoc;
         };
+
+        Plugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            /* Do nothing */
+        };
         return Plugin;
     })();
     AssureNote.Plugin = Plugin;
@@ -103,6 +107,12 @@ var AssureNote;
                 NodeDoc = value.RenderHTML(NodeDoc, Model);
             });
             return NodeDoc;
+        };
+
+        PluginManager.prototype.InvokeSVGRenderPlugin = function (ShapeGroup, NodeView) {
+            $.each(this.PluginMap, function (key, value) {
+                value.RenderSVG(ShapeGroup, NodeView);
+            });
         };
         return PluginManager;
     })();

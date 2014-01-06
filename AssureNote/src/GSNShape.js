@@ -133,7 +133,7 @@ var AssureNote;
 
         GSNShape.prototype.PrerenderContent = function (manager) {
             this.PrerenderHTMLContent(manager);
-            this.PrerenderSVGContent();
+            this.PrerenderSVGContent(manager);
         };
 
         GSNShape.prototype.Render = function (HtmlContentFragment, SvgNodeFragment, SvgConnectionFragment) {
@@ -228,10 +228,11 @@ var AssureNote;
             }
         };
 
-        GSNShape.prototype.PrerenderSVGContent = function () {
+        GSNShape.prototype.PrerenderSVGContent = function (manager) {
             this.ShapeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ArrowPath = GSNShape.CreateArrowPath();
+            manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         };
 
         GSNShape.prototype.SetArrowPosition = function (P1, P2, Dir, Duration) {
@@ -317,8 +318,8 @@ var AssureNote;
         function GSNGoalShape() {
             _super.apply(this, arguments);
         }
-        GSNGoalShape.prototype.PrerenderSVGContent = function () {
-            _super.prototype.PrerenderSVGContent.call(this);
+        GSNGoalShape.prototype.PrerenderSVGContent = function (manager) {
+            _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyRect);
@@ -368,8 +369,8 @@ var AssureNote;
         function GSNContextShape() {
             _super.apply(this, arguments);
         }
-        GSNContextShape.prototype.PrerenderSVGContent = function () {
-            _super.prototype.PrerenderSVGContent.call(this);
+        GSNContextShape.prototype.PrerenderSVGContent = function (manager) {
+            _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
@@ -403,8 +404,8 @@ var AssureNote;
             _super.apply(this, arguments);
             this.delta = 20;
         }
-        GSNStrategyShape.prototype.PrerenderSVGContent = function () {
-            _super.prototype.PrerenderSVGContent.call(this);
+        GSNStrategyShape.prototype.PrerenderSVGContent = function (manager) {
+            _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
             this.BodyPolygon.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyPolygon);
@@ -448,8 +449,8 @@ var AssureNote;
         function GSNEvidenceShape() {
             _super.apply(this, arguments);
         }
-        GSNEvidenceShape.prototype.PrerenderSVGContent = function () {
-            _super.prototype.PrerenderSVGContent.call(this);
+        GSNEvidenceShape.prototype.PrerenderSVGContent = function (manager) {
+            _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
             this.BodyEllipse.setAttribute("class", AssureNote.ColorStyle.Default);
             this.ShapeGroup.appendChild(this.BodyEllipse);
