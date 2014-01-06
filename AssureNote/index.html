@@ -94,6 +94,59 @@
 			<div id="editor-wrapper" style="border: 1px solid black">
 				<textarea id="editor" placeholder="Type something..." style="display: none;"></textarea>
 			</div>
+            <!-- Help Modal -->
+            <div class="modal fade" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="help-modal-label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="help-modal-label">Help: Command list</h4>
+                        </div>
+                        <div class="modal-body">
+                            <ul>
+                                <li>
+                                    <code>new [name]</code><br>
+                                    create new file
+                                </li>
+                                <li>
+                                    <code>open</code> / <code>e</code><br>
+                                    open file
+                                </li>
+                                <li>
+                                    <code> save [name]</code> / <code> w [name]</code><br>
+                                    save editing file
+                                </li>
+                                <li>
+                                    <code> help </code> / <code> w [name]</code><br>
+                                    show this message
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+            <!-- Help Modal -->
+            <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="about-modal-label">About</h4>
+                        </div>
+                        <div class="modal-body" style="text-align: center;">
+                            <img src="images/logo.png" alt="AssureNote" style="width: 100%"/>
+                            <div>Version 1.0.0</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
 		</div>
 	</div>
 	<svg width="0" height="0">

@@ -91,7 +91,7 @@ var AssureNote;
                     }
                     break;
                 case "about-menu":
-                    alert("AssureNote 0.1");
+                    ($('#about-modal')).modal();
                     break;
             }
             if (Command != null) {

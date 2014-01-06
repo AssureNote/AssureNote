@@ -291,14 +291,7 @@ module AssureNote {
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
-            alert(
-                "new [name]\n    create new file\n" +
-                "open\n" +
-                "e\n    open file\n" +
-                "save [name]\n" +
-                "w [name]\n    save editing file\n" +
-                "help\n    show this message\n" +
-                "");
+            (<any>$("#help-modal")).modal();
         }
     }
 }

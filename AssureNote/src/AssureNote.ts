@@ -105,7 +105,7 @@ module AssureNote {
                     }
                     break;
                 case "about-menu":
-                    alert("AssureNote 0.1");
+                    (<any>$('#about-modal')).modal();
                     break;
             }
             if (Command != null) {
