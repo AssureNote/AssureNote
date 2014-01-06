@@ -8,6 +8,7 @@
 ///<reference path='plugin/FullScreenEditor/FullScreenEditor.ts'/>
 ///<reference path='plugin/MessageChat/MessageChat.ts'/>
 ///<reference path='plugin/VariableInterpolation/VariableInterpolation.ts'/>
+///<reference path='plugin/ToDo/ToDo.ts'/>
 var Debug = {};
 
 $(function () {
@@ -22,6 +23,8 @@ $(function () {
     AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
     var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
+    var ToDoPlugin = new AssureNote.ToDoPlugin(AssureNoteApp);
+    AssureNoteApp.PluginManager.SetPlugin("todo", ToDoPlugin);
 
     AssureNoteApp.LoadNewWGSN("hello.wgsn", $("#default-case").text());
 });
