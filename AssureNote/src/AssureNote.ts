@@ -104,6 +104,9 @@ module AssureNote {
                         Args = [Name.replace(/(\.\w+)?$/, ".dcase_model")];
                     }
                     break;
+                case "about-menu":
+                    alert("AssureNote 0.1");
+                    break;
             }
             if (Command != null) {
                 Command.Invoke(Id/*FIXME*/, this.PictgramPanel.MasterView, Args);
