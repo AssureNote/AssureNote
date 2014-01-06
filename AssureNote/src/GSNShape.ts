@@ -125,7 +125,8 @@ module AssureNote {
                 h4.textContent = this.NodeView.Label;
 
                 var p = document.createElement("p");
-                p.innerHTML = manager.InvokeHTMLRenderPlugin(this.NodeView.NodeDoc.trim(), this.NodeView.Model);
+                var encoded: string = AssureNoteUtils.HTMLEncode(this.NodeView.NodeDoc.trim());
+                p.innerHTML = manager.InvokeHTMLRenderPlugin(encoded, this.NodeView.Model);
                 this.UpdateHtmlClass();
                 div.appendChild(h4);
                 div.appendChild(p);

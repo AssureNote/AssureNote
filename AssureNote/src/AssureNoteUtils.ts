@@ -164,6 +164,12 @@ module AssureNote{
         export function CreateCSSFadeinAnimationDefinition(Prefix: string, Name: string): string {
             return "@" + Prefix + "keyframes " + Name + " { 0% { opacity: 0; } }";
         }
+
+        var element: HTMLDivElement = document.createElement('div');
+        export function HTMLEncode(text: string): string {
+            element.innerText = text;
+            return element.innerHTML;
+        }
     }
 
     export class ColorStyle {
