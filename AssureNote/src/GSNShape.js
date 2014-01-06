@@ -18,7 +18,7 @@ var AssureNote;
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
-            this.ColorStyle = "";
+            this.ColorStyle = AssureNote.ColorStyle.Default;
             this.GX = null;
             this.GY = null;
             this.PreviousAnimateElement = null;
@@ -321,7 +321,7 @@ var AssureNote;
         GSNGoalShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
                 this.ModuleRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
@@ -372,7 +372,7 @@ var AssureNote;
         GSNContextShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
             this.BodyRect.setAttribute("rx", "10");
             this.BodyRect.setAttribute("ry", "10");
@@ -407,7 +407,7 @@ var AssureNote;
         GSNStrategyShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
-            this.BodyPolygon.setAttribute("class", AssureNote.ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyPolygon);
         };
 
@@ -452,7 +452,7 @@ var AssureNote;
         GSNEvidenceShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
-            this.BodyEllipse.setAttribute("class", AssureNote.ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyEllipse);
         };
 

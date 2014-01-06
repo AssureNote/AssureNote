@@ -15,7 +15,7 @@ module AssureNote {
         ShapeGroup: SVGGElement;
         ArrowPath: SVGPathElement;
         Content: HTMLElement;
-        ColorStyle: string = "";
+        ColorStyle: string = ColorStyle.Default;
         private NodeWidth: number;
         private NodeHeight: number;
         private HeadBoundingBox: Rect; // Head is the node and Left and Right.
@@ -327,7 +327,7 @@ module AssureNote {
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
                 this.ModuleRect = AssureNoteUtils.CreateSVGElement("rect");
@@ -374,7 +374,7 @@ module AssureNote {
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
-            this.BodyRect.setAttribute("class", ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
             this.BodyRect.setAttribute("rx", "10");
             this.BodyRect.setAttribute("ry", "10");
@@ -406,7 +406,7 @@ module AssureNote {
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyPolygon = AssureNoteUtils.CreateSVGElement("polygon");
-            this.BodyPolygon.setAttribute("class", ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyPolygon);
         }
 
@@ -449,7 +449,7 @@ module AssureNote {
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
-            this.BodyEllipse.setAttribute("class", ColorStyle.Default);
+            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyEllipse);
         }
 

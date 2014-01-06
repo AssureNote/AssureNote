@@ -10,8 +10,9 @@ module AssureNote {
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
             var TagMap: HashMap<string, string> = NodeView.Model.GetTagMap();
-            if (TagMap && TagMap.get('TODO')) {
-                ShapeGroup.setAttribute('class', 'assurenote-todo');
+            if (TagMap && (TagMap.get('TODO') || TagMap.get('TODO') == '')) {
+                NodeView.ChangeColorStyle(ColorStyle.ToDo);
+                //ShapeGroup.setAttribute('class', 'assurenote-todo');
             }
         }
 	}
