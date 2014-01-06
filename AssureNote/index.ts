@@ -24,4 +24,6 @@ $(() => {
     AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
     var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(AssureNoteApp);
     AssureNoteApp.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
+
+    AssureNoteApp.LoadNewWGSN("hello.wgsn", $("#default-case").text());
 });
