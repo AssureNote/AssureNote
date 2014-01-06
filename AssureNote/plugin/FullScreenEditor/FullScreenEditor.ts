@@ -55,25 +55,25 @@ module AssureNote {
 
         /* This focuses on the node where the cursor of CodeMirror indicate */
         MoveBackgroundNode(doc: CodeMirror.Doc) {
-            var Label: string = null;
+            var UID: string = null;
             var line = doc.getCursor().line;
             while (line >= 0) {
                 var LineString: string = doc.getLine(line);
                 if (LineString.startsWith('*')) {
-                    var LabelChar: string = WikiSyntax.FormatNodeType(WikiSyntax.ParseNodeType(LineString));
-                    var LabelNum: string = WikiSyntax.ParseLabelNumber(LineString);
-                    Label = LabelChar + LabelNum;
+                    UID = WikiSyntax.ParseUID(LineString);
                     break;
                 }
                 line -= 1;
             }
-            if (Label) {
-                var View: NodeView = this.AssureNoteApp.PictgramPanel.ViewMap[Label];
-
-                /* Node exists and visible */
-                if (View && View.Shape) {
-                    console.log(View.GetCenterGX() + " " +  View.GetCenterGY())
-                    this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
+            if (UID != null) {
+                var Keys: string[] = Object.keys(this.AssureNoteApp.PictgramPanel.ViewMap);
+                for (var i in Keys) {
+                    var View: NodeView = this.AssureNoteApp.PictgramPanel.ViewMap[Keys[i]];
+                    /* Node exists and visible */
+                    if (View && View.Model && Lib.DecToHex(View.Model.UID) == UID) {
+                        console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
+                        this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
+                    }
                 }
             }
         }

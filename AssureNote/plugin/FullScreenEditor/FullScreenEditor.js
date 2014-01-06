@@ -66,24 +66,25 @@ var AssureNote;
 
         /* This focuses on the node where the cursor of CodeMirror indicate */
         FullScreenEditorPlugin.prototype.MoveBackgroundNode = function (doc) {
-            var Label = null;
+            var UID = null;
             var line = doc.getCursor().line;
             while (line >= 0) {
                 var LineString = doc.getLine(line);
                 if (LineString.startsWith('*')) {
-                    var LabelChar = WikiSyntax.FormatNodeType(WikiSyntax.ParseNodeType(LineString));
-                    var LabelNum = WikiSyntax.ParseLabelNumber(LineString);
-                    Label = LabelChar + LabelNum;
+                    UID = WikiSyntax.ParseUID(LineString);
                     break;
                 }
                 line -= 1;
             }
-            if (Label) {
-                var View = this.AssureNoteApp.PictgramPanel.ViewMap[Label];
+            if (UID != null) {
+                var Keys = Object.keys(this.AssureNoteApp.PictgramPanel.ViewMap);
+                for (var i in Keys) {
+                    var View = this.AssureNoteApp.PictgramPanel.ViewMap[Keys[i]];
 
-                if (View && View.Shape) {
-                    console.log(View.GetCenterGX() + " " + View.GetCenterGY());
-                    this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
+                    if (View && View.Model && Lib.DecToHex(View.Model.UID) == UID) {
+                        console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
+                        this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
+                    }
                 }
             }
         };
