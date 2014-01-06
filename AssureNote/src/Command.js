@@ -291,7 +291,8 @@ var AssureNote;
         OpenCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             var _this = this;
             $("#file-open-dialog").change(function (e) {
-                _this.App.LoadFiles((e.srcElement).files);
+                var target = e.target || e.srcElement;
+                _this.App.LoadFiles((target).files);
             });
             $("#file-open-dialog").click();
         };
