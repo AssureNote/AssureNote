@@ -40,9 +40,16 @@ var AssureNote;
         }
         ToDoPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
             var TagMap = NodeView.Model.GetTagMap();
-            if (TagMap && (TagMap.get('TODO') || TagMap.get('TODO') == '')) {
+            if (!TagMap)
+                return;
+            if (TagMap.get('TODO') || TagMap.get('TODO') == '') {
                 NodeView.ChangeColorStyle(AssureNote.ColorStyle.ToDo);
-                //ShapeGroup.setAttribute('class', 'assurenote-todo');
+            }
+            var KeySet = TagMap.keySet();
+            for (var key in KeySet) {
+                if (TagMap.get(KeySet[key]) == '') {
+                    NodeView.ChangeColorStyle(AssureNote.ColorStyle.ToDo);
+                }
             }
         };
         return ToDoPlugin;

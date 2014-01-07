@@ -34,9 +34,15 @@ module AssureNote {
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
             var TagMap: HashMap<string, string> = NodeView.Model.GetTagMap();
-            if (TagMap && (TagMap.get('TODO') || TagMap.get('TODO') == '')) {
+            if (!TagMap) return;
+            if (TagMap.get('TODO') || TagMap.get('TODO') == '') {
                 NodeView.ChangeColorStyle(ColorStyle.ToDo);
-                //ShapeGroup.setAttribute('class', 'assurenote-todo');
+            }
+            var KeySet: string[] = TagMap.keySet();
+            for (var key in KeySet) {
+                if (TagMap.get(KeySet[key]) == '') {
+                    NodeView.ChangeColorStyle(ColorStyle.ToDo);
+                }
             }
         }
 	}
