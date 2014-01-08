@@ -60,12 +60,8 @@ module AssureNote {
             this.TextArea.refresh();
             this.TextArea.focus();
         }
-
         DisableEditor(OldNodeView: NodeView): void {
             var WGSN: string = (<any>this.TextArea).getValue();
-
-            //Create a new GSNDoc
-            //TODO input user name
             this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
             var Node: GSNNode = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);

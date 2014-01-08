@@ -1,6 +1,8 @@
+///<reference path='../AssureNote/src/AssureNoteParser.ts'/>
 ///<reference path='d.ts/socket.io/socket.io.d.ts' />
 
 import socketio = require('socket.io');
+import parser = require('./AssureNoteParser');
 
 class AssureNoteServer {
     io: SocketManager;

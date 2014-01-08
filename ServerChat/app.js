@@ -1,5 +1,7 @@
+///<reference path='../AssureNote/src/AssureNoteParser.ts'/>
 ///<reference path='d.ts/socket.io/socket.io.d.ts' />
 var socketio = require('socket.io');
+
 
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
@@ -42,4 +44,3 @@ var AssureNoteServer = (function () {
 
 new AssureNoteServer();
 
-//# sourceMappingURL=app.js.map
