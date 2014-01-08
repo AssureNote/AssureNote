@@ -1,3 +1,4 @@
+module AssureNote {
 // ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
@@ -26,7 +27,7 @@
 
 
 
-class StringReader {
+export class StringReader {
 	CurrentPos: number;
 	PreviousPos: number;
 	Linenum: number;
@@ -81,11 +82,11 @@ class StringReader {
 	ReadLineList(LineList: Array<string>, UntilSection: boolean): void {
 		while(this.HasNext()) {
 			var Line: string = this.ReadLine();
-			if(UntilSection && Line.startsWith("*")) {
+			if(UntilSection && Lib.String_startsWith(Line, "*")) {
 				this.RollbackLineFeed();
 				break;
 			}
-			LineList.add(Line);
+			Lib.Array_add(LineList,  Line);
 		}
 	}
 
@@ -105,7 +106,7 @@ class StringReader {
 
 }
 
-class StringWriter {
+export class StringWriter {
 	sb: StringBuilder;
 	constructor() {
 		this.sb = new StringBuilder();
@@ -125,11 +126,11 @@ class StringWriter {
 	}
 }
 
-enum GSNType {
+export enum GSNType {
 	Goal, Context, Strategy, Evidence, Undefined
 }
 
-class GSNHistory {
+export class GSNHistory {
 	Rev: number;
 	Author: string;
 	Role: string;
@@ -162,16 +163,16 @@ class GSNHistory {
 	}
 
 	public EqualsHistory(aHistory: GSNHistory): boolean {
-		return (this.Date.equals(aHistory.Date) && this.Author.equals(aHistory.Author));
+		return (Lib.Object_equals(this.Date, aHistory.Date) && Lib.Object_equals(this.Author, aHistory.Author));
 	}
 	
 	public CompareDate(aHistory: GSNHistory): number {
-		return (this.Date.compareTo(aHistory.Date));
+		return (Lib.String_compareTo(this.Date, aHistory.Date));
 	}
 
 }
 
-class WikiSyntax {
+export class WikiSyntax {
 	static ParseInt(NumText: string, DefVal: number): number {
 		try {
 			return Lib.parseInt(NumText);
@@ -322,7 +323,7 @@ class WikiSyntax {
 	}
 }
 
-class TagUtils {
+export class TagUtils {
 	static ParseTag(TagMap: HashMap<string, string>, Line: string): void {
 		var loc: number = Line.indexOf("::");
 		if (loc != -1) {
@@ -343,8 +344,8 @@ class TagUtils {
 	}
 
 	static FormatHistoryTag(HistoryList: Array<GSNHistory>, Writer: StringWriter): void {
-		for (var i: number = 0; i < HistoryList.size(); i++) {
-			var History: GSNHistory = HistoryList.get(i);
+		for (var i: number = 0; i < Lib.Array_size(HistoryList); i++) {
+			var History: GSNHistory = Lib.Array_get(HistoryList, i);
 			if (History != null) {
 				Writer.println("#" + i + "::" + History);
 			}
@@ -369,7 +370,7 @@ class TagUtils {
 	}
 }
 
-class GSNNode {
+export class GSNNode {
 	BaseDoc: GSNDoc;
 	ParentNode: GSNNode;
 	SubNodeList: Array<GSNNode>;
@@ -429,8 +430,8 @@ class GSNNode {
 		if(BaseDoc != null) {
 			BaseDoc.UncheckAddNode(NewNode);
 		}
-		for (var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
+		for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.DeepCopy(BaseDoc, NewNode);
 		}
 		return NewNode;
@@ -455,8 +456,8 @@ class GSNNode {
 
 	public Remap(NodeMap: HashMap<Number, GSNNode>): void {
 		NodeMap.put(this.UID, this);
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.Remap(NodeMap);
 		}
 	}
@@ -486,8 +487,8 @@ class GSNNode {
 		if(NewNumber != null) {
 			this.LabelNumber = NewNumber;
 		}
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.ReplaceLabels(LabelMap);
 		}
 	}
@@ -506,8 +507,8 @@ class GSNNode {
 		var LineCount: number = 0;
 		var Writer: StringWriter = new StringWriter();
 		var md: MessageDigest = Lib.GetMD5();
-		for (var i: number = 0; i < LineList.size(); i++) {
-			var Line: string = LineList.get(i);
+		for (var i: number = 0; i < Lib.Array_size(LineList); i++) {
+			var Line: string = Lib.Array_get(LineList, i);
 			var Loc: number = Line.indexOf("::");
 			if (Loc > 0) {
 				this.HasTag = true;
@@ -560,14 +561,14 @@ class GSNNode {
 	GetNodeHistoryList(): Array<GSNNode> {
 		var NodeList: Array<GSNNode> = new Array<GSNNode>();
 		var LastNode: GSNNode = null;
-		for(var i: number = 0; i < this.BaseDoc.Record.HistoryList.size(); i++) {
-			var NodeHistory: GSNHistory = this.BaseDoc.Record.HistoryList.get(i);
+		for(var i: number = 0; i < Lib.Array_size(this.BaseDoc.Record.HistoryList); i++) {
+			var NodeHistory: GSNHistory = Lib.Array_get(this.BaseDoc.Record.HistoryList, i);
 			if(NodeHistory.Doc != null) {
 				var Node: GSNNode = NodeHistory.Doc.GetNode(this.UID);
 				if(Node != null) {
 					if(Node.Created == this.Created) {
 						if(LastNode == null || LastNode.LastModified != this.LastModified) {
-							NodeList.add(Node);
+							Lib.Array_add(NodeList,  Node);
 							LastNode = Node;
 						}
 					}
@@ -581,12 +582,12 @@ class GSNNode {
 		if (this.SubNodeList == null) {
 			this.SubNodeList = new Array<GSNNode>();
 		}
-		this.SubNodeList.add(Node);
+		Lib.Array_add(this.SubNodeList,  Node);
 	}
 
 	HasSubNode(NodeType: GSNType): boolean {
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if (Node.NodeType == NodeType) {
 				return true;
 			}
@@ -641,8 +642,8 @@ class GSNNode {
 			Result = this.GetTagMap();
 		}
 		if (this.SubNodeList != null) {
-			for (var i: number = 0; i < this.SubNodeList.size(); i++) {
-				var Node: GSNNode = this.SubNodeList.get(i);
+			for (var i: number = 0; i < Lib.Array_size(this.SubNodeList); i++) {
+				var Node: GSNNode = Lib.Array_get(this.SubNodeList, i);
 				if (Node.IsContext()) {
 					Result = this.MergeTagMap(Result, Node.GetTagMap());
 				}
@@ -653,8 +654,8 @@ class GSNNode {
 
 	GetLastNode(NodeType: GSNType, Creation: boolean): GSNNode {
 		if (this.SubNodeList != null) {
-			for (var i: number = this.SubNodeList.size() - 1; i >= 0; i--) {
-				var Node: GSNNode = this.SubNodeList.get(i);
+			for (var i: number = Lib.Array_size(this.SubNodeList) - 1; i >= 0; i--) {
+				var Node: GSNNode = Lib.Array_get(this.SubNodeList, i);
 				if (Node.NodeType == NodeType) {
 					return Node;
 				}
@@ -684,13 +685,13 @@ class GSNNode {
 			Writer.print(" " + HistoryTriple);
 		}
 		Writer.newline();
-		if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+		if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
 			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
 		Writer.newline();
-		for (var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
+		for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.FormatNode(Writer);
 		}
 	}
@@ -710,14 +711,14 @@ class GSNNode {
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		Writer.newline();
-		if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+		if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
 			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
 		Writer.newline();
 		if (this.NonNullSubNodeList() != null) {
-			for (var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-				var Node: GSNNode = this.NonNullSubNodeList().get(i);
+			for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+				var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 				Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
 			}
 		}
@@ -726,9 +727,9 @@ class GSNNode {
 	ReplaceSubNode(NewNode: GSNNode): GSNNode {
 		this.MergeSubNode(NewNode);
 		if(this.ParentNode != null) {
-			for(var i: number = 0; i < this.ParentNode.SubNodeList.size(); i++) {
-				if(this.ParentNode.SubNodeList.get(i) == this) {
-					this.ParentNode.SubNodeList.set(i, NewNode);
+			for(var i: number = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
+				if(Lib.Array_get(this.ParentNode.SubNodeList, i) == this) {
+					Lib.Array_set(this.ParentNode.SubNodeList, i, NewNode);
 				}
 			}
 		}
@@ -752,8 +753,8 @@ class GSNNode {
 		if(UID == this.UID) {
 			return true;
 		}
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var SubNode: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var SubNode: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if(SubNode.HasSubNodeUID(UID)) return true;
 		}
 		return false;
@@ -779,8 +780,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(var i: number = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
-			var SubNode: GSNNode = NewNode.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < Lib.Array_size(NewNode.NonNullSubNodeList()); i++) {
+			var SubNode: GSNNode = Lib.Array_get(NewNode.NonNullSubNodeList(), i);
 			this.MergeSubNode(SubNode);
 		}
 	}
@@ -788,8 +789,8 @@ class GSNNode {
 	// Merge
 	IsNewerTree(ModifiedRev: number): boolean {
 		if (ModifiedRev <= this.LastModified.Rev) {
-			for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-				var Node: GSNNode = this.NonNullSubNodeList().get(i);
+			for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+				var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 				if (!Node.IsNewerTree(ModifiedRev)) {
 					return false;
 				}
@@ -800,10 +801,10 @@ class GSNNode {
 	}
 
 	ListSubGoalNode(BufferList: Array<GSNNode>): void {
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if(Node.IsGoal()) {
-				BufferList.add(Node);
+				Lib.Array_add(BufferList, Node);
 			}
 			if(Node.IsStrategy()) {
 				Node.ListSubGoalNode(BufferList);
@@ -812,10 +813,10 @@ class GSNNode {
 	}
 
 	ListSectionNode(BufferList: Array<GSNNode>): void {
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if(!Node.IsGoal()) {
-				BufferList.add(Node);
+				Lib.Array_add(BufferList, Node);
 			}
 			if(Node.IsStrategy() || Node.IsEvidence()) {
 				Node.ListSectionNode(BufferList);
@@ -825,8 +826,8 @@ class GSNNode {
 	
 	ReserveLabelMap(LabelMap: HashMap<string, string>): void {
 		if (this.LabelNumber != null) LabelMap.put(this.LabelNumber,  "exists"); // Non-null value
-		for (var i: number = 0; this.SubNodeList != null && i < this.SubNodeList.size(); i++) {
-			this.SubNodeList.get(i).ReserveLabelMap(LabelMap);
+		for (var i: number = 0; this.SubNodeList != null && i < Lib.Array_size(this.SubNodeList); i++) {
+			Lib.Array_get(this.SubNodeList, i).ReserveLabelMap(LabelMap);
 		}
 	}
 
@@ -842,17 +843,17 @@ class GSNNode {
 			var BufferList: Array<GSNNode> = new Array<GSNNode>();
 			CurrentNode.ListSectionNode(BufferList);
 			var SectionCount: number = 1;
-			for(var i: number = 0; i < BufferList.size(); i++, SectionCount += 1) {
-				var SectionNode: GSNNode = BufferList.get(i);
+			for(var i: number = 0; i < Lib.Array_size(BufferList); i++, SectionCount += 1) {
+				var SectionNode: GSNNode = Lib.Array_get(BufferList, i);
 				var LabelNumber: string = CurrentNode.GetLabelNumber() + "." + SectionCount;
 				if (LabelMap.get(LabelNumber) != null) continue;
 				SectionNode.AssignedLabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
 			}
-			BufferList.clear();
+			Lib.Array_clear(BufferList);
 			
 			CurrentNode.ListSubGoalNode(BufferList);
-			for(var i: number = 0; i < BufferList.size(); i++) {
-				var GoalNode: GSNNode = BufferList.get(i);
+			for(var i: number = 0; i < Lib.Array_size(BufferList); i++) {
+				var GoalNode: GSNNode = Lib.Array_get(BufferList, i);
 				queue.add(GoalNode);
 				//NextCount = GoalNode.RenumberGoalRecursive(NextGoalCount, NextCount, LabelMap);
 				NextGoalCount += 1;
@@ -868,19 +869,19 @@ class GSNNode {
 	
 	SearchNode(SearchWord: string): Array<GSNNode> {
 		var NodeList: Array<GSNNode> = new Array<GSNNode>();
-		if(this.NodeDoc.matches(SearchWord)) {
-			NodeList.add(this);
+		if(Lib.String_matches(this.NodeDoc, SearchWord)) {
+			Lib.Array_add(NodeList, this);
 		}
-		for(var i: number = 0; i < this.NonNullSubNodeList().size(); i++) {
-			var Node: GSNNode = this.NonNullSubNodeList().get(i);
-			NodeList.addAll(Node.SearchNode(SearchWord));
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
+			Lib.Array_addAll(NodeList, Node.SearchNode(SearchWord));
 		}
 		return NodeList;
 	}
 
 }
 
-class GSNDoc {
+export class GSNDoc {
 	Record: GSNRecord;
 	TopNode: GSNNode;
 	NodeMap: HashMap<Number, GSNNode>;
@@ -976,7 +977,7 @@ class GSNDoc {
 
 	RemoveNode(Node: GSNNode): void {(this == Node.BaseDoc);
 		if(Node.ParentNode != null) {
-			Node.ParentNode.SubNodeList.remove(Node);
+			Lib.Array_remove(Node.ParentNode.SubNodeList, Node);
 		}
 		this.RemapNodeMap();
 	}
@@ -997,8 +998,8 @@ class GSNDoc {
 			if (CurrentNode.LabelName != null) {
 				LabelMap.put(CurrentNode.LabelName, CurrentNode.GetLabel());
 			}
-			for (var i: number = 0; CurrentNode.SubNodeList != null && i < CurrentNode.SubNodeList.size(); i++) {
-				queue.add(CurrentNode.SubNodeList.get(i));
+			for (var i: number = 0; CurrentNode.SubNodeList != null && i < Lib.Array_size(CurrentNode.SubNodeList); i++) {
+				queue.add(Lib.Array_get(CurrentNode.SubNodeList, i));
 			}
 		}
 		return LabelMap;
@@ -1013,7 +1014,7 @@ class GSNDoc {
 }
 
 
-class GSNRecord {
+export class GSNRecord {
 	HistoryList: Array<GSNHistory>;
 	EditingDoc: GSNDoc;
 
@@ -1024,17 +1025,17 @@ class GSNRecord {
 
 	DeepCopy(): GSNRecord {
 		var NewRecord: GSNRecord = new GSNRecord();
-		for(var i: number = 0; i < this.HistoryList.size(); i++) {
-			var Item: GSNHistory = this.HistoryList.get(i);
-			NewRecord.HistoryList.add(Item);
+		for(var i: number = 0; i < Lib.Array_size(this.HistoryList); i++) {
+			var Item: GSNHistory = Lib.Array_get(this.HistoryList, i);
+			Lib.Array_add(NewRecord.HistoryList, Item);
 		}
 		NewRecord.EditingDoc = this.EditingDoc;
 		return NewRecord;
 	}
 	
 	GetHistory(Rev: number): GSNHistory {
-		if (Rev < this.HistoryList.size()) {
-			return this.HistoryList.get(Rev);
+		if (Rev < Lib.Array_size(this.HistoryList)) {
+			return Lib.Array_get(this.HistoryList, Rev);
 		}
 		return null;
 	}
@@ -1048,18 +1049,18 @@ class GSNRecord {
 	}
 	
 	NewHistory(Author: string, Role: string, Date: string, Process: string, Doc: GSNDoc): GSNHistory {
-		var History: GSNHistory = new GSNHistory(this.HistoryList.size(), Author, Role, Date, Process, Doc);
-		this.HistoryList.add(History);
+		var History: GSNHistory = new GSNHistory(Lib.Array_size(this.HistoryList), Author, Role, Date, Process, Doc);
+		Lib.Array_add(this.HistoryList, History);
 		return History;
 	}
 
 	AddHistory(Rev: number, Author: string, Role: string, Date: string, Process: string, Doc: GSNDoc): void {
 		if(Rev >= 0) {
 			var History: GSNHistory = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
-			while (!(Rev < this.HistoryList.size())) {
-				this.HistoryList.add(null);
+			while (!(Rev < Lib.Array_size(this.HistoryList))) {
+				Lib.Array_add(this.HistoryList, null);
 			}
-			this.HistoryList.set(Rev, History);
+			Lib.Array_set(this.HistoryList, Rev, History);
 			if (Doc != null) {
 				Doc.DocHistory = History;
 			}
@@ -1115,7 +1116,7 @@ class GSNRecord {
 
 	public Merge(NewRecord: GSNRecord): void {
 		var CommonHistory: number = -1;
-		for (var Rev: number = 0; Rev < this.HistoryList.size(); Rev++) {
+		for (var Rev: number = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
 			var MasterHistory: GSNHistory = this.GetHistory(Rev);
 			var NewHistory: GSNHistory = NewRecord.GetHistory(Rev);
 			if (NewHistory != null && MasterHistory.EqualsHistory(MasterHistory)) {
@@ -1127,7 +1128,7 @@ class GSNRecord {
 		if(CommonHistory == -1) {
 			this.MergeAsReplaceTopGoal(NewRecord);
 		}
-		else if(CommonHistory == this.HistoryList.size()-1) {
+		else if(CommonHistory == Lib.Array_size(this.HistoryList)-1) {
 			this.MergeAsFastFoward(NewRecord);
 		}
 		else {
@@ -1137,18 +1138,18 @@ class GSNRecord {
 	}
 
 	public MergeAsFastFoward(NewRecord: GSNRecord): void {
-		for (var i: number = this.HistoryList.size(); i < NewRecord.HistoryList.size(); i++) {
+		for (var i: number = Lib.Array_size(this.HistoryList); i < Lib.Array_size(NewRecord.HistoryList); i++) {
 			var BranchDoc: GSNDoc = NewRecord.GetHistoryDoc(i);
 			if(BranchDoc != null) {
 				BranchDoc.Record = this;
-				this.HistoryList.add(BranchDoc.DocHistory);
+				Lib.Array_add(this.HistoryList, BranchDoc.DocHistory);
 			}
 		}
 	}
 
 	public MergeAsReplaceTopGoal(NewRecord: GSNRecord): void {
-		for(var i: number = 0; i < NewRecord.HistoryList.size(); i++) {
-			var NewHistory: GSNHistory = NewRecord.HistoryList.get(i);
+		for(var i: number = 0; i < Lib.Array_size(NewRecord.HistoryList); i++) {
+			var NewHistory: GSNHistory = Lib.Array_get(NewRecord.HistoryList, i);
 			var Doc: GSNDoc = NewHistory != null ? NewHistory.Doc : null;
 			if(Doc != null) {
 				this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
@@ -1159,16 +1160,16 @@ class GSNRecord {
 	}
 
 	public MergeAsIncrementalAddition(Rev1: number, Record1: GSNRecord, Rev2: number, Record2: GSNRecord): void {
-		while(Rev1 < Record1.HistoryList.size() && Rev2 < Record2.HistoryList.size()) {
+		while(Rev1 < Lib.Array_size(Record1.HistoryList) && Rev2 < Lib.Array_size(Record2.HistoryList)) {
 			var History1: GSNHistory = Record1.GetHistory(Rev1);
 			var History2: GSNHistory = Record2.GetHistory(Rev2);
 			if(History1 == null || History1.Doc == null) {
-				if(Rev1 < Record1.HistoryList.size()) {
+				if(Rev1 < Lib.Array_size(Record1.HistoryList)) {
 					Rev1++; continue;
 				}
 			}
 			if(History2 == null || History2.Doc == null) {
-				if(Rev2 < Record2.HistoryList.size()) {
+				if(Rev2 < Lib.Array_size(Record2.HistoryList)) {
 					Rev2++; continue;
 				}
 			}
@@ -1186,7 +1187,7 @@ class GSNRecord {
 	}
 
 	GetLatestDoc(): GSNDoc {
-		for(var i: number = this.HistoryList.size() - 1; i >= 0; i++) {
+		for(var i: number = Lib.Array_size(this.HistoryList) - 1; i >= 0; i++) {
 			var Doc: GSNDoc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				return Doc;
@@ -1198,7 +1199,7 @@ class GSNRecord {
 	public FormatRecord(Writer: StringWriter): void {
 		var DocCount: number = 0;
 		TagUtils.FormatHistoryTag(this.HistoryList, Writer);
-		for (var i: number = 0; i < this.HistoryList.size(); i++) {
+		for (var i: number = 0; i < Lib.Array_size(this.HistoryList); i++) {
 			var Doc: GSNDoc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				if(DocCount > 0) {
@@ -1212,7 +1213,7 @@ class GSNRecord {
 
 }
 
-class ParserContext {
+export class ParserContext {
 	NullableDoc: GSNDoc;
 	GoalStack: Array<GSNNode>;
 	FirstNode: GSNNode;
@@ -1242,8 +1243,8 @@ class ParserContext {
 	}
 	
 	GetStrategyOfGoal(Level: number): GSNNode {
-		if (Level - 1 < this.GoalStack.size()) {
-			var ParentGoal: GSNNode = this.GoalStack.get(Level - 1);
+		if (Level - 1 < Lib.Array_size(this.GoalStack)) {
+			var ParentGoal: GSNNode = Lib.Array_get(this.GoalStack, Level - 1);
 			if (ParentGoal != null) {
 				return ParentGoal.GetLastNode(GSNType.Strategy, true/*Creation*/);
 			}
@@ -1261,10 +1262,10 @@ class ParserContext {
 	SetGoalStackAt(Node: GSNNode): void {
 		var GoalLevel: number = Node.GetGoalLevel();
 //		System.out.println("GoalLevel="+GoalLevel+ ", stack="+this.GoalStackList.size());
-		while (!(GoalLevel - 1 < this.GoalStack.size())) {
-			this.GoalStack.add(null);
+		while (!(GoalLevel - 1 < Lib.Array_size(this.GoalStack))) {
+			Lib.Array_add(this.GoalStack, null);
 		}
-		this.GoalStack.set(GoalLevel-1, Node);
+		Lib.Array_set(this.GoalStack, GoalLevel-1, Node);
 	}
 
 	IsValidSection(Line: string, Reader: StringReader): boolean {
@@ -1275,11 +1276,11 @@ class ParserContext {
 			if (ParentNode != null) {
 				return true;
 			}
-			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
+			Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
 			return false;
 		}
-		if (this.LastGoalNode != null && this.GoalStack.size() <= Level) {
-			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
+		if (this.LastGoalNode != null && Lib.Array_size(this.GoalStack) <= Level) {
+			Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
 			return false;
 		}
 		if (NodeType == GSNType.Context) {
@@ -1321,7 +1322,7 @@ class ParserContext {
 		if (NodeType == GSNType.Goal) {
 			ParentNode = this.GetStrategyOfGoal(Level);
 		} else {
-			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GoalStack.get(Level);
+			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : Lib.Array_get(this.GoalStack, Level);
 //			if(ParentNode.GoalLevel != Level) {
 //				Reader.LogError("mismatched level", Line);
 //			}
@@ -1350,12 +1351,12 @@ class ParserContext {
 	ParseNode(Reader: StringReader, RefMap: HashMap<string, GSNNode>): GSNNode {
 		while (Reader.HasNext()) {
 			var Line: string = Reader.ReadLine();
-			if (Line.startsWith("*")) {
+			if (Lib.String_startsWith(Line, "*")) {
 				Reader.RollbackLineFeed();
 				break;
 			}
 			if(this.NullableDoc != null) {
-				if (Line.startsWith("#")) {
+				if (Lib.String_startsWith(Line, "#")) {
 					this.NullableDoc.Record.ParseHistoryTag(Line, Reader);
 				} else {
 					TagUtils.ParseTag(this.NullableDoc.DocTagMap, Line);
@@ -1369,8 +1370,8 @@ class ParserContext {
 		var LineList: Array<string> = new Array<string>();
 		while (Reader.HasNext()) {
 			var Line: string = Reader.ReadLine();
-			if (Line.startsWith("*")) {
-				if (Line.startsWith(Lib.VersionDelim)) {
+			if (Lib.String_startsWith(Line,  "*")) {
+				if (Lib.String_startsWith(Line,  Lib.VersionDelim)) {
 					break;
 				}
 				if (this.IsValidSection(Line, Reader)) {
@@ -1379,7 +1380,7 @@ class ParserContext {
 					continue;
 				}
 			}
-			LineList.add(Line);
+			Lib.Array_add(LineList, Line);
 		}
 		this.UpdateContent(LastNode, LineList);
 		return this.FirstNode;
@@ -1389,11 +1390,11 @@ class ParserContext {
 		if (LastNode != null) {
 			LastNode.SetContent(LineList);
 		}
-		LineList.clear();
+		Lib.Array_clear(LineList);
 	}
 }
 
-class AssureNoteParser {
+export class AssureNoteParser {
 	public  static merge(MasterFile: string, BranchFile: string): void {
 		var MasterRecord: GSNRecord = new GSNRecord();
 		MasterRecord.Parse(Lib.ReadFile(MasterFile));
@@ -1449,12 +1450,12 @@ class AssureNoteParser {
 declare function unescape(str: string) : string;
 
 /* FIXME this class is never used */
-class PdfConverter {
+export class PdfConverter {
 	constructor () {}
 	static main(args: string[]) {}
 }
 
-class Random {
+export class Random {
     constructor(seed: number) {}
 
     nextInt() : number {
@@ -1462,13 +1463,13 @@ class Random {
     }
 }
 
-class System {
+export class System {
     static currentTimeMillis() {
         return new Date().getTime();
     }
 }
 
-class StringBuilder {
+export class StringBuilder {
 	str : string;
 	constructor() {
 		this.str = "";
@@ -1483,7 +1484,7 @@ class StringBuilder {
 	}
 }
 
-class Character {
+export class Character {
 	static isDigit(c: number) : boolean {
 		/* '0' ~ '9' */
 		return 48 <= c && c <= 57;
@@ -1495,7 +1496,7 @@ class Character {
 	}
 }
 
-class SimpleDateFormat {
+export class SimpleDateFormat {
 	constructor(format: string) {
 		// Support format string, or is it needless?
 	}
@@ -1540,7 +1541,7 @@ class SimpleDateFormat {
 	}
 }
 
-class Queue <E> {
+export class Queue <E> {
     list: E[];
 
     constructor() {
@@ -1559,10 +1560,10 @@ class Queue <E> {
     }
 }
 
-class LinkedList <E> extends Queue <E> {
+export class LinkedList <E> extends Queue <E> {
 }
 
-class HashMap <K, V>{
+export class HashMap <K, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
 	constructor() {
@@ -1597,7 +1598,7 @@ class HashMap <K, V>{
 	}
 }
 
-class MessageDigest {
+export class MessageDigest {
 	digestString: string;
 	constructor() {
 		this.digestString = null;
@@ -1608,7 +1609,7 @@ class MessageDigest {
 	}
 }
 
-class Lib {
+export class Lib {
 	/* To be set on lib/md5.js */
 	static md5 : (str: string) => string;
 
@@ -1646,23 +1647,95 @@ class Lib {
     static DecToHex(n: number) : string {
         return n.toString(16);
     }
+
+    static String_startsWith(self: string, key: string) : boolean {
+        return self.indexOf(key, 0) == 0;
+    }
+
+    static String_compareTo(self: string, anotherString: string): number {
+        if (self < anotherString) {
+            return -1;
+        } else if (self > anotherString) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    static String_endsWith(self: string, key: string) : boolean {
+        return self.lastIndexOf(key, 0) == 0;
+    }
+
+    static String_matches(self: string, str: string): boolean {
+        return self.match(str) != null;
+    }
+
+    static Array_get(self: any[], index: number): any {
+        if (index >= this.length) {
+            throw new RangeError("invalid array index");
+        }
+        return self[index];
+    }
+    static Array_set(self: any[], index: number, value: any): void {
+        self[index] = value;
+    }
+    static Array_add(self: any[], obj: any): void {
+        self.push(obj);
+    }
+    static Array_add2(self: any[], index: number, obj: any): void {
+        self.splice(index, 0, obj);
+    }
+    static Array_addAll(self: any[], obj: any): void {
+        Array.prototype.push.apply(self, obj);
+    }
+    static Array_size(self: any[]): number {
+        return self.length;
+    }
+    static Array_clear(self: any[]): void {
+        self.length = 0;
+    }
+    static Array_remove(self: any[], index: any): any {
+        if (typeof index == 'number') {
+            if (index >= self.length) {
+                throw new RangeError("invalid array index");
+            }
+        } else {
+            var item = index;
+            index = 0;
+            for (var j in self) {
+                if (self[j] === index) break;
+            }
+            if (j == self.length) return null;
+        }
+        var v = self[index];
+        self.splice(index, 1);
+        return v;
+    }
+
+    static Object_equals(self: any, obj: any) : boolean {
+        return (self === obj);
+    }
+
+    static Object_InstanceOf(self: any, klass: any) : boolean {
+        return (<any>this).constructor == klass;
+    }
 }
 
-class Iterator<T> {//FIX ME!!
+export class Iterator<T> {//FIX ME!!
 }
 
-interface Array {
-        get(index: number): any;
-        set(index: number, value: any): void;
-        add(obj: any): void;
-        add(index: number, obj : any): void;
-        addAll(obj : any): void;
-        size(): number;
-        clear(): void;
-        remove(index: number): any;
-        remove(item: any): any;
-        iterator(): Iterator<Array>;
-}
+//export interface Array<T> {
+//        get(index: number): any;
+//        set(index: number, value: any): void;
+//        add(obj: any): void;
+//        add(index: number, obj : any): void;
+//        addAll(obj : any): void;
+//        size(): number;
+//        clear(): void;
+//        remove(index: number): any;
+//        remove(item: any): any;
+//        iterator(): Iterator<Array>;
+//}
 
 Object.defineProperty(Array.prototype, "addAll", {
         enumerable : false,
@@ -1735,7 +1808,7 @@ Object.defineProperty(Array.prototype, "clear", {
         }
 });
 
-interface Object {
+export interface Object {
         equals(other: any): boolean;
         InstanceOf(klass: any): boolean;
 }
@@ -1754,15 +1827,15 @@ Object.defineProperty(Object.prototype, "InstanceOf", {
         }
 });
 
-interface String {
-        compareTo(anotherString: string): number;
-        startsWith(key: string): boolean;
-        endsWith(key: string): boolean;
-        lastIndexOf(ch: number) : number;
-        indexOf(ch: number) : number;
-        substring(BeginIdx : number, EndIdx : number) : string;
-        matches(str : string) : boolean;
-}
+//export interface String {
+//        compareTo(anotherString: string): number;
+//        startsWith(key: string): boolean;
+//        endsWith(key: string): boolean;
+//        lastIndexOf(ch: number) : number;
+//        indexOf(ch: number) : number;
+//        substring(BeginIdx : number, EndIdx : number) : string;
+//        matches(str : string) : boolean;
+//}
 
 Object.defineProperty(String.prototype, "compareTo", {
         enumerable : false,
@@ -2072,3 +2145,4 @@ Object.defineProperty(String.prototype, "matches", {
 
 	$.md5 = md5;
 }(Lib));
+}

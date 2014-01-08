@@ -83,7 +83,7 @@ module AssureNote {
             var line = doc.getCursor().line;
             while (line >= 0) {
                 var LineString: string = doc.getLine(line);
-                if (LineString.startsWith('*')) {
+                if (LineString.indexOf('*') == 0) {
                     UID = WikiSyntax.ParseUID(LineString);
                     break;
                 }

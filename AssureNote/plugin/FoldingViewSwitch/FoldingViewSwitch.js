@@ -42,11 +42,11 @@ var AssureNote;
             this.HasDoubleClicked = true;
 
             this.FoldingAction = function (event, TargetView) {
-                if (TargetView.GetNodeType() == GSNType.Strategy) {
+                if (TargetView.GetNodeType() == AssureNote.GSNType.Strategy) {
                     if (TargetView.Children != null) {
                         for (var i = 0; i < TargetView.Children.length; i++) {
                             var SubView = TargetView.Children[i];
-                            if (SubView.GetNodeType() == GSNType.Goal) {
+                            if (SubView.GetNodeType() == AssureNote.GSNType.Goal) {
                                 SubView.IsFolded = true;
                             }
                         }
@@ -85,7 +85,7 @@ var AssureNote;
             var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
                 var TargetType = TargetView.GetNodeType();
-                if (TargetType != GSNType.Goal && TargetType != GSNType.Strategy) {
+                if (TargetType != AssureNote.GSNType.Goal && TargetType != AssureNote.GSNType.Strategy) {
                     AssureNoteApp.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
                     return;
                 }
@@ -96,7 +96,7 @@ var AssureNote;
         };
 
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
+            if (NodeView.GetNodeType() != AssureNote.GSNType.Goal && NodeView.GetNodeType() != AssureNote.GSNType.Strategy) {
                 return null;
             }
             return new AssureNote.MenuBarButton("folded-id", "images/copy.png", "fold", this.FoldingAction);

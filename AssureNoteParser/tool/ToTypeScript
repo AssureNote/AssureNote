@@ -19,12 +19,14 @@ for s in ${source}; do
     ts="${ts} ${build}_${s}.ts"
 done
 
-cat ${ts} ${libs} > ${build}${target}.ts
+echo "module AssureNote {" > ${build}${target}.ts
+cat ${ts} ${libs} >> ${build}${target}.ts
 rm ${ts}
 
 if [ $# -ne 0 ]; then
     perl src/TypeScript/PackInputFiles.pl $@ >> ${build}${target}.ts
 fi
+echo "}" >> ${build}${target}.ts
 
 
 tsc ${build}${target}.ts --module commonjs
