@@ -41,6 +41,7 @@ import java.util.Random;
 
 import com.itextpdf.text.DocumentException;
 //endif VAJA
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 //ifdef JAVA
 class Lib {
@@ -115,7 +116,55 @@ class Lib {
 	static String DecToHex(int n) {
 		return Integer.toHexString(n);
 	}
-		
+	
+	static boolean String_startsWith(String self, String key) {
+		return self.startsWith(key);
+	}
+	
+	static int String_compareTo(String self, String anotherString) {
+		return self.compareTo(anotherString);
+	}
+	
+	static boolean String_endsWith(String self, String key) {
+		return self.endsWith(key);
+	}
+	
+	static boolean String_matches(String self, String str) {
+		return self.matches(str);
+	}
+	
+	static <T> T Array_get(ArrayList<T> self, int index) {
+		return self.get(index);
+	}
+	
+	static <T> void Array_set(ArrayList<T> self, int index, T value) {
+		self.set(index, value);
+	}
+	
+	static <T> void Array_add(ArrayList<T> self, T obj) {
+		self.add(obj);
+	}
+	
+	static <T> void Array_add2(ArrayList<T> self, int index, T obj) {
+		self.add(index, obj);
+	}
+	
+	static <T> void Array_addAll(ArrayList<T> self,  ArrayList<T> obj) {
+		self.addAll(obj);
+	}
+	
+	static <T> int Array_size(ArrayList<T> self) {
+		return self.size();
+	}
+	
+	static <T> void Array_clear(ArrayList<T> self) {
+		self.clear();
+	}
+	
+	static <T> void Array_remove(ArrayList<T> self, Object obj) {
+		self.remove(obj);
+	}
+	
 }
 //endif VAJA
 
