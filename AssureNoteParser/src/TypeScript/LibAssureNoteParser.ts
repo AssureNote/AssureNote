@@ -246,7 +246,7 @@ export class Lib {
     static Array_clear(self: any[]): void {
         self.length = 0;
     }
-    static Array_remove(self: any[], index: number): any {
+    static Array_remove(self: any[], index: any): any {
         if (typeof index == 'number') {
             if (index >= self.length) {
                 throw new RangeError("invalid array index");
@@ -262,6 +262,14 @@ export class Lib {
         var v = self[index];
         self.splice(index, 1);
         return v;
+    }
+
+    static Object_equals(self: any, obj: any) : boolean {
+        return (self === obj);
+    }
+
+    static Object_InstanceOf(self: any, klass: any) : boolean {
+        return (<any>this).constructor == klass;
     }
 }
 

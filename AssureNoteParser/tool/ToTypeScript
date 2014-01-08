@@ -27,4 +27,4 @@ if [ $# -ne 0 ]; then
 fi
 
 
-tsc ${build}${target}.ts
+tsc ${build}${target}.ts --module commonjs

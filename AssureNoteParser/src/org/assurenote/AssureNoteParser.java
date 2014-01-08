@@ -41,7 +41,6 @@ import java.util.Random;
 
 import com.itextpdf.text.DocumentException;
 //endif VAJA
-import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 //ifdef JAVA
 class Lib {
@@ -165,6 +164,9 @@ class Lib {
 		self.remove(obj);
 	}
 	
+	static boolean Object_equals(Object self, Object obj) {
+		return self.equals(obj);
+	}
 }
 //endif VAJA
 
@@ -223,11 +225,11 @@ class StringReader {
 	void ReadLineList(ArrayList<String> LineList, boolean UntilSection) {
 		while(this.HasNext()) {
 			/*local*/String Line = this.ReadLine();
-			if(UntilSection && Line.startsWith("*")) {
+			if(UntilSection && Lib.String_startsWith(Line, "*")) {
 				this.RollbackLineFeed();
 				break;
 			}
-			LineList.add(Line);
+			Lib.Array_add(LineList,  Line);
 		}
 	}
 
@@ -304,11 +306,11 @@ class GSNHistory {
 	}
 
 	public boolean EqualsHistory(GSNHistory aHistory) {
-		return (this.Date.equals(aHistory.Date) && this.Author.equals(aHistory.Author));
+		return (Lib.Object_equals(this.Date, aHistory.Date) && Lib.Object_equals(this.Author, aHistory.Author));
 	}
 	
 	public int CompareDate(GSNHistory aHistory) {
-		return (this.Date.compareTo(aHistory.Date));
+		return (Lib.String_compareTo(this.Date, aHistory.Date));
 	}
 
 }
@@ -485,8 +487,8 @@ class TagUtils {
 	}
 
 	static void FormatHistoryTag(ArrayList<GSNHistory> HistoryList, StringWriter Writer) {
-		for (/*local*/int i = 0; i < HistoryList.size(); i++) {
-			/*local*/GSNHistory History = HistoryList.get(i);
+		for (/*local*/int i = 0; i < Lib.Array_size(HistoryList); i++) {
+			/*local*/GSNHistory History = Lib.Array_get(HistoryList, i);
 			if (History != null) {
 				Writer.println("#" + i + "::" + History);
 			}
@@ -571,8 +573,8 @@ class GSNNode {
 		if(BaseDoc != null) {
 			BaseDoc.UncheckAddNode(NewNode);
 		}
-		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+		for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.DeepCopy(BaseDoc, NewNode);
 		}
 		return NewNode;
@@ -597,8 +599,8 @@ class GSNNode {
 
 	public void Remap(HashMap<Integer, GSNNode> NodeMap) {
 		NodeMap.put(this.UID, this);
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.Remap(NodeMap);
 		}
 	}
@@ -628,8 +630,8 @@ class GSNNode {
 		if(NewNumber != null) {
 			this.LabelNumber = NewNumber;
 		}
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.ReplaceLabels(LabelMap);
 		}
 	}
@@ -648,8 +650,8 @@ class GSNNode {
 		/*local*/int LineCount = 0;
 		/*local*/StringWriter Writer = new StringWriter();
 		/*local*/MessageDigest md = Lib.GetMD5();
-		for (/*local*/int i = 0; i < LineList.size(); i++) {
-			/*local*/String Line = LineList.get(i);
+		for (/*local*/int i = 0; i < Lib.Array_size(LineList); i++) {
+			/*local*/String Line = Lib.Array_get(LineList, i);
 			/*local*/int Loc = Line.indexOf("::");
 			if (Loc > 0) {
 				this.HasTag = true;
@@ -702,14 +704,14 @@ class GSNNode {
 	ArrayList<GSNNode> GetNodeHistoryList() {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
 		/*local*/GSNNode LastNode = null;
-		for(/*local*/int i = 0; i < this.BaseDoc.Record.HistoryList.size(); i++) {
-			/*local*/GSNHistory NodeHistory = this.BaseDoc.Record.HistoryList.get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.BaseDoc.Record.HistoryList); i++) {
+			/*local*/GSNHistory NodeHistory = Lib.Array_get(this.BaseDoc.Record.HistoryList, i);
 			if(NodeHistory.Doc != null) {
 				/*local*/GSNNode Node = NodeHistory.Doc.GetNode(this.UID);
 				if(Node != null) {
 					if(Node.Created == this.Created) {
 						if(LastNode == null || LastNode.LastModified != this.LastModified) {
-							NodeList.add(Node);
+							Lib.Array_add(NodeList,  Node);
 							LastNode = Node;
 						}
 					}
@@ -724,12 +726,12 @@ class GSNNode {
 		if (this.SubNodeList == null) {
 			this.SubNodeList = new ArrayList<GSNNode>();
 		}
-		this.SubNodeList.add(Node);
+		Lib.Array_add(this.SubNodeList,  Node);
 	}
 
 	boolean HasSubNode(GSNType NodeType) {
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if (Node.NodeType == NodeType) {
 				return true;
 			}
@@ -784,8 +786,8 @@ class GSNNode {
 			Result = this.GetTagMap();
 		}
 		if (this.SubNodeList != null) {
-			for (/*local*/int i = 0; i < this.SubNodeList.size(); i++) {
-				/*local*/GSNNode Node = this.SubNodeList.get(i);
+			for (/*local*/int i = 0; i < Lib.Array_size(this.SubNodeList); i++) {
+				/*local*/GSNNode Node = Lib.Array_get(this.SubNodeList, i);
 				if (Node.IsContext()) {
 					Result = this.MergeTagMap(Result, Node.GetTagMap());
 				}
@@ -796,8 +798,8 @@ class GSNNode {
 
 	GSNNode GetLastNode(GSNType NodeType, boolean Creation) {
 		if (this.SubNodeList != null) {
-			for (/*local*/int i = this.SubNodeList.size() - 1; i >= 0; i--) {
-				/*local*/GSNNode Node = this.SubNodeList.get(i);
+			for (/*local*/int i = Lib.Array_size(this.SubNodeList) - 1; i >= 0; i--) {
+				/*local*/GSNNode Node = Lib.Array_get(this.SubNodeList, i);
 				if (Node.NodeType == NodeType) {
 					return Node;
 				}
@@ -827,13 +829,13 @@ class GSNNode {
 			Writer.print(" " + HistoryTriple);
 		}
 		Writer.newline();
-		if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+		if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
 			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
 		Writer.newline();
-		for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+		for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 			Node.FormatNode(Writer);
 		}
 	}
@@ -853,14 +855,14 @@ class GSNNode {
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		Writer.newline();
-		if (this.NodeDoc != null && !this.NodeDoc.equals("")) {
+		if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
 			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
 		Writer.newline();
 		if (this.NonNullSubNodeList() != null) {
-			for (/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-				/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+			for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+				/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 				Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
 			}
 		}
@@ -869,9 +871,9 @@ class GSNNode {
 	GSNNode ReplaceSubNode(GSNNode NewNode) {
 		this.MergeSubNode(NewNode);
 		if(this.ParentNode != null) {
-			for(/*local*/int i = 0; i < this.ParentNode.SubNodeList.size(); i++) {
-				if(this.ParentNode.SubNodeList.get(i) == this) {
-					this.ParentNode.SubNodeList.set(i, NewNode);
+			for(/*local*/int i = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
+				if(Lib.Array_get(this.ParentNode.SubNodeList, i) == this) {
+					Lib.Array_set(this.ParentNode.SubNodeList, i, NewNode);
 				}
 			}
 		}
@@ -896,8 +898,8 @@ class GSNNode {
 		if(UID == this.UID) {
 			return true;
 		}
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode SubNode = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode SubNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if(SubNode.HasSubNodeUID(UID)) return true;
 		}
 		return false;
@@ -924,8 +926,8 @@ class GSNNode {
 			NewNode.LastModified = this.BaseDoc.DocHistory;	
 		}
 		NewNode.BaseDoc = this.BaseDoc;
-		for(/*local*/int i = 0; i < NewNode.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode SubNode = NewNode.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(NewNode.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode SubNode = Lib.Array_get(NewNode.NonNullSubNodeList(), i);
 			this.MergeSubNode(SubNode);
 		}
 	}
@@ -933,8 +935,8 @@ class GSNNode {
 	// Merge
 	boolean IsNewerTree(int ModifiedRev) {
 		if (ModifiedRev <= this.LastModified.Rev) {
-			for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-				/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+			for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+				/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 				if (!Node.IsNewerTree(ModifiedRev)) {
 					return false;
 				}
@@ -945,10 +947,10 @@ class GSNNode {
 	}
 
 	void ListSubGoalNode(ArrayList<GSNNode> BufferList) {
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if(Node.IsGoal()) {
-				BufferList.add(Node);
+				Lib.Array_add(BufferList, Node);
 			}
 			if(Node.IsStrategy()) {
 				Node.ListSubGoalNode(BufferList);
@@ -957,10 +959,10 @@ class GSNNode {
 	}
 
 	void ListSectionNode(ArrayList<GSNNode> BufferList) {
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 			if(!Node.IsGoal()) {
-				BufferList.add(Node);
+				Lib.Array_add(BufferList, Node);
 			}
 			if(Node.IsStrategy() || Node.IsEvidence()) {
 				Node.ListSectionNode(BufferList);
@@ -970,8 +972,8 @@ class GSNNode {
 	
 	void ReserveLabelMap(HashMap<String, String> LabelMap) {
 		if (this.LabelNumber != null) LabelMap.put(this.LabelNumber,  "exists"); // Non-null value
-		for (/*local*/int i = 0; this.SubNodeList != null && i < this.SubNodeList.size(); i++) {
-			this.SubNodeList.get(i).ReserveLabelMap(LabelMap);
+		for (/*local*/int i = 0; this.SubNodeList != null && i < Lib.Array_size(this.SubNodeList); i++) {
+			Lib.Array_get(this.SubNodeList, i).ReserveLabelMap(LabelMap);
 		}
 	}
 
@@ -988,17 +990,17 @@ class GSNNode {
 			/*local*/ArrayList<GSNNode> BufferList = new ArrayList<GSNNode>();
 			CurrentNode.ListSectionNode(BufferList);
 			/*local*/int SectionCount = 1;
-			for(/*local*/int i = 0; i < BufferList.size(); i++, SectionCount += 1) {
-				/*local*/GSNNode SectionNode = BufferList.get(i);
+			for(/*local*/int i = 0; i < Lib.Array_size(BufferList); i++, SectionCount += 1) {
+				/*local*/GSNNode SectionNode = Lib.Array_get(BufferList, i);
 				/*local*/String LabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
 				if (LabelMap.get(LabelNumber) != null) continue;
 				SectionNode.AssignedLabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
 			}
-			BufferList.clear();
+			Lib.Array_clear(BufferList);
 			
 			CurrentNode.ListSubGoalNode(BufferList);
-			for(/*local*/int i = 0; i < BufferList.size(); i++) {
-				/*local*/GSNNode GoalNode = BufferList.get(i);
+			for(/*local*/int i = 0; i < Lib.Array_size(BufferList); i++) {
+				/*local*/GSNNode GoalNode = Lib.Array_get(BufferList, i);
 				queue.add(GoalNode);
 				//NextCount = GoalNode.RenumberGoalRecursive(NextGoalCount, NextCount, LabelMap);
 				NextGoalCount += 1;
@@ -1014,12 +1016,12 @@ class GSNNode {
 	
 	ArrayList<GSNNode> SearchNode(String SearchWord) {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
-		if(this.NodeDoc.matches(SearchWord)) {
-			NodeList.add(this);
+		if(Lib.String_matches(this.NodeDoc, SearchWord)) {
+			Lib.Array_add(NodeList, this);
 		}
-		for(/*local*/int i = 0; i < this.NonNullSubNodeList().size(); i++) {
-			/*local*/GSNNode Node = this.NonNullSubNodeList().get(i);
-			NodeList.addAll(Node.SearchNode(SearchWord));
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+			Lib.Array_addAll(NodeList, Node.SearchNode(SearchWord));
 		}
 		return NodeList;
 	}
@@ -1123,7 +1125,7 @@ class GSNDoc {
 	void RemoveNode(GSNNode Node) {
 		assert(this == Node.BaseDoc);
 		if(Node.ParentNode != null) {
-			Node.ParentNode.SubNodeList.remove(Node);
+			Lib.Array_remove(Node.ParentNode.SubNodeList, Node);
 		}
 		this.RemapNodeMap();
 	}
@@ -1144,8 +1146,8 @@ class GSNDoc {
 			if (CurrentNode.LabelName != null) {
 				LabelMap.put(CurrentNode.LabelName, CurrentNode.GetLabel());
 			}
-			for (/*local*/int i = 0; CurrentNode.SubNodeList != null && i < CurrentNode.SubNodeList.size(); i++) {
-				queue.add(CurrentNode.SubNodeList.get(i));
+			for (/*local*/int i = 0; CurrentNode.SubNodeList != null && i < Lib.Array_size(CurrentNode.SubNodeList); i++) {
+				queue.add(Lib.Array_get(CurrentNode.SubNodeList, i));
 			}
 		}
 		return LabelMap;
@@ -1171,17 +1173,17 @@ class GSNRecord {
 
 	GSNRecord DeepCopy() {
 		/*local*/GSNRecord NewRecord = new GSNRecord();
-		for(/*local*/int i = 0; i < this.HistoryList.size(); i++) {
-			/*local*/GSNHistory Item = this.HistoryList.get(i);
-			NewRecord.HistoryList.add(Item);
+		for(/*local*/int i = 0; i < Lib.Array_size(this.HistoryList); i++) {
+			/*local*/GSNHistory Item = Lib.Array_get(this.HistoryList, i);
+			Lib.Array_add(NewRecord.HistoryList, Item);
 		}
 		NewRecord.EditingDoc = this.EditingDoc;
 		return NewRecord;
 	}
 	
 	GSNHistory GetHistory(int Rev) {
-		if (Rev < this.HistoryList.size()) {
-			return this.HistoryList.get(Rev);
+		if (Rev < Lib.Array_size(this.HistoryList)) {
+			return Lib.Array_get(this.HistoryList, Rev);
 		}
 		return null;
 	}
@@ -1195,18 +1197,18 @@ class GSNRecord {
 	}
 	
 	GSNHistory NewHistory(String Author, String Role, String Date, String Process, GSNDoc Doc) {
-		/*local*/GSNHistory History = new GSNHistory(this.HistoryList.size(), Author, Role, Date, Process, Doc);
-		this.HistoryList.add(History);
+		/*local*/GSNHistory History = new GSNHistory(Lib.Array_size(this.HistoryList), Author, Role, Date, Process, Doc);
+		Lib.Array_add(this.HistoryList, History);
 		return History;
 	}
 
 	void AddHistory(int Rev, String Author, String Role, String Date, String Process, GSNDoc Doc) {
 		if(Rev >= 0) {
 			/*local*/GSNHistory History = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
-			while (!(Rev < this.HistoryList.size())) {
-				this.HistoryList.add(null);
+			while (!(Rev < Lib.Array_size(this.HistoryList))) {
+				Lib.Array_add(this.HistoryList, null);
 			}
-			this.HistoryList.set(Rev, History);
+			Lib.Array_set(this.HistoryList, Rev, History);
 			if (Doc != null) {
 				Doc.DocHistory = History;
 			}
@@ -1262,7 +1264,7 @@ class GSNRecord {
 
 	public void Merge(GSNRecord NewRecord) {
 		/*local*/int CommonHistory = -1;
-		for (/*local*/int Rev = 0; Rev < this.HistoryList.size(); Rev++) {
+		for (/*local*/int Rev = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
 			/*local*/GSNHistory MasterHistory = this.GetHistory(Rev);
 			/*local*/GSNHistory NewHistory = NewRecord.GetHistory(Rev);
 			if (NewHistory != null && MasterHistory.EqualsHistory(MasterHistory)) {
@@ -1274,7 +1276,7 @@ class GSNRecord {
 		if(CommonHistory == -1) {
 			this.MergeAsReplaceTopGoal(NewRecord);
 		}
-		else if(CommonHistory == this.HistoryList.size()-1) {
+		else if(CommonHistory == Lib.Array_size(this.HistoryList)-1) {
 			this.MergeAsFastFoward(NewRecord);
 		}
 		else {
@@ -1284,18 +1286,18 @@ class GSNRecord {
 	}
 
 	public void MergeAsFastFoward(GSNRecord NewRecord) {
-		for (/*local*/int i = this.HistoryList.size(); i < NewRecord.HistoryList.size(); i++) {
+		for (/*local*/int i = Lib.Array_size(this.HistoryList); i < Lib.Array_size(NewRecord.HistoryList); i++) {
 			/*local*/GSNDoc BranchDoc = NewRecord.GetHistoryDoc(i);
 			if(BranchDoc != null) {
 				BranchDoc.Record = this;
-				this.HistoryList.add(BranchDoc.DocHistory);
+				Lib.Array_add(this.HistoryList, BranchDoc.DocHistory);
 			}
 		}
 	}
 
 	public void MergeAsReplaceTopGoal(GSNRecord NewRecord) {
-		for(/*local*/int i = 0; i < NewRecord.HistoryList.size(); i++) {
-			/*local*/GSNHistory NewHistory = NewRecord.HistoryList.get(i);
+		for(/*local*/int i = 0; i < Lib.Array_size(NewRecord.HistoryList); i++) {
+			/*local*/GSNHistory NewHistory = Lib.Array_get(NewRecord.HistoryList, i);
 			/*local*/GSNDoc Doc = NewHistory != null ? NewHistory.Doc : null;
 			if(Doc != null) {
 				this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
@@ -1306,16 +1308,16 @@ class GSNRecord {
 	}
 
 	public void MergeAsIncrementalAddition(int Rev1, GSNRecord Record1, int Rev2, GSNRecord Record2) {
-		while(Rev1 < Record1.HistoryList.size() && Rev2 < Record2.HistoryList.size()) {
+		while(Rev1 < Lib.Array_size(Record1.HistoryList) && Rev2 < Lib.Array_size(Record2.HistoryList)) {
 			/*local*/GSNHistory History1 = Record1.GetHistory(Rev1);
 			/*local*/GSNHistory History2 = Record2.GetHistory(Rev2);
 			if(History1 == null || History1.Doc == null) {
-				if(Rev1 < Record1.HistoryList.size()) {
+				if(Rev1 < Lib.Array_size(Record1.HistoryList)) {
 					Rev1++; continue;
 				}
 			}
 			if(History2 == null || History2.Doc == null) {
-				if(Rev2 < Record2.HistoryList.size()) {
+				if(Rev2 < Lib.Array_size(Record2.HistoryList)) {
 					Rev2++; continue;
 				}
 			}
@@ -1333,7 +1335,7 @@ class GSNRecord {
 	}
 
 	GSNDoc GetLatestDoc() {
-		for(/*local*/int i = this.HistoryList.size() - 1; i >= 0; i++) {
+		for(/*local*/int i = Lib.Array_size(this.HistoryList) - 1; i >= 0; i++) {
 			/*local*/GSNDoc Doc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				return Doc;
@@ -1345,7 +1347,7 @@ class GSNRecord {
 	public void FormatRecord(StringWriter Writer) {
 		/*local*/int DocCount = 0;
 		TagUtils.FormatHistoryTag(this.HistoryList, Writer);
-		for (/*local*/int i = 0; i < this.HistoryList.size(); i++) {
+		for (/*local*/int i = 0; i < Lib.Array_size(this.HistoryList); i++) {
 			/*local*/GSNDoc Doc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				if(DocCount > 0) {
@@ -1389,8 +1391,8 @@ class ParserContext {
 	}
 	
 	GSNNode GetStrategyOfGoal(int Level) {
-		if (Level - 1 < this.GoalStack.size()) {
-			/*local*/GSNNode ParentGoal = this.GoalStack.get(Level - 1);
+		if (Level - 1 < Lib.Array_size(this.GoalStack)) {
+			/*local*/GSNNode ParentGoal = Lib.Array_get(this.GoalStack, Level - 1);
 			if (ParentGoal != null) {
 				return ParentGoal.GetLastNode(GSNType.Strategy, true/*Creation*/);
 			}
@@ -1408,10 +1410,10 @@ class ParserContext {
 	void SetGoalStackAt(GSNNode Node) {
 		/*local*/int GoalLevel = Node.GetGoalLevel();
 //		System.out.println("GoalLevel="+GoalLevel+ ", stack="+this.GoalStackList.size());
-		while (!(GoalLevel - 1 < this.GoalStack.size())) {
-			this.GoalStack.add(null);
+		while (!(GoalLevel - 1 < Lib.Array_size(this.GoalStack))) {
+			Lib.Array_add(this.GoalStack, null);
 		}
-		this.GoalStack.set(GoalLevel-1, Node);
+		Lib.Array_set(this.GoalStack, GoalLevel-1, Node);
 	}
 
 	boolean IsValidSection(String Line, StringReader Reader) {
@@ -1422,11 +1424,11 @@ class ParserContext {
 			if (ParentNode != null) {
 				return true;
 			}
-			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
+			Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
 			return false;
 		}
-		if (this.LastGoalNode != null && this.GoalStack.size() <= Level) {
-			Reader.LogError("Mismatched goal level < " + (this.GoalStack.size()), Line);
+		if (this.LastGoalNode != null && Lib.Array_size(this.GoalStack) <= Level) {
+			Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
 			return false;
 		}
 		if (NodeType == GSNType.Context) {
@@ -1468,7 +1470,7 @@ class ParserContext {
 		if (NodeType == GSNType.Goal) {
 			ParentNode = this.GetStrategyOfGoal(Level);
 		} else {
-			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GoalStack.get(Level);
+			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : Lib.Array_get(this.GoalStack, Level);
 //			if(ParentNode.GoalLevel != Level) {
 //				Reader.LogError("mismatched level", Line);
 //			}
@@ -1497,12 +1499,12 @@ class ParserContext {
 	GSNNode ParseNode(StringReader Reader, HashMap<String, GSNNode> RefMap) {
 		while (Reader.HasNext()) {
 			/*local*/String Line = Reader.ReadLine();
-			if (Line.startsWith("*")) {
+			if (Lib.String_startsWith(Line, "*")) {
 				Reader.RollbackLineFeed();
 				break;
 			}
 			if(this.NullableDoc != null) {
-				if (Line.startsWith("#")) {
+				if (Lib.String_startsWith(Line, "#")) {
 					this.NullableDoc.Record.ParseHistoryTag(Line, Reader);
 				} else {
 					TagUtils.ParseTag(this.NullableDoc.DocTagMap, Line);
@@ -1516,8 +1518,8 @@ class ParserContext {
 		/*local*/ArrayList<String> LineList = new ArrayList<String>();
 		while (Reader.HasNext()) {
 			/*local*/String Line = Reader.ReadLine();
-			if (Line.startsWith("*")) {
-				if (Line.startsWith(Lib.VersionDelim)) {
+			if (Lib.String_startsWith(Line,  "*")) {
+				if (Lib.String_startsWith(Line,  Lib.VersionDelim)) {
 					break;
 				}
 				if (this.IsValidSection(Line, Reader)) {
@@ -1526,7 +1528,7 @@ class ParserContext {
 					continue;
 				}
 			}
-			LineList.add(Line);
+			Lib.Array_add(LineList, Line);
 		}
 		this.UpdateContent(LastNode, LineList);
 		return this.FirstNode;
@@ -1536,7 +1538,7 @@ class ParserContext {
 		if (LastNode != null) {
 			LastNode.SetContent(LineList);
 		}
-		LineList.clear();
+		Lib.Array_clear(LineList);
 	}
 }
 
