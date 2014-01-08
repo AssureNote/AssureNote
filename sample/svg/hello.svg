@@ -18,13 +18,16 @@
         </g>
         <g transform="matrix(1 0 0 1 -141 306)">
             <rect class="assurenote-default " width="250" height="79"></rect>
-        </g><g transform="matrix(1 0 0 1 -141 449)">
+        </g>
+        <g transform="matrix(1 0 0 1 -141 449)">
             <ellipse class="assurenote-default " cx="125" cy="125" rx="125" ry="125"></ellipse>
-        </g><g transform="matrix(1 0 0 1 141 529.5)">
+        </g>
+        <g transform="matrix(1 0 0 1 141 529.5)">
             <rect class="assurenote-default " rx="10" ry="10" width="250" height="89"></rect>
-        </g><g transform="matrix(1 0 0 1 121 306)">
+        </g>
+        <g transform="matrix(1 0 0 1 121 306)">
             <rect class="assurenote-default " width="250" height="79"></rect>
-        <polygon points="0 -20 -20 0 0 20 20 0" class="assurenote-default" transform="translate(125,99)" y="99px"></polygon>
+            <polygon points="0 -20 -20 0 0 20 20 0" class="assurenote-default" transform="translate(125,99)" y="99px"></polygon>
         </g>
     </g>
     <defs>
