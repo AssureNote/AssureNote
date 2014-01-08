@@ -223,7 +223,7 @@ export class Lib {
     }
 
     static Array_get(self: any[], index: number): any {
-        if (index >= this.length) {
+        if (index >= self.length) {
             throw new RangeError("invalid array index");
         }
         return self[index];
@@ -269,7 +269,7 @@ export class Lib {
     }
 
     static Object_InstanceOf(self: any, klass: any) : boolean {
-        return (<any>this).constructor == klass;
+        return (<any>self).constructor == klass;
     }
 }
 

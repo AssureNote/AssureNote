@@ -1674,7 +1674,7 @@ var AssureNote;
         };
 
         Lib.Array_get = function (self, index) {
-            if (index >= this.length) {
+            if (index >= self.length) {
                 throw new RangeError("invalid array index");
             }
             return self[index];
@@ -1722,7 +1722,7 @@ var AssureNote;
         };
 
         Lib.Object_InstanceOf = function (self, klass) {
-            return (this).constructor == klass;
+            return (self).constructor == klass;
         };
         Lib.Input = [];
         Lib.EmptyNodeList = new Array();

@@ -33,6 +33,7 @@ echo "}" >> ${build}${target}.ts
 
 tsc ${build}${target}.ts --module commonjs
 cp ${build}${target}.ts ${clientdir}
+cp ${build}${target}.js ${clientdir}
 
 # Second path: Serverside
 
@@ -44,6 +45,7 @@ fi
 
 tsc ${build}${target}.ts --module commonjs
 cp ${build}${target}.ts ${serverdir}
+cp ${build}${target}.js ${serverdir}
 
 # Destructor
 rm ${ts}
