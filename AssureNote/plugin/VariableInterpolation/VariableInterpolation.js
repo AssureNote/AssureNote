@@ -70,4 +70,9 @@ var AssureNote;
     })(AssureNote.Plugin);
     AssureNote.VariableInterpolationPlugin = VariableInterpolationPlugin;
 })(AssureNote || (AssureNote = {}));
+
+AssureNote.OnLoadPlugin(function (App) {
+    var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(App);
+    App.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
+});
 //# sourceMappingURL=VariableInterpolation.js.map

@@ -47,3 +47,8 @@ module AssureNote {
         }
 	}
 }
+
+AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
+    var ToDoPlugin = new AssureNote.ToDoPlugin(App);
+    App.PluginManager.SetPlugin("todo", ToDoPlugin);
+});

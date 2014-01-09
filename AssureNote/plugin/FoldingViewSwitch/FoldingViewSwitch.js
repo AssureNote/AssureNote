@@ -105,4 +105,9 @@ var AssureNote;
     })(AssureNote.Plugin);
     AssureNote.FoldingViewSwitchPlugin = FoldingViewSwitchPlugin;
 })(AssureNote || (AssureNote = {}));
+
+AssureNote.OnLoadPlugin(function (App) {
+    var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(App);
+    App.PluginManager.SetPlugin("fold", FoldPlugin);
+});
 //# sourceMappingURL=FoldingViewSwitch.js.map

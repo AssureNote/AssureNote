@@ -108,4 +108,11 @@ var AssureNote;
     })(AssureNote.Plugin);
     AssureNote.ConnectServerPlugin = ConnectServerPlugin;
 })(AssureNote || (AssureNote = {}));
+
+AssureNote.OnLoadPlugin(function (App) {
+    var MessageChatPlugin = new AssureNote.MessageChatPlugin(App);
+    App.PluginManager.SetPlugin("message", MessageChatPlugin);
+    var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(App);
+    App.PluginManager.SetPlugin("connect", ConnectserverPlugin);
+});
 //# sourceMappingURL=MessageChat.js.map

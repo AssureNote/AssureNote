@@ -133,4 +133,7 @@ var AssureNote;
     })(AssureNote.Plugin);
     AssureNote.FullScreenEditorPlugin = FullScreenEditorPlugin;
 })(AssureNote || (AssureNote = {}));
+
+AssureNote.OnLoadPlugin(function (App) {
+});
 //# sourceMappingURL=FullScreenEditor.js.map

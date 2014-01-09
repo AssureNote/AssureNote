@@ -83,10 +83,29 @@ module AssureNote {
 	//	}
     //}
 
+    export function OnLoadPlugin(Callback: (App: AssureNoteApp) => void) {
+        PluginManager.OnLoadPlugin.push(Callback);
+        if (PluginManager.Current != null) {
+            PluginManager.Current.LoadPlugin();
+        }
+    }
+
 	export class PluginManager {
 		private PluginMap: {[index: string]: Plugin};
 		constructor(public AssureNoteApp: AssureNoteApp) {
-			this.PluginMap = {};
+            this.PluginMap = {};
+            PluginManager.Current = this;
+        }
+
+        static Current: PluginManager;
+
+        static OnLoadPlugin: Array<(App: AssureNoteApp) => void> = [];
+
+        LoadPlugin() {
+            for (var i = 0; i < PluginManager.OnLoadPlugin.length; i++) {
+                PluginManager.OnLoadPlugin[i](this.AssureNoteApp);
+            }
+            PluginManager.OnLoadPlugin = [];
         }
 
         SetPlugin(Name: string, Plugin: Plugin): void {
@@ -146,3 +165,4 @@ module AssureNote {
         }
 	}
 }
+

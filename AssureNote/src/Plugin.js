@@ -75,11 +75,27 @@ var AssureNote;
     //		});
     //	}
     //}
+    function OnLoadPlugin(Callback) {
+        PluginManager.OnLoadPlugin.push(Callback);
+        if (PluginManager.Current != null) {
+            PluginManager.Current.LoadPlugin();
+        }
+    }
+    AssureNote.OnLoadPlugin = OnLoadPlugin;
+
     var PluginManager = (function () {
         function PluginManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
             this.PluginMap = {};
+            PluginManager.Current = this;
         }
+        PluginManager.prototype.LoadPlugin = function () {
+            for (var i = 0; i < PluginManager.OnLoadPlugin.length; i++) {
+                PluginManager.OnLoadPlugin[i](this.AssureNoteApp);
+            }
+            PluginManager.OnLoadPlugin = [];
+        };
+
         PluginManager.prototype.SetPlugin = function (Name, Plugin) {
             if (!this.PluginMap[Name]) {
                 this.PluginMap[Name] = Plugin;
@@ -137,6 +153,7 @@ var AssureNote;
                 value.RenderSVG(ShapeGroup, NodeView);
             });
         };
+        PluginManager.OnLoadPlugin = [];
         return PluginManager;
     })();
     AssureNote.PluginManager = PluginManager;

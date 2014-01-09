@@ -480,24 +480,11 @@ var AssureNote;
             this.ShapeGroup.appendChild(this.BodyEllipse);
         };
 
-        GSNEvidenceShape.prototype.GetNodeHeight = function () {
-            if (this["NodeHeight"] == 0) {
-                this.ClientHeight = this.Content.clientHeight;
-                this["NodeHeight"] = Math.max(this.ClientHeight, this.GetNodeWidth());
-            }
-            return this["NodeHeight"];
-        };
-
         GSNEvidenceShape.prototype.FitSizeToContent = function () {
             this.BodyEllipse.setAttribute("cx", (this.GetNodeWidth() / 2).toString());
             this.BodyEllipse.setAttribute("cy", (this.GetNodeHeight() / 2).toString());
             this.BodyEllipse.setAttribute("rx", (this.GetNodeWidth() / 2).toString());
             this.BodyEllipse.setAttribute("ry", (this.GetNodeHeight() / 2).toString());
-            if (this.ClientHeight < this.GetNodeWidth()) {
-                var Padding = (this.GetNodeWidth() - this.ClientHeight) / 2 + 30/*default padding*/ ;
-                this.Content.style.paddingTop = Padding + "px";
-                this.Content.style.paddingBottom = Padding + "px";
-            }
         };
 
         GSNEvidenceShape.prototype.UpdateHtmlClass = function () {

@@ -38,19 +38,8 @@
 var Debug = <any>{};
 
 $(() => {
-	var AssureNoteApp = new AssureNote.AssureNoteApp();
-	Debug.AssureNote = AssureNoteApp;
+	var App = new AssureNote.AssureNoteApp();
+	Debug.AssureNote = App;
 
-    var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(AssureNoteApp);
-    AssureNoteApp.PluginManager.SetPlugin("fold", FoldPlugin);
-    var MessageChatPlugin = new AssureNote.MessageChatPlugin(AssureNoteApp);
-    AssureNoteApp.PluginManager.SetPlugin("message", MessageChatPlugin);
-    var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(AssureNoteApp);
-    AssureNoteApp.PluginManager.SetPlugin("connect", ConnectserverPlugin);
-    var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(AssureNoteApp);
-    AssureNoteApp.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
-    var ToDoPlugin = new AssureNote.ToDoPlugin(AssureNoteApp);
-    AssureNoteApp.PluginManager.SetPlugin("todo", ToDoPlugin);
-
-    AssureNoteApp.LoadNewWGSN("hello.wgsn", $("#default-case").text());
+    App.LoadNewWGSN("hello.wgsn", $("#default-case").text());
 });

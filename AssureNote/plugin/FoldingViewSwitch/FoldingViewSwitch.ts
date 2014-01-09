@@ -98,3 +98,8 @@ module AssureNote {
 		}
 	}
 }
+
+AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
+    var FoldPlugin = new AssureNote.FoldingViewSwitchPlugin(App);
+    App.PluginManager.SetPlugin("fold", FoldPlugin);
+});

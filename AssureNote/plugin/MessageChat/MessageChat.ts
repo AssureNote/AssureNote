@@ -86,3 +86,10 @@ module AssureNote {
         }
     }
 }
+
+AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
+    var MessageChatPlugin = new AssureNote.MessageChatPlugin(App);
+    App.PluginManager.SetPlugin("message", MessageChatPlugin);
+    var ConnectserverPlugin = new AssureNote.ConnectServerPlugin(App);
+    App.PluginManager.SetPlugin("connect", ConnectserverPlugin);
+});

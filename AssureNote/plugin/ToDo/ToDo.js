@@ -56,4 +56,9 @@ var AssureNote;
     })(AssureNote.Plugin);
     AssureNote.ToDoPlugin = ToDoPlugin;
 })(AssureNote || (AssureNote = {}));
+
+AssureNote.OnLoadPlugin(function (App) {
+    var ToDoPlugin = new AssureNote.ToDoPlugin(App);
+    App.PluginManager.SetPlugin("todo", ToDoPlugin);
+});
 //# sourceMappingURL=ToDo.js.map

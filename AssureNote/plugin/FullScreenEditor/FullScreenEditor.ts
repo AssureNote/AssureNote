@@ -118,3 +118,6 @@ module AssureNote {
         }
 	}
 }
+
+AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
+});

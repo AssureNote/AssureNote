@@ -64,3 +64,8 @@ module AssureNote {
         }
 	}
 }
+
+AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
+    var VariableInterpolationPlugin = new AssureNote.VariableInterpolationPlugin(App);
+    App.PluginManager.SetPlugin("variableinterpolation", VariableInterpolationPlugin);
+});
