@@ -92,12 +92,12 @@ module AssureNote {
                 var UID: number = Math.floor(Math.random() * 2147483647);
                 while (Label.charAt(0).search(/[A-Za-z]/) == 0) Label = Label.substr(1); // G1.1 -> 1.1
                 console.log(Label);
-                var node: GSNNode = new GSNNode(this.Doc, null, this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), Label, UID, null);
+                var node: GSNNode = new GSNNode(this.Doc, null, this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), UID, null);
                 node.NodeDoc = Statement;
                 this.nodes[Id] = node;
 
                 /* TODO Need to remove this code */
-                node.ParentNode = new GSNNode(null, null, GSNType.Goal, null, null, -1, null);
+                node.ParentNode = new GSNNode(null, null, GSNType.Goal, null, -1, null);
             });
 
             $XML.find("rootBasicLink").each((index: any, elem: Element) => {

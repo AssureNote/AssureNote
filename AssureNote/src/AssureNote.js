@@ -132,6 +132,15 @@ var AssureNote;
             Command.Invoke(CommandName, this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
         };
 
+        AssureNoteApp.prototype.LoadDefaultWGSN = function () {
+            var lang = navigator.browserLanguage || navigator.language || navigator.userLanguage;
+            if (!lang || lang == "ja") {
+                this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+            } else {
+                this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+            }
+        };
+
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;

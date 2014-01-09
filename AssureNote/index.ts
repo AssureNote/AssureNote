@@ -41,5 +41,5 @@ $(() => {
 	var App = new AssureNote.AssureNoteApp();
 	Debug.AssureNote = App;
 
-    App.LoadNewWGSN("hello.wgsn", $("#default-case").text());
+    App.LoadDefaultWGSN();
 });
