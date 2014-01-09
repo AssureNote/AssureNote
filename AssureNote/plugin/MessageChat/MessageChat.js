@@ -32,6 +32,56 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path="../../src/Editor.ts" />
 var AssureNote;
 (function (AssureNote) {
+    var MessageCommand = (function (_super) {
+        __extends(MessageCommand, _super);
+        function MessageCommand() {
+            _super.apply(this, arguments);
+        }
+        MessageCommand.prototype.GetCommandLineNames = function () {
+            return ["message"];
+        };
+
+        MessageCommand.prototype.GetDisplayName = function () {
+            return "Message";
+        };
+
+        MessageCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+            if (this.App.SocketManager.IsConnected()) {
+                this.App.SocketManager.Emit('message', Params.join(' '));
+                $.notify(Params.join(' '), 'info');
+            }
+        };
+        return MessageCommand;
+    })(AssureNote.Command);
+    AssureNote.MessageCommand = MessageCommand;
+
+    var ConnectCommand = (function (_super) {
+        __extends(ConnectCommand, _super);
+        function ConnectCommand() {
+            _super.apply(this, arguments);
+        }
+        ConnectCommand.prototype.GetCommandLineNames = function () {
+            return ["connect"];
+        };
+
+        ConnectCommand.prototype.GetDisplayName = function () {
+            return "Connect";
+        };
+
+        ConnectCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+            console.log(Params);
+            if (Params.length > 1) {
+                this.App.DebugP('Invalid parameter: ' + Params);
+                return;
+            }
+            if (this.App.SocketManager.IsOperational()) {
+                this.App.SocketManager.Connect(Params[0]);
+            }
+        };
+        return ConnectCommand;
+    })(AssureNote.Command);
+    AssureNote.ConnectCommand = ConnectCommand;
+
     var MessageChatPlugin = (function (_super) {
         __extends(MessageChatPlugin, _super);
         function MessageChatPlugin(AssureNoteApp) {
@@ -41,13 +91,8 @@ var AssureNote;
                 console.log(data);
                 $.notify(data);
             });
+            this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
-        MessageChatPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            if (AssureNoteApp.SocketManager.IsConnected()) {
-                this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
-                $.notify(Args.join(' '), 'info');
-            }
-        };
         return MessageChatPlugin;
     })(AssureNote.Plugin);
     AssureNote.MessageChatPlugin = MessageChatPlugin;
@@ -57,17 +102,8 @@ var AssureNote;
         function ConnectServerPlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
+            this.AssureNoteApp.RegistCommand(new ConnectCommand(this.AssureNoteApp));
         }
-        ConnectServerPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            console.log(Args);
-            if (Args.length > 1) {
-                AssureNoteApp.DebugP('Invalid parameter: ' + Args);
-                return;
-            }
-            if (AssureNoteApp.SocketManager.IsOperational()) {
-                AssureNoteApp.SocketManager.Connect(Args[0]);
-            }
-        };
         return ConnectServerPlugin;
     })(AssureNote.Plugin);
     AssureNote.ConnectServerPlugin = ConnectServerPlugin;

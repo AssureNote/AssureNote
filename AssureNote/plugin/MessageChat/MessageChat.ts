@@ -28,6 +28,44 @@
 
 
 module AssureNote {
+    export class MessageCommand extends Command {
+        public GetCommandLineNames(): string[] {
+            return ["message"];
+        }
+
+        public GetDisplayName(): string {
+            return "Message";
+        }
+
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+            if (this.App.SocketManager.IsConnected()) {
+                this.App.SocketManager.Emit('message', Params.join(' '));
+                $.notify(Params.join(' '), 'info');
+            }
+        }
+    }
+
+    export class ConnectCommand extends Command {
+        public GetCommandLineNames(): string[] {
+            return ["connect"];
+        }
+
+        public GetDisplayName(): string {
+            return "Connect";
+        }
+
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+            console.log(Params);
+            if (Params.length > 1) {
+                this.App.DebugP('Invalid parameter: ' + Params);
+                return;
+            }
+            if (this.App.SocketManager.IsOperational()) {
+                this.App.SocketManager.Connect(Params[0]);
+            }
+        }
+    }
+
     export class MessageChatPlugin extends Plugin {
         public EditorUtil: EditorUtil;
 		constructor(public AssureNoteApp: AssureNoteApp) {
@@ -36,13 +74,7 @@ module AssureNote {
                     console.log(data);
                 $.notify(data);
             });
-        }
-
-        ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-            if (AssureNoteApp.SocketManager.IsConnected()) {
-                this.AssureNoteApp.SocketManager.Emit('message', Args.join(' '));
-                $.notify(Args.join(' '), 'info');
-            }
+            this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
 	}
 
@@ -50,16 +82,7 @@ module AssureNote {
         socket: any;
         constructor(public AssureNoteApp: AssureNoteApp) {
             super();
-        }
-        ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-            console.log(Args);
-            if (Args.length > 1) {
-                AssureNoteApp.DebugP('Invalid parameter: ' + Args);
-                return;
-            }
-            if (AssureNoteApp.SocketManager.IsOperational()) {
-                AssureNoteApp.SocketManager.Connect(Args[0]);
-            }
+            this.AssureNoteApp.RegistCommand(new ConnectCommand(this.AssureNoteApp));
         }
     }
 }
