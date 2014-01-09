@@ -27,7 +27,42 @@
 ///<reference path="../../src/Editor.ts" />
 
 module AssureNote {
-	export class FoldingViewSwitchPlugin extends Plugin {
+
+    export class FoldingCommand extends Command {
+        constructor(App: AssureNoteApp, public FoldingAction: (event: Event, TargetView: NodeView) => void) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["fold"];
+        }
+
+        public GetDisplayName(): string {
+            return "FoldingView";
+        }
+
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+            if (Params.length < 1) {
+                this.App.DebugP("no args");
+                return;
+            }
+            var Label = Params[0].toUpperCase();
+            var event = document.createEvent("UIEvents");
+            var TargetView = this.App.PictgramPanel.ViewMap[Label];
+            if (TargetView != null) {
+                var TargetType = TargetView.GetNodeType();
+                if (TargetType != GSNType.Goal && TargetType != GSNType.Strategy) {
+                    this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
+                    return;
+                }
+                this.FoldingAction(event, TargetView);
+            } else {
+                this.App.DebugP(Label + " not found.");
+            }
+        }
+    }
+
+    export class FoldingViewSwitchPlugin extends Plugin {
 		FoldingAction: (event: Event, TargetView: NodeView) => void;
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
@@ -54,15 +89,16 @@ module AssureNote {
 				}
 				var wx0 = TargetView.GetGX();
 				var wy0 = TargetView.GetGY();
-				this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300); //FIXME Gx, Gy
+				AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300); //FIXME Gx, Gy
 				var wx1 = TargetView.GetGX();
 				var wy1 = TargetView.GetGY();
-				var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
+				var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
 				var OffX0 = ViewPort.GetLogicalOffsetX();
                 var OffY0 = ViewPort.GetLogicalOffsetY();
                 var Scale = ViewPort.GetScale();
                 ViewPort.MoveTo(OffX0 + Scale * (wx0 - wx1), OffY0 + Scale * (wy0 - wy1), Scale, 300);
-			};
+            };
+            this.AssureNoteApp.RegistCommand(new FoldingCommand(this.AssureNoteApp, this.FoldingAction));
 		}
 
 		ExecDoubleClicked(NodeView: NodeView): void {
@@ -71,23 +107,6 @@ module AssureNote {
 		}
 
 		ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-			if (Args.length < 1) {
-				AssureNoteApp.DebugP("no args");
-				return;
-			}
-			var Label = Args[0].toUpperCase();
-			var event = document.createEvent("UIEvents");
-			var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
-			if (TargetView != null) {
-				var TargetType = TargetView.GetNodeType();
-				if (TargetType != GSNType.Goal && TargetType != GSNType.Strategy) {
-					AssureNoteApp.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
-					return;
-				}
-				this.FoldingAction(event, TargetView);
-			} else {
-				AssureNoteApp.DebugP(Label + " not found.");
-			}
 		}
 
 		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {

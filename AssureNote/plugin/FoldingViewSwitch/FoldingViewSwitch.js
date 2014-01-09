@@ -32,10 +32,46 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path="../../src/Editor.ts" />
 var AssureNote;
 (function (AssureNote) {
+    var FoldingCommand = (function (_super) {
+        __extends(FoldingCommand, _super);
+        function FoldingCommand(App, FoldingAction) {
+            _super.call(this, App);
+            this.FoldingAction = FoldingAction;
+        }
+        FoldingCommand.prototype.GetCommandLineNames = function () {
+            return ["fold"];
+        };
+
+        FoldingCommand.prototype.GetDisplayName = function () {
+            return "FoldingView";
+        };
+
+        FoldingCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+            if (Params.length < 1) {
+                this.App.DebugP("no args");
+                return;
+            }
+            var Label = Params[0].toUpperCase();
+            var event = document.createEvent("UIEvents");
+            var TargetView = this.App.PictgramPanel.ViewMap[Label];
+            if (TargetView != null) {
+                var TargetType = TargetView.GetNodeType();
+                if (TargetType != AssureNote.GSNType.Goal && TargetType != AssureNote.GSNType.Strategy) {
+                    this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
+                    return;
+                }
+                this.FoldingAction(event, TargetView);
+            } else {
+                this.App.DebugP(Label + " not found.");
+            }
+        };
+        return FoldingCommand;
+    })(AssureNote.Command);
+    AssureNote.FoldingCommand = FoldingCommand;
+
     var FoldingViewSwitchPlugin = (function (_super) {
         __extends(FoldingViewSwitchPlugin, _super);
         function FoldingViewSwitchPlugin(AssureNoteApp) {
-            var _this = this;
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             this.HasMenuBarButton = true;
@@ -60,15 +96,16 @@ var AssureNote;
                 }
                 var wx0 = TargetView.GetGX();
                 var wy0 = TargetView.GetGY();
-                _this.AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300);
+                AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300);
                 var wx1 = TargetView.GetGX();
                 var wy1 = TargetView.GetGY();
-                var ViewPort = _this.AssureNoteApp.PictgramPanel.Viewport;
+                var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
                 var OffX0 = ViewPort.GetLogicalOffsetX();
                 var OffY0 = ViewPort.GetLogicalOffsetY();
                 var Scale = ViewPort.GetScale();
                 ViewPort.MoveTo(OffX0 + Scale * (wx0 - wx1), OffY0 + Scale * (wy0 - wy1), Scale, 300);
             };
+            this.AssureNoteApp.RegistCommand(new FoldingCommand(this.AssureNoteApp, this.FoldingAction));
         }
         FoldingViewSwitchPlugin.prototype.ExecDoubleClicked = function (NodeView) {
             var event = document.createEvent("UIEvents");
@@ -76,23 +113,6 @@ var AssureNote;
         };
 
         FoldingViewSwitchPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            if (Args.length < 1) {
-                AssureNoteApp.DebugP("no args");
-                return;
-            }
-            var Label = Args[0].toUpperCase();
-            var event = document.createEvent("UIEvents");
-            var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
-            if (TargetView != null) {
-                var TargetType = TargetView.GetNodeType();
-                if (TargetType != AssureNote.GSNType.Goal && TargetType != AssureNote.GSNType.Strategy) {
-                    AssureNoteApp.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
-                    return;
-                }
-                this.FoldingAction(event, TargetView);
-            } else {
-                AssureNoteApp.DebugP(Label + " not found.");
-            }
         };
 
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
