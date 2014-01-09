@@ -190,7 +190,7 @@ module AssureNote{
 
         var element: HTMLDivElement = document.createElement('div');
         export function HTMLEncode(text: string): string {
-            element.innerText = text;
+            element.textContent = text;
             return element.innerHTML;
         }
     }

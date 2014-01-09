@@ -148,7 +148,7 @@ var AssureNote;
 
         var element = document.createElement('div');
         function HTMLEncode(text) {
-            element.innerText = text;
+            element.textContent = text;
             return element.innerHTML;
         }
         AssureNoteUtils.HTMLEncode = HTMLEncode;
