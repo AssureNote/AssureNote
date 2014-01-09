@@ -45,7 +45,6 @@ module AssureNote {
             this.AssureNoteApp.PluginPanel.IsVisible = false;
 
             var Callback = (event: MouseEvent) => {
-                console.log("hi");
                 this.Element.blur();
             };
             var App = this.AssureNoteApp;

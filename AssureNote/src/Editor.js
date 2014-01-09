@@ -46,7 +46,6 @@ var AssureNote;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
 
             var Callback = function (event) {
-                console.log("hi");
                 _this.Element.blur();
             };
             var App = this.AssureNoteApp;
