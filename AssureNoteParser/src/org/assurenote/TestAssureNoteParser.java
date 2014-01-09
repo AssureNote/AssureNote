@@ -250,11 +250,6 @@ public class TestAssureNoteParser {
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
 		GSNNode TopNode = LatestDoc.TopNode;
-		
-		assertNull(TopNode.LabelNumber);
-		assertNull(TopNode.SubNodeList.get(0).LabelNumber);
-		
-		TopNode.RenumberGoal(1, 2);
 
 		assertEquals(TopNode.AssignedLabelNumber, "1");
 		assertEquals(TopNode.SubNodeList.get(0).AssignedLabelNumber, "1.1");
@@ -271,10 +266,6 @@ public class TestAssureNoteParser {
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
 		GSNNode TopNode = LatestDoc.TopNode;
 		
-		assertNull(TopNode.LabelNumber);
-		assertNull(TopNode.SubNodeList.get(0).LabelNumber);
-		
-		TopNode.RenumberGoal(1, 2);
 		GSNNode Strategy = TopNode.SubNodeList.get(0);
 		assertNotEquals(Strategy.SubNodeList.get(0).AssignedLabelNumber, Strategy.SubNodeList.get(1).AssignedLabelNumber);
 	}
@@ -301,7 +292,6 @@ public class TestAssureNoteParser {
 		
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
 		GSNNode TopNode = LatestDoc.TopNode;
-		TopNode.RenumberGoal(1, 2);
 		HashMap<String, String> LabelMap = LatestDoc.GetLabelMap();
 		
 		assertEquals(LabelMap.size(), 2);
@@ -314,5 +304,17 @@ public class TestAssureNoteParser {
 		assertEquals(LabelMap.size(), 2);
 		assertEquals(LabelMap.get("G:TopGoal"), "G1");
 		assertEquals(LabelMap.get("C:SubNode"), "C1.1");
+	}
+	
+	@Test
+	public void NeverReserveLabel() {
+		String input = "*G123\n*C";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNotEquals(TopNode.AssignedLabelNumber, "123");
 	}
 }
