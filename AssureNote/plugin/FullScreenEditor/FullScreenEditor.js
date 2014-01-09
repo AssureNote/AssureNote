@@ -56,11 +56,11 @@ var AssureNote;
             var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                if (TargetView.GetNodeType() == GSNType.Strategy) {
+                if (TargetView.GetNodeType() == AssureNote.GSNType.Strategy) {
                     this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
                     return;
                 }
-                var Writer = new StringWriter();
+                var Writer = new AssureNote.StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
                 this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
             } else {
@@ -95,11 +95,11 @@ var AssureNote;
         }
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
-            if (NodeView.GetNodeType() == GSNType.Strategy) {
+            if (NodeView.GetNodeType() == AssureNote.GSNType.Strategy) {
                 return null;
             }
             return new AssureNote.MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
-                var Writer = new StringWriter();
+                var Writer = new AssureNote.StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
                 _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
             });
@@ -111,8 +111,8 @@ var AssureNote;
             var line = doc.getCursor().line;
             while (line >= 0) {
                 var LineString = doc.getLine(line);
-                if (LineString.startsWith('*')) {
-                    UID = WikiSyntax.ParseUID(LineString);
+                if (LineString.indexOf('*') == 0) {
+                    UID = AssureNote.WikiSyntax.ParseUID(LineString);
                     break;
                 }
                 line -= 1;
@@ -122,7 +122,7 @@ var AssureNote;
                 for (var i in Keys) {
                     var View = this.AssureNoteApp.PictgramPanel.ViewMap[Keys[i]];
 
-                    if (View && View.Model && Lib.DecToHex(View.Model.UID) == UID) {
+                    if (View && View.Model && AssureNote.Lib.DecToHex(View.Model.UID) == UID) {
                         console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
                         this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
                     }

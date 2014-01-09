@@ -49,7 +49,7 @@ var AssureNote;
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
                     var SubView = new NodeView(SubNode, IsRecursive);
-                    if (SubNode.NodeType == GSNType.Context) {
+                    if (SubNode.NodeType == AssureNote.GSNType.Context) {
                         // Layout Engine allowed to move a node left-side
                         this.AppendRightNode(SubView);
                     } else {

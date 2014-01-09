@@ -153,7 +153,9 @@ $src =~ s/\bSystem\.err\.println/console.log/g;
 
 $src =~ s/\binterface\b/declare class/g;
 
-$src =~ s/\bpublic\s*class\b/class/g;
+$src =~ s/\benum\b/export enum/g;
+$src =~ s/\bclass\b/export class/g;
+$src =~ s/\bpublic\s*export\s*class\b/export class/g;
 
 # Delegates.
 #$src =~ s/(?!\.)\b(Parse|Type)(?:Unary|Binary|Const|Block)\b(?!\()/LibLoadFunc.Load$1Func(Context, this, "$2")/g;

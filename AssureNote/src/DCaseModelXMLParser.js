@@ -37,8 +37,8 @@ var AssureNote;
             this.Record = Record;
             this.nodes = {};
             this.links = {};
-            this.Text2NodeTypeMap = { "Goal": GSNType.Goal, "Strategy": GSNType.Strategy, "Context": GSNType.Context, "Pattern": GSNType.Context, "Evidence": GSNType.Evidence };
-            this.Doc = new GSNDoc(this.Record);
+            this.Text2NodeTypeMap = { "Goal": AssureNote.GSNType.Goal, "Strategy": AssureNote.GSNType.Strategy, "Context": AssureNote.GSNType.Context, "Pattern": AssureNote.GSNType.Context, "Evidence": AssureNote.GSNType.Evidence };
+            this.Doc = new AssureNote.GSNDoc(this.Record);
 
             // TODO: set real date
             this.Record.AddHistory(0, "unknown", "converter", "2013-12-09T13:16:18+0900", "-", this.Doc);
@@ -93,12 +93,12 @@ var AssureNote;
                 while (Label.charAt(0).search(/[A-Za-z]/) == 0)
                     Label = Label.substr(1);
                 console.log(Label);
-                var node = new GSNNode(_this.Doc, null, _this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), Label, UID, null);
+                var node = new AssureNote.GSNNode(_this.Doc, null, _this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), Label, UID, null);
                 node.NodeDoc = Statement;
                 _this.nodes[Id] = node;
 
                 /* TODO Need to remove this code */
-                node.ParentNode = new GSNNode(null, null, GSNType.Goal, null, null, -1, null);
+                node.ParentNode = new AssureNote.GSNNode(null, null, AssureNote.GSNType.Goal, null, null, -1, null);
             });
 
             $XML.find("rootBasicLink").each(function (index, elem) {

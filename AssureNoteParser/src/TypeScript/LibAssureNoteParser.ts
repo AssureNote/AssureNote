@@ -2,12 +2,12 @@
 declare function unescape(str: string) : string;
 
 /* FIXME this class is never used */
-class PdfConverter {
+export class PdfConverter {
 	constructor () {}
 	static main(args: string[]) {}
 }
 
-class Random {
+export class Random {
     constructor(seed: number) {}
 
     nextInt() : number {
@@ -15,13 +15,13 @@ class Random {
     }
 }
 
-class System {
+export class System {
     static currentTimeMillis() {
         return new Date().getTime();
     }
 }
 
-class StringBuilder {
+export class StringBuilder {
 	str : string;
 	constructor() {
 		this.str = "";
@@ -36,7 +36,7 @@ class StringBuilder {
 	}
 }
 
-class Character {
+export class Character {
 	static isDigit(c: number) : boolean {
 		/* '0' ~ '9' */
 		return 48 <= c && c <= 57;
@@ -48,7 +48,7 @@ class Character {
 	}
 }
 
-class SimpleDateFormat {
+export class SimpleDateFormat {
 	constructor(format: string) {
 		// Support format string, or is it needless?
 	}
@@ -93,7 +93,7 @@ class SimpleDateFormat {
 	}
 }
 
-class Queue <E> {
+export class Queue <E> {
     list: E[];
 
     constructor() {
@@ -112,10 +112,10 @@ class Queue <E> {
     }
 }
 
-class LinkedList <E> extends Queue <E> {
+export class LinkedList <E> extends Queue <E> {
 }
 
-class HashMap <K, V>{
+export class HashMap <K, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
 	constructor() {
@@ -150,7 +150,7 @@ class HashMap <K, V>{
 	}
 }
 
-class MessageDigest {
+export class MessageDigest {
 	digestString: string;
 	constructor() {
 		this.digestString = null;
@@ -161,7 +161,7 @@ class MessageDigest {
 	}
 }
 
-class Lib {
+export class Lib {
 	/* To be set on lib/md5.js */
 	static md5 : (str: string) => string;
 
@@ -199,23 +199,95 @@ class Lib {
     static DecToHex(n: number) : string {
         return n.toString(16);
     }
+
+    static String_startsWith(self: string, key: string) : boolean {
+        return self.indexOf(key, 0) == 0;
+    }
+
+    static String_compareTo(self: string, anotherString: string): number {
+        if (self < anotherString) {
+            return -1;
+        } else if (self > anotherString) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    static String_endsWith(self: string, key: string) : boolean {
+        return self.lastIndexOf(key, 0) == 0;
+    }
+
+    static String_matches(self: string, str: string): boolean {
+        return self.match(str) != null;
+    }
+
+    static Array_get(self: any[], index: number): any {
+        if (index >= self.length) {
+            throw new RangeError("invalid array index");
+        }
+        return self[index];
+    }
+    static Array_set(self: any[], index: number, value: any): void {
+        self[index] = value;
+    }
+    static Array_add(self: any[], obj: any): void {
+        self.push(obj);
+    }
+    static Array_add2(self: any[], index: number, obj: any): void {
+        self.splice(index, 0, obj);
+    }
+    static Array_addAll(self: any[], obj: any): void {
+        Array.prototype.push.apply(self, obj);
+    }
+    static Array_size(self: any[]): number {
+        return self.length;
+    }
+    static Array_clear(self: any[]): void {
+        self.length = 0;
+    }
+    static Array_remove(self: any[], index: any): any {
+        if (typeof index == 'number') {
+            if (index >= self.length) {
+                throw new RangeError("invalid array index");
+            }
+        } else {
+            var item = index;
+            index = 0;
+            for (var j in self) {
+                if (self[j] === index) break;
+            }
+            if (j == self.length) return null;
+        }
+        var v = self[index];
+        self.splice(index, 1);
+        return v;
+    }
+
+    static Object_equals(self: any, obj: any) : boolean {
+        return (self === obj);
+    }
+
+    static Object_InstanceOf(self: any, klass: any) : boolean {
+        return (<any>self).constructor == klass;
+    }
 }
 
-class Iterator<T> {//FIX ME!!
+export class Iterator<T> {//FIX ME!!
 }
 
-interface Array {
-        get(index: number): any;
-        set(index: number, value: any): void;
-        add(obj: any): void;
-        add(index: number, obj : any): void;
-        addAll(obj : any): void;
-        size(): number;
-        clear(): void;
-        remove(index: number): any;
-        remove(item: any): any;
-        iterator(): Iterator<Array>;
-}
+//export interface Array<T> {
+//        get(index: number): any;
+//        set(index: number, value: any): void;
+//        add(obj: any): void;
+//        add(index: number, obj : any): void;
+//        addAll(obj : any): void;
+//        size(): number;
+//        clear(): void;
+//        remove(index: number): any;
+//        remove(item: any): any;
+//        iterator(): Iterator<Array>;
+//}
 
 Object.defineProperty(Array.prototype, "addAll", {
         enumerable : false,
@@ -288,7 +360,7 @@ Object.defineProperty(Array.prototype, "clear", {
         }
 });
 
-interface Object {
+export interface Object {
         equals(other: any): boolean;
         InstanceOf(klass: any): boolean;
 }
@@ -307,15 +379,15 @@ Object.defineProperty(Object.prototype, "InstanceOf", {
         }
 });
 
-interface String {
-        compareTo(anotherString: string): number;
-        startsWith(key: string): boolean;
-        endsWith(key: string): boolean;
-        lastIndexOf(ch: number) : number;
-        indexOf(ch: number) : number;
-        substring(BeginIdx : number, EndIdx : number) : string;
-        matches(str : string) : boolean;
-}
+//export interface String {
+//        compareTo(anotherString: string): number;
+//        startsWith(key: string): boolean;
+//        endsWith(key: string): boolean;
+//        lastIndexOf(ch: number) : number;
+//        indexOf(ch: number) : number;
+//        substring(BeginIdx : number, EndIdx : number) : string;
+//        matches(str : string) : boolean;
+//}
 
 Object.defineProperty(String.prototype, "compareTo", {
         enumerable : false,

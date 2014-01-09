@@ -1,4 +1,3 @@
-module AssureNote {
 // ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
@@ -2145,4 +2144,3 @@ Object.defineProperty(String.prototype, "matches", {
 
 	$.md5 = md5;
 }(Lib));
-}

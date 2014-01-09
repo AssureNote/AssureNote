@@ -133,7 +133,7 @@ var AssureNote;
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
-            this.MasterRecord = new GSNRecord();
+            this.MasterRecord = new AssureNote.GSNRecord();
             switch (Extention) {
                 case "dcase_model":
                     new AssureNote.DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);

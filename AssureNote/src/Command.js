@@ -104,7 +104,7 @@ var AssureNote;
                         Extention = "wgsn";
                         Filename += ".wgsn";
                     }
-                    var Writer = new StringWriter();
+                    var Writer = new AssureNote.StringWriter();
                     this.App.MasterRecord.FormatRecord(Writer);
                     StringToWrite = Writer.toString();
                     break;
@@ -126,13 +126,13 @@ var AssureNote;
 
             function NodeTypeToString(type) {
                 switch (type) {
-                    case GSNType.Goal:
+                    case AssureNote.GSNType.Goal:
                         return "Goal";
-                    case GSNType.Strategy:
+                    case AssureNote.GSNType.Strategy:
                         return "Strategy";
-                    case GSNType.Evidence:
+                    case AssureNote.GSNType.Evidence:
                         return "Evidence";
-                    case GSNType.Context:
+                    case AssureNote.GSNType.Context:
                         return "Context";
                     default:
                         return "";
@@ -155,7 +155,7 @@ var AssureNote;
                     var ParentUID = node.ParentNode.UID.toString();
                     var linkId = "LINK_" + ParentUID + "_" + UID;
                     var LinkXML = document.createElementNS(dcaseNS, "rootBasicLink");
-                    if (node.NodeType == GSNType.Context) {
+                    if (node.NodeType == AssureNote.GSNType.Context) {
                         LinkXML.setAttribute("xsi:type", "dcase:InContextOf");
                     } else {
                         LinkXML.setAttribute("xsi:type", "dcase:SupportedBy");

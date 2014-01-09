@@ -1,0 +1,45 @@
+<?xml-stylesheet href="../../AssureNote/css/index.css" type="text/css"?>
+<svg id="svglayer-box" xmlns="http://www.w3.org/2000/svg" version="1.1" style="top: 0px; left: 0px; width: 100%; height: 100%; position: absolute">
+    <g id="svg-layer" transform="translate(141 0) scale(1) " style="">
+        <path marker-end="url(#Triangle-white)" fill="none" stroke="gray" d="M 250 49.5 C 266 49.5 266 49.5 282 49.5"></path>
+        <path marker-end="url(#Triangle-black)" fill="none" stroke="gray" d="M 125 99 C 125 131 125 131 125 163"></path>
+        <path marker-end="url(#Triangle-black)" fill="none" stroke="gray" d="M 125 242 C 110.9 306 -1.9 242 -16 306"></path>
+        <path marker-end="url(#Triangle-black)" fill="none" stroke="gray" d="M -16 385 C -16 417 -16 417 -16 449"></path>
+        <path marker-end="url(#Triangle-white)" fill="none" stroke="gray" d="M 109 574 C 125 574 125 574 141 574"></path>
+        <path marker-end="url(#Triangle-black)" fill="none" stroke="gray" d="M 125 242 C 137.1 306 233.9 242 246 306"></path>
+        <g transform="matrix(1 0 0 1 0 0)">
+            <rect class="assurenote-default " width="250" height="99"></rect>
+        </g>
+        <g transform="matrix(1 0 0 1 282 5)">
+            <rect class="assurenote-default " rx="10" ry="10" width="250" height="89"></rect>
+        </g>
+        <g transform="matrix(1 0 0 1 0 163)">
+            <polygon class="assurenote-default " points="20,0 250,0 230,79 0,79"></polygon>
+        </g>
+        <g transform="matrix(1 0 0 1 -141 306)">
+            <rect class="assurenote-default " width="250" height="79"></rect>
+        </g>
+        <g transform="matrix(1 0 0 1 -141 449)">
+            <ellipse class="assurenote-default " cx="125" cy="125" rx="125" ry="125"></ellipse>
+        </g>
+        <g transform="matrix(1 0 0 1 141 529.5)">
+            <rect class="assurenote-default " rx="10" ry="10" width="250" height="89"></rect>
+        </g>
+        <g transform="matrix(1 0 0 1 121 306)">
+            <rect class="assurenote-default " width="250" height="79"></rect>
+            <polygon points="0 -20 -20 0 0 20 20 0" class="assurenote-default" transform="translate(125,99)" y="99px"></polygon>
+        </g>
+    </g>
+    <defs>
+        <marker id="Triangle-black" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="15" markerHeight="9" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" stroke="gray"></path>
+        </marker>
+        <marker id="Triangle-white" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="15" markerHeight="9" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="white" stroke="gray"></path>
+        </marker>
+        <polygon id="undevelopd-master" class="assurenote-default" fill="none" stroke="#333" stroke-width="1.5" points="0 -20 -20 0 0 20 20 0"></polygon>
+        <rect id="goal-master" class="assurenote-default" width="1" height="1"></rect>
+        <polygon id="strategy-master" class="assurenote-default" points="0.08,0 1,0 0.92,1 0,1"></polygon>
+        <ellipse id="evidence-master" class="assurenote-default" cx="1" cy="1" rx="0.5" ry="0.5"></ellipse>
+    </defs>
+</svg>

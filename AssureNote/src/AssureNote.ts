@@ -29,7 +29,6 @@
 declare function saveAs(data: Blob, filename: String): void;
 
 module AssureNote {
-
 	export class AssureNoteApp {
         PluginManager: PluginManager;
         SocketManager: SocketManager;
