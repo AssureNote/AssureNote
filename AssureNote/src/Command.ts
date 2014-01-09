@@ -319,4 +319,40 @@ module AssureNote {
             (<any>$("#help-modal")).modal();
         }
     }
+
+    export class RemoveCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["rm", "remove"];
+        }
+
+        public GetDisplayName(): string {
+            return "Remove";
+        }
+
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]): void {
+            if (Params.length > 0) {
+                var Label = Params[0];
+                var Node   = this.App.PictgramPanel.ViewMap[Label].Model;
+                var Parent = Node.ParentNode;
+                for (var i = 0; i < Parent.SubNodeList.length; i++) {
+                    var it = Parent.SubNodeList[i];
+                    if (Node == it) {
+                        Parent.SubNodeList.splice(i, 1);
+                    }
+                }
+                var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
+                var NewNodeView: NodeView = new NodeView(TopGoal, true);
+                NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
+                this.App.PictgramPanel.SetView(NewNodeView);
+                this.App.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+            } else {
+                console.log("Need paramter");
+            }
+        }
+    }
+
 }

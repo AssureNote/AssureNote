@@ -32,6 +32,45 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path="../../src/Editor.ts" />
 var AssureNote;
 (function (AssureNote) {
+    var FullScreenEditorCommand = (function (_super) {
+        __extends(FullScreenEditorCommand, _super);
+        function FullScreenEditorCommand(App, EditorUtil) {
+            _super.call(this, App);
+            this.EditorUtil = EditorUtil;
+        }
+        FullScreenEditorCommand.prototype.GetCommandLineNames = function () {
+            return ["edit"];
+        };
+
+        FullScreenEditorCommand.prototype.GetDisplayName = function () {
+            return "Editor";
+        };
+
+        FullScreenEditorCommand.prototype.Invoke = function (CommandName, Target, Params) {
+            var Label;
+            if (Params.length < 1) {
+                Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
+            } else {
+                Label = Params[0].toUpperCase();
+            }
+            var event = document.createEvent("UIEvents");
+            var TargetView = this.App.PictgramPanel.ViewMap[Label];
+            if (TargetView != null) {
+                if (TargetView.GetNodeType() == GSNType.Strategy) {
+                    this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
+                    return;
+                }
+                var Writer = new StringWriter();
+                TargetView.Model.FormatSubNode(1, Writer);
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+            } else {
+                this.App.DebugP(Label + " not found.");
+            }
+        };
+        return FullScreenEditorCommand;
+    })(AssureNote.Command);
+    AssureNote.FullScreenEditorCommand = FullScreenEditorCommand;
+
     var FullScreenEditorPlugin = (function (_super) {
         __extends(FullScreenEditorPlugin, _super);
         function FullScreenEditorPlugin(AssureNoteApp, textarea, selector) {
@@ -52,29 +91,8 @@ var AssureNote;
             CodeMirror.on(this.textarea, 'cursorActivity', function (doc) {
                 return _this.MoveBackgroundNode(doc);
             });
+            this.AssureNoteApp.RegistCommand(new FullScreenEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
-        FullScreenEditorPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-            var Label;
-            if (Args.length < 1) {
-                Label = AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel();
-            } else {
-                Label = Args[0].toUpperCase();
-            }
-            var event = document.createEvent("UIEvents");
-            var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
-            if (TargetView != null) {
-                if (TargetView.GetNodeType() == GSNType.Strategy) {
-                    AssureNoteApp.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
-                    return;
-                }
-                var Writer = new StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer);
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-            } else {
-                AssureNoteApp.DebugP(Label + " not found.");
-            }
-        };
-
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
             if (NodeView.GetNodeType() == GSNType.Strategy) {

@@ -27,6 +27,42 @@
 ///<reference path="../../src/Editor.ts" />
 
 module AssureNote {
+    export class FullScreenEditorCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp, public EditorUtil: EditorUtil) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[]{
+            return ["edit"];
+        }
+
+        public GetDisplayName(): string {
+            return "Editor";
+        }
+
+        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+            var Label: string;
+            if (Params.length < 1) {
+                Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
+            } else {
+                Label = Params[0].toUpperCase();
+            }
+            var event = document.createEvent("UIEvents");
+            var TargetView = this.App.PictgramPanel.ViewMap[Label];
+            if (TargetView != null) {
+                if (TargetView.GetNodeType() == GSNType.Strategy) {
+                    this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
+                    return;
+                }
+                var Writer = new StringWriter();
+                TargetView.Model.FormatSubNode(1, Writer);
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+            } else {
+                this.App.DebugP(Label + " not found.");
+            }
+        }
+    }
+
     export class FullScreenEditorPlugin extends Plugin {
         public EditorUtil: EditorUtil;
 		constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
@@ -41,29 +77,8 @@ module AssureNote {
                 height: "90%"
             });
             CodeMirror.on(this.textarea, 'cursorActivity', (doc: CodeMirror.Doc) => this.MoveBackgroundNode(doc));
+            this.AssureNoteApp.RegistCommand(new FullScreenEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
-
-		ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-			var Label: string;
-			if (Args.length < 1) {
-				Label = AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel();
-			} else {
-				Label = Args[0].toUpperCase();
-			}
-			var event = document.createEvent("UIEvents");
-			var TargetView = AssureNoteApp.PictgramPanel.ViewMap[Label];
-			if (TargetView != null) {
-				if (TargetView.GetNodeType() == GSNType.Strategy) {
-					AssureNoteApp.DebugP("Strategy " + Label+ " cannot open FullScreenEditor.");
-					return;
-				}
-				var Writer = new StringWriter();
-				TargetView.Model.FormatSubNode(1, Writer);
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-			} else {
-				AssureNoteApp.DebugP(Label + " not found.");
-			}
-		}
 
 		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
 			if (NodeView.GetNodeType() == GSNType.Strategy) {

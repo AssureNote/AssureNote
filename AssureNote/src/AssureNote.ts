@@ -42,11 +42,12 @@ module AssureNote {
         DefaultCommand: AssureNote.CommandMissingCommand;
 
 		constructor() {
+            this.Commands = {};
+
             this.PluginManager = new PluginManager(this);
             this.SocketManager = new SocketManager(this);
 			this.PictgramPanel = new PictgramPanel(this);
             this.PluginPanel = new PluginPanel(this);
-            this.Commands = {};
 
             this.DefaultCommand = new CommandMissingCommand(this);
             this.RegistCommand(new SaveCommand(this));

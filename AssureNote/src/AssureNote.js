@@ -25,11 +25,12 @@ var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
+            this.Commands = {};
+
             this.PluginManager = new AssureNote.PluginManager(this);
             this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
-            this.Commands = {};
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
