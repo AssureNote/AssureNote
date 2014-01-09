@@ -336,6 +336,11 @@ module AssureNote {
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]): void {
             if (Params.length > 0) {
                 var Label = Params[0];
+                var View = this.App.PictgramPanel.ViewMap[Label];
+                if (View == null) {
+                    this.App.DebugP("Node not Found");
+                    return;
+                }
                 var Node   = this.App.PictgramPanel.ViewMap[Label].Model;
                 var Parent = Node.ParentNode;
                 for (var i = 0; i < Parent.SubNodeList.length; i++) {
@@ -344,6 +349,9 @@ module AssureNote {
                         Parent.SubNodeList.splice(i, 1);
                     }
                 }
+
+                this.RemoveDescendantsRecursive(Node);
+
                 var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
@@ -353,6 +361,17 @@ module AssureNote {
                 console.log("Need paramter");
             }
         }
-    }
 
+        private RemoveDescendantsRecursive(Node: GSNNode): void {
+            if (Node.SubNodeList == null) {
+                Node.ParentNode = null;
+                return;
+            }
+
+            for (var i = 0; i < Node.SubNodeList.length; i++) {
+                this.RemoveDescendantsRecursive(Node.SubNodeList[i]);
+            }
+            Node.SubNodeList = null;
+        }
+    }
 }

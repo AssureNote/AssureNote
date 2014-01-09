@@ -360,6 +360,11 @@ var AssureNote;
         RemoveCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
                 var Label = Params[0];
+                var View = this.App.PictgramPanel.ViewMap[Label];
+                if (View == null) {
+                    this.App.DebugP("Node not Found");
+                    return;
+                }
                 var Node = this.App.PictgramPanel.ViewMap[Label].Model;
                 var Parent = Node.ParentNode;
                 for (var i = 0; i < Parent.SubNodeList.length; i++) {
@@ -368,6 +373,9 @@ var AssureNote;
                         Parent.SubNodeList.splice(i, 1);
                     }
                 }
+
+                this.RemoveDescendantsRecursive(Node);
+
                 var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
@@ -376,6 +384,18 @@ var AssureNote;
             } else {
                 console.log("Need paramter");
             }
+        };
+
+        RemoveCommand.prototype.RemoveDescendantsRecursive = function (Node) {
+            if (Node.SubNodeList == null) {
+                Node.ParentNode = null;
+                return;
+            }
+
+            for (var i = 0; i < Node.SubNodeList.length; i++) {
+                this.RemoveDescendantsRecursive(Node.SubNodeList[i]);
+            }
+            Node.SubNodeList = null;
         };
         return RemoveCommand;
     })(Command);
