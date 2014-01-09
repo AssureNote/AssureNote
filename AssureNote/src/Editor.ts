@@ -43,6 +43,13 @@ module AssureNote {
         EnableEditor(WGSN: string, NodeView: NodeView): void {
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
+
+            var Callback = (event: MouseEvent) => {
+                console.log("hi");
+                this.Element.blur();
+            };
+            var App = this.AssureNoteApp;
+
             (<any>this.TextArea).setValue(WGSN);
             this.Element.off("blur");
             this.Element.off("keydown");
@@ -56,7 +63,9 @@ module AssureNote {
                 e.stopPropagation();
                 e.preventDefault();
                 this.DisableEditor(NodeView);
+                App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
             });
+            this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);
             this.TextArea.refresh();
             this.TextArea.focus();
         }
