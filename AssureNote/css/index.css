@@ -12,8 +12,12 @@ body {
 	width: 194px;
 	height: 64px;
 	position: fixed;
-	right: 0px;
+	left: -4px;
 	top: -3px;
+}
+
+.logo-offset {
+    left : 180px;
 }
 
 #content-layer {
