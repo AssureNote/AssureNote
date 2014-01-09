@@ -106,9 +106,6 @@ module AssureNote {
 			this.FoldingAction(event, NodeView);
 		}
 
-		ExecCommand(AssureNoteApp: AssureNoteApp, Args: string[]): void {
-		}
-
 		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
 			if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
 				return null;

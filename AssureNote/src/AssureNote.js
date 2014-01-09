@@ -36,7 +36,6 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SaveCommand(this));
             this.RegistCommand(new AssureNote.OpenCommand(this));
             this.RegistCommand(new AssureNote.NewCommand(this));
-            this.RegistCommand(new AssureNote.RemoveCommand(this));
             this.RegistCommand(new AssureNote.UnfoldAllCommand(this));
             this.RegistCommand(new AssureNote.SetColorCommand(this));
             this.RegistCommand(new AssureNote.SetScaleCommand(this));

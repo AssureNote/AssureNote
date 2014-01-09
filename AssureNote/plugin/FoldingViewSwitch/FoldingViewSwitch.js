@@ -112,9 +112,6 @@ var AssureNote;
             this.FoldingAction(event, NodeView);
         };
 
-        FoldingViewSwitchPlugin.prototype.ExecCommand = function (AssureNoteApp, Args) {
-        };
-
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             if (NodeView.GetNodeType() != AssureNote.GSNType.Goal && NodeView.GetNodeType() != AssureNote.GSNType.Strategy) {
                 return null;
