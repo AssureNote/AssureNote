@@ -197,10 +197,10 @@ module AssureNote {
 
         ConvertToSVG(TopView: NodeView): string {
             var SVG_NS = "http://www.w3.org/2000/svg";
-            var $svg = $('<svg width="100%" height="100%" version="1.1" xmlns="' + SVG_NS + '">');
+            var $svg = $('<svg width="' + (TopView.Shape.GetTreeWidth() + 20) +  'px" height="' + (TopView.Shape.GetTreeHeight() + 20) + 'px" version="1.1" xmlns="' + SVG_NS + '">');
             $svg.append($("svg defs").clone(false));
 
-            var $target = $(AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + -TopView.Shape.GetTreeLeftX() + " 0) scale(1)").appendTo($svg);
+            var $target = $(AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + (10 -TopView.Shape.GetTreeLeftX()) + " 10) scale(1)").appendTo($svg);
             TopView.TraverseVisibleNode((nodeView) => {
                 var svg = nodeView.Shape.ShapeGroup;
                 var connector: SVGPathElement = nodeView.Shape.ArrowPath;

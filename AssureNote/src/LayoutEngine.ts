@@ -220,7 +220,7 @@ module AssureNote {
                 TreeRightX= Math.max(ChildrenWidth, HeadWidth);
             }
             Shape.SetTreeUpperLeft(TreeLeftX, 0);
-            Shape.SetTreeSize(TreeRightX, TreeHeight);
+            Shape.SetTreeSize(TreeRightX - TreeLeftX, TreeHeight);
             //console.log(ThisNode.Label + ": " + (<any>ThisNode.Shape).TreeBoundingBox.toString());
 		}
 
