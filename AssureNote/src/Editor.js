@@ -44,6 +44,12 @@ var AssureNote;
             var _this = this;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
+
+            var Callback = function (event) {
+                _this.Element.blur();
+            };
+            var App = this.AssureNoteApp;
+
             (this.TextArea).setValue(WGSN);
             this.Element.off("blur");
             this.Element.off("keydown");
@@ -57,7 +63,9 @@ var AssureNote;
                 e.stopPropagation();
                 e.preventDefault();
                 _this.DisableEditor(NodeView);
+                App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
             });
+            this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);
             this.TextArea.refresh();
             this.TextArea.focus();
         };

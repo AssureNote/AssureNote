@@ -461,8 +461,8 @@ class WikiSyntax {
 		}
 		return null;
 	}
-	public static String FormatRefKey(GSNType NodeType, String LabelNumber, String HistoryTriple) {
-		return WikiSyntax.FormatNodeType(NodeType) + LabelNumber + HistoryTriple;
+	public static String FormatRefKey(GSNType NodeType, String HistoryTriple) {
+		return WikiSyntax.FormatNodeType(NodeType) + HistoryTriple;
 	}
 }
 
@@ -519,7 +519,6 @@ class GSNNode {
 	/*field*/ArrayList<GSNNode> SubNodeList;
 	/*field*/GSNType NodeType;
 	/*field*/String  LabelName;   /* e.g, G:TopGoal */
-	/*field*/String  LabelNumber; /* e.g, G1 G1.1. Null-able */
 	/*field*/String  AssignedLabelNumber; /* This field is used only if LabelNumber is null */
 	/*field*/int     SectionCount;
 	
@@ -533,12 +532,11 @@ class GSNNode {
 	
 	/*field*/int UID; /* Unique ID */
 
-	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType,String LabelName, String LabelNumber, int UID, GSNHistory[] HistoryTriple) {
+	GSNNode/*constructor*/(GSNDoc BaseDoc, GSNNode ParentNode, GSNType NodeType,String LabelName, int UID, GSNHistory[] HistoryTriple) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
 		this.NodeType    = NodeType;	
 		this.LabelName   = LabelName;      // G:TopGoal
-		this.LabelNumber = LabelNumber;    // G1.1
 		this.AssignedLabelNumber = "";
 		this.UID = UID;
 		this.SectionCount = 0;
@@ -564,7 +562,7 @@ class GSNNode {
 	}
 	
 	GSNNode DeepCopy(GSNDoc BaseDoc, GSNNode ParentNode) {
-		/*local*/GSNNode NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, this.UID, null);
+		/*local*/GSNNode NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.UID, null);
 		NewNode.Created = this.Created;
 		NewNode.LastModified = this.LastModified;
 		NewNode.Digest = this.Digest;
@@ -624,21 +622,9 @@ class GSNNode {
 	String GetHistoryTriple() {
 		return "#" + this.Created.Rev + ":" + this.LastModified.Rev;
 	}
-
-	void ReplaceLabels(HashMap<String,String> LabelMap) {
-		/*local*/String NewNumber = LabelMap.get(this.GetLabel());
-		if(NewNumber != null) {
-			this.LabelNumber = NewNumber;
-		}
-		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-			Node.ReplaceLabels(LabelMap);
-		}
-	}
 	
 	String GetLabelNumber() {
-		if (this.LabelNumber == null) return this.AssignedLabelNumber;
-		return this.LabelNumber;
+		return this.AssignedLabelNumber;
 	}
 	
 	boolean IsModified() {
@@ -806,7 +792,7 @@ class GSNNode {
 			}
 		}
 		if (NodeType == GSNType.Strategy && Creation) {
-			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, this.UID, null);
+			return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.UID, null);
 		}
 		return null;
 	}
@@ -819,7 +805,6 @@ class GSNNode {
 		} else {
 			Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		}
-		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
 		Writer.print(" &");
 		Writer.print(Lib.DecToHex(this.UID));
 		// Stream.append(" ");
@@ -849,7 +834,6 @@ class GSNNode {
 		} else {
 			Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
 		}
-		if (this.LabelNumber != null) Writer.print(this.LabelNumber);
 		Writer.print(" &");
 		Writer.print(Lib.DecToHex(this.UID));
 		// Stream.append(" ");
@@ -908,17 +892,14 @@ class GSNNode {
 	void MergeSubNode(GSNNode NewNode) {
 		assert(this.BaseDoc != null);
 		NewNode.LastModified = null; // this.BaseDoc has Last
-		if(NewNode.LabelNumber != null) {
-			/*local*/int UID = NewNode.UID;
-			/*local*/GSNNode OldNode = this.BaseDoc.GetNode(UID);
-			if(OldNode != null && this.HasSubNodeUID(UID)) {
-				NewNode.Created = OldNode.Created;
-				if(Lib.EqualsDigest(OldNode.Digest, NewNode.Digest)) {
-					NewNode.LastModified = OldNode.LastModified;
-				}
-				else {
-					NewNode.LastModified = this.BaseDoc.DocHistory;					
-				}
+		/*local*/int UID = NewNode.UID;
+		/*local*/GSNNode OldNode = this.BaseDoc.GetNode(UID);
+		if(OldNode != null && this.HasSubNodeUID(UID)) {
+			NewNode.Created = OldNode.Created;
+			if(Lib.EqualsDigest(OldNode.Digest, NewNode.Digest)) {
+				NewNode.LastModified = OldNode.LastModified;
+			} else {
+				NewNode.LastModified = this.BaseDoc.DocHistory;					
 			}
 		}
 		if(NewNode.LastModified == null) {
@@ -969,13 +950,6 @@ class GSNNode {
 			}
 		}
 	}
-	
-	void ReserveLabelMap(HashMap<String, String> LabelMap) {
-		if (this.LabelNumber != null) LabelMap.put(this.LabelNumber,  "exists"); // Non-null value
-		for (/*local*/int i = 0; this.SubNodeList != null && i < Lib.Array_size(this.SubNodeList); i++) {
-			Lib.Array_get(this.SubNodeList, i).ReserveLabelMap(LabelMap);
-		}
-	}
 
 	void RenumberGoalRecursive(int GoalCount, int NextGoalCount, HashMap<String, String> LabelMap) {
 		assert(this.IsGoal());
@@ -1010,7 +984,6 @@ class GSNNode {
 	
 	void RenumberGoal(int GoalCount, int NextGoalCount) {
 		/*local*/HashMap<String, String> LabelMap = new HashMap<String, String>();
-		this.ReserveLabelMap(LabelMap);
 		this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
 	}
 	
@@ -1106,10 +1079,6 @@ class GSNDoc {
 		if (Node.NodeType == GSNType.Goal) {
 			if (Node.GetGoalLevel() == 1) {
 				this.TopNode = Node;
-			}
-			/*local*/int num = WikiSyntax.ParseInt(Node.LabelNumber, 0);
-			if (num > this.GoalCount) {
-				this.GoalCount = num;
 			}
 		}
 	}
@@ -1236,6 +1205,7 @@ class GSNRecord {
 			/*local*/GSNDoc Doc = new GSNDoc(this);
 			/*local*/ParserContext Parser = new ParserContext(Doc);
 			Doc.TopNode = Parser.ParseNode(Reader, RefMap);
+			Doc.RenumberAll();
 		}
 	}
 	
@@ -1370,7 +1340,7 @@ class ParserContext {
 	/*field*/Random random;
 
 	ParserContext/*constructor*/(GSNDoc NullableDoc) {
-		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, -1, null);
+		/*local*/GSNNode ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, -1, null);
 		this.NullableDoc = NullableDoc;  // nullabel
 		this.FirstNode = null;
 		this.LastGoalNode = null;
@@ -1455,13 +1425,13 @@ class ParserContext {
 	GSNNode CreateNewNode(String LabelLine, HashMap<String, GSNNode> RefMap, StringReader Reader) {
 		/*local*/GSNType NodeType = WikiSyntax.ParseNodeType(LabelLine);
 		/*local*/String LabelName = WikiSyntax.ParseLabelName(LabelLine);
-		/*local*/String LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
+		/*local*/String LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine); /* NOTE: LabelNumber WILL BE NEVER USED */
 		/*local*/int UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
 		/*local*/String RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
 		/*local*/GSNNode RefNode = null;
 		/*local*/GSNNode NewNode = null;
 		if (RefMap != null && LabelNumber != null && RevisionHistory != null) {
-			/*local*/String RefKey = WikiSyntax.FormatRefKey(NodeType, LabelNumber, RevisionHistory);
+			/*local*/String RefKey = WikiSyntax.FormatRefKey(NodeType, RevisionHistory);
 			RefNode = RefMap.get(RefKey);
 		}
 		/*local*/GSNNode ParentNode = null;
@@ -1475,7 +1445,7 @@ class ParserContext {
 //				Reader.LogError("mismatched level", Line);
 //			}
 		}
-		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, UID, HistoryTriple);
+		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTriple);
 		if(this.FirstNode == null) {
 			this.FirstNode = NewNode;
 		}
@@ -1484,7 +1454,7 @@ class ParserContext {
 			this.NullableDoc.AddNode(NewNode);
 		}
 		if (RefMap != null && HistoryTriple != null) {
-			/*local*/String RefKey = WikiSyntax.FormatRefKey(NodeType, LabelNumber, NewNode.GetHistoryTriple());
+			/*local*/String RefKey = WikiSyntax.FormatRefKey(NodeType, NewNode.GetHistoryTriple());
 			RefMap.put(RefKey, NewNode);
 		}
 		if(RefNode != null) {

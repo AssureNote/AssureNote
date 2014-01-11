@@ -93,12 +93,12 @@ var AssureNote;
                 while (Label.charAt(0).search(/[A-Za-z]/) == 0)
                     Label = Label.substr(1);
                 console.log(Label);
-                var node = new AssureNote.GSNNode(_this.Doc, null, _this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), Label, UID, null);
+                var node = new AssureNote.GSNNode(_this.Doc, null, _this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), UID, null);
                 node.NodeDoc = Statement;
                 _this.nodes[Id] = node;
 
                 /* TODO Need to remove this code */
-                node.ParentNode = new AssureNote.GSNNode(null, null, AssureNote.GSNType.Goal, null, null, -1, null);
+                node.ParentNode = new AssureNote.GSNNode(null, null, AssureNote.GSNType.Goal, null, -1, null);
             });
 
             $XML.find("rootBasicLink").each(function (index, elem) {

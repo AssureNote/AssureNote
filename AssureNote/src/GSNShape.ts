@@ -352,11 +352,10 @@ module AssureNote {
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
-            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
                 this.ModuleRect = AssureNoteUtils.CreateSVGElement("rect");
-                this.ModuleRect.setAttribute("class", ColorStyle.Default);
+                //this.ModuleRect.setAttribute("class", ColorStyle.Default);
                 this.ModuleRect.setAttribute("width", "80px");
                 this.ModuleRect.setAttribute("height", "13px");
                 this.ModuleRect.setAttribute("y", "-13px");
@@ -365,9 +364,10 @@ module AssureNote {
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
                 this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("polygon");
                 this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
-                this.UndevelopedSymbol.setAttribute("class", ColorStyle.Default);
+                //this.UndevelopedSymbol.setAttribute("class", ColorStyle.Default);
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
+            this.ChangeColorStyle(this.ColorStyle);
         }
 
         FitSizeToContent(): void {
@@ -387,8 +387,8 @@ module AssureNote {
 
         ChangeColorStyle(ColorStyleCode: string): void {
             super.ChangeColorStyle(ColorStyleCode);
-            if (this.BodyRect != null) {
-                this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            if (this.ShapeGroup != null) {
+                this.ShapeGroup.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
             }
         }
     }

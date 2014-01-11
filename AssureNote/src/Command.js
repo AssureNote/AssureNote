@@ -407,42 +407,5 @@ var AssureNote;
         return HelpCommand;
     })(Command);
     AssureNote.HelpCommand = HelpCommand;
-
-    var RemoveCommand = (function (_super) {
-        __extends(RemoveCommand, _super);
-        function RemoveCommand(App) {
-            _super.call(this, App);
-        }
-        RemoveCommand.prototype.GetCommandLineNames = function () {
-            return ["rm", "remove"];
-        };
-
-        RemoveCommand.prototype.GetDisplayName = function () {
-            return "Remove";
-        };
-
-        RemoveCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
-            if (Params.length > 0) {
-                var Label = Params[0];
-                var Node = this.App.PictgramPanel.ViewMap[Label].Model;
-                var Parent = Node.ParentNode;
-                for (var i = 0; i < Parent.SubNodeList.length; i++) {
-                    var it = Parent.SubNodeList[i];
-                    if (Node == it) {
-                        Parent.SubNodeList.splice(i, 1);
-                    }
-                }
-                var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.SetView(NewNodeView);
-                this.App.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
-            } else {
-                console.log("Need paramter");
-            }
-        };
-        return RemoveCommand;
-    })(Command);
-    AssureNote.RemoveCommand = RemoveCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

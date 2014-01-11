@@ -324,8 +324,8 @@ var AssureNote;
             }
             return null;
         };
-        WikiSyntax.FormatRefKey = function (NodeType, LabelNumber, HistoryTriple) {
-            return WikiSyntax.FormatNodeType(NodeType) + LabelNumber + HistoryTriple;
+        WikiSyntax.FormatRefKey = function (NodeType, HistoryTriple) {
+            return WikiSyntax.FormatNodeType(NodeType) + HistoryTriple;
         };
         return WikiSyntax;
     })();
@@ -383,12 +383,11 @@ var AssureNote;
     AssureNote.TagUtils = TagUtils;
 
     var GSNNode = (function () {
-        function GSNNode(BaseDoc, ParentNode, NodeType, LabelName, LabelNumber, UID, HistoryTriple) {
+        function GSNNode(BaseDoc, ParentNode, NodeType, LabelName, UID, HistoryTriple) {
             this.BaseDoc = BaseDoc;
             this.ParentNode = ParentNode;
             this.NodeType = NodeType;
             this.LabelName = LabelName;
-            this.LabelNumber = LabelNumber;
             this.AssignedLabelNumber = "";
             this.UID = UID;
             this.SectionCount = 0;
@@ -412,7 +411,7 @@ var AssureNote;
             }
         }
         GSNNode.prototype.DeepCopy = function (BaseDoc, ParentNode) {
-            var NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.LabelNumber, this.UID, null);
+            var NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.UID, null);
             NewNode.Created = this.Created;
             NewNode.LastModified = this.LastModified;
             NewNode.Digest = this.Digest;
@@ -473,21 +472,8 @@ var AssureNote;
             return "#" + this.Created.Rev + ":" + this.LastModified.Rev;
         };
 
-        GSNNode.prototype.ReplaceLabels = function (LabelMap) {
-            var NewNumber = LabelMap.get(this.GetLabel());
-            if (NewNumber != null) {
-                this.LabelNumber = NewNumber;
-            }
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-                Node.ReplaceLabels(LabelMap);
-            }
-        };
-
         GSNNode.prototype.GetLabelNumber = function () {
-            if (this.LabelNumber == null)
-                return this.AssignedLabelNumber;
-            return this.LabelNumber;
+            return this.AssignedLabelNumber;
         };
 
         GSNNode.prototype.IsModified = function () {
@@ -656,7 +642,7 @@ var AssureNote;
                 }
             }
             if (NodeType == GSNType.Strategy && Creation) {
-                return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.LabelNumber, this.UID, null);
+                return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.UID, null);
             }
             return null;
         };
@@ -669,8 +655,6 @@ var AssureNote;
             } else {
                 Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
             }
-            if (this.LabelNumber != null)
-                Writer.print(this.LabelNumber);
             Writer.print(" &");
             Writer.print(Lib.DecToHex(this.UID));
 
@@ -699,8 +683,6 @@ var AssureNote;
             } else {
                 Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
             }
-            if (this.LabelNumber != null)
-                Writer.print(this.LabelNumber);
             Writer.print(" &");
             Writer.print(Lib.DecToHex(this.UID));
 
@@ -760,16 +742,14 @@ var AssureNote;
         GSNNode.prototype.MergeSubNode = function (NewNode) {
             (this.BaseDoc != null);
             NewNode.LastModified = null;
-            if (NewNode.LabelNumber != null) {
-                var UID = NewNode.UID;
-                var OldNode = this.BaseDoc.GetNode(UID);
-                if (OldNode != null && this.HasSubNodeUID(UID)) {
-                    NewNode.Created = OldNode.Created;
-                    if (Lib.EqualsDigest(OldNode.Digest, NewNode.Digest)) {
-                        NewNode.LastModified = OldNode.LastModified;
-                    } else {
-                        NewNode.LastModified = this.BaseDoc.DocHistory;
-                    }
+            var UID = NewNode.UID;
+            var OldNode = this.BaseDoc.GetNode(UID);
+            if (OldNode != null && this.HasSubNodeUID(UID)) {
+                NewNode.Created = OldNode.Created;
+                if (Lib.EqualsDigest(OldNode.Digest, NewNode.Digest)) {
+                    NewNode.LastModified = OldNode.LastModified;
+                } else {
+                    NewNode.LastModified = this.BaseDoc.DocHistory;
                 }
             }
             if (NewNode.LastModified == null) {
@@ -821,14 +801,6 @@ var AssureNote;
             }
         };
 
-        GSNNode.prototype.ReserveLabelMap = function (LabelMap) {
-            if (this.LabelNumber != null)
-                LabelMap.put(this.LabelNumber, "exists");
-            for (var i = 0; this.SubNodeList != null && i < Lib.Array_size(this.SubNodeList); i++) {
-                Lib.Array_get(this.SubNodeList, i).ReserveLabelMap(LabelMap);
-            }
-        };
-
         GSNNode.prototype.RenumberGoalRecursive = function (GoalCount, NextGoalCount, LabelMap) {
             (this.IsGoal());
 
@@ -865,7 +837,6 @@ var AssureNote;
 
         GSNNode.prototype.RenumberGoal = function (GoalCount, NextGoalCount) {
             var LabelMap = new HashMap();
-            this.ReserveLabelMap(LabelMap);
             this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
         };
 
@@ -954,10 +925,6 @@ var AssureNote;
             if (Node.NodeType == GSNType.Goal) {
                 if (Node.GetGoalLevel() == 1) {
                     this.TopNode = Node;
-                }
-                var num = WikiSyntax.ParseInt(Node.LabelNumber, 0);
-                if (num > this.GoalCount) {
-                    this.GoalCount = num;
                 }
             }
         };
@@ -1080,6 +1047,7 @@ var AssureNote;
                 var Doc = new GSNDoc(this);
                 var Parser = new ParserContext(Doc);
                 Doc.TopNode = Parser.ParseNode(Reader, RefMap);
+                Doc.RenumberAll();
             }
         };
 
@@ -1209,7 +1177,7 @@ var AssureNote;
 
     var ParserContext = (function () {
         function ParserContext(NullableDoc) {
-            var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, null, -1, null);
+            var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, -1, null);
             this.NullableDoc = NullableDoc;
             this.FirstNode = null;
             this.LastGoalNode = null;
@@ -1298,7 +1266,7 @@ var AssureNote;
             var RefNode = null;
             var NewNode = null;
             if (RefMap != null && LabelNumber != null && RevisionHistory != null) {
-                var RefKey = WikiSyntax.FormatRefKey(NodeType, LabelNumber, RevisionHistory);
+                var RefKey = WikiSyntax.FormatRefKey(NodeType, RevisionHistory);
                 RefNode = RefMap.get(RefKey);
             }
             var ParentNode = null;
@@ -1312,7 +1280,7 @@ var AssureNote;
                 //				Reader.LogError("mismatched level", Line);
                 //			}
             }
-            NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, LabelNumber, UID, HistoryTriple);
+            NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTriple);
             if (this.FirstNode == null) {
                 this.FirstNode = NewNode;
             }
@@ -1321,7 +1289,7 @@ var AssureNote;
                 this.NullableDoc.AddNode(NewNode);
             }
             if (RefMap != null && HistoryTriple != null) {
-                var RefKey = WikiSyntax.FormatRefKey(NodeType, LabelNumber, NewNode.GetHistoryTriple());
+                var RefKey = WikiSyntax.FormatRefKey(NodeType, NewNode.GetHistoryTriple());
                 RefMap.put(RefKey, NewNode);
             }
             if (RefNode != null) {

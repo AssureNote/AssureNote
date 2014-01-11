@@ -149,7 +149,16 @@ module AssureNote {
 
             var Command = this.FindCommandByCommandLineName(CommandName);
             Command.Invoke(CommandName, this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
-		}
+        }
+
+        LoadDefaultWGSN(): void {
+            var lang: string = navigator.browserLanguage || navigator.language || navigator.userLanguage;
+            if (!lang || lang == "ja") {
+                this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+            } else {
+                this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+            }
+        }
 
         LoadNewWGSN(Name: string, WGSN: string): void {
             var Extention = Name.split(".").pop();

@@ -345,11 +345,11 @@ var AssureNote;
         GSNGoalShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
                 this.ModuleRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-                this.ModuleRect.setAttribute("class", AssureNote.ColorStyle.Default);
+
+                //this.ModuleRect.setAttribute("class", ColorStyle.Default);
                 this.ModuleRect.setAttribute("width", "80px");
                 this.ModuleRect.setAttribute("height", "13px");
                 this.ModuleRect.setAttribute("y", "-13px");
@@ -358,9 +358,11 @@ var AssureNote;
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
                 this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
                 this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
-                this.UndevelopedSymbol.setAttribute("class", AssureNote.ColorStyle.Default);
+
+                //this.UndevelopedSymbol.setAttribute("class", ColorStyle.Default);
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
+            this.ChangeColorStyle(this.ColorStyle);
         };
 
         GSNGoalShape.prototype.FitSizeToContent = function () {
@@ -380,8 +382,8 @@ var AssureNote;
 
         GSNGoalShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
             _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            if (this.BodyRect != null) {
-                this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            if (this.ShapeGroup != null) {
+                this.ShapeGroup.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
             }
         };
         return GSNGoalShape;
