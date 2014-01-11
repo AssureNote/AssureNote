@@ -183,7 +183,7 @@ module AssureNote {
         }
 
         public GetCommandLineNames(): string[] {
-            return ["save-as-svg"];
+            return ["saveassvg", "save-as-svg"];
         }
 
         public GetDisplayName(): string {

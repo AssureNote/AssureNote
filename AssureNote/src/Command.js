@@ -193,7 +193,7 @@ var AssureNote;
             _super.call(this, App);
         }
         SaveSVGCommand.prototype.GetCommandLineNames = function () {
-            return ["save-as-svg"];
+            return ["saveassvg", "save-as-svg"];
         };
 
         SaveSVGCommand.prototype.GetDisplayName = function () {

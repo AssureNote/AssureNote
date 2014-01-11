@@ -47,7 +47,7 @@ var AssureNote;
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             var Names = Command.GetCommandLineNames();
             for (var i = 0; i < Names.length; ++i) {
-                this.Commands[Names[i]] = Command;
+                this.Commands[Names[i].toLowerCase()] = Command;
             }
         };
 
@@ -69,7 +69,7 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
-            return this.Commands[Name] || this.DefaultCommand;
+            return this.Commands[Name.toLowerCase()] || this.DefaultCommand;
         };
 
         AssureNoteApp.prototype.ExecTopMenu = function (Id) {

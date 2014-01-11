@@ -65,7 +65,7 @@ module AssureNote {
         public RegistCommand(Command: Command) {
             var Names = Command.GetCommandLineNames();
             for (var i = 0; i < Names.length; ++i) {
-                this.Commands[Names[i]] = Command;
+                this.Commands[Names[i].toLowerCase()] = Command;
             }
         }
 
@@ -87,7 +87,7 @@ module AssureNote {
         }
 
         FindCommandByCommandLineName(Name: string): Command {
-            return this.Commands[Name] || this.DefaultCommand;
+            return this.Commands[Name.toLowerCase()] || this.DefaultCommand;
         }
 
         ExecTopMenu(Id: string): void {
