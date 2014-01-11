@@ -42,7 +42,7 @@ var AssureNote;
             this.Viewport = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
-            var Bar = new AssureNote.MenuBar(AssureNoteApp);
+            var Bar = new AssureNote.NodeMenu(AssureNoteApp);
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 _this.AssureNoteApp.DebugP("click:" + Label);

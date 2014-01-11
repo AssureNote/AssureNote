@@ -90,9 +90,9 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new RemoveCommand(this.AssureNoteApp));
         }
 
-        CreateMenuBarButton(View: NodeView): MenuBarButton {
+        CreateMenuBarButton(View: NodeView): NodeMenuItem {
             var App = this.AssureNoteApp;
-            return new MenuBarButton("remove-id", "images/remove.png", "remove", (event: Event, TargetView: NodeView) => {
+            return new NodeMenuItem("remove-id", "images/remove.png", "remove", (event: Event, TargetView: NodeView) => {
                 var Node = TargetView.Model;
                 var Parent = Node.ParentNode;
                 if (Parent.SubNodeList == null) {

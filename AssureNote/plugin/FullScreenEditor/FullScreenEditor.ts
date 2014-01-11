@@ -80,11 +80,11 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new FullScreenEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
 
-		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
+		CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
 			if (NodeView.GetNodeType() == GSNType.Strategy) {
 				return null;
 			}
-			return new MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor",
+			return new NodeMenuItem("fullscreeneditor-id", "images/editor.png", "fullscreeneditor",
 				(event: Event, TargetView: NodeView) => {
 					var Writer = new StringWriter();
 					TargetView.Model.FormatSubNode(1, Writer);

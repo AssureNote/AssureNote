@@ -24,14 +24,14 @@
 ///<reference path="./AssureNote.ts" />
 var AssureNote;
 (function (AssureNote) {
-    var MenuBarButton = (function () {
-        function MenuBarButton(ElementId, ImagePath, Title, EventHandler) {
+    var NodeMenuItem = (function () {
+        function NodeMenuItem(ElementId, ImagePath, Title, EventHandler) {
             this.ElementId = ElementId;
             this.ImagePath = ImagePath;
             this.Title = Title;
             this.EventHandler = EventHandler;
         }
-        MenuBarButton.prototype.EnableEventHandler = function (MenuBar) {
+        NodeMenuItem.prototype.EnableEventHandler = function (MenuBar) {
             var _this = this;
             MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
             $("#" + this.ElementId).click(function (event) {
@@ -39,23 +39,23 @@ var AssureNote;
                 MenuBar.Remove();
             });
         };
-        return MenuBarButton;
+        return NodeMenuItem;
     })();
-    AssureNote.MenuBarButton = MenuBarButton;
+    AssureNote.NodeMenuItem = NodeMenuItem;
 
-    var MenuBar = (function () {
-        function MenuBar(AssureNoteApp) {
+    var NodeMenu = (function () {
+        function NodeMenu(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
             this.IsEnable = false;
         }
-        MenuBar.prototype.CreateButtons = function (Contents) {
+        NodeMenu.prototype.CreateButtons = function (Contents) {
             for (var i = 0; i < Contents.length; i++) {
                 var Button = Contents[i];
                 Button.EnableEventHandler(this);
             }
         };
 
-        MenuBar.prototype.Create = function (CurrentView, ControlLayer, Contents) {
+        NodeMenu.prototype.Create = function (CurrentView, ControlLayer, Contents) {
             var _this = this;
             this.IsEnable = true;
             this.CurrentView = CurrentView;
@@ -87,14 +87,14 @@ var AssureNote;
             });
         };
 
-        MenuBar.prototype.Remove = function () {
+        NodeMenu.prototype.Remove = function () {
             this.Menu.remove();
             this.Menu = null;
             this.CurrentView = null;
             this.IsEnable = false;
         };
-        return MenuBar;
+        return NodeMenu;
     })();
-    AssureNote.MenuBar = MenuBar;
+    AssureNote.NodeMenu = NodeMenu;
 })(AssureNote || (AssureNote = {}));
-//# sourceMappingURL=MenuBar.js.map
+//# sourceMappingURL=NodeMenu.js.map

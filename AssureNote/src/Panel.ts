@@ -58,7 +58,7 @@ module AssureNote {
 			this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
-            var Bar = new MenuBar(AssureNoteApp);
+            var Bar = new NodeMenu(AssureNoteApp);
             this.ContentLayer.addEventListener("click", (event: MouseEvent) => {
 				var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
 				this.AssureNoteApp.DebugP("click:" + Label);

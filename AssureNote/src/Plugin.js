@@ -21,7 +21,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
-///<reference path="./MenuBar.ts" />
+///<reference path="./NodeMenu.ts" />
 ///<reference path='../d.ts/jquery.d.ts'/>
 var AssureNote;
 (function (AssureNote) {

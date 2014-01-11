@@ -98,7 +98,7 @@ var AssureNote;
             if (NodeView.GetNodeType() == AssureNote.GSNType.Strategy) {
                 return null;
             }
-            return new AssureNote.MenuBarButton("fullscreeneditor-id", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
+            return new AssureNote.NodeMenuItem("fullscreeneditor-id", "images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Writer = new AssureNote.StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer);
                 _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);

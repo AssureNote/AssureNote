@@ -22,7 +22,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
 
-///<reference path="./MenuBar.ts" />
+///<reference path="./NodeMenu.ts" />
 ///<reference path='../d.ts/jquery.d.ts'/>
 
 module AssureNote {
@@ -47,7 +47,7 @@ module AssureNote {
 		ExecDoubleClicked(NodeView: NodeView): void {
 		}
 
-		CreateMenuBarButton(NodeView: NodeView): MenuBarButton {
+		CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
 			return null;
         }
 
@@ -125,8 +125,8 @@ module AssureNote {
 			return this.PluginMap[Name];
 		}
 
-		GetMenuBarButtons(TargetView: NodeView): MenuBarButton[]{
-			var ret: MenuBarButton[] = [];
+		GetMenuBarButtons(TargetView: NodeView): NodeMenuItem[]{
+			var ret: NodeMenuItem[] = [];
 			$.each(this.PluginMap, (key, value: Plugin) => {
 				if (value.HasMenuBarButton) {
 					this.AssureNoteApp.DebugP("Menu: key=" + key);
