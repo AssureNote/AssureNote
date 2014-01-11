@@ -40,6 +40,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetColorCommand(this));
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
             this.RegistCommand(new AssureNote.HelpCommand(this));
+            this.RegistCommand(new AssureNote.SaveSVGCommand(this));
 
             this.PluginManager.LoadPlugin();
         }

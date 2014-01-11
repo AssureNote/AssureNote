@@ -56,6 +56,7 @@ module AssureNote {
             this.RegistCommand(new SetColorCommand(this));
             this.RegistCommand(new SetScaleCommand(this));
             this.RegistCommand(new HelpCommand(this));
+            this.RegistCommand(new SaveSVGCommand(this));
 
             this.PluginManager.LoadPlugin();
 

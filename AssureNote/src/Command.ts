@@ -75,7 +75,7 @@ module AssureNote {
         }
 
         public GetCommandLineNames(): string[] {
-            return ["w"];
+            return ["w", "save"];
         }
 
         public GetDisplayName(): string {
@@ -173,6 +173,74 @@ module AssureNote {
             var DummyNode = document.createElement("div");
             DummyNode.appendChild(DCaseArgumentXML);
             return '<?xml version="1.0" encoding="UTF-8"?>\n' + DummyNode.innerHTML.replace(/>/g, ">\n").replace(/&amp;#x/g, "&#x");
+        }
+
+    }
+
+    export class SaveSVGCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["save-as-svg"];
+        }
+
+        public GetDisplayName(): string {
+            return "Save As SVG";
+        }
+
+        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+            var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
+            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
+        }
+
+        ConvertToSVG(TopView: NodeView): string {
+            var SVG_NS = "http://www.w3.org/2000/svg";
+            var $svg = $('<svg width="100%" height="100%" version="1.1" xmlns="' + SVG_NS + '">');
+            $svg.append($("svg defs").clone(false));
+
+            var $target = $(AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + -TopView.Shape.GetTreeLeftX() + " 0) scale(1)").appendTo($svg);
+            TopView.TraverseVisibleNode((nodeView) => {
+                var svg = nodeView.Shape.ShapeGroup;
+                var connector: SVGPathElement = nodeView.Shape.ArrowPath;
+                var SVGStyle = document.defaultView.getComputedStyle(svg, null);
+                var Style = document.defaultView.getComputedStyle(nodeView.Shape.Content, null);
+
+
+                $target.append($(svg).clone(false).attr({"fill": "none", "stroke": "#000000"}));
+                if (nodeView != TopView) {
+                    $target.append($(connector).clone(false));
+                }
+
+                var TextX = nodeView.GetGX() + parseInt(Style.paddingLeft);
+                var TextY = nodeView.GetGY() + parseInt(Style.paddingTop);
+                var $svgtext = $(AssureNoteUtils.CreateSVGElement("text"))
+                    .attr({ x: TextX, y: TextY });
+
+                function CreateTSpan(Text: string): JQuery {
+                    return $(AssureNoteUtils.CreateSVGElement("tspan")).text(Text);
+                }
+
+                CreateTSpan(nodeView.Label).attr({ "x": TextX, dy: 18, "font-size": "18px", "font-weight": "bold", "font-family": 'Arial' }).appendTo($svgtext);
+
+                var MaxNumberOfCharInLine = 1 + ~~((nodeView.Shape.GetNodeWidth() - parseInt(Style.paddingLeft) * 2) * 2 / 15);
+                var firstLine = true;
+                AssureNoteUtils.ForeachLine(nodeView.NodeDoc, MaxNumberOfCharInLine, (linetext) => {
+                    CreateTSpan(linetext)
+                        .attr({ x: TextX, dy: firstLine ? 20 : 15, "font-size": "13px", "font-family": 'Helvetica Neue' })
+                        .appendTo($svgtext);
+                    firstLine = false;
+                });
+
+                $target.append($svgtext);
+            });
+            var $dummydiv = $("<div>").append($svg);
+            var header = '<?xml version="1.0" standalone="no"?>\n' +
+                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n';
+            var doc = header + $dummydiv.html();
+            $svg.empty().remove();
+            return doc;
         }
     }
 

@@ -190,8 +190,32 @@ module AssureNote{
 
         var element: HTMLDivElement = document.createElement('div');
         export function HTMLEncode(text: string): string {
-            element.innerText = text;
+            element.textContent = text;
             return element.innerHTML;
+        }
+
+        export function ForeachLine(Text: string, LineWidth: number, Callback): void {
+            if (!Callback) return;
+            var rest: string = Text;
+            var maxLength: number = LineWidth || 20;
+            maxLength = maxLength < 1 ? 1 : maxLength;
+            var length = 0;
+            var i = 0;
+            for (var pos = 0; pos < rest.length; ++pos) {
+                var code = rest.charCodeAt(pos);
+                length += code < 128 ? 1 : 2;
+                if (length > maxLength || rest.charAt(pos) == "\n") {
+                    Callback(rest.substr(0, pos), i);
+                    if (rest.charAt(pos) == "\n") {
+                        pos++;
+                    }
+                    rest = rest.substr(pos, rest.length - pos);
+                    pos = -1;
+                    length = 0;
+                    i++;
+                }
+            }
+            Callback(rest, i);
         }
     }
 
@@ -231,4 +255,5 @@ module AssureNote{
     export function ReverseDirection(Dir: Direction): Direction {
         return (Dir + 2) & 3;
     }
+
 }

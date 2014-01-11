@@ -148,10 +148,36 @@ var AssureNote;
 
         var element = document.createElement('div');
         function HTMLEncode(text) {
-            element.innerText = text;
+            element.textContent = text;
             return element.innerHTML;
         }
         AssureNoteUtils.HTMLEncode = HTMLEncode;
+
+        function ForeachLine(Text, LineWidth, Callback) {
+            if (!Callback)
+                return;
+            var rest = Text;
+            var maxLength = LineWidth || 20;
+            maxLength = maxLength < 1 ? 1 : maxLength;
+            var length = 0;
+            var i = 0;
+            for (var pos = 0; pos < rest.length; ++pos) {
+                var code = rest.charCodeAt(pos);
+                length += code < 128 ? 1 : 2;
+                if (length > maxLength || rest.charAt(pos) == "\n") {
+                    Callback(rest.substr(0, pos), i);
+                    if (rest.charAt(pos) == "\n") {
+                        pos++;
+                    }
+                    rest = rest.substr(pos, rest.length - pos);
+                    pos = -1;
+                    length = 0;
+                    i++;
+                }
+            }
+            Callback(rest, i);
+        }
+        AssureNoteUtils.ForeachLine = ForeachLine;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
