@@ -851,6 +851,14 @@ var AssureNote;
             }
             return NodeList;
         };
+
+        GSNNode.prototype.GetNodeCount = function () {
+            var res = 1;
+            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+                res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCount();
+            }
+            return res;
+        };
         return GSNNode;
     })();
     AssureNote.GSNNode = GSNNode;
@@ -966,6 +974,10 @@ var AssureNote;
                 }
             }
             return LabelMap;
+        };
+
+        GSNDoc.prototype.GetNodeCount = function () {
+            return this.TopNode.GetNodeCount();
         };
 
         GSNDoc.prototype.RenumberAll = function () {
@@ -2108,4 +2120,3 @@ var AssureNote;
         $.md5 = md5;
     })(Lib));
 })(AssureNote || (AssureNote = {}));
-//# sourceMappingURL=AssureNoteParser.js.map

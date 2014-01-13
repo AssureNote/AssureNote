@@ -998,6 +998,14 @@ class GSNNode {
 		}
 		return NodeList;
 	}
+	
+	int GetNodeCount() {
+		/*local*/int res = 1;
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCount();
+		}
+		return res;
+	}
 
 }
 
@@ -1120,6 +1128,10 @@ class GSNDoc {
 			}
 		}
 		return LabelMap;
+	}
+	
+	int GetNodeCount() {
+		return this.TopNode.GetNodeCount();
 	}
 	
 	void RenumberAll() {

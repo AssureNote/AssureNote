@@ -256,7 +256,7 @@ module AssureNote {
 		}
 
         SetScale(scale: number): void {
-            scale = Math.max(0.2, Math.min(2.0, scale));
+            scale = Math.max(0.02, Math.min(20.0, scale));
 			this.Scale = scale;
 			var cx = this.GetPageCenterX();
 			var cy = this.GetPageCenterY();

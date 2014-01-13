@@ -849,6 +849,14 @@ var GSNNode = (function () {
         }
         return NodeList;
     };
+
+    GSNNode.prototype.GetNodeCount = function () {
+        var res = 1;
+        for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+            res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCount();
+        }
+        return res;
+    };
     return GSNNode;
 })();
 exports.GSNNode = GSNNode;
@@ -964,6 +972,10 @@ var GSNDoc = (function () {
             }
         }
         return LabelMap;
+    };
+
+    GSNDoc.prototype.GetNodeCount = function () {
+        return this.TopNode.GetNodeCount();
     };
 
     GSNDoc.prototype.RenumberAll = function () {

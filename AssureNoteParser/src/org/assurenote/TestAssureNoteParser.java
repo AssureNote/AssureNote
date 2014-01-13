@@ -317,4 +317,14 @@ public class TestAssureNoteParser {
 		
 		assertNotEquals(TopNode.AssignedLabelNumber, "123");
 	}
+	
+	@Test
+	public void GetNodeCount() {
+		String input = "*G\n*S\n**G\n**G";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		assertEquals(LatestDoc.GetNodeCount(), 4);
+	}
 }

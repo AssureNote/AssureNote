@@ -851,6 +851,14 @@ export class GSNNode {
 		}
 		return NodeList;
 	}
+	
+	GetNodeCount(): number {
+		var res: number = 1;
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCount();
+		}
+		return res;
+	}
 
 }
 
@@ -972,6 +980,10 @@ export class GSNDoc {
 			}
 		}
 		return LabelMap;
+	}
+	
+	GetNodeCount(): number {
+		return this.TopNode.GetNodeCount();
 	}
 	
 	RenumberAll(): void {
