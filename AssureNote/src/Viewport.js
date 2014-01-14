@@ -280,6 +280,10 @@ var AssureNote;
             return this.LogicalOffsetY;
         };
 
+        ViewportManager.prototype.SetCameraPosition = function (GX, GY) {
+            this.SetOffset(this.GetPageCenterX() - GX * this.Scale, this.GetPageCenterY() - GY * this.Scale);
+        };
+
         ViewportManager.prototype.CalcLogicalOffsetX = function (OffsetX) {
             var cx = this.GetPageCenterX();
             return (OffsetX - cx) / this.Scale + cx;

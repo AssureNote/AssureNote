@@ -285,7 +285,11 @@ module AssureNote {
 
 		GetLogicalOffsetY(): number {
 			return this.LogicalOffsetY;
-		}
+        }
+
+        SetCameraPosition(GX: number, GY: number) {
+            this.SetOffset(this.GetPageCenterX() - GX * this.Scale, this.GetPageCenterY() - GY * this.Scale);
+        }
 
 		private CalcLogicalOffsetX(OffsetX: number): number {
 			var cx = this.GetPageCenterX();
