@@ -79,8 +79,8 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
             this.textarea = textarea;
             this.selector = selector;
-            this.HasMenuBarButton = true;
-            this.HasEditor = true;
+            this.SetMenuBarButton(true);
+            this.SetEditor(true);
             this.EditorUtil = new AssureNote.EditorUtil(AssureNoteApp, textarea, selector, {
                 position: "fixed",
                 top: "5%",

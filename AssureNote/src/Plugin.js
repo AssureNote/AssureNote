@@ -27,9 +27,9 @@ var AssureNote;
 (function (AssureNote) {
     var Plugin = (function () {
         function Plugin() {
-            this.HasMenuBarButton = false;
-            this.HasEditor = false;
-            this.HasDoubleClicked = false;
+            this.hasMenuBarButton = false;
+            this.hasEditor = false;
+            this.hasDoubleClicked = false;
         }
         Plugin.prototype.ExecCommand = function (AssureNote, Args) {
         };
@@ -59,6 +59,30 @@ var AssureNote;
 
         Plugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
             /* Do nothing */
+        };
+
+        Plugin.prototype.SetMenuBarButton = function (b) {
+            this.hasMenuBarButton = b;
+        };
+
+        Plugin.prototype.HasMenuBarButton = function () {
+            return this.hasMenuBarButton;
+        };
+
+        Plugin.prototype.SetEditor = function (b) {
+            this.hasEditor = b;
+        };
+
+        Plugin.prototype.HasEditor = function () {
+            return this.hasEditor;
+        };
+
+        Plugin.prototype.SetDoubleClicked = function (b) {
+            this.hasDoubleClicked = b;
+        };
+
+        Plugin.prototype.HasDoubleClicked = function () {
+            return this.hasDoubleClicked;
         };
         return Plugin;
     })();
@@ -117,7 +141,7 @@ var AssureNote;
             var _this = this;
             var ret = [];
             $.each(this.PluginMap, function (key, value) {
-                if (value.HasMenuBarButton) {
+                if (value.HasMenuBarButton()) {
                     _this.AssureNoteApp.DebugP("Menu: key=" + key);
                     var Button = value.CreateMenuBarButton(TargetView);
                     if (Button != null) {
