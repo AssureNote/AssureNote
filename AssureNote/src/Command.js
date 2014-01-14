@@ -228,6 +228,7 @@ var AssureNote;
                 var LableDy = parseInt(LableStyle.marginTop) + parseInt(LableStyle.fontSize);
                 var FirstLineDy = parseInt(LableStyle.marginBottom) + parseInt(LableStyle.lineHeight);
                 var LineDy = parseInt(Style.lineHeight);
+                var LineFontSize = parseInt(Style.fontSize);
 
                 var $svgtext = $(AssureNote.AssureNoteUtils.CreateSVGElement("text")).attr({ x: TextX, y: TextY });
 
@@ -237,7 +238,7 @@ var AssureNote;
 
                 CreateTSpan(nodeView.Label).attr({ "x": TextX, dy: LableDy, "font-size": LableStyle.fontSize, "font-weight": "bold", "font-family": 'Arial, Meiryo' }).appendTo($svgtext);
 
-                var MaxNumberOfCharInLine = 1 + ~~((nodeView.Shape.GetNodeWidth() - parseInt(Style.paddingLeft) * 2) * 2 / 15);
+                var MaxNumberOfCharInLine = 1 + ~~((nodeView.Shape.GetNodeWidth() - 2 * parseInt(Style.paddingLeft)) * 2 / LineFontSize);
                 var firstLine = true;
                 AssureNote.AssureNoteUtils.ForeachLine(nodeView.NodeDoc, MaxNumberOfCharInLine, function (linetext) {
                     CreateTSpan(linetext).attr({ x: TextX, dy: firstLine ? FirstLineDy : LineDy, "font-size": Style.fontSize, "font-family": 'Arial, Meiryo' }).appendTo($svgtext);
