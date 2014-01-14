@@ -67,8 +67,8 @@ module AssureNote {
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			super();
-			this.HasMenuBarButton = true;
-			this.HasDoubleClicked = true;
+            this.SetMenuBarButton(true);
+			this.SetDoubleClicked(true);
 
 			this.FoldingAction = (event: Event, TargetView: NodeView) => {
 				if (TargetView.GetNodeType() == GSNType.Strategy) {

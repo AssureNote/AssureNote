@@ -28,14 +28,14 @@
 module AssureNote {
 
 	export class Plugin {
-        public HasMenuBarButton: boolean;
-		public HasEditor: boolean;
-		public HasDoubleClicked: boolean;
+        private hasMenuBarButton: boolean;
+		private hasEditor: boolean;
+		private hasDoubleClicked: boolean;
 
 		constructor() {
-            this.HasMenuBarButton = false;
-			this.HasEditor = false;
-			this.HasDoubleClicked = false;
+            this.hasMenuBarButton = false;
+			this.hasEditor = false;
+			this.hasDoubleClicked = false;
 		}
 
 		ExecCommand(AssureNote: AssureNoteApp, Args: string[]): void {
@@ -66,6 +66,30 @@ module AssureNote {
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
             /* Do nothing */
+        }
+
+        SetMenuBarButton(b: boolean) {
+            this.hasMenuBarButton = b;
+        }
+
+        HasMenuBarButton() : boolean {
+            return this.hasMenuBarButton;
+        }
+
+        SetEditor(b: boolean): void {
+            this.hasEditor = b;
+        }
+
+        HasEditor(): boolean {
+            return this.hasEditor;
+        }
+
+        SetDoubleClicked(b: boolean): void {
+            this.hasDoubleClicked = b;
+        }
+
+        HasDoubleClicked(): boolean {
+            return this.hasDoubleClicked;
         }
     }
 
@@ -128,7 +152,7 @@ module AssureNote {
 		GetMenuBarButtons(TargetView: NodeView): NodeMenuItem[]{
 			var ret: NodeMenuItem[] = [];
 			$.each(this.PluginMap, (key, value: Plugin) => {
-				if (value.HasMenuBarButton) {
+				if (value.HasMenuBarButton()) {
 					this.AssureNoteApp.DebugP("Menu: key=" + key);
 					var Button = value.CreateMenuBarButton(TargetView);
 					if (Button != null) {

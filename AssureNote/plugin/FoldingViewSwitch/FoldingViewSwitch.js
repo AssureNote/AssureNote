@@ -74,8 +74,8 @@ var AssureNote;
         function FoldingViewSwitchPlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
-            this.HasMenuBarButton = true;
-            this.HasDoubleClicked = true;
+            this.SetMenuBarButton(true);
+            this.SetDoubleClicked(true);
 
             this.FoldingAction = function (event, TargetView) {
                 if (TargetView.GetNodeType() == AssureNote.GSNType.Strategy) {

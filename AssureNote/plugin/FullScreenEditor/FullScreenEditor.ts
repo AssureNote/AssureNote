@@ -67,8 +67,8 @@ module AssureNote {
         public EditorUtil: EditorUtil;
 		constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
 			super();
-            this.HasMenuBarButton = true;
-            this.HasEditor = true;
+            this.SetMenuBarButton(true);
+            this.SetEditor(true);
             this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
                 position: "fixed",
                 top: "5%",
