@@ -51,6 +51,10 @@ module AssureNote {
 			return null;
         }
 
+        CreateMenuBarButtons(NodeView: NodeView): NodeMenuItem[] {
+            return null;
+        }
+
         EditorEnableCallback(): () => void {
             return null;
         }
@@ -157,7 +161,11 @@ module AssureNote {
 					var Button = value.CreateMenuBarButton(TargetView);
 					if (Button != null) {
 						ret.push(Button);
-					}
+                    }
+                    var Buttons = value.CreateMenuBarButtons(TargetView);
+                    if (Buttons != null) {
+                        ret = ret.concat(Buttons);
+                    }
 				}
 			});
 			return ret;

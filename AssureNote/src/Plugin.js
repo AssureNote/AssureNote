@@ -44,6 +44,10 @@ var AssureNote;
             return null;
         };
 
+        Plugin.prototype.CreateMenuBarButtons = function (NodeView) {
+            return null;
+        };
+
         Plugin.prototype.EditorEnableCallback = function () {
             return null;
         };
@@ -146,6 +150,10 @@ var AssureNote;
                     var Button = value.CreateMenuBarButton(TargetView);
                     if (Button != null) {
                         ret.push(Button);
+                    }
+                    var Buttons = value.CreateMenuBarButtons(TargetView);
+                    if (Buttons != null) {
+                        ret = ret.concat(Buttons);
                     }
                 }
             });
