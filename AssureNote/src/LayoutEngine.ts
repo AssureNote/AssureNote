@@ -129,7 +129,9 @@ module AssureNote {
                     TreeRightX += RightNodesWidth + SimpleLayoutEngine.ContextHorizontalMargin;
                     TreeHeight = Math.max(TreeHeight, RightNodesHeight);
 				}
-			}
+            }
+
+            var HeadRightX = TreeRightX;
             var HeadWidth = TreeRightX - TreeLeftX;
             Shape.SetHeadRect(TreeLeftX, 0, HeadWidth, TreeHeight);
             TreeHeight += SimpleLayoutEngine.ChildrenVerticalMargin;
@@ -146,7 +148,7 @@ module AssureNote {
                     this.Layout(SubNode);
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
                     var ChildHeadWidth = SubNode.IsFolded ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
-                    var ChildHeadLeftSideMargin = -SubNode.Shape.GetTreeLeftLocalX() + SubNode.Shape.GetHeadLeftLocalX();
+                    var ChildHeadLeftSideMargin = SubNode.Shape.GetHeadLeftLocalX() - SubNode.Shape.GetTreeLeftLocalX();
                     var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     var Margin = SimpleLayoutEngine.ChildrenHorizontalMargin;
@@ -214,7 +216,7 @@ module AssureNote {
                 });
 
                 TreeHeight += ChildrenHeight;
-                TreeRightX= Math.max(ChildrenWidth, HeadWidth);
+                TreeRightX = Math.max(TreeLeftX + ChildrenWidth, HeadRightX);
             }
             Shape.SetTreeRect(TreeLeftX, 0, TreeRightX - TreeLeftX, TreeHeight);
             //console.log(ThisNode.Label + ": " + (<any>ThisNode.Shape).TreeBoundingBox.toString());
