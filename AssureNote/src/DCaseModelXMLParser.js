@@ -89,11 +89,11 @@ var AssureNote;
                     _this.RootNodeId = Id;
                     IsRootNode = false;
                 }
-                var UID = Math.floor(Math.random() * 2147483647);
                 while (Label.charAt(0).search(/[A-Za-z]/) == 0)
                     Label = Label.substr(1);
                 console.log(Label);
-                var node = new AssureNote.GSNNode(_this.Doc, null, _this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), UID, null);
+                var Type = _this.Text2NodeTypeMap[NodeType];
+                var node = new AssureNote.GSNNode(_this.Doc, null, Type, NodeType.charAt(0), AssureNote.AssureNoteUtils.GenerateUID(), null);
                 node.NodeDoc = Statement;
                 _this.nodes[Id] = node;
 

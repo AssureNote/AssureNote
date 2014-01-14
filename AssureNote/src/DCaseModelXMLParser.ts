@@ -89,10 +89,10 @@ module AssureNote {
                     this.RootNodeId = Id;
                     IsRootNode = false;
                 }
-                var UID: number = Math.floor(Math.random() * 2147483647);
                 while (Label.charAt(0).search(/[A-Za-z]/) == 0) Label = Label.substr(1); // G1.1 -> 1.1
                 console.log(Label);
-                var node: GSNNode = new GSNNode(this.Doc, null, this.Text2NodeTypeMap[NodeType], NodeType.charAt(0), UID, null);
+                var Type = this.Text2NodeTypeMap[NodeType];
+                var node: GSNNode = new GSNNode(this.Doc, null, Type, NodeType.charAt(0), AssureNoteUtils.GenerateUID(), null);
                 node.NodeDoc = Statement;
                 this.nodes[Id] = node;
 

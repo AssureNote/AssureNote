@@ -178,6 +178,11 @@ var AssureNote;
             Callback(rest, i);
         }
         AssureNoteUtils.ForeachLine = ForeachLine;
+
+        function GenerateUID() {
+            return Math.floor(Math.random() * 2147483647);
+        }
+        AssureNoteUtils.GenerateUID = GenerateUID;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

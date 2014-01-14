@@ -62,6 +62,7 @@
     <TypeScriptCompile Include="d.ts\jquery_plugins.d.ts" />
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
     <TypeScriptCompile Include="index.ts" />
+    <TypeScriptCompile Include="plugin\AddNode\AddNode.ts" />
     <TypeScriptCompile Include="plugin\FoldingViewSwitch\FoldingViewSwitch.ts" />
     <TypeScriptCompile Include="plugin\MessageChat\MessageChat.ts" />
     <TypeScriptCompile Include="plugin\RemoveNode\RemoveNode.ts" />
@@ -109,6 +110,7 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

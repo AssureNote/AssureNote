@@ -34,36 +34,58 @@ module AssureNote {
             //this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
         }
 
+        CreateCallback(Type: GSNType): (Event, NodeView) => void {
+            return (event: Event, TargetView: NodeView) => {
+                var Node = TargetView.Model;
+                new GSNNode(Node.BaseDoc, Node, Type, null, AssureNoteUtils.GenerateUID(), null);
+                var Doc = this.AssureNoteApp.MasterRecord.GetLatestDoc();
+                Doc.RenumberAll();
+                var TopGoal = Doc.TopNode;
+                var NewNodeView: NodeView = new NodeView(TopGoal, true);
+                NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
+                this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
+                this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+            };
+        }
+
+        CreateGoalMenu(View: NodeView): NodeMenuItem {
+            return new NodeMenuItem("add-goal", "images/goal.png", "goal", this.CreateCallback(GSNType.Goal));
+        }
+
+        CreateContextMenu(View: NodeView): NodeMenuItem {
+            return new NodeMenuItem("add-context", "images/context.png", "context", this.CreateCallback(GSNType.Context));
+        }
+
+        CreateStrategyMenu(View: NodeView): NodeMenuItem {
+            return new NodeMenuItem("add-strategy", "images/strategy.png", "strategy", this.CreateCallback(GSNType.Strategy));
+        }
+
+        CreateEvidenceMenu(View: NodeView): NodeMenuItem {
+            return new NodeMenuItem("add-evidence", "images/evidence.png", "evidence", this.CreateCallback(GSNType.Evidence));
+        }
+
         CreateMenuBarButtons(View: NodeView): NodeMenuItem[]{
-            return null;
+            var res = [];
+            var NodeType = View.GetNodeType();
+            switch (NodeType) {
+                case GSNType.Goal:
+                    res = res.concat([this.CreateContextMenu(View),
+                        this.CreateStrategyMenu(View),
+                        this.CreateEvidenceMenu(View)]);
+                    break;
+                case GSNType.Strategy:
+                    res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
+                    break;
+                case GSNType.Context:
+                    break;
+                case GSNType.Evidence:
+                    res.push(this.CreateContextMenu(View));
+                    break;
+                default:
+                    break;
+            }
+            return res;
         }
-        CreateMenuBarButton(View: NodeView): NodeMenuItem {
-            return null;
-            //var App = this.AssureNoteApp;
-            //return new NodeMenuItem("remove-id", "images/remove.png", "remove", (event: Event, TargetView: NodeView) => {
-            //    var Node = TargetView.Model;
-            //    var Parent = Node.ParentNode;
-            //    if (Parent.SubNodeList == null) {
-            //        App.DebugP("Node not Found");
-            //        return;
-            //    }
-            //    for (var i = 0; i < Parent.SubNodeList.length; i++) {
-            //        var it = Parent.SubNodeList[i];
-            //        if (Node == it) {
-            //            Parent.SubNodeList.splice(i, 1);
-            //        }
-            //    }
-
-            //    RemoveCommand.RemoveDescendantsRecursive(Node);
-
-            //    var TopGoal = App.MasterRecord.GetLatestDoc().TopNode;
-            //    var NewNodeView: NodeView = new NodeView(TopGoal, true);
-            //    NewNodeView.SaveFoldedFlag(App.PictgramPanel.ViewMap);
-            //    App.PictgramPanel.SetView(NewNodeView);
-            //    App.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
-            //});
-        }
-
     }
 }
 

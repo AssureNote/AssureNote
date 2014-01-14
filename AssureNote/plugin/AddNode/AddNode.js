@@ -39,32 +39,60 @@ var AssureNote;
             this.SetMenuBarButton(true);
             //this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
         }
-        AddNodePlugin.prototype.CreateMenuBarButtons = function (View) {
-            return null;
+        AddNodePlugin.prototype.CreateCallback = function (Type) {
+            var _this = this;
+            return function (event, TargetView) {
+                var Node = TargetView.Model;
+                new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
+                var Doc = _this.AssureNoteApp.MasterRecord.GetLatestDoc();
+                Doc.RenumberAll();
+                var TopGoal = Doc.TopNode;
+                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+                NewNodeView.SaveFoldedFlag(_this.AssureNoteApp.PictgramPanel.ViewMap);
+                _this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
+                _this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+            };
         };
-        AddNodePlugin.prototype.CreateMenuBarButton = function (View) {
-            return null;
-            //var App = this.AssureNoteApp;
-            //return new NodeMenuItem("remove-id", "images/remove.png", "remove", (event: Event, TargetView: NodeView) => {
-            //    var Node = TargetView.Model;
-            //    var Parent = Node.ParentNode;
-            //    if (Parent.SubNodeList == null) {
-            //        App.DebugP("Node not Found");
-            //        return;
-            //    }
-            //    for (var i = 0; i < Parent.SubNodeList.length; i++) {
-            //        var it = Parent.SubNodeList[i];
-            //        if (Node == it) {
-            //            Parent.SubNodeList.splice(i, 1);
-            //        }
-            //    }
-            //    RemoveCommand.RemoveDescendantsRecursive(Node);
-            //    var TopGoal = App.MasterRecord.GetLatestDoc().TopNode;
-            //    var NewNodeView: NodeView = new NodeView(TopGoal, true);
-            //    NewNodeView.SaveFoldedFlag(App.PictgramPanel.ViewMap);
-            //    App.PictgramPanel.SetView(NewNodeView);
-            //    App.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
-            //});
+
+        AddNodePlugin.prototype.CreateGoalMenu = function (View) {
+            return new AssureNote.NodeMenuItem("add-goal", "images/goal.png", "goal", this.CreateCallback(AssureNote.GSNType.Goal));
+        };
+
+        AddNodePlugin.prototype.CreateContextMenu = function (View) {
+            return new AssureNote.NodeMenuItem("add-context", "images/context.png", "context", this.CreateCallback(AssureNote.GSNType.Context));
+        };
+
+        AddNodePlugin.prototype.CreateStrategyMenu = function (View) {
+            return new AssureNote.NodeMenuItem("add-strategy", "images/strategy.png", "strategy", this.CreateCallback(AssureNote.GSNType.Strategy));
+        };
+
+        AddNodePlugin.prototype.CreateEvidenceMenu = function (View) {
+            return new AssureNote.NodeMenuItem("add-evidence", "images/evidence.png", "evidence", this.CreateCallback(AssureNote.GSNType.Evidence));
+        };
+
+        AddNodePlugin.prototype.CreateMenuBarButtons = function (View) {
+            var res = [];
+            var NodeType = View.GetNodeType();
+            switch (NodeType) {
+                case AssureNote.GSNType.Goal:
+                    res = res.concat([
+                        this.CreateContextMenu(View),
+                        this.CreateStrategyMenu(View),
+                        this.CreateEvidenceMenu(View)
+                    ]);
+                    break;
+                case AssureNote.GSNType.Strategy:
+                    res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
+                    break;
+                case AssureNote.GSNType.Context:
+                    break;
+                case AssureNote.GSNType.Evidence:
+                    res.push(this.CreateContextMenu(View));
+                    break;
+                default:
+                    break;
+            }
+            return res;
         };
         return AddNodePlugin;
     })(AssureNote.Plugin);

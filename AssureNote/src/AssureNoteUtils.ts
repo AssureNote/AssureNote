@@ -217,6 +217,10 @@ module AssureNote{
             }
             Callback(rest, i);
         }
+
+        export function GenerateUID(): number {
+            return Math.floor(Math.random() * 2147483647);
+        }
     }
 
     export class ColorStyle {
@@ -255,5 +259,4 @@ module AssureNote{
     export function ReverseDirection(Dir: Direction): Direction {
         return (Dir + 2) & 3;
     }
-
 }
