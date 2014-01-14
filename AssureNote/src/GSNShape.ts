@@ -66,6 +66,16 @@ module AssureNote {
             return <SVGPathElement>GSNShape.ArrowPathMaster.cloneNode();
         }
 
+        SetTreeRect(LocalX: number, LocalY: number, Width: number, Height: number): void {
+            this.SetTreeUpperLeft(LocalX, LocalY);
+            this.SetTreeSize(Width, Height);
+        }
+
+        SetHeadRect(LocalX: number, LocalY: number, Width: number, Height: number): void {
+            this.SetHeadUpperLeft(LocalX, LocalY);
+            this.SetHeadSize(Width, Height);
+        }
+
         SetTreeSize(Width: number, Height: number): void {
             this.TreeBoundingBox.Width = Width;
             this.TreeBoundingBox.Height = Height;
@@ -115,22 +125,22 @@ module AssureNote {
             return this.HeadBoundingBox.Height;
         }
 
-        GetTreeLeftX(): number {
+        GetTreeLeftLocalX(): number {
             return this.TreeBoundingBox.X;
         }
 
-        GetHeadLeftX(): number {
+        GetHeadLeftLocalX(): number {
             return this.HeadBoundingBox.X;
         }
 
-        SetTreeUpperLeft(X: number, Y: number): void {
-            this.TreeBoundingBox.X = X;
-            this.TreeBoundingBox.Y = Y;
+        SetTreeUpperLeft(LocalX: number, LocalY: number): void {
+            this.TreeBoundingBox.X = LocalX;
+            this.TreeBoundingBox.Y = LocalY;
         }
 
-        SetHeadUpperLeft(X: number, Y: number): void {
-            this.HeadBoundingBox.X = X;
-            this.HeadBoundingBox.Y = Y;
+        SetHeadUpperLeft(LocalX: number, LocalY: number): void {
+            this.HeadBoundingBox.X = LocalX;
+            this.HeadBoundingBox.Y = LocalY;
         }
 
         UpdateHtmlClass() {

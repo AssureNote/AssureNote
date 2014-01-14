@@ -64,6 +64,16 @@ var AssureNote;
             return GSNShape.ArrowPathMaster.cloneNode();
         };
 
+        GSNShape.prototype.SetTreeRect = function (LocalX, LocalY, Width, Height) {
+            this.SetTreeUpperLeft(LocalX, LocalY);
+            this.SetTreeSize(Width, Height);
+        };
+
+        GSNShape.prototype.SetHeadRect = function (LocalX, LocalY, Width, Height) {
+            this.SetHeadUpperLeft(LocalX, LocalY);
+            this.SetHeadSize(Width, Height);
+        };
+
         GSNShape.prototype.SetTreeSize = function (Width, Height) {
             this.TreeBoundingBox.Width = Width;
             this.TreeBoundingBox.Height = Height;
@@ -113,22 +123,22 @@ var AssureNote;
             return this.HeadBoundingBox.Height;
         };
 
-        GSNShape.prototype.GetTreeLeftX = function () {
+        GSNShape.prototype.GetTreeLeftLocalX = function () {
             return this.TreeBoundingBox.X;
         };
 
-        GSNShape.prototype.GetHeadLeftX = function () {
+        GSNShape.prototype.GetHeadLeftLocalX = function () {
             return this.HeadBoundingBox.X;
         };
 
-        GSNShape.prototype.SetTreeUpperLeft = function (X, Y) {
-            this.TreeBoundingBox.X = X;
-            this.TreeBoundingBox.Y = Y;
+        GSNShape.prototype.SetTreeUpperLeft = function (LocalX, LocalY) {
+            this.TreeBoundingBox.X = LocalX;
+            this.TreeBoundingBox.Y = LocalY;
         };
 
-        GSNShape.prototype.SetHeadUpperLeft = function (X, Y) {
-            this.HeadBoundingBox.X = X;
-            this.HeadBoundingBox.Y = Y;
+        GSNShape.prototype.SetHeadUpperLeft = function (LocalX, LocalY) {
+            this.HeadBoundingBox.X = LocalX;
+            this.HeadBoundingBox.Y = LocalY;
         };
 
         GSNShape.prototype.UpdateHtmlClass = function () {
