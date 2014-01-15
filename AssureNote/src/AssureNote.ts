@@ -40,6 +40,8 @@ module AssureNote {
         Commands: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
 
+        private UserName: string;
+
 		constructor() {
             this.Commands = {};
 
@@ -59,7 +61,7 @@ module AssureNote {
             this.RegistCommand(new SaveSVGCommand(this));
 
             this.PluginManager.LoadPlugin();
-
+            this.UserName = $.cookie('UserName');
 		}
 
         public RegistCommand(Command: Command) {
@@ -160,6 +162,10 @@ module AssureNote {
             }
         }
 
+        GetUserName(): string {
+            return this.UserName;
+        }
+
         LoadNewWGSN(Name: string, WGSN: string): void {
             var Extention = Name.split(".").pop();
 			this.WGSNName = Name;
@@ -209,7 +215,7 @@ module AssureNote {
 				};
 				reader.readAsText(Files[0], 'utf-8');
 			}
-		}
+        }
 	}
 
 }

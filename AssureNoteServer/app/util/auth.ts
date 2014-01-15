@@ -14,6 +14,7 @@ export class Auth {
 	}
 
 	getLoginName(): string {
+        console.log('Login Name: ' + this.req.session.UserName);
 		return this.req.session.UserName;
 	}
 

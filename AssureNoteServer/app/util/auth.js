@@ -17,6 +17,7 @@ var Auth = (function () {
     };
 
     Auth.prototype.getLoginName = function () {
+        console.log('Login Name: ' + this.req.session.UserName);
         return this.req.session.UserName;
     };
 
