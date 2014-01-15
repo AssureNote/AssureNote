@@ -7,11 +7,14 @@ var util_auth = require('../util/auth');
 var CONFIG = require('config');
 
 var getBasicParam = function (req, res) {
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null };
+    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, UserName: null };
     var auth = new util_auth.Auth(req, res);
 
     if (auth.isLogin()) {
-        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: auth.getLoginName() };
+        params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, UserName: auth.getLoginName() };
+    } else {
+        auth.clear();
+        auth.set('guest', 'Guest');
     }
     return params;
 };
