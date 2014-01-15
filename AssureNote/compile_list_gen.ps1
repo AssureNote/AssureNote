@@ -1,0 +1,1 @@
+([XML](Get-Content .\AssureNote.csproj)).GetElementsByTagName("TypeScriptCompile") | Where-Object { -not $_.Include.Contains("d.ts") -and -not $_.Include.Contains("\old\") } | Select-Object Include | Format-Wide -Column 1
