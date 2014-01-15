@@ -155,3 +155,6 @@ $RECYCLE.BIN/
 
 node_modules
 development.yaml
+
+# MySQL workbench
+*.mwb.bak
