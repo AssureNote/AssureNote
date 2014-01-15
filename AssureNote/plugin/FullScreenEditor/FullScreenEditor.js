@@ -124,7 +124,7 @@ var AssureNote;
 
                     if (View && View.Model && AssureNote.Lib.DecToHex(View.Model.UID) == UID) {
                         console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
-                        this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
+                        this.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(View.GetCenterGX(), View.GetCenterGY());
                     }
                 }
             }

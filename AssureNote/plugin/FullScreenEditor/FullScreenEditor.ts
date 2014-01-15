@@ -111,7 +111,7 @@ module AssureNote {
                     /* Node exists and visible */
                     if (View && View.Model && Lib.DecToHex(View.Model.UID) == UID) {
                         console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
-                        this.AssureNoteApp.PictgramPanel.Viewport.SetCaseCenter(View.GetCenterGX(), View.GetCenterGY());
+                        this.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(View.GetCenterGX(), View.GetCenterGY());
                     }
                 }
             }

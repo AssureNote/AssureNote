@@ -913,7 +913,7 @@ export class GSNDoc {
 		}
 		if(this.DocHistory == null) {
 			var Author: string = TagUtils.GetString(this.DocTagMap, "Author", "unknown");
-			var Role: string = TagUtils.GetString(this.DocTagMap, "Role", "converter");
+			var Role: string = TagUtils.GetString(this.DocTagMap, "Role", "unknown");
 			var Date: string = TagUtils.GetString(this.DocTagMap, "Date", null);
 			var Process: string = TagUtils.GetString(this.DocTagMap, "Process", "-");
 			this.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, this);
