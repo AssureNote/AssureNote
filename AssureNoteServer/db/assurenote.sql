@@ -18,9 +18,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `assurenote`.`case`
+-- Table `assurenote`.`assurance_case`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `assurenote`.`case` (
+CREATE  TABLE IF NOT EXISTS `assurenote`.`assurance_case` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `hash_key` VARCHAR(45) NOT NULL ,
   `data` TEXT NOT NULL ,
