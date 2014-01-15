@@ -116,7 +116,9 @@ var AssureNote;
             if (NodeView.GetNodeType() != AssureNote.GSNType.Goal && NodeView.GetNodeType() != AssureNote.GSNType.Strategy) {
                 return null;
             }
-            return new AssureNote.NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
+
+            //return new NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
+            return null;
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);

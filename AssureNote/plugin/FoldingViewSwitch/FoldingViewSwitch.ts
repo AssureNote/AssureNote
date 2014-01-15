@@ -110,7 +110,8 @@ module AssureNote {
 			if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
 				return null;
 			}
-			return new NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
+            //return new NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
+            return null;
 		}
 	}
 }
