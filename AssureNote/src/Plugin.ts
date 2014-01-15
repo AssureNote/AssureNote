@@ -175,7 +175,7 @@ module AssureNote {
 			var ret: Plugin = null;
 			//FIXME Editing mode
 			$.each(this.PluginMap, (key, value: Plugin) => {
-				if (value.HasDoubleClicked) {
+				if (value.HasDoubleClicked()) {
 					ret = value;
 					return false;
 				}
