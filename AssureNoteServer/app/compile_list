@@ -9,4 +9,5 @@ api/error.ts
 api/jsonrpc.ts
 api/assurance_case.ts
 model/assurance_case.ts
+model/user.ts
 db/db.ts

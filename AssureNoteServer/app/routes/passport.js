@@ -4,7 +4,58 @@ var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
+var util_auth = require('../util/auth');
 var CONFIG = require('config');
+
+function GetUserId(user) {
+    if (user.provider && user.provider == 'github') {
+        return 'github_' + user.id;
+    }
+    return null;
+}
+
+function GetUserName(user) {
+    if (user.provider && user.provider == 'github') {
+        return user.username;
+    }
+    return null;
+}
+
+exports.login = function (req, res) {
+    var user = req.user;
+    var UserId = GetUserId(user);
+    var UserName = GetUserName(user);
+    if (!UserId || UserName) {
+        console.log('Auth failed');
+        res.redirect(CONFIG.ads.basePath + '/');
+    }
+
+    /* TODO Write some code for login */
+    /* At this time, we just use UserName and UserId for identification. */
+    /* Possively it's not enough. */
+    console.log('Login. UserId: ' + UserId + ', UserName: ' + UserName);
+    var auth = new util_auth.Auth(req, res);
+    auth.set(UserId, UserName);
+    res.redirect(CONFIG.ads.basePath + '/');
+    //var con = new db.Database();
+    //var userDAO = new model_user.UserDAO(con);
+    //userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
+    //	if (err) {
+    //		// TODO: display error information
+    //		console.error(err);
+    //		res.redirect(CONFIG.ads.basePath+'/');
+    //		// res.redirect('/');
+    //		return;
+    //	}
+    //});
+};
+
+exports.logout = function (req, res) {
+    var auth = new util_auth.Auth(req, res);
+    auth.clear();
+    req.logout();
+    res.redirect(CONFIG.ads.basePath + '/');
+};
 
 (function () {
     passport.serializeUser(function (user, done) {
@@ -20,7 +71,7 @@ var CONFIG = require('config');
     passport.use(new TwitterStrategy({
         consumerKey: CONFIG.passport.TWITTER_CONSUMER_KEY,
         consumerSecret: CONFIG.passport.TWITTER_CONSUMER_SECRET,
-        callbackURL: CONFIG.passport.resolveURL + "/auth/twitter/callback"
+        callbackURL: CONFIG.passport.resolveURL + "/auth    witter/callback"
     }, function (token, tokenSecret, profile, done) {
         passport.session.accessToken = token;
         passport.session.profile = profile;
@@ -54,9 +105,11 @@ var CONFIG = require('config');
         clientSecret: CONFIG.passport.GITHUB_CLIENT_SECRET,
         callbackURL: CONFIG.passport.resolveURL + "/auth/github/callback"
     }, function (accessToken, refreshToken, profile, done) {
-        profile.displayName = profile.username;
-        profile.loginName = profile.username;
-        console.log(profile);
+        console.log('GitHub-Auth');
+
+        //profile.displayName = profile.username;
+        //profile.loginName = profile.username;
+        //console.log(profile);
         process.nextTick(function () {
             return done(null, profile);
         });
@@ -64,3 +117,4 @@ var CONFIG = require('config');
 })();
 
 exports.passport = passport;
+

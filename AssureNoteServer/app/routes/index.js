@@ -6,7 +6,6 @@ var db = require('../db/db');
 var util_auth = require('../util/auth');
 var CONFIG = require('config');
 
-//import ex = module('./exporter')
 var getBasicParam = function (req, res) {
     var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null };
     var auth = new util_auth.Auth(req, res);
@@ -23,7 +22,8 @@ var index_DummyUser = function (req, res, params) {
     } else {
         req.user = { displayName: 'tsunade' };
     }
-    var con = new db.Database();
+
+    //var con = new db.Database();
     //var userDAO = new model_user.UserDAO(con);
     //userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
     //	if (err) {
@@ -33,7 +33,7 @@ var index_DummyUser = function (req, res, params) {
     //	}
     //	var auth = new util_auth.Auth(req, res);
     //	auth.set(result.id, result.loginName);
-    //	res.render('index', params);
+    res.render('index', params);
     //});
 };
 
@@ -45,3 +45,4 @@ exports.index = function (req, res) {
         res.render('index', params);
     }
 };
+

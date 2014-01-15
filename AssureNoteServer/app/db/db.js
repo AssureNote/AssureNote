@@ -25,7 +25,6 @@ var Database = (function (_super) {
     };
 
     Database.prototype.query = function (sql, values, callback) {
-        // console.log('QUERY: ' + sql);
         if (callback === undefined && typeof values === 'function') {
             callback = values;
         }
@@ -114,3 +113,4 @@ var Database = (function (_super) {
     return Database;
 })(events.EventEmitter);
 exports.Database = Database;
+
