@@ -72,7 +72,7 @@ var AssureNote;
         EditorUtil.prototype.DisableEditor = function (OldNodeView) {
             var _this = this;
             var WGSN = (this.TextArea).getValue();
-            this.AssureNoteApp.MasterRecord.OpenEditor("todo", "todo", null, "test");
+            this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
             var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode = Node.ReplaceSubNodeAsText(WGSN);
             console.log(NewNode);

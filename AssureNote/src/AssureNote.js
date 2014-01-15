@@ -43,6 +43,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
 
             this.PluginManager.LoadPlugin();
+            this.UserName = $.cookie('UserName');
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             var Names = Command.GetCommandLineNames();
@@ -140,6 +141,10 @@ var AssureNote;
             } else {
                 this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
             }
+        };
+
+        AssureNoteApp.prototype.GetUserName = function () {
+            return this.UserName;
         };
 
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
