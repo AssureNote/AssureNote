@@ -100,7 +100,7 @@ var AssureNote;
                 var X1 = TargetView.GetGX();
                 var Y1 = TargetView.GetGY();
                 var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
-                var Scale = ViewPort.GetScale();
+                var Scale = ViewPort.GetCameraScale();
                 ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
             };
             this.AssureNoteApp.RegistCommand(new FoldingCommand(this.AssureNoteApp, this.FoldingAction));

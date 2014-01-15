@@ -181,12 +181,12 @@ module AssureNote {
                 if (!this.MasterView) {
                     return;
                 }
-                var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
+                var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
                 this.MasterView.TraverseVisibleNode((Node: NodeView) => {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
-                        var R = 150 / this.Viewport.GetScale();
+                        var R = 150 / this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
                             this.AssureNoteApp.ExecDoubleClicked(Node);
                         }

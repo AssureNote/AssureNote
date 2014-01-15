@@ -361,7 +361,7 @@ var AssureNote;
 
         SetScaleCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
-                this.App.PictgramPanel.Viewport.SetScale(Params[0] - 0);
+                this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
         };
         return SetScaleCommand;

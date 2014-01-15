@@ -178,7 +178,7 @@ module AssureNote {
         }
 
         OnMouseWheel(e: { deltaX: number; deltaY: number }, Screen: ViewportManager) {
-            Screen.SetScale(Screen.GetScale() * (1 + e.deltaY * 0.02));
+            Screen.SetCameraScale(Screen.GetCameraScale() * (1 + e.deltaY * 0.02));
         }
 	}
 
@@ -187,10 +187,9 @@ module AssureNote {
 		ScrollManager: ScrollManager = new ScrollManager(this);
 		private OffsetPageX: number = 0;
 		private OffsetPageY: number = 0;
-		private LogicalOffsetX: number = 0;
-		private LogicalOffsetY: number = 0;
         private Scale: number = 1.0;
-        private HTMLBodyBoundingRect: ClientRect;
+        private PageWidth: number = window.innerWidth;
+        private PageHeight: number = window.innerHeight;
         private CameraCenterPageX: number;
         private CameraCenterPageY: number;
 
@@ -209,9 +208,9 @@ module AssureNote {
         }
 
         constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
-            window.addEventListener("resize", (e) => { this.UpdateBodyBoundingRect(); console.log("resized!"); });
-            this.UpdateBodyBoundingRect();
-
+            window.addEventListener("resize", (e) => { this.UpdatePageRect(); console.log("resized!"); });
+            this.UpdatePageRect();
+            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
 			this.UpdateAttr();
@@ -224,11 +223,11 @@ module AssureNote {
             $(this.EventMapLayer.parentElement).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
         }
 
-        GetScale(): number {
+        GetCameraScale(): number {
             return this.Scale;
         }
 
-        SetScale(scale: number): void {
+        SetCameraScale(scale: number): void {
             scale = Math.max(0.02, Math.min(20.0, scale));
             var scaleChange = scale / this.Scale;
             var cx = this.CameraCenterPageX;
@@ -307,24 +306,24 @@ module AssureNote {
             return new Rect(x1, y1, x2 - x1, y2 - y1); 
         }
 
-		GetWidth(): number {
-            return this.HTMLBodyBoundingRect.width;
+		GetPageWidth(): number {
+            return this.PageWidth;
 		}
 
-		GetHeight(): number {
-            return this.HTMLBodyBoundingRect.height;
+		GetPageHeight(): number {
+            return this.PageHeight;
         }
 
-        GetPageRect(): Rect {
-            return new Rect(0, 0, this.GetWidth(), this.GetHeight());
+        private GetPageRect(): Rect {
+            return new Rect(0, 0, this.GetPageWidth(), this.GetPageHeight());
         }
 
 		GetPageCenterX(): number {
-			return this.GetWidth() * 0.5;
+			return this.GetPageWidth() * 0.5;
 		}
 
 		GetPageCenterY(): number {
-            return this.GetHeight() * 0.5;
+            return this.GetPageHeight() * 0.5;
 		}
 
         private AnimationFrameTimerHandle: number = 0;
@@ -341,7 +340,7 @@ module AssureNote {
 
             var VX = (GX - this.GetCameraGX()) / duration;
             var VY = (GY - this.GetCameraGY()) / duration;
-            var VS = (scale - this.GetScale()) / duration;
+            var VS = (scale - this.GetCameraScale()) / duration;
 
             if (VY == 0 && VX == 0 && VS == 0) {
                 return;
@@ -360,7 +359,7 @@ module AssureNote {
                 var deltaT = currentTime - lastTime;
                 var currentX = this.GetCameraGX();
                 var currentY = this.GetCameraGY();
-                var currentS = this.GetScale();
+                var currentS = this.GetCameraScale();
                 if (currentTime - startTime < duration) {
                     this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
@@ -372,9 +371,12 @@ module AssureNote {
             update();
         }
 
-        private UpdateBodyBoundingRect(): void {
-            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
-            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
+        private UpdatePageRect(): void {
+            var CameraCenterXRate = this.CameraCenterPageX / this.PageWidth;
+            var CameraCenterYRate = this.CameraCenterPageY / this.PageHeight;
+            this.PageWidth = window.innerWidth;
+            this.PageHeight = window.innerHeight;
+            this.SetCameraPageCenter(this.PageWidth * CameraCenterXRate, this.PageHeight * CameraCenterYRate);
         }
 
         private IsEventMapUpper: boolean = false;

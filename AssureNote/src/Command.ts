@@ -347,7 +347,7 @@ module AssureNote {
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (Params.length > 0) {
-                this.App.PictgramPanel.Viewport.SetScale(<number><any>Params[0] - 0);
+                this.App.PictgramPanel.Viewport.SetCameraScale(<number><any>Params[0] - 0);
             }
         }
     }

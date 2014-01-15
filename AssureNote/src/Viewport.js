@@ -159,7 +159,7 @@ var AssureNote;
         };
 
         ScrollManager.prototype.OnMouseWheel = function (e, Screen) {
-            Screen.SetScale(Screen.GetScale() * (1 + e.deltaY * 0.02));
+            Screen.SetCameraScale(Screen.GetCameraScale() * (1 + e.deltaY * 0.02));
         };
         return ScrollManager;
     })();
@@ -176,17 +176,17 @@ var AssureNote;
             this.ScrollManager = new ScrollManager(this);
             this.OffsetPageX = 0;
             this.OffsetPageY = 0;
-            this.LogicalOffsetX = 0;
-            this.LogicalOffsetY = 0;
             this.Scale = 1.0;
+            this.PageWidth = window.innerWidth;
+            this.PageHeight = window.innerHeight;
             this.AnimationFrameTimerHandle = 0;
             this.IsEventMapUpper = false;
             window.addEventListener("resize", function (e) {
-                _this.UpdateBodyBoundingRect();
+                _this.UpdatePageRect();
                 console.log("resized!");
             });
-            this.UpdateBodyBoundingRect();
-
+            this.UpdatePageRect();
+            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
@@ -217,11 +217,11 @@ var AssureNote;
             Element.style["webkitTransform"] = Value;
         };
 
-        ViewportManager.prototype.GetScale = function () {
+        ViewportManager.prototype.GetCameraScale = function () {
             return this.Scale;
         };
 
-        ViewportManager.prototype.SetScale = function (scale) {
+        ViewportManager.prototype.SetCameraScale = function (scale) {
             scale = Math.max(0.02, Math.min(20.0, scale));
             var scaleChange = scale / this.Scale;
             var cx = this.CameraCenterPageX;
@@ -300,24 +300,24 @@ var AssureNote;
             return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
         };
 
-        ViewportManager.prototype.GetWidth = function () {
-            return this.HTMLBodyBoundingRect.width;
+        ViewportManager.prototype.GetPageWidth = function () {
+            return this.PageWidth;
         };
 
-        ViewportManager.prototype.GetHeight = function () {
-            return this.HTMLBodyBoundingRect.height;
+        ViewportManager.prototype.GetPageHeight = function () {
+            return this.PageHeight;
         };
 
         ViewportManager.prototype.GetPageRect = function () {
-            return new AssureNote.Rect(0, 0, this.GetWidth(), this.GetHeight());
+            return new AssureNote.Rect(0, 0, this.GetPageWidth(), this.GetPageHeight());
         };
 
         ViewportManager.prototype.GetPageCenterX = function () {
-            return this.GetWidth() * 0.5;
+            return this.GetPageWidth() * 0.5;
         };
 
         ViewportManager.prototype.GetPageCenterY = function () {
-            return this.GetHeight() * 0.5;
+            return this.GetPageHeight() * 0.5;
         };
 
         ViewportManager.prototype.Move = function (GX, GY, scale, duration) {
@@ -333,7 +333,7 @@ var AssureNote;
 
             var VX = (GX - this.GetCameraGX()) / duration;
             var VY = (GY - this.GetCameraGY()) / duration;
-            var VS = (scale - this.GetScale()) / duration;
+            var VS = (scale - this.GetCameraScale()) / duration;
 
             if (VY == 0 && VX == 0 && VS == 0) {
                 return;
@@ -352,7 +352,7 @@ var AssureNote;
                 var deltaT = currentTime - lastTime;
                 var currentX = _this.GetCameraGX();
                 var currentY = _this.GetCameraGY();
-                var currentS = _this.GetScale();
+                var currentS = _this.GetCameraScale();
                 if (currentTime - startTime < duration) {
                     _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
@@ -364,9 +364,12 @@ var AssureNote;
             update();
         };
 
-        ViewportManager.prototype.UpdateBodyBoundingRect = function () {
-            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
-            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
+        ViewportManager.prototype.UpdatePageRect = function () {
+            var CameraCenterXRate = this.CameraCenterPageX / this.PageWidth;
+            var CameraCenterYRate = this.CameraCenterPageY / this.PageHeight;
+            this.PageWidth = window.innerWidth;
+            this.PageHeight = window.innerHeight;
+            this.SetCameraPageCenter(this.PageWidth * CameraCenterXRate, this.PageHeight * CameraCenterYRate);
         };
 
         ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {

@@ -155,7 +155,7 @@ module AssureNote {
 		}
 
 		private MoveToNext(ViewPort: ViewportManager, Callback: () => void): void {
-            ViewPort.MoveTo(this.DestinationX, this.DestinationY, ViewPort.GetScale(), 100);
+            ViewPort.MoveTo(this.DestinationX, this.DestinationY, ViewPort.GetCameraScale(), 100);
 			Callback();
 		}
 
