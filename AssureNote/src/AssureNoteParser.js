@@ -670,7 +670,15 @@ var AssureNote;
             Writer.newline();
             for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                 var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-                Node.FormatNode(Writer);
+                if (Node.IsContext()) {
+                    Node.FormatNode(Writer);
+                }
+            }
+            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+                if (!Node.IsContext()) {
+                    Node.FormatNode(Writer);
+                }
             }
         };
 
@@ -697,7 +705,15 @@ var AssureNote;
             if (this.NonNullSubNodeList() != null) {
                 for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                     var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer);
+                    if (Node.IsContext()) {
+                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer);
+                    }
+                }
+                for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+                    var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+                    if (!Node.IsContext()) {
+                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer);
+                    }
                 }
             }
         };
@@ -906,7 +922,7 @@ var AssureNote;
             }
             if (this.DocHistory == null) {
                 var Author = TagUtils.GetString(this.DocTagMap, "Author", "unknown");
-                var Role = TagUtils.GetString(this.DocTagMap, "Role", "unknown");
+                var Role = TagUtils.GetString(this.DocTagMap, "Role", "converter");
                 var Date = TagUtils.GetString(this.DocTagMap, "Date", null);
                 var Process = TagUtils.GetString(this.DocTagMap, "Process", "-");
                 this.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, this);
