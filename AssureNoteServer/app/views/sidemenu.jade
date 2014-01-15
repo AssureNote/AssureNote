@@ -1,0 +1,41 @@
+.navbar.navbar-default
+  .navbar-collapse
+    a.logo-fixed(href='#')
+      img#logo(src='images/logo.png', alt='AssureNote')
+    .dropdown.logo-offset
+      button#file-menu-button.btn.navbar-btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', oncontextmenu='return false')
+        span.glyphicon.glyphicon-file
+        | File
+        span.caret
+      ul#top-menu.dropdown-menu(role='menu', style='right: auto; width: 250px;', oncontextmenu='return false')
+        li
+          a#create-wgsn-menu(href='#')
+            span.glyphicon.glyphicon-plus
+            | New&period;&period;&period;
+        li
+          a#open-menu(href='#')
+            span.glyphicon.glyphicon-folder-open
+            | Open&period;&period;&period;
+        li
+          a#save-menu(href='#')
+            span.glyphicon.glyphicon-floppy-save
+            | Save
+        li.dropdown-submenu
+          a(href='#')
+            span.glyphicon.glyphicon-floppy-save
+            | Save As
+          ul.dropdown-menu
+            li
+              a#save-wgsn-menu(href='#')
+                span.glyphicon.glyphicon-floppy-save
+                | &midast;&period;wgsn&period;&period;&period;
+            li
+              a#save-dcasemodel-menu(href='#')
+                span.glyphicon.glyphicon-floppy-save
+                | &midast;&period;dcase&UnderBar;model&period;&period;&period;
+        li
+          a#about-menu(href='#')
+            span.glyphicon.glyphicon-question-sign
+            | About
+      span#filename-view
+input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')
