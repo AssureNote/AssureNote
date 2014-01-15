@@ -64,6 +64,7 @@
     <TypeScriptCompile Include="index.ts" />
     <TypeScriptCompile Include="plugin\AddNode\AddNode.ts" />
     <TypeScriptCompile Include="plugin\FoldingViewSwitch\FoldingViewSwitch.ts" />
+    <TypeScriptCompile Include="plugin\LastModified\LastModified.ts" />
     <TypeScriptCompile Include="plugin\MessageChat\MessageChat.ts" />
     <TypeScriptCompile Include="plugin\RemoveNode\RemoveNode.ts" />
     <TypeScriptCompile Include="plugin\ToDo\ToDo.ts" />
@@ -157,6 +158,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>cd ..
+
 powershell -NoProfile -ExecutionPolicy unrestricted -Command ./compile_list_gen.ps1</PreBuildEvent>
   </PropertyGroup>
 </Project>

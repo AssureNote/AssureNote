@@ -906,7 +906,7 @@ var AssureNote;
             }
             if (this.DocHistory == null) {
                 var Author = TagUtils.GetString(this.DocTagMap, "Author", "unknown");
-                var Role = TagUtils.GetString(this.DocTagMap, "Role", "converter");
+                var Role = TagUtils.GetString(this.DocTagMap, "Role", "unknown");
                 var Date = TagUtils.GetString(this.DocTagMap, "Date", null);
                 var Process = TagUtils.GetString(this.DocTagMap, "Process", "-");
                 this.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, this);
