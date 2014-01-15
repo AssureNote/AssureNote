@@ -76,39 +76,23 @@ app.get('/file/:id', client.index);
 //app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
-//app.get('/auth/twitter',
-//  passport.passport.authenticate('twitter'),
-//  function(req, res) {}
-//);
-//app.get('/auth/twitter/callback',
-//  passport.passport.authenticate('twitter', {failureRedirect: '/' }),
-//  client.login
-//);
-//
-//app.get('/auth/facebook',
-//  passport.passport.authenticate('facebook'),
-//  function(req, res) {}
-//);
-//
-//app.get('/auth/facebook/callback',
-//  passport.passport.authenticate('facebook', { failureRedirect: '/' }),
-//  client.login
-//);
-//
-//app.get('/auth/github',
-//  passport.passport.authenticate('github'),
-//  function(req, res) {}
-//);
-//
-//app.get('/auth/github/callback',
-//  passport.passport.authenticate('github', { failureRedirect: '/failure' }),
-//  client.login
-//);
-//
-//app.post('/logout', client.logout);
-//app.post('/register', client.register);
+app.get('/auth/twitter', passport.passport.authenticate('twitter'), function (req, res) {
+});
+app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: '/' }), passport.login);
+
+app.get('/auth/facebook', passport.passport.authenticate('facebook'), function (req, res) {
+});
+
+app.get('/auth/facebook/callback', passport.passport.authenticate('facebook', { failureRedirect: '/' }), passport.login);
+
+app.get('/auth/github', passport.passport.authenticate('github'), function (req, res) {
+});
+
+app.get('/auth/github/callback', passport.passport.authenticate('github', { failureRedirect: '/' }), passport.login);
+
 if (!module.parent) {
     http.createServer(app).listen(app.get('port'), function () {
         console.log('Express server listening on port ' + app.get('port'));
     });
 }
+

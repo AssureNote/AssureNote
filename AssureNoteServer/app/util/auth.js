@@ -4,36 +4,37 @@ var Auth = (function () {
         this.res = res;
     }
     Auth.prototype.isLogin = function () {
-        return this.req.session.userId != null;
+        return this.req.session.UserId != null;
     };
 
-    Auth.prototype.set = function (userId, userName) {
-        this.res.cookie('userId', userId);
-        this.res.cookie('userName', userName);
-        this.res.cookie('sessionUserId', userId, { signed: true });
-        this.res.cookie('sessionUserName', userName, { signed: true });
-        this.req.session.userId = userId;
-        this.req.session.userName = userName;
+    Auth.prototype.set = function (UserId, UserName) {
+        this.res.cookie('UserId', UserId);
+        this.res.cookie('UserName', UserName);
+        this.res.cookie('sessionUserId', UserId, { signed: true });
+        this.res.cookie('sessionUserName', UserName, { signed: true });
+        this.req.session.UserId = UserId;
+        this.req.session.UserName = UserName;
     };
 
     Auth.prototype.getLoginName = function () {
-        return this.req.session.userName;
+        return this.req.session.UserName;
     };
 
     Auth.prototype.getUserId = function () {
-        if (this.req.session.userId)
-            return parseInt(this.req.session.userId, 10);
+        if (this.req.session.UserId)
+            return parseInt(this.req.session.UserId, 10);
         return undefined;
     };
 
     Auth.prototype.clear = function () {
-        this.res.clearCookie('userId');
-        this.res.clearCookie('userName');
+        this.res.clearCookie('UserId');
+        this.res.clearCookie('UserName');
         this.res.clearCookie('sessionUserId');
         this.res.clearCookie('sessionUserName');
-        delete this.req.session.userId;
-        delete this.req.session.userName;
+        delete this.req.session.UserId;
+        delete this.req.session.UserName;
     };
     return Auth;
 })();
 exports.Auth = Auth;
+
