@@ -1,6 +1,6 @@
 var model    = require('./model')
 var error    = require('../api/error')
-var net_ldap = require('../net/ldap')
+//var net_ldap = require('../net/ldap')
 
 //export class User {
 //	constructor(public id:number, public loginName: string, public mailAddress: string, public deleteFlag: bool, public systemFlag: bool) {

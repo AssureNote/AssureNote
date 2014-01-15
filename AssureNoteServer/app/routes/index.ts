@@ -5,7 +5,6 @@ var model_user   = require('../model/user')
 var db           = require('../db/db')
 var util_auth    = require('../util/auth')
 var CONFIG = require('config')
-//import ex = module('./exporter')
 
 var getBasicParam = function(req: any, res: any) {
 	var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, userName: null};
@@ -23,7 +22,7 @@ var index_DummyUser = function(req: any, res: any, params: any) {
 	} else {
 		req.user = {displayName: 'tsunade'};
 	}
-	var con = new db.Database();
+	//var con = new db.Database();
 	//var userDAO = new model_user.UserDAO(con);
 	//userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
 	//	if (err) {
@@ -33,7 +32,7 @@ var index_DummyUser = function(req: any, res: any, params: any) {
 	//	}
 	//	var auth = new util_auth.Auth(req, res);
 	//	auth.set(result.id, result.loginName);
-	//	res.render('index', params);
+	res.render('index', params);
 	//});
 }
 

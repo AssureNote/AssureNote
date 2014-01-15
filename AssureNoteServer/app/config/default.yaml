@@ -18,3 +18,5 @@ translator:
   CLIENT_SECRET: ''
 debug_user:
   loginName: 'tsunade'
+ads:
+    basePath: ""

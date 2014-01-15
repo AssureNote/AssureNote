@@ -5,10 +5,8 @@ var express = require('express');
 var api = require('./routes/api');
 var client = require('./routes/index');
 var js = require('./routes/javascript');
-var monitor = require('./routes/monitor');
 var passport = require('./routes/passport');
 var path = require('path');
-var file = require('./routes/file');
 var constant = require('./constant');
 var CONFIG = require('config');
 
@@ -20,12 +18,11 @@ app.configure(function () {
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
     app.use(express.favicon());
-    var uploadDir = path.join(__dirname, CONFIG.ads.uploadPath);
-    console.log(uploadDir);
 
+    //var uploadDir = path.join(__dirname, CONFIG.ads.uploadPath);
+    //console.log(uploadDir);
     //utilFs.mkdirpSync(uploadDir);
-    app.use(express.bodyParser({ uploadDir: uploadDir }));
-
+    //app.use(express.bodyParser({uploadDir: uploadDir}));
     // app.use(express.bodyParser({uploadDir:'./upload'}));
     app.use(express.cookieParser(CONFIG.cookie.secret));
 
@@ -79,25 +76,37 @@ app.get('/file/:id', client.index);
 //app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
-app.get('/auth/twitter', passport.passport.authenticate('twitter'), function (req, res) {
-});
-app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: '/' }), client.login);
-
-app.get('/auth/facebook', passport.passport.authenticate('facebook'), function (req, res) {
-});
-
-app.get('/auth/facebook/callback', passport.passport.authenticate('facebook', { failureRedirect: '/' }), client.login);
-
-app.get('/auth/github', passport.passport.authenticate('github'), function (req, res) {
-});
-
-app.get('/auth/github/callback', passport.passport.authenticate('github', { failureRedirect: '/failure' }), client.login);
-
-app.post('/logout', client.logout);
-
+//app.get('/auth/twitter',
+//  passport.passport.authenticate('twitter'),
+//  function(req, res) {}
+//);
+//app.get('/auth/twitter/callback',
+//  passport.passport.authenticate('twitter', {failureRedirect: '/' }),
+//  client.login
+//);
+//
+//app.get('/auth/facebook',
+//  passport.passport.authenticate('facebook'),
+//  function(req, res) {}
+//);
+//
+//app.get('/auth/facebook/callback',
+//  passport.passport.authenticate('facebook', { failureRedirect: '/' }),
+//  client.login
+//);
+//
+//app.get('/auth/github',
+//  passport.passport.authenticate('github'),
+//  function(req, res) {}
+//);
+//
+//app.get('/auth/github/callback',
+//  passport.passport.authenticate('github', { failureRedirect: '/failure' }),
+//  client.login
+//);
+//
+//app.post('/logout', client.logout);
 //app.post('/register', client.register);
-app.get('/monitor/:id', monitor.show);
-
 if (!module.parent) {
     http.createServer(app).listen(app.get('port'), function () {
         console.log('Express server listening on port ' + app.get('port'));
