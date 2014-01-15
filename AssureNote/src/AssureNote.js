@@ -43,6 +43,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
 
             this.PluginManager.LoadPlugin();
+            this.UserName = $.cookie('UserName');
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             var Names = Command.GetCommandLineNames();
@@ -142,6 +143,10 @@ var AssureNote;
             }
         };
 
+        AssureNoteApp.prototype.GetUserName = function () {
+            return this.UserName;
+        };
+
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
@@ -164,11 +169,8 @@ var AssureNote;
 
             this.PictgramPanel.Draw();
 
-            var Shape = this.PictgramPanel.MasterView.GetShape();
-            var WX = window.innerWidth / 2 - Shape.GetNodeWidth() / 2;
-            var WY = window.innerHeight / 3 - Shape.GetNodeHeight() / 2;
-            this.PictgramPanel.Viewport.SetScale(1);
-            this.PictgramPanel.Viewport.SetOffset(WX, WY);
+            var TopGoal = this.PictgramPanel.MasterView;
+            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY(), 1);
 
             $("#filename-view").text(Name);
             $("title").text("AssureNote - " + Name);

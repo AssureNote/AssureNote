@@ -59,7 +59,7 @@ module AssureNote {
             }
             if (Node != null) {
                 if ($("#" + Label.replace(/\./g, "\\.")).length > 0) { //FIXME use IsVisible
-                    this.App.PictgramPanel.Viewport.SetCaseCenter(Node.GetCenterGX(), Node.GetCenterGY());
+                    this.App.PictgramPanel.Viewport.SetCameraPosition(Node.GetCenterGX(), Node.GetCenterGY());
                 } else {
                     this.App.DebugP("Invisible node " + Label + " Selected.");
                 }

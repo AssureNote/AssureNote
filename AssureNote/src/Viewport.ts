@@ -145,7 +145,7 @@ module AssureNote {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(Screen.GetOffsetX() + this.CalcOffsetDX(), Screen.GetOffsetY() + this.CalcOffsetDY());
+                        Screen.SetOffset(Screen.GetOffsetPageX() + this.CalcOffsetDX(), Screen.GetOffsetPageY() + this.CalcOffsetDY());
                     } else {
                         this.EndDrag();
                     }
@@ -164,7 +164,7 @@ module AssureNote {
 						this.CurrentY += this.Dy;
 						this.Dx *= 0.95;
 						this.Dy *= 0.95;
-                        Screen.SetOffset(Screen.GetOffsetX() + this.CalcOffsetDX(), Screen.GetOffsetY() + this.CalcOffsetDY());
+                        Screen.SetOffset(Screen.GetOffsetPageX() + this.CalcOffsetDX(), Screen.GetOffsetPageY() + this.CalcOffsetDY());
 					}, 16);
 				}
                 this.EndDrag();
@@ -185,12 +185,14 @@ module AssureNote {
 	export class ViewportManager {
 		//windowX, windowY
 		ScrollManager: ScrollManager = new ScrollManager(this);
-		private OffsetX: number = 0;
-		private OffsetY: number = 0;
+		private OffsetPageX: number = 0;
+		private OffsetPageY: number = 0;
 		private LogicalOffsetX: number = 0;
 		private LogicalOffsetY: number = 0;
         private Scale: number = 1.0;
         private HTMLBodyBoundingRect: ClientRect;
+        private CameraCenterPageX: number;
+        private CameraCenterPageY: number;
 
         private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
             Element.style["transformOrigin"] = Value;
@@ -206,7 +208,10 @@ module AssureNote {
             Element.style["webkitTransform"] = Value;
         }
 
-		constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
+        constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
+            window.addEventListener("resize", (e) => { this.UpdateBodyBoundingRect(); console.log("resized!"); });
+            this.UpdateBodyBoundingRect();
+
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
 			this.UpdateAttr();
@@ -217,104 +222,81 @@ module AssureNote {
 			//this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
             $(this.EventMapLayer.parentElement).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
-            document.body.addEventListener("resize", (e) => { this.HTMLBodyBoundingRect = document.body.getBoundingClientRect(); });
-            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
         }
 
-        private IsEventMapUpper: boolean = false;
-        public SetEventMapLayerPosition(IsUpper: boolean) {
-            if (IsUpper && !this.IsEventMapUpper) {
-                $(this.ControlLayer).after(this.EventMapLayer);
-            } else if(!IsUpper && this.IsEventMapUpper){
-                $(this.ContentLayer).before(this.EventMapLayer);
-            }
-            this.IsEventMapUpper = IsUpper;
+        GetScale(): number {
+            return this.Scale;
         }
-
-		private static translateA(x: number, y: number): string {
-			return "translate(" + x + " " + y + ") ";
-		}
-
-		private static scaleA(scale: number): string {
-			return "scale(" + scale + ") ";
-		}
-
-		private static translateS(x: number, y: number): string {
-			return "translate(" + x + "px, " + y + "px) ";
-		}
-
-		private static scaleS(scale: number): string {
-			return "scale(" + scale + ") ";
-		}
-
-		private UpdateAttr(): void {
-			var attr: string = ViewportManager.translateA(this.OffsetX, this.OffsetY) + ViewportManager.scaleA(this.Scale);
-			var style: string = ViewportManager.translateS(this.OffsetX, this.OffsetY) + ViewportManager.scaleS(this.Scale);
-			this.SVGLayer.setAttribute("transform", attr);
-            this.SetTransformToElement(this.ContentLayer, style);
-            this.SetTransformToElement(this.ControlLayer, style);
-		}
 
         SetScale(scale: number): void {
             scale = Math.max(0.02, Math.min(20.0, scale));
-			this.Scale = scale;
-			var cx = this.GetPageCenterX();
-			var cy = this.GetPageCenterY();
-			this.OffsetX = (this.LogicalOffsetX - cx) * scale + cx;
-			this.OffsetY = (this.LogicalOffsetY - cy) * scale + cy;
+            var scaleChange = scale / this.Scale;
+            var cx = this.CameraCenterPageX;
+            var cy = this.CameraCenterPageY;
+            this.OffsetPageX = scaleChange * (this.OffsetPageX - cx) + cx;
+            this.OffsetPageY = scaleChange * (this.OffsetPageY - cy) + cy;
+            this.Scale = scale;
 			this.UpdateAttr();
 		}
 
-		SetOffset(x: number, y: number): void {
-			this.OffsetX = x;
-			this.OffsetY = y;
-			this.LogicalOffsetX = this.CalcLogicalOffsetX(x);
-			this.LogicalOffsetY = this.CalcLogicalOffsetY(y);
+        GetOffsetPageX(): number {
+            return this.OffsetPageX;
+        }
+
+        GetOffsetPageY(): number {
+            return this.OffsetPageY;
+        }
+
+		SetOffset(PageX: number, PageY: number): void {
+			this.OffsetPageX = PageX;
+			this.OffsetPageY = PageY;
 			this.UpdateAttr();
 		}
 
-		SetLogicalOffset(x: number, y: number, scale?: number): void {
-			this.LogicalOffsetX = x;
-			this.LogicalOffsetY = y;
-			this.SetScale(scale || this.Scale);
-		}
-
-		GetLogicalOffsetX(): number {
-			return this.LogicalOffsetX;
-		}
-
-		GetLogicalOffsetY(): number {
-			return this.LogicalOffsetY;
+        GetCameraGX(): number {
+            return (this.CameraCenterPageX - this.OffsetPageX) / this.Scale;
         }
 
-        SetCameraPosition(GX: number, GY: number) {
-            this.SetOffset(this.GetPageCenterX() - GX * this.Scale, this.GetPageCenterY() - GY * this.Scale);
+        GetCameraGY(): number {
+            return (this.CameraCenterPageY - this.OffsetPageY) / this.Scale;
         }
 
-		private CalcLogicalOffsetX(OffsetX: number): number {
-			var cx = this.GetPageCenterX();
-			return (OffsetX - cx) / this.Scale + cx;
-		}
-
-		private CalcLogicalOffsetY(OffsetY: number): number {
-			var cy = this.GetPageCenterY();
-			return (OffsetY - cy) / this.Scale + cy;
+        SetCameraPosition(GX: number, GY: number): void {
+            this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
         }
 
-        PageXFromGX(GX: number) {
-            return this.GetOffsetX() + this.Scale * GX;
+        SetCamera(GX: number, GY: number, Scale: number): void {
+            this.Scale = Scale;
+            this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
         }
 
-        PageYFromGY(GY: number) {
-            return this.GetOffsetY() + this.Scale * GY;
+        GetCameraPageCenterX(): number {
+            return this.CameraCenterPageX;
+        }
+
+        GetCameraPageCenterY(): number {
+            return this.CameraCenterPageY;
+        }
+
+        SetCameraPageCenter(PageX: number, PageY: number): void {
+            this.CameraCenterPageX = PageX;
+            this.CameraCenterPageY = PageY;
+        }
+
+        PageXFromGX(GX: number): number {
+            return this.OffsetPageX + this.Scale * GX;
+        }
+
+        PageYFromGY(GY: number): number {
+            return this.OffsetPageY + this.Scale * GY;
         }
 
         GXFromPageX(PageX: number): number {
-            return (PageX - this.GetOffsetX()) / this.Scale;
+            return (PageX - this.OffsetPageX) / this.Scale;
 		}
 
 		GYFromPageY(PageY: number): number {
-            return (PageY - this.GetOffsetY()) / this.Scale;
+            return (PageY - this.OffsetPageY) / this.Scale;
         }
 
         ConvertRectGlobalXYFromPageXY(PageRect: Rect): Rect {
@@ -324,14 +306,6 @@ module AssureNote {
             var y2 = this.GYFromPageY(PageRect.Y + PageRect.Height);
             return new Rect(x1, y1, x2 - x1, y2 - y1); 
         }
-
-		GetOffsetX(): number {
-			return this.OffsetX;
-		}
-
-		GetOffsetY(): number {
-			return this.OffsetY;
-		}
 
 		GetWidth(): number {
             return this.HTMLBodyBoundingRect.width;
@@ -346,62 +320,91 @@ module AssureNote {
         }
 
 		GetPageCenterX(): number {
-			return this.GetWidth() / 2;
+			return this.GetWidth() * 0.5;
 		}
 
 		GetPageCenterY(): number {
-			return this.GetHeight() / 2;
+            return this.GetHeight() * 0.5;
 		}
-
-		GetScale() {
-			return this.Scale;
-		}
-
-		SetCaseCenter(X: number, Y: number): void {
-            var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X * this.Scale));
-            var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y * this.Scale));
-			this.SetOffset(NewOffsetX, NewOffsetY);
-        }
 
         private AnimationFrameTimerHandle: number = 0;
 
         MoveTo(logicalOffsetX: number, logicalOffsetY: number, scale: number, duration: number): void {
-            if (duration <= 0) {
-                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
-                return;
+            //if (duration <= 0) {
+            //    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
+            //    return;
+            //}
+
+            //var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
+            //var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
+            //var VS = (scale - this.GetScale()) / duration;
+
+            //if (VY == 0 && VX == 0 && VS == 0) {
+            //    return;
+            //}
+
+            //if (this.AnimationFrameTimerHandle) {
+            //    cancelAnimationFrame(this.AnimationFrameTimerHandle);
+            //    this.AnimationFrameTimerHandle = 0;
+            //}
+
+            //var lastTime: number = performance.now();
+            //var startTime = lastTime; 
+
+            //var update: any = () => {
+            //    var currentTime: number = performance.now();
+            //    var deltaT = currentTime - lastTime;
+            //    var currentX = this.GetLogicalOffsetX();
+            //    var currentY = this.GetLogicalOffsetY();
+            //    var currentS = this.GetScale();
+            //    if (currentTime - startTime < duration) {
+            //        this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+            //    } else {
+            //        deltaT = duration - (lastTime - startTime);
+            //    }
+            //    this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+            //    lastTime = currentTime;
+            //}
+            //update();
+        }
+
+        private UpdateBodyBoundingRect(): void {
+            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
+            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
+        }
+
+        private IsEventMapUpper: boolean = false;
+        public SetEventMapLayerPosition(IsUpper: boolean) {
+            if (IsUpper && !this.IsEventMapUpper) {
+                $(this.ControlLayer).after(this.EventMapLayer);
+            } else if (!IsUpper && this.IsEventMapUpper) {
+                $(this.ContentLayer).before(this.EventMapLayer);
             }
+            this.IsEventMapUpper = IsUpper;
+        }
 
-            var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
-            var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
-            var VS = (scale - this.GetScale()) / duration;
+        private static translateA(x: number, y: number): string {
+            return "translate(" + x + " " + y + ") ";
+        }
 
-            if (VY == 0 && VX == 0 && VS == 0) {
-                return;
-            }
+        private static scaleA(scale: number): string {
+            return "scale(" + scale + ") ";
+        }
 
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
+        private static translateS(x: number, y: number): string {
+            return "translate(" + x + "px, " + y + "px) ";
+        }
 
-            var lastTime: number = performance.now();
-            var startTime = lastTime; 
+        private static scaleS(scale: number): string {
+            return "scale(" + scale + ") ";
+        }
 
-            var update: any = () => {
-                var currentTime: number = performance.now();
-                var deltaT = currentTime - lastTime;
-                var currentX = this.GetLogicalOffsetX();
-                var currentY = this.GetLogicalOffsetY();
-                var currentS = this.GetScale();
-                if (currentTime - startTime < duration) {
-                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = duration - (lastTime - startTime);
-                }
-                this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
-                lastTime = currentTime;
-            }
-            update();
+        private UpdateAttr(): void {
+            var attr: string = ViewportManager.translateA(this.OffsetPageX, this.OffsetPageY) + ViewportManager.scaleA(this.Scale);
+            var style: string = ViewportManager.translateS(this.OffsetPageX, this.OffsetPageY) + ViewportManager.scaleS(this.Scale);
+            this.SVGLayer.setAttribute("transform", attr);
+            this.SetTransformToElement(this.ContentLayer, style);
+            this.SetTransformToElement(this.ControlLayer, style);
         }
 	}
 }

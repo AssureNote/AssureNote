@@ -151,4 +151,12 @@
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>cd ..
+powershell -NoProfile -ExecutionPolicy unrestricted -Command ./compile_list_gen.ps1</PreBuildEvent>
+  </PropertyGroup>
 </Project>

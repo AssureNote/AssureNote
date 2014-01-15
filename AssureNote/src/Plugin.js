@@ -165,7 +165,7 @@ var AssureNote;
 
             //FIXME Editing mode
             $.each(this.PluginMap, function (key, value) {
-                if (value.HasDoubleClicked) {
+                if (value.HasDoubleClicked()) {
                     ret = value;
                     return false;
                 }

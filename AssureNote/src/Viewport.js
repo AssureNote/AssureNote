@@ -126,7 +126,7 @@ var AssureNote;
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(Screen.GetOffsetX() + this.CalcOffsetDX(), Screen.GetOffsetY() + this.CalcOffsetDY());
+                        Screen.SetOffset(Screen.GetOffsetPageX() + this.CalcOffsetDX(), Screen.GetOffsetPageY() + this.CalcOffsetDY());
                     } else {
                         this.EndDrag();
                     }
@@ -145,7 +145,7 @@ var AssureNote;
                         _this.CurrentY += _this.Dy;
                         _this.Dx *= 0.95;
                         _this.Dy *= 0.95;
-                        Screen.SetOffset(Screen.GetOffsetX() + _this.CalcOffsetDX(), Screen.GetOffsetY() + _this.CalcOffsetDY());
+                        Screen.SetOffset(Screen.GetOffsetPageX() + _this.CalcOffsetDX(), Screen.GetOffsetPageY() + _this.CalcOffsetDY());
                     }, 16);
                 }
                 this.EndDrag();
@@ -174,13 +174,19 @@ var AssureNote;
             this.ControlLayer = ControlLayer;
             //windowX, windowY
             this.ScrollManager = new ScrollManager(this);
-            this.OffsetX = 0;
-            this.OffsetY = 0;
+            this.OffsetPageX = 0;
+            this.OffsetPageY = 0;
             this.LogicalOffsetX = 0;
             this.LogicalOffsetY = 0;
             this.Scale = 1.0;
-            this.IsEventMapUpper = false;
             this.AnimationFrameTimerHandle = 0;
+            this.IsEventMapUpper = false;
+            window.addEventListener("resize", function (e) {
+                _this.UpdateBodyBoundingRect();
+                console.log("resized!");
+            });
+            this.UpdateBodyBoundingRect();
+
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
@@ -196,10 +202,6 @@ var AssureNote;
             $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
                 _this.ScrollManager.OnMouseWheel(e, _this);
             });
-            document.body.addEventListener("resize", function (e) {
-                _this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
-            });
-            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
         }
         ViewportManager.prototype.SetTransformOriginToElement = function (Element, Value) {
             Element.style["transformOrigin"] = Value;
@@ -213,6 +215,148 @@ var AssureNote;
             Element.style["MozTransform"] = Value;
             Element.style["msTransform"] = Value;
             Element.style["webkitTransform"] = Value;
+        };
+
+        ViewportManager.prototype.GetScale = function () {
+            return this.Scale;
+        };
+
+        ViewportManager.prototype.SetScale = function (scale) {
+            scale = Math.max(0.02, Math.min(20.0, scale));
+            var scaleChange = scale / this.Scale;
+            var cx = this.CameraCenterPageX;
+            var cy = this.CameraCenterPageY;
+            this.OffsetPageX = scaleChange * (this.OffsetPageX - cx) + cx;
+            this.OffsetPageY = scaleChange * (this.OffsetPageY - cy) + cy;
+            this.Scale = scale;
+            this.UpdateAttr();
+        };
+
+        ViewportManager.prototype.GetOffsetPageX = function () {
+            return this.OffsetPageX;
+        };
+
+        ViewportManager.prototype.GetOffsetPageY = function () {
+            return this.OffsetPageY;
+        };
+
+        ViewportManager.prototype.SetOffset = function (PageX, PageY) {
+            this.OffsetPageX = PageX;
+            this.OffsetPageY = PageY;
+            this.UpdateAttr();
+        };
+
+        ViewportManager.prototype.GetCameraGX = function () {
+            return (this.CameraCenterPageX - this.OffsetPageX) / this.Scale;
+        };
+
+        ViewportManager.prototype.GetCameraGY = function () {
+            return (this.CameraCenterPageY - this.OffsetPageY) / this.Scale;
+        };
+
+        ViewportManager.prototype.SetCameraPosition = function (GX, GY) {
+            this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
+        };
+
+        ViewportManager.prototype.SetCamera = function (GX, GY, Scale) {
+            this.Scale = Scale;
+            this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
+        };
+
+        ViewportManager.prototype.GetCameraPageCenterX = function () {
+            return this.CameraCenterPageX;
+        };
+
+        ViewportManager.prototype.GetCameraPageCenterY = function () {
+            return this.CameraCenterPageY;
+        };
+
+        ViewportManager.prototype.SetCameraPageCenter = function (PageX, PageY) {
+            this.CameraCenterPageX = PageX;
+            this.CameraCenterPageY = PageY;
+        };
+
+        ViewportManager.prototype.PageXFromGX = function (GX) {
+            return this.OffsetPageX + this.Scale * GX;
+        };
+
+        ViewportManager.prototype.PageYFromGY = function (GY) {
+            return this.OffsetPageY + this.Scale * GY;
+        };
+
+        ViewportManager.prototype.GXFromPageX = function (PageX) {
+            return (PageX - this.OffsetPageX) / this.Scale;
+        };
+
+        ViewportManager.prototype.GYFromPageY = function (PageY) {
+            return (PageY - this.OffsetPageY) / this.Scale;
+        };
+
+        ViewportManager.prototype.ConvertRectGlobalXYFromPageXY = function (PageRect) {
+            var x1 = this.GXFromPageX(PageRect.X);
+            var y1 = this.GYFromPageY(PageRect.Y);
+            var x2 = this.GXFromPageX(PageRect.X + PageRect.Width);
+            var y2 = this.GYFromPageY(PageRect.Y + PageRect.Height);
+            return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
+        };
+
+        ViewportManager.prototype.GetWidth = function () {
+            return this.HTMLBodyBoundingRect.width;
+        };
+
+        ViewportManager.prototype.GetHeight = function () {
+            return this.HTMLBodyBoundingRect.height;
+        };
+
+        ViewportManager.prototype.GetPageRect = function () {
+            return new AssureNote.Rect(0, 0, this.GetWidth(), this.GetHeight());
+        };
+
+        ViewportManager.prototype.GetPageCenterX = function () {
+            return this.GetWidth() * 0.5;
+        };
+
+        ViewportManager.prototype.GetPageCenterY = function () {
+            return this.GetHeight() * 0.5;
+        };
+
+        ViewportManager.prototype.MoveTo = function (logicalOffsetX, logicalOffsetY, scale, duration) {
+            //if (duration <= 0) {
+            //    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
+            //    return;
+            //}
+            //var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
+            //var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
+            //var VS = (scale - this.GetScale()) / duration;
+            //if (VY == 0 && VX == 0 && VS == 0) {
+            //    return;
+            //}
+            //if (this.AnimationFrameTimerHandle) {
+            //    cancelAnimationFrame(this.AnimationFrameTimerHandle);
+            //    this.AnimationFrameTimerHandle = 0;
+            //}
+            //var lastTime: number = performance.now();
+            //var startTime = lastTime;
+            //var update: any = () => {
+            //    var currentTime: number = performance.now();
+            //    var deltaT = currentTime - lastTime;
+            //    var currentX = this.GetLogicalOffsetX();
+            //    var currentY = this.GetLogicalOffsetY();
+            //    var currentS = this.GetScale();
+            //    if (currentTime - startTime < duration) {
+            //        this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+            //    } else {
+            //        deltaT = duration - (lastTime - startTime);
+            //    }
+            //    this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+            //    lastTime = currentTime;
+            //}
+            //update();
+        };
+
+        ViewportManager.prototype.UpdateBodyBoundingRect = function () {
+            this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
+            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
         };
 
         ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {
@@ -241,159 +385,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.UpdateAttr = function () {
-            var attr = ViewportManager.translateA(this.OffsetX, this.OffsetY) + ViewportManager.scaleA(this.Scale);
-            var style = ViewportManager.translateS(this.OffsetX, this.OffsetY) + ViewportManager.scaleS(this.Scale);
+            var attr = ViewportManager.translateA(this.OffsetPageX, this.OffsetPageY) + ViewportManager.scaleA(this.Scale);
+            var style = ViewportManager.translateS(this.OffsetPageX, this.OffsetPageY) + ViewportManager.scaleS(this.Scale);
             this.SVGLayer.setAttribute("transform", attr);
             this.SetTransformToElement(this.ContentLayer, style);
             this.SetTransformToElement(this.ControlLayer, style);
-        };
-
-        ViewportManager.prototype.SetScale = function (scale) {
-            scale = Math.max(0.02, Math.min(20.0, scale));
-            this.Scale = scale;
-            var cx = this.GetPageCenterX();
-            var cy = this.GetPageCenterY();
-            this.OffsetX = (this.LogicalOffsetX - cx) * scale + cx;
-            this.OffsetY = (this.LogicalOffsetY - cy) * scale + cy;
-            this.UpdateAttr();
-        };
-
-        ViewportManager.prototype.SetOffset = function (x, y) {
-            this.OffsetX = x;
-            this.OffsetY = y;
-            this.LogicalOffsetX = this.CalcLogicalOffsetX(x);
-            this.LogicalOffsetY = this.CalcLogicalOffsetY(y);
-            this.UpdateAttr();
-        };
-
-        ViewportManager.prototype.SetLogicalOffset = function (x, y, scale) {
-            this.LogicalOffsetX = x;
-            this.LogicalOffsetY = y;
-            this.SetScale(scale || this.Scale);
-        };
-
-        ViewportManager.prototype.GetLogicalOffsetX = function () {
-            return this.LogicalOffsetX;
-        };
-
-        ViewportManager.prototype.GetLogicalOffsetY = function () {
-            return this.LogicalOffsetY;
-        };
-
-        ViewportManager.prototype.SetCameraPosition = function (GX, GY) {
-            this.SetOffset(this.GetPageCenterX() - GX * this.Scale, this.GetPageCenterY() - GY * this.Scale);
-        };
-
-        ViewportManager.prototype.CalcLogicalOffsetX = function (OffsetX) {
-            var cx = this.GetPageCenterX();
-            return (OffsetX - cx) / this.Scale + cx;
-        };
-
-        ViewportManager.prototype.CalcLogicalOffsetY = function (OffsetY) {
-            var cy = this.GetPageCenterY();
-            return (OffsetY - cy) / this.Scale + cy;
-        };
-
-        ViewportManager.prototype.PageXFromGX = function (GX) {
-            return this.GetOffsetX() + this.Scale * GX;
-        };
-
-        ViewportManager.prototype.PageYFromGY = function (GY) {
-            return this.GetOffsetY() + this.Scale * GY;
-        };
-
-        ViewportManager.prototype.GXFromPageX = function (PageX) {
-            return (PageX - this.GetOffsetX()) / this.Scale;
-        };
-
-        ViewportManager.prototype.GYFromPageY = function (PageY) {
-            return (PageY - this.GetOffsetY()) / this.Scale;
-        };
-
-        ViewportManager.prototype.ConvertRectGlobalXYFromPageXY = function (PageRect) {
-            var x1 = this.GXFromPageX(PageRect.X);
-            var y1 = this.GYFromPageY(PageRect.Y);
-            var x2 = this.GXFromPageX(PageRect.X + PageRect.Width);
-            var y2 = this.GYFromPageY(PageRect.Y + PageRect.Height);
-            return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
-        };
-
-        ViewportManager.prototype.GetOffsetX = function () {
-            return this.OffsetX;
-        };
-
-        ViewportManager.prototype.GetOffsetY = function () {
-            return this.OffsetY;
-        };
-
-        ViewportManager.prototype.GetWidth = function () {
-            return this.HTMLBodyBoundingRect.width;
-        };
-
-        ViewportManager.prototype.GetHeight = function () {
-            return this.HTMLBodyBoundingRect.height;
-        };
-
-        ViewportManager.prototype.GetPageRect = function () {
-            return new AssureNote.Rect(0, 0, this.GetWidth(), this.GetHeight());
-        };
-
-        ViewportManager.prototype.GetPageCenterX = function () {
-            return this.GetWidth() / 2;
-        };
-
-        ViewportManager.prototype.GetPageCenterY = function () {
-            return this.GetHeight() / 2;
-        };
-
-        ViewportManager.prototype.GetScale = function () {
-            return this.Scale;
-        };
-
-        ViewportManager.prototype.SetCaseCenter = function (X, Y) {
-            var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X * this.Scale));
-            var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y * this.Scale));
-            this.SetOffset(NewOffsetX, NewOffsetY);
-        };
-
-        ViewportManager.prototype.MoveTo = function (logicalOffsetX, logicalOffsetY, scale, duration) {
-            var _this = this;
-            if (duration <= 0) {
-                this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
-                return;
-            }
-
-            var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
-            var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
-            var VS = (scale - this.GetScale()) / duration;
-
-            if (VY == 0 && VX == 0 && VS == 0) {
-                return;
-            }
-
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
-
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                var currentX = _this.GetLogicalOffsetX();
-                var currentY = _this.GetLogicalOffsetY();
-                var currentS = _this.GetScale();
-                if (currentTime - startTime < duration) {
-                    _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = duration - (lastTime - startTime);
-                }
-                _this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
-                lastTime = currentTime;
-            };
-            update();
         };
         return ViewportManager;
     })();
