@@ -8,15 +8,75 @@ var error = require('./error');
 var async = require('async');
 var _ = require('underscore');
 
-function upload(params, userId, callback) {
+function upload(params, userIdKey, callback) {
+    function validate(params) {
+        var checks = [];
+        if (!params)
+            checks.push('Parameter is required.');
+        if (params && !params.contents)
+            checks.push('Contents is required.');
+        if (checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if (!validate(params))
+        return;
+
     var con = new db.Database();
-    //TODO
+
+    var userDAO = new model_user.UserDAO(con);
+    var caseDAO = new model_assurance_case.AssuranceCaseDAO(con);
+    async.waterfall([
+        function (next) {
+            con.begin(function (err, result) {
+                return next(err);
+            });
+        },
+        function (next) {
+            userDAO.select(userIdKey, function (err, user) {
+                return next(err, user);
+            });
+        },
+        function (user, next) {
+            caseDAO.insert(user.key, params.contents, params.meta_data, function (err, resultCheck) {
+                return next(err, resultCheck);
+            });
+        },
+        function (commitResult, next) {
+            con.commit(function (err, result) {
+                return next(err, commitResult);
+            });
+        }
+    ], function (err, result) {
+        con.close();
+        if (err) {
+            callback.onFailure(err);
+            return;
+        }
+        callback.onSuccess(result);
+    });
 }
 exports.upload = upload;
 
 function download(params, userId, callback) {
+    function validate(params) {
+        var checks = [];
+        if (!params)
+            checks.push('Parameter is required.');
+        if (params && !params.fileId)
+            checks.push('FileID is required.');
+        if (checks.length > 0) {
+            callback.onFailure(new error.InvalidParamsError(checks, null));
+            return false;
+        }
+        return true;
+    }
+    if (!validate(params))
+        return;
+
     var con = new db.Database();
     //TODO
 }
 exports.download = download;
-

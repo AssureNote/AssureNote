@@ -1,5 +1,5 @@
-import db = module('../db/db')
-import events = module('events')
+import db = require('../db/db');
+import events = require('events');
 
 export class DAO extends events.EventEmitter {
 	constructor(public con: db.Database) {
