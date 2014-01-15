@@ -46,7 +46,7 @@ app.configure(function () {
     //     next();
     // });
     app.use(app.router);
-    app.use(express.static(path.join(__dirname, 'public')));
+    app.use(express.static(path.join(__dirname, '../../AssureNote')));
 
     app.use(express.logger('dev'));
 });
