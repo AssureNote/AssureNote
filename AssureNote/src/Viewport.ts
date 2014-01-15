@@ -191,6 +191,8 @@ module AssureNote {
 		private LogicalOffsetY: number = 0;
         private Scale: number = 1.0;
         private HTMLBodyBoundingRect: ClientRect;
+        private CameraPageCenterX: number;
+        private CameraPageCenterY: number;
 
         private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
             Element.style["transformOrigin"] = Value;
@@ -219,6 +221,7 @@ module AssureNote {
             $(this.EventMapLayer.parentElement).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
             document.body.addEventListener("resize", (e) => { this.HTMLBodyBoundingRect = document.body.getBoundingClientRect(); });
             this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
+            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
         }
 
         private IsEventMapUpper: boolean = false;
@@ -273,22 +276,43 @@ module AssureNote {
 			this.UpdateAttr();
 		}
 
-		SetLogicalOffset(x: number, y: number, scale?: number): void {
+		private SetLogicalOffset(x: number, y: number, scale?: number): void {
 			this.LogicalOffsetX = x;
 			this.LogicalOffsetY = y;
 			this.SetScale(scale || this.Scale);
 		}
 
-		GetLogicalOffsetX(): number {
+		private GetLogicalOffsetX(): number {
 			return this.LogicalOffsetX;
 		}
 
-		GetLogicalOffsetY(): number {
+		private GetLogicalOffsetY(): number {
 			return this.LogicalOffsetY;
         }
 
         SetCameraPosition(GX: number, GY: number) {
-            this.SetOffset(this.GetPageCenterX() - GX * this.Scale, this.GetPageCenterY() - GY * this.Scale);
+            this.SetOffset(this.CameraPageCenterX - GX * this.Scale, this.CameraPageCenterY - GY * this.Scale);
+        }
+
+        GetCameraGX(): number {
+            return (this.CameraPageCenterX - this.GetOffsetX()) / this.Scale;
+        }
+
+        GetCameraGY(): number {
+            return (this.CameraPageCenterY - this.GetOffsetY()) / this.Scale;
+        }
+
+        SetCameraPageCenter(PageX: number, PageY: number) {
+            this.CameraPageCenterX = PageX;
+            this.CameraPageCenterY = PageY;
+        }
+
+        GetCameraPageCenterX(): number {
+            return this.CameraPageCenterX;
+        }
+
+        GetCameraPageCenterY(): number {
+            return this.CameraPageCenterY;
         }
 
 		private CalcLogicalOffsetX(OffsetX: number): number {
@@ -346,18 +370,18 @@ module AssureNote {
         }
 
 		GetPageCenterX(): number {
-			return this.GetWidth() / 2;
+			return this.GetWidth() * 0.5;
 		}
 
 		GetPageCenterY(): number {
-			return this.GetHeight() / 2;
+            return this.GetHeight() * 0.5;
 		}
 
 		GetScale() {
 			return this.Scale;
 		}
 
-		SetCaseCenter(X: number, Y: number): void {
+		private SetCaseCenter(X: number, Y: number): void {
             var NewOffsetX = this.OffsetX + (this.GetPageCenterX() - (this.OffsetX + X * this.Scale));
             var NewOffsetY = this.OffsetY + (this.GetPageCenterY() - (this.OffsetY + Y * this.Scale));
 			this.SetOffset(NewOffsetX, NewOffsetY);

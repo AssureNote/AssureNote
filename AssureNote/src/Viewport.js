@@ -200,6 +200,7 @@ var AssureNote;
                 _this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
             });
             this.HTMLBodyBoundingRect = document.body.getBoundingClientRect();
+            this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
         }
         ViewportManager.prototype.SetTransformOriginToElement = function (Element, Value) {
             Element.style["transformOrigin"] = Value;
@@ -281,7 +282,28 @@ var AssureNote;
         };
 
         ViewportManager.prototype.SetCameraPosition = function (GX, GY) {
-            this.SetOffset(this.GetPageCenterX() - GX * this.Scale, this.GetPageCenterY() - GY * this.Scale);
+            this.SetOffset(this.CameraPageCenterX - GX * this.Scale, this.CameraPageCenterY - GY * this.Scale);
+        };
+
+        ViewportManager.prototype.GetCameraGX = function () {
+            return (this.CameraPageCenterX - this.GetOffsetX()) / this.Scale;
+        };
+
+        ViewportManager.prototype.GetCameraGY = function () {
+            return (this.CameraPageCenterY - this.GetOffsetY()) / this.Scale;
+        };
+
+        ViewportManager.prototype.SetCameraPageCenter = function (PageX, PageY) {
+            this.CameraPageCenterX = PageX;
+            this.CameraPageCenterY = PageY;
+        };
+
+        ViewportManager.prototype.GetCameraPageCenterX = function () {
+            return this.CameraPageCenterX;
+        };
+
+        ViewportManager.prototype.GetCameraPageCenterY = function () {
+            return this.CameraPageCenterY;
         };
 
         ViewportManager.prototype.CalcLogicalOffsetX = function (OffsetX) {
@@ -339,11 +361,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.GetPageCenterX = function () {
-            return this.GetWidth() / 2;
+            return this.GetWidth() * 0.5;
         };
 
         ViewportManager.prototype.GetPageCenterY = function () {
-            return this.GetHeight() / 2;
+            return this.GetHeight() * 0.5;
         };
 
         ViewportManager.prototype.GetScale = function () {
