@@ -66,10 +66,9 @@ module AssureNote {
                 this.IsMoving = true;
                 this.Searching = true;
                 this.CreateHitNodeView(ViewMap);
-                ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
 
                 this.SetAllNodesColor(ViewMap, ColorStyle.Searched);
-				this.SetDestination(this.HitNodes[0], ViewMap);
+				this.SetDestination(this.HitNodes[0]);
                 ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
 				this.MoveToNext(ViewPort, () => {
 					this.IsMoving = false;
@@ -92,7 +91,7 @@ module AssureNote {
 
 
 				this.IsMoving = true;
-				this.SetDestination(this.HitNodes[this.NodeIndex], ViewMap);
+				this.SetDestination(this.HitNodes[this.NodeIndex]);
 				this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, () => {
                     ViewMap[this.HitNodes[this.NodeIndex].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
                     var index = 0;
@@ -145,15 +144,14 @@ module AssureNote {
             }
         }
 
-		private SetDestination(HitNode: GSNNode, ViewMap: { [index: string]: NodeView }): void {
+		private SetDestination(HitNode: GSNNode): void {
 			if (HitNode == null) {
 				return;
 			}
+            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
 			var TargetView = ViewMap[HitNode.GetLabel()];
-            var Viewport = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.DestinationX = Viewport.GetPageCenterX() - TargetView.GetCenterGX();
-            this.DestinationY = Viewport.GetPageCenterY() - TargetView.GetCenterGY();
-			return;
+            this.DestinationX = TargetView.GetCenterGX();
+            this.DestinationY = TargetView.GetCenterGY();
 		}
 
 		private MoveToNext(ViewPort: ViewportManager, Callback: () => void): void {

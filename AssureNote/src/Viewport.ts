@@ -329,43 +329,47 @@ module AssureNote {
 
         private AnimationFrameTimerHandle: number = 0;
 
-        MoveTo(logicalOffsetX: number, logicalOffsetY: number, scale: number, duration: number): void {
-            //if (duration <= 0) {
-            //    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
-            //    return;
-            //}
+        Move(GX: number, GY: number, scale: number, duration: number): void {
+            this.MoveTo(this.GetCameraGX() + GX, this.GetCameraGY() + GY, scale, duration);
+        }
 
-            //var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
-            //var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
-            //var VS = (scale - this.GetScale()) / duration;
+        MoveTo(GX: number, GY: number, scale: number, duration: number): void {
+            if (duration <= 0) {
+                this.SetCamera(GX, GY, scale);
+                return;
+            }
 
-            //if (VY == 0 && VX == 0 && VS == 0) {
-            //    return;
-            //}
+            var VX = (GX - this.GetCameraGX()) / duration;
+            var VY = (GY - this.GetCameraGY()) / duration;
+            var VS = (scale - this.GetScale()) / duration;
 
-            //if (this.AnimationFrameTimerHandle) {
-            //    cancelAnimationFrame(this.AnimationFrameTimerHandle);
-            //    this.AnimationFrameTimerHandle = 0;
-            //}
+            if (VY == 0 && VX == 0 && VS == 0) {
+                return;
+            }
 
-            //var lastTime: number = performance.now();
-            //var startTime = lastTime; 
+            if (this.AnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.AnimationFrameTimerHandle);
+                this.AnimationFrameTimerHandle = 0;
+            }
 
-            //var update: any = () => {
-            //    var currentTime: number = performance.now();
-            //    var deltaT = currentTime - lastTime;
-            //    var currentX = this.GetLogicalOffsetX();
-            //    var currentY = this.GetLogicalOffsetY();
-            //    var currentS = this.GetScale();
-            //    if (currentTime - startTime < duration) {
-            //        this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-            //    } else {
-            //        deltaT = duration - (lastTime - startTime);
-            //    }
-            //    this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
-            //    lastTime = currentTime;
-            //}
-            //update();
+            var lastTime: number = performance.now();
+            var startTime = lastTime; 
+
+            var update: any = () => {
+                var currentTime: number = performance.now();
+                var deltaT = currentTime - lastTime;
+                var currentX = this.GetCameraGX();
+                var currentY = this.GetCameraGY();
+                var currentS = this.GetScale();
+                if (currentTime - startTime < duration) {
+                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    deltaT = duration - (lastTime - startTime);
+                }
+                this.SetCamera(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+                lastTime = currentTime;
+            }
+            update();
         }
 
         private UpdateBodyBoundingRect(): void {

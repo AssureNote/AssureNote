@@ -320,38 +320,48 @@ var AssureNote;
             return this.GetHeight() * 0.5;
         };
 
-        ViewportManager.prototype.MoveTo = function (logicalOffsetX, logicalOffsetY, scale, duration) {
-            //if (duration <= 0) {
-            //    this.SetLogicalOffset(logicalOffsetX, logicalOffsetY, scale);
-            //    return;
-            //}
-            //var VX = (logicalOffsetX - this.GetLogicalOffsetX()) / duration;
-            //var VY = (logicalOffsetY - this.GetLogicalOffsetY()) / duration;
-            //var VS = (scale - this.GetScale()) / duration;
-            //if (VY == 0 && VX == 0 && VS == 0) {
-            //    return;
-            //}
-            //if (this.AnimationFrameTimerHandle) {
-            //    cancelAnimationFrame(this.AnimationFrameTimerHandle);
-            //    this.AnimationFrameTimerHandle = 0;
-            //}
-            //var lastTime: number = performance.now();
-            //var startTime = lastTime;
-            //var update: any = () => {
-            //    var currentTime: number = performance.now();
-            //    var deltaT = currentTime - lastTime;
-            //    var currentX = this.GetLogicalOffsetX();
-            //    var currentY = this.GetLogicalOffsetY();
-            //    var currentS = this.GetScale();
-            //    if (currentTime - startTime < duration) {
-            //        this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-            //    } else {
-            //        deltaT = duration - (lastTime - startTime);
-            //    }
-            //    this.SetLogicalOffset(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
-            //    lastTime = currentTime;
-            //}
-            //update();
+        ViewportManager.prototype.Move = function (GX, GY, scale, duration) {
+            this.MoveTo(this.GetCameraGX() + GX, this.GetCameraGY() + GY, scale, duration);
+        };
+
+        ViewportManager.prototype.MoveTo = function (GX, GY, scale, duration) {
+            var _this = this;
+            if (duration <= 0) {
+                this.SetCamera(GX, GY, scale);
+                return;
+            }
+
+            var VX = (GX - this.GetCameraGX()) / duration;
+            var VY = (GY - this.GetCameraGY()) / duration;
+            var VS = (scale - this.GetScale()) / duration;
+
+            if (VY == 0 && VX == 0 && VS == 0) {
+                return;
+            }
+
+            if (this.AnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.AnimationFrameTimerHandle);
+                this.AnimationFrameTimerHandle = 0;
+            }
+
+            var lastTime = performance.now();
+            var startTime = lastTime;
+
+            var update = function () {
+                var currentTime = performance.now();
+                var deltaT = currentTime - lastTime;
+                var currentX = _this.GetCameraGX();
+                var currentY = _this.GetCameraGY();
+                var currentS = _this.GetScale();
+                if (currentTime - startTime < duration) {
+                    _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    deltaT = duration - (lastTime - startTime);
+                }
+                _this.SetCamera(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+                lastTime = currentTime;
+            };
+            update();
         };
 
         ViewportManager.prototype.UpdateBodyBoundingRect = function () {

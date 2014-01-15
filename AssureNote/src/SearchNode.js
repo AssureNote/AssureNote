@@ -56,10 +56,9 @@ var AssureNote;
                 this.IsMoving = true;
                 this.Searching = true;
                 this.CreateHitNodeView(ViewMap);
-                ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
 
                 this.SetAllNodesColor(ViewMap, AssureNote.ColorStyle.Searched);
-                this.SetDestination(this.HitNodes[0], ViewMap);
+                this.SetDestination(this.HitNodes[0]);
                 ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.SearchHighlight);
                 this.MoveToNext(ViewPort, function () {
                     _this.IsMoving = false;
@@ -81,7 +80,7 @@ var AssureNote;
                 }
 
                 this.IsMoving = true;
-                this.SetDestination(this.HitNodes[this.NodeIndex], ViewMap);
+                this.SetDestination(this.HitNodes[this.NodeIndex]);
                 this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, function () {
                     ViewMap[_this.HitNodes[_this.NodeIndex].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.SearchHighlight);
                     var index = 0;
@@ -134,15 +133,14 @@ var AssureNote;
             }
         };
 
-        Search.prototype.SetDestination = function (HitNode, ViewMap) {
+        Search.prototype.SetDestination = function (HitNode) {
             if (HitNode == null) {
                 return;
             }
+            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
             var TargetView = ViewMap[HitNode.GetLabel()];
-            var Viewport = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.DestinationX = Viewport.GetPageCenterX() - TargetView.GetCenterGX();
-            this.DestinationY = Viewport.GetPageCenterY() - TargetView.GetCenterGY();
-            return;
+            this.DestinationX = TargetView.GetCenterGX();
+            this.DestinationY = TargetView.GetCenterGY();
         };
 
         Search.prototype.MoveToNext = function (ViewPort, Callback) {
