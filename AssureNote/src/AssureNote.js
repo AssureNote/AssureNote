@@ -43,7 +43,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
 
             this.PluginManager.LoadPlugin();
-            this.UserName = $.cookie('UserName');
+            this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             var Names = Command.GetCommandLineNames();

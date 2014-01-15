@@ -821,7 +821,15 @@ class GSNNode {
 		Writer.newline();
 		for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-			Node.FormatNode(Writer);
+			if (Node.IsContext()) {
+				Node.FormatNode(Writer);
+			}
+		}
+		for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+			if (!Node.IsContext()) {
+				Node.FormatNode(Writer);
+			}
 		}
 	}
 
@@ -847,7 +855,15 @@ class GSNNode {
 		if (this.NonNullSubNodeList() != null) {
 			for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 				/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-				Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+				if (Node.IsContext()) {
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+				}
+			}
+			for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+				/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+				if (!Node.IsContext()) {
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+				}
 			}
 		}
 	}
