@@ -1,0 +1,194 @@
+doctype html
+html
+  head
+    // for mobile browser
+    meta(name='viewport', content='initial-scale=1.0,width=device-width,user-scalable=no')
+    title AssureNote
+    link(rel='stylesheet', href='lib/bootstrap/css/bootstrap.min.css')
+    link(rel='stylesheet', href='lib//animate-custom.css')
+    link(rel='stylesheet', href='lib/codemirror.css')
+    link(rel='stylesheet', href='css/dcase-node.css')
+    link(rel='stylesheet', href='css/sidemenu.css')
+    link(rel='stylesheet', href='css/historymenu.css')
+    link(rel='stylesheet', href='css/index.css')
+    link(rel='stylesheet', href='css/topmenu.css')
+  body(style='overflow: hidden; margin: 0px;')
+    #assure-note(style='width: 100%; height: 100%;')
+      input#file-open-dialog(type='file', accept='.wgsn,.dcase_model', style='display:none;')
+      #auto-expand-area
+      svg#svglayer-box(xmlns='http://www.w3.org/2000/svg', version='1.1', style='top: 0px; left: 0px; width: 100%; height: 100%; position: absolute')
+        g#svg-layer(transform='translate(0,0)')
+      #eventmap-layer(style='top: 0px; left: 0px; width: 100%; height: 100%; position: absolute;')
+      #content-layer(style='top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;')
+      #control-layer(style='top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;')
+      #fixed-control-layer(style='top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;')
+        .navbar.navbar-default
+          .navbar-collapse
+            a.logo-fixed(href='#')
+              img#logo(src='images/logo.png', alt='AssureNote')
+            .dropdown.logo-offset
+              button#file-menu-button.btn.navbar-btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', oncontextmenu='return false')
+                span.glyphicon.glyphicon-file
+                | File
+                span.caret
+              ul#top-menu.dropdown-menu(role='menu', style='right: auto; width: 250px;', oncontextmenu='return false')
+                li
+                  a#create-wgsn-menu(href='#')
+                    span.glyphicon.glyphicon-plus
+                    | New&period;&period;&period;
+                li
+                  a#open-menu(href='#')
+                    span.glyphicon.glyphicon-folder-open
+                    | Open&period;&period;&period;
+                li
+                  a#save-menu(href='#')
+                    span.glyphicon.glyphicon-floppy-save
+                    | Save
+                li.dropdown-submenu
+                  a(href='#')
+                    span.glyphicon.glyphicon-floppy-save
+                    | Save As
+                  ul.dropdown-menu
+                    li
+                      a#save-wgsn-menu(href='#')
+                        span.glyphicon.glyphicon-floppy-save
+                        | &midast;&period;wgsn&period;&period;&period;
+                    li
+                      a#save-dcasemodel-menu(href='#')
+                        span.glyphicon.glyphicon-floppy-save
+                        | &midast;&period;dcase&UnderBar;model&period;&period;&period;
+                li
+                  a#about-menu(href='#')
+                    span.glyphicon.glyphicon-question-sign
+                    | About
+              span#filename-view
+        input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')
+      #plugin-layer(style='width: 0px; height: 0px; position: absolute;')
+        #editor-wrapper(style='border: 1px solid black')
+          textarea#editor(placeholder='Type something...', style='display: none;')
+        // Help Modal
+        #help-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='help-modal-label', aria-hidden='true')
+          .modal-dialog
+            .modal-content
+              .modal-header
+                button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+                h4#help-modal-label.modal-title Help&colon; Command list
+              .modal-body
+                ul
+                  li
+                    code new &lsqb;name&rsqb;
+                    br
+                    | create new file
+                  li
+                    code open
+                    | &sol;
+                    code e
+                    br
+                    | open file
+                  li
+                    code  save &lsqb;name&rsqb;
+                    | &sol;
+                    code  w &lsqb;name&rsqb;
+                    br
+                    | save editing file
+                  li
+                    code  help 
+                    | &sol;
+                    code  w &lsqb;name&rsqb;
+                    br
+                    | show this message
+              .modal-footer
+                button.btn.btn-default(type='button', data-dismiss='modal') Close
+            // /.modal-content
+          // /.modal-dialog
+        // /.modal
+        // Help Modal
+        #about-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
+          .modal-dialog
+            .modal-content
+              .modal-header
+                button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+                h4#about-modal-label.modal-title About
+              .modal-body(style='text-align: center;')
+                img(src='images/logo.png', alt='AssureNote', style='width: 60%')
+                div Version 1&period;0&period;0
+              .modal-footer
+                button.btn.btn-default(type='button', data-dismiss='modal') Close
+            // /.modal-content
+          // /.modal-dialog
+        // /.modal
+    svg(width='0', height='0')
+      defs
+        marker#Triangle-black(viewbox='0 0 10 10', refx='10', refy='5', markerunits='strokeWidth', markerwidth='15', markerheight='9', orient='auto')
+          path(d='M 0 0 L 10 5 L 0 10 z', fill='gray', stroke='gray')
+        marker#Triangle-white(viewbox='0 0 10 10', refx='10', refy='5', markerunits='strokeWidth', markerwidth='15', markerheight='9', orient='auto')
+          path(d='M 0 0 L 10 5 L 0 10 z', fill='white', stroke='gray')
+        polygon#undevelopd-master.assurenote-default(fill='none', stroke='#333', stroke-width='1.5', points='0 -20 -20 0 0 20 20 0')
+        rect#goal-master.assurenote-default(width='1', height='1')
+        polygon#strategy-master.assurenote-default(points='0.08,0 1,0 0.92,1 0,1')
+        ellipse#evidence-master.assurenote-default(cx='1', cy='1', rx='0.5', ry='0.5')
+    script(type='text/javascript', src='lib/jquery.min.js')
+    script(type='text/javascript', src='lib/jquery.tmpl.min.js')
+    script(type='text/javascript', src='lib/jquery.jqdock.min.js')
+    script(type='text/javascript', src='lib/jquery.cookie.js')
+    script(type='text/javascript', src='lib/jquery.mousewheel.js')
+    script(type='text/javascript', src='lib/pointer.min.js')
+    script(type='text/javascript', src='lib/codemirror.js')
+    script(type='text/javascript', src='lib/FileSaver.js')
+    script(type='text/javascript', src='lib/notify.min.js')
+    script(type='text/javascript', src='lib/bootstrap/js/bootstrap.min.js')
+    script(type='text/javascript', src='lib/socket.io.js')
+    script(type='text/javascript', src='src/AssureNoteUtils.js')
+    script(type='text/javascript', src='src/AssureNoteParser.js')
+    script(type='text/javascript', src='src/DCaseModelXMLParser.js')
+    script(type='text/javascript', src='src/CommandLine.js')
+    script(type='text/javascript', src='src/Command.js')
+    script(type='text/javascript', src='src/GSNShape.js')
+    script(type='text/javascript', src='src/NodeView.js')
+    script(type='text/javascript', src='src/Panel.js')
+    script(type='text/javascript', src='src/LayoutEngine.js')
+    script(type='text/javascript', src='src/AssureNote.js')
+    script(type='text/javascript', src='src/Viewport.js')
+    script(type='text/javascript', src='src/Plugin.js')
+    script(type='text/javascript', src='src/NodeMenu.js')
+    script(type='text/javascript', src='src/SearchNode.js')
+    script(type='text/javascript', src='src/Socket.js')
+    script(type='text/javascript', src='src/Editor.js')
+    script(type='text/javascript', src='plugin/FullScreenEditor/FullScreenEditor.js')
+    script(type='text/javascript', src='plugin/FoldingViewSwitch/FoldingViewSwitch.js')
+    script(type='text/javascript', src='plugin/MessageChat/MessageChat.js')
+    script(type='text/javascript', src='plugin/VariableInterpolation/VariableInterpolation.js')
+    script(type='text/javascript', src='plugin/AddNode/AddNode.js')
+    script(type='text/javascript', src='plugin/RemoveNode/RemoveNode.js')
+    script(type='text/javascript', src='plugin/ToDo/ToDo.js')
+    script#default-case-ja(type='text/wgsn')
+      * G &2422f9c3
+      ゴール: ある性質が成り立つという主張
+      * C &45255f17
+      前提: 主張が成り立つ状況
+      * S &137c4f60
+      戦略: 主張を分解する指標
+      ** G &35938c38
+      サブゴール: 分解された主張
+      ** E &654abc0c
+      証拠: サブゴールの成立を支持する事実
+      ** C &6072c487
+      反証: 証拠に対する反例
+      ** G &152377e9
+      未達成なサブゴール
+    script#default-case-en(type='text/wgsn')
+      * G &2422f9c3
+      Goal: A claim that a system certainly has some desirable properties.
+      * C &45255f17
+      Context: A contextual artefact.
+      * S &137c4f60
+      Strategy: A reason for claim decomposition.
+      ** G &35938c38
+      SubGoal
+      ** E &654abc0c
+      Evidence:  A piece of materials to support that the linked claim.
+      ** C &6072c487
+      Rebuttal
+      ** G &152377e9
+      Undeveloped
+    script(type='text/javascript', src='index.js')

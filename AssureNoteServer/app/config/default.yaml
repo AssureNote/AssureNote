@@ -1,0 +1,20 @@
+cookie:
+  secret: 'REPLACE SECRET IN LOCAL.YAML'
+mysql:
+  host: 'localhost'
+  user: 'root'
+  password: ''
+  database: 'ads'
+passport:
+  resolveURL: ''
+  FACEBOOK_APP_ID: ''
+  FACEBOOK_APP_SECRET: ''
+  TWITTER_CONSUMER_KEY: ''
+  TWITTER_CONSUMER_SECRET: ''
+  GITHUB_CLIENT_ID: ''
+  GITHUB_CLIENT_SECRET: ''
+translator:
+  CLIENT_ID: ''
+  CLIENT_SECRET: ''
+debug_user:
+  loginName: 'tsunade'
