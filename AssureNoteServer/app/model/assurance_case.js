@@ -8,6 +8,7 @@ var model = require('./model');
 
 var error = require('../api/error');
 
+
 //var async         = require('async'); //TODO no longer needed?
 var _ = require('underscore');
 var crypto = require('crypto');
@@ -67,11 +68,13 @@ var AssuranceCaseDAO = (function (_super) {
         }
         var hashKey = exports.getMd5String();
 
-        async.waterfall([function (next) {
+        async.waterfall([
+            function (next) {
                 _this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)', [hashKey, data, meta_data, userKey], function (err, result) {
                     return next(err, result);
                 });
-            }], function (err, result) {
+            }
+        ], function (err, result) {
             if (err) {
                 callback(err, null);
                 return;
@@ -82,3 +85,4 @@ var AssuranceCaseDAO = (function (_super) {
     return AssuranceCaseDAO;
 })(model.DAO);
 exports.AssuranceCaseDAO = AssuranceCaseDAO;
+

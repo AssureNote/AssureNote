@@ -6,3 +6,4 @@ exports.config = function (req, res) {
     res.set('Content-type', 'text/javascript');
     res.render('javascript/config', params);
 };
+

@@ -127,3 +127,4 @@ var UserDAO = (function (_super) {
     return UserDAO;
 })(model.DAO);
 exports.UserDAO = UserDAO;
+

@@ -102,6 +102,10 @@ app.get('/auth/github/callback',
   passport.login
 );
 
+app.get('/logout',
+  passport.logout
+);
+
 if (!module.parent) {
 	http.createServer(app).listen(app.get('port'), function(){
 	  console.log('Express server listening on port ' + app.get('port'));

@@ -90,8 +90,11 @@ app.get('/auth/github', passport.passport.authenticate('github'), function (req,
 
 app.get('/auth/github/callback', passport.passport.authenticate('github', { failureRedirect: '/' }), passport.login);
 
+app.get('/logout', passport.logout);
+
 if (!module.parent) {
     http.createServer(app).listen(app.get('port'), function () {
         console.log('Express server listening on port ' + app.get('port'));
     });
 }
+
