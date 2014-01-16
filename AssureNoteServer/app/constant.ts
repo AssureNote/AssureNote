@@ -1,4 +1,4 @@
-export var SYSTEM_USER_ID = 1;
+export var SYSTEM_USER_ID = "guest";
 export var SYSTEM_PROJECT_ID = 1;
 export var UPLOAD_DIR = 'upload';
 export var basepath  = "";

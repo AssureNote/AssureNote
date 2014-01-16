@@ -250,6 +250,13 @@ var AssureNote;
             this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
         };
 
+        ViewportManager.prototype.MoveCamera = function (GX, GY, Scale) {
+            this.Scale += Scale;
+            this.OffsetPageX -= GX * this.Scale;
+            this.OffsetPageY -= GY * this.Scale;
+            this.UpdateAttr();
+        };
+
         ViewportManager.prototype.GetCameraPageCenterX = function () {
             return this.CameraCenterPageX;
         };
@@ -295,10 +302,6 @@ var AssureNote;
             return this.PageHeight;
         };
 
-        ViewportManager.prototype.GetPageRect = function () {
-            return new AssureNote.Rect(0, 0, this.GetPageWidth(), this.GetPageHeight());
-        };
-
         ViewportManager.prototype.GetPageCenterX = function () {
             return this.GetPageWidth() * 0.5;
         };
@@ -337,15 +340,12 @@ var AssureNote;
             var update = function () {
                 var currentTime = performance.now();
                 var deltaT = currentTime - lastTime;
-                var currentX = _this.GetCameraGX();
-                var currentY = _this.GetCameraGY();
-                var currentS = _this.GetCameraScale();
                 if (currentTime - startTime < duration) {
                     _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
                     deltaT = duration - (lastTime - startTime);
                 }
-                _this.SetCamera(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+                _this.MoveCamera(VX * deltaT, VY * deltaT, VS * deltaT);
                 lastTime = currentTime;
             };
             update();

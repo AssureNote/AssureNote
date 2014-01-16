@@ -35,7 +35,7 @@ var AssureNote;
         function PictgramPanel(AssureNoteApp) {
             var _this = this;
             this.AssureNoteApp = AssureNoteApp;
-            this.SVGLayer = (document.getElementById("svg-layer"));
+            this.SVGLayer = document.getElementById("svg-layer");
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
             this.ControlLayer = (document.getElementById("control-layer"));
@@ -54,6 +54,7 @@ var AssureNote;
 
             //FIXME
             this.EventMapLayer.addEventListener("pointerdown", function (event) {
+                //this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -152,7 +153,7 @@ var AssureNote;
                 if (_this.AssureNoteApp.PluginPanel.IsVisible) {
                     event.stopPropagation();
                     event.preventDefault();
-                    _this.AssureNoteApp.LoadFiles(((event.originalEvent).dataTransfer).files);
+                    _this.AssureNoteApp.LoadFiles(event.originalEvent.dataTransfer.files);
                 }
             });
 
@@ -175,14 +176,14 @@ var AssureNote;
             };
             this.Viewport.ScrollManager.OnStartDrag = function (Viewport) {
                 $("#auto-expand-area").show(100);
-                ($(".dropdown.open > .dropdown-toggle")).dropdown("toggle");
+                $(".dropdown.open > .dropdown-toggle").dropdown("toggle");
             };
             this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
                 $("#auto-expand-area").hide(100);
             };
 
             $("#top-menu").click(function (event) {
-                var target = (event.target) || (event.srcElement);
+                var target = event.target || event.srcElement;
                 var id = target.id;
                 if (id == "" || id == null) {
                     return;
@@ -190,14 +191,14 @@ var AssureNote;
                 _this.AssureNoteApp.ExecTopMenu(id);
             });
 
-            ($(".dropdown-toggle")).dropdown();
+            $(".dropdown-toggle").dropdown();
         }
         PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
             var _this = this;
             NodeView.ForEachVisibleChildren(function (SubNode) {
                 _this.SetFoldedAllGoalNode(SubNode);
-                if (SubNode.GetNodeType() == AssureNote.GSNType.Goal && SubNode.Children != null) {
-                    if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != AssureNote.GSNType.Evidence) {
+                if (SubNode.GetNodeType() == 0 /* Goal */ && SubNode.Children != null) {
+                    if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != 3 /* Evidence */) {
                         SubNode.IsFolded = true;
                     }
                 }
@@ -214,22 +215,6 @@ var AssureNote;
             this.AssureNoteApp.PluginPanel.Clear();
         };
 
-        PictgramPanel.prototype.AppendCSSAnimationDefinition = function (Definitions) {
-            var Id = "GSNNodeAnimationDefinition";
-            if (PictgramPanel.GSNNodeAnimationDefinitionMaster == null) {
-                PictgramPanel.GSNNodeAnimationDefinitionMaster = document.createElement("style");
-                PictgramPanel.GSNNodeAnimationDefinitionMaster.id = Id;
-                PictgramPanel.GSNNodeAnimationDefinitionMaster.type = "text/css";
-            }
-            var StyleElement = PictgramPanel.GSNNodeAnimationDefinitionMaster.cloneNode();
-            StyleElement.innerHTML = Definitions.join("\n");
-            var OldDefinition = document.getElementById(Id);
-            if (OldDefinition) {
-                OldDefinition.parentElement.removeChild(OldDefinition);
-            }
-            document.head.appendChild(StyleElement);
-        };
-
         PictgramPanel.prototype.Draw = function (Label, Duration) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
@@ -242,10 +227,7 @@ var AssureNote;
             this.SVGLayer.style.display = "none";
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
 
-            var CSSAnimationBuffer = [];
-            TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
-            this.AppendCSSAnimationDefinition(CSSAnimationBuffer);
-
+            TargetView.UpdateDocumentPosition(Duration);
             TargetView.ClearAnimationCache();
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);

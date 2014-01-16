@@ -21,6 +21,10 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+///<reference path='Socket.ts'/>
+///<reference path='Command.ts'/>
+///<reference path='DCaseModelXMLParser.ts'/>
+
 var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
@@ -117,7 +121,7 @@ var AssureNote;
                     }
                     break;
                 case "about-menu":
-                    ($('#about-modal')).modal();
+                    $('#about-modal').modal();
                     break;
             }
             if (Command != null) {
@@ -136,11 +140,18 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.LoadDefaultWGSN = function () {
-            var lang = navigator.browserLanguage || navigator.language || navigator.userLanguage;
-            if (!lang || lang == "ja") {
-                this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+            var _this = this;
+            if (window.location.pathname.match("/file/") != null) {
+                AssureNote.AssureNoteUtils.postJsonRPC("download", { fileId: window.location.pathname.replace(/\/.*\//, "") }, function (result) {
+                    _this.LoadNewWGSN("hello.wgsn", result.content);
+                });
             } else {
-                this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+                var lang = navigator.browserLanguage || navigator.language || navigator.userLanguage;
+                if (!lang || lang == "ja") {
+                    this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+                } else {
+                    this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+                }
             }
         };
 
@@ -182,11 +193,11 @@ var AssureNote;
             if (Files[0]) {
                 var reader = new FileReader();
                 reader.onerror = function (event) {
-                    console.log('error', (event.target).error.code);
+                    console.log('error', event.target.error.code);
                 };
 
                 reader.onload = function (event) {
-                    var Contents = (event.target).result;
+                    var Contents = event.target.result;
                     var Name = Files[0].name;
                     _this.LoadNewWGSN(Name, Contents);
 

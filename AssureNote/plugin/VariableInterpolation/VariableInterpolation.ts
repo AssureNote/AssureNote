@@ -43,7 +43,8 @@ module AssureNote {
 
         Supplant(str: string, LabelMap: any, TagMap: any) {
             return str.replace(/\[([^\[\]]*)\]/g,
-                (v: string, b: string) => {
+                ((v: string, ...params: string[]) => {
+                    var b = params[0];
                     var value = TagMap[b];
                     if ((typeof value === 'string' && value != '') || typeof value === 'number') {
                         return this.Style(value, 'node-variable');
@@ -53,7 +54,7 @@ module AssureNote {
                         return this.Style(value, 'node-variable');
                     }
                     return this.Style(v, 'node-variable-undefined');
-                }
+                })
             );
         }
 

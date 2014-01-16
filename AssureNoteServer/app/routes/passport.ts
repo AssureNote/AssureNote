@@ -1,6 +1,9 @@
 ///<reference path='../DefinitelyTyped/node/node.d.ts'/>
 ///<reference path='../DefinitelyTyped/express/express.d.ts'/>
 
+var db = require('../db/db');
+import model_user           = require('../model/user');
+
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
@@ -26,37 +29,37 @@ export var login = function(req: any, res: any) {
     var user: any = req.user;
     var UserId = GetUserId(user);
     var UserName = GetUserName(user);
-    if (!UserId || UserName) {
-        console.log('Auth failed');
-        res.redirect(CONFIG.ads.basePath+'/');
-    }
+    //if (!UserId || UserName) {
+    //    console.log('Auth failed');
+    //    res.redirect(CONFIG.assurenote.basepath+'/');
+    //}
 
     /* TODO Write some code for login */
     /* At this time, we just use UserName and UserId for identification. */
     /* Possively it's not enough. */
-    console.log('Login. UserId: ' + UserId + ', UserName: ' + UserName);
-	var auth = new util_auth.Auth(req, res);
-	auth.set(UserId, UserName);
-	res.redirect(CONFIG.ads.basePath+'/');
-
-	//var con = new db.Database();
-	//var userDAO = new model_user.UserDAO(con);
-	//userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
-	//	if (err) {
-	//		// TODO: display error information
-	//		console.error(err);
-	//		res.redirect(CONFIG.ads.basePath+'/');
-	//		// res.redirect('/');
-	//		return;
-	//	}
-	//});
+    //console.log('Login. UserId: ' + UserId + ', UserName: ' + UserName);
+    var con = new db.Database();
+    var userDAO = new model_user.UserDAO(con);
+    console.log(UserId);
+    userDAO.login(UserId, UserName, UserId, (err:any, result: model_user.User) => {
+        console.log(err);
+        if (err) {
+            // TODO: display error information
+            console.error(err);
+            res.redirect(CONFIG.assurenote.basepath+'/');
+            return;
+        }
+        var auth = new util_auth.Auth(req, res);
+        auth.set(UserId, UserName);
+        res.redirect(CONFIG.assurenote.basepath+'/');
+    });
 }
 
 export var logout = function(req: any, res: any) {
-	var auth = new util_auth.Auth(req, res);
-	auth.clear();
-	req.logout();
-	res.redirect(CONFIG.ads.basePath+'/');
+    var auth = new util_auth.Auth(req, res);
+    auth.clear();
+    req.logout();
+    res.redirect(CONFIG.assurenote.basepath+'/');
 };
 
 (() => {

@@ -50,7 +50,7 @@ var AssureNote;
             };
             var App = this.AssureNoteApp;
 
-            (this.TextArea).setValue(WGSN);
+            this.TextArea.setValue(WGSN);
             this.Element.off("blur");
             this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", function (e) {
@@ -71,7 +71,7 @@ var AssureNote;
         };
         EditorUtil.prototype.DisableEditor = function (OldNodeView) {
             var _this = this;
-            var WGSN = (this.TextArea).getValue();
+            var WGSN = this.TextArea.getValue();
             this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
             var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode = Node.ReplaceSubNodeAsText(WGSN);
@@ -80,6 +80,10 @@ var AssureNote;
             if (NewNode) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();
                 var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
+                if (TopGoal.ParentNode == null) {
+                    /* TODO Need to remove this code */
+                    TopGoal.ParentNode = new AssureNote.GSNNode(null, null, 0 /* Goal */, null, -1, null);
+                }
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);

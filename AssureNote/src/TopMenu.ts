@@ -1,3 +1,5 @@
+
+
 module AssureNote {
     class TopMenuItem {
         constructor() { }

@@ -327,4 +327,18 @@ public class TestAssureNoteParser {
 		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
 		assertEquals(LatestDoc.GetNodeCount(), 4);
 	}
+	
+	@Test
+	public void LastModified() {
+		String input = "#0::2014-01-16T18:36:03+0900;unknown;converter;-\n#1::2014-01-16T18:37:47+0900;shidasan;todo;test\nRevision:: 0\n* G &2422f9c3 #0:0\nゴール: ある性質が成り立つという主張\n\n* C &45255f17 #0:0\n前提: 主張が成り立つ状況\n\n* E &654abc0c #0:0\n証拠: サブゴールの成立を支持する事実\n\n*=====\nRevision:: 1\n* G &2422f9c3 #0:0\nゴール: ある性質が成り立つという主張\n\n* C &45255f17 #0:1\n前提: 主張が成り立つ状況\n更新\n\n* E &654abc0c #0:1\n証拠: サブゴールの成立を支持する事実\n更新\n";
+		
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		assertEquals(LatestDoc.TopNode.LastModified.Author, "unknown");
+		assertEquals(LatestDoc.TopNode.Created.Author, "unknown");
+		assertEquals(LatestDoc.TopNode.SubNodeList.get(0).LastModified.Author, "shidasan");
+		assertEquals(LatestDoc.TopNode.SubNodeList.get(0).Created.Author, "unknown");
+	}
 }

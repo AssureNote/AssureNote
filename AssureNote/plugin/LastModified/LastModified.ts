@@ -37,7 +37,14 @@ module AssureNote {
                 var iconspan: HTMLSpanElement = document.createElement('span');
                 iconspan.className = 'glyphicon glyphicon-user';
                 var span: HTMLSpanElement = document.createElement('span');
-                span.className = (Model.IsEvidence) ? 'node-author-evidence' : 'node-author'; // Due to Evidence's shape is ellipse.
+
+                /* Due to Evidence and Strategy's shape. */
+                span.className = 'node-author';
+                if (Model.IsEvidence()) {
+                    span.className = span.className + ' node-author-evidence';
+                } else if (Model.IsStrategy()) {
+                    span.className = span.className + ' node-author-strategy';
+                }
                 span.textContent = Author;
                 span.innerHTML = iconspan.outerHTML + span.textContent;
                 return NodeDoc + span.outerHTML;

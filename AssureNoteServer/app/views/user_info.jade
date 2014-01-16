@@ -1,13 +1,14 @@
 #user-info
   .glyphicon.glyphicon-user
   | &nbsp; #{UserName} 
-  //a(href='#{basepath}/case/${caseId}/history/${revisionId}') #{Message} 
-  //.span
-    //small ${count} nodes
-  //p.list-group-item-text
-      //small
-      //    |${userName} commited
-      //    abbr(title="${dateTimeString}") ${dateTime}
+  if(UserName != "Guest")
+    a.btn(href='#{basepath}/logout') 
+      button.btn-large
+        span.glyphicon.glyphicon-log-out LogOut
+  else
+    a.btn(href='#{basepath}/auth/github') 
+      button.btn-large
+        span.glyphicon.glyphicon-log-out LogIn
   //.list-group-item-heading
     a(href='#{basepath}/case/${caseId}/${prevRevision}')
       span.glyphicon.glyphicon-circle-arrow-left

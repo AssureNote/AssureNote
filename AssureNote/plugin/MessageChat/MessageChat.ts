@@ -40,7 +40,7 @@ module AssureNote {
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (this.App.SocketManager.IsConnected()) {
                 this.App.SocketManager.Emit('message', Params.join(' '));
-                $.notify(Params.join(' '), 'info');
+                (<any>$).notify(Params.join(' '), 'info');
             }
         }
     }
@@ -72,7 +72,7 @@ module AssureNote {
             super();
             this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {
                     console.log(data);
-                $.notify(data);
+                (<any>$).notify(data);
             });
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }

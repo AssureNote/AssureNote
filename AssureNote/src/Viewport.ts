@@ -198,7 +198,7 @@ module AssureNote {
 			this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
 			//this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
-            $(this.EventMapLayer.parentElement).on('mousewheel', (e) => { this.ScrollManager.OnMouseWheel(e, this); });
+            $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { this.ScrollManager.OnMouseWheel(e, this); });
         }
 
         GetCameraScale(): number {
@@ -243,6 +243,13 @@ module AssureNote {
         SetCamera(GX: number, GY: number, Scale: number): void {
             this.Scale = Scale;
             this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
+        }
+
+        private MoveCamera(GX: number, GY: number, Scale: number): void {
+            this.Scale += Scale;
+            this.OffsetPageX -= GX * this.Scale;
+            this.OffsetPageY -= GY * this.Scale;
+            this.UpdateAttr();
         }
 
         GetCameraPageCenterX(): number {
@@ -290,10 +297,6 @@ module AssureNote {
             return this.PageHeight;
         }
 
-        private GetPageRect(): Rect {
-            return new Rect(0, 0, this.GetPageWidth(), this.GetPageHeight());
-        }
-
 		GetPageCenterX(): number {
 			return this.GetPageWidth() * 0.5;
 		}
@@ -333,15 +336,12 @@ module AssureNote {
             var update: any = () => {
                 var currentTime: number = performance.now();
                 var deltaT = currentTime - lastTime;
-                var currentX = this.GetCameraGX();
-                var currentY = this.GetCameraGY();
-                var currentS = this.GetCameraScale();
                 if (currentTime - startTime < duration) {
                     this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
                     deltaT = duration - (lastTime - startTime);
                 }
-                this.SetCamera(currentX + VX * deltaT, currentY + VY * deltaT, currentS + VS * deltaT);
+                this.MoveCamera(VX * deltaT, VY * deltaT, VS * deltaT);
                 lastTime = currentTime;
             }
             update();

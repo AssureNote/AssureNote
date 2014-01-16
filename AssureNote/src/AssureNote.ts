@@ -62,7 +62,7 @@ module AssureNote {
             this.RegistCommand(new UploadCommand(this));
 
             this.PluginManager.LoadPlugin();
-            this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
+            this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
 		}
 
         public RegistCommand(Command: Command) {
@@ -155,11 +155,17 @@ module AssureNote {
         }
 
         LoadDefaultWGSN(): void {
-            var lang: string = navigator.browserLanguage || navigator.language || navigator.userLanguage;
-            if (!lang || lang == "ja") {
-                this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+            if(window.location.pathname.match("/file/") != null) {
+                AssureNoteUtils.postJsonRPC("download", {fileId: window.location.pathname.replace(/\/.*\//,"")}, (result: any) => {
+                    this.LoadNewWGSN("hello.wgsn", result.content);
+                });
             } else {
-                this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+                var lang: string = navigator.browserLanguage || navigator.language || navigator.userLanguage;
+                if (!lang || lang == "ja") {
+                    this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+                } else {
+                    this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+                }
             }
         }
 

@@ -2,16 +2,16 @@ cookie:
   secret: 'REPLACE SECRET IN LOCAL.YAML'
 mysql:
   host: 'localhost'
-  user: 'root'
-  password: ''
-  database: 'ads'
+  user: 'assure'
+  password: 'assure_test'
+  database: 'assurenote'
 translator:
   CLIENT_ID: ''
   CLIENT_SECRET: ''
 debug_user:
   loginName: 'tsunade'
-ads:
-    basePath: ""
+assurenote:
+    basepath: ''
 passport:
     resolveURL: 'localhost:3000'
     FACEBOOK_APP_ID: ''

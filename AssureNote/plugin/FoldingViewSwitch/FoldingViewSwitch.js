@@ -56,7 +56,7 @@ var AssureNote;
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
                 var TargetType = TargetView.GetNodeType();
-                if (TargetType != AssureNote.GSNType.Goal && TargetType != AssureNote.GSNType.Strategy) {
+                if (TargetType != 0 /* Goal */ && TargetType != 2 /* Strategy */) {
                     this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
                     return;
                 }
@@ -72,17 +72,18 @@ var AssureNote;
     var FoldingViewSwitchPlugin = (function (_super) {
         __extends(FoldingViewSwitchPlugin, _super);
         function FoldingViewSwitchPlugin(AssureNoteApp) {
+            var _this = this;
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             this.SetMenuBarButton(true);
             this.SetDoubleClicked(true);
 
             this.FoldingAction = function (event, TargetView) {
-                if (TargetView.GetNodeType() == AssureNote.GSNType.Strategy) {
+                if (TargetView.GetNodeType() == 2 /* Strategy */) {
                     if (TargetView.Children != null) {
                         for (var i = 0; i < TargetView.Children.length; i++) {
                             var SubView = TargetView.Children[i];
-                            if (SubView.GetNodeType() == AssureNote.GSNType.Goal) {
+                            if (SubView.GetNodeType() == 0 /* Goal */) {
                                 SubView.IsFolded = true;
                             }
                         }
@@ -96,7 +97,7 @@ var AssureNote;
                 }
                 var X0 = TargetView.GetGX();
                 var Y0 = TargetView.GetGY();
-                AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, 300);
+                AssureNoteApp.PictgramPanel.Draw(_this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
                 var X1 = TargetView.GetGX();
                 var Y1 = TargetView.GetGY();
                 var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
@@ -111,7 +112,7 @@ var AssureNote;
         };
 
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            if (NodeView.GetNodeType() != AssureNote.GSNType.Goal && NodeView.GetNodeType() != AssureNote.GSNType.Strategy) {
+            if (NodeView.GetNodeType() != 0 /* Goal */ && NodeView.GetNodeType() != 2 /* Strategy */) {
                 return null;
             }
 
