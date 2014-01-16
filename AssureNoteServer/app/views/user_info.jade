@@ -1,17 +1,17 @@
 #user-info
-  h4.list-group-item-heading
-    a(href='#{basepath}/case/${caseId}/history/${revisionId}') #{Message} 
-    small #{UserName} 
-    small ${count} nodes
-  p.list-group-item-text
+  .glyphicon.glyphicon-user
+  | &nbsp; #{UserName} 
+  //a(href='#{basepath}/case/${caseId}/history/${revisionId}') #{Message} 
+  //.span
+    //small ${count} nodes
+  //p.list-group-item-text
       //small
-      //    |${userName} commited 
+      //    |${userName} commited
       //    abbr(title="${dateTimeString}") ${dateTime}
-  h4.list-group-item-heading()
-    big
-      a(href='#{basepath}/case/${caseId}/${prevRevision}') 
-        span.glyphicon.glyphicon-circle-arrow-left
-      a(href='#{basepath}/case/${caseId}') 
-        span.glyphicon.glyphicon-ok-sign
-      a(href='#{basepath}/case/${caseId}/${nextRevision}') 
-        span.glyphicon.glyphicon-circle-arrow-right
+  //.list-group-item-heading
+    a(href='#{basepath}/case/${caseId}/${prevRevision}')
+      span.glyphicon.glyphicon-circle-arrow-left
+    a(href='#{basepath}/case/${caseId}') 
+      span.glyphicon.glyphicon-ok-sign
+    a(href='#{basepath}/case/${caseId}/${nextRevision}')
+      span.glyphicon.glyphicon-circle-arrow-right
