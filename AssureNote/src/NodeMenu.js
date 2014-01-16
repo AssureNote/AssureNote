@@ -72,7 +72,7 @@ var AssureNote;
                 _this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
             };
 
-            this.Menu.jqDock({
+            (this.Menu).jqDock({
                 align: 'bottom',
                 idle: 1500,
                 size: 45,

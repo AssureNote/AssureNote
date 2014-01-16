@@ -44,6 +44,10 @@ var AssureNote;
 
         Command.prototype.Invoke = function (CommandName, ForcusedView, Params) {
         };
+
+        Command.prototype.GetHelpHTML = function () {
+            return "<code>" + this.GetCommandLineNames().pop() + "</code>";
+        };
         return Command;
     })();
     AssureNote.Command = Command;
@@ -112,6 +116,10 @@ var AssureNote;
             AssureNote.AssureNoteUtils.SaveAs(StringToWrite, Filename);
         };
 
+        SaveCommand.prototype.GetHelpHTML = function () {
+            return "<code>save [name]</code><br>Save editing GSN.";
+        };
+
         SaveCommand.prototype.ConvertToDCaseXML = function (root) {
             var dcaseNS = "http://www.dependable-os.net/2013/11/dcase_model/";
             var xsiNS = "http://www.w3.org/2001/XMLSchema-instance";
@@ -126,13 +134,13 @@ var AssureNote;
 
             function NodeTypeToString(type) {
                 switch (type) {
-                    case 0 /* Goal */:
+                    case AssureNote.GSNType.Goal:
                         return "Goal";
-                    case 2 /* Strategy */:
+                    case AssureNote.GSNType.Strategy:
                         return "Strategy";
-                    case 3 /* Evidence */:
+                    case AssureNote.GSNType.Evidence:
                         return "Evidence";
-                    case 1 /* Context */:
+                    case AssureNote.GSNType.Context:
                         return "Context";
                     default:
                         return "";
@@ -145,7 +153,7 @@ var AssureNote;
 
                 var NodeXML = document.createElementNS(dcaseNS, "rootBasicNode");
                 NodeXML.setAttribute("xsi:type", "dcase:" + NodeTypeToString(node.NodeType));
-                NodeXML.setAttribute("id", UID); // label is also regarded as id in AssureNote
+                NodeXML.setAttribute("id", UID);
                 NodeXML.setAttribute("name", Label);
                 NodeXML.setAttribute("desc", node.NodeDoc.replace(/^\s*(.*?)\s*$/, "$1").replace(/\r/g, "&#xD;").replace(/\n/g, "&#xA;"));
 
@@ -155,7 +163,7 @@ var AssureNote;
                     var ParentUID = node.ParentNode.UID.toString();
                     var linkId = "LINK_" + ParentUID + "_" + UID;
                     var LinkXML = document.createElementNS(dcaseNS, "rootBasicLink");
-                    if (node.NodeType == 1 /* Context */) {
+                    if (node.NodeType == AssureNote.GSNType.Context) {
                         LinkXML.setAttribute("xsi:type", "dcase:InContextOf");
                     } else {
                         LinkXML.setAttribute("xsi:type", "dcase:SupportedBy");
@@ -203,6 +211,10 @@ var AssureNote;
         SaveSVGCommand.prototype.Invoke = function (CommandName, Target, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
+        };
+
+        SaveSVGCommand.prototype.GetHelpHTML = function () {
+            return "<code>save-as-svg [name]</code><br>Save editing GSN as SVG file.";
         };
 
         SaveSVGCommand.prototype.ConvertToSVG = function (TopView) {
@@ -385,7 +397,7 @@ var AssureNote;
             var _this = this;
             $("#file-open-dialog").change(function (e) {
                 var target = e.target || e.srcElement;
-                _this.App.LoadFiles(target.files);
+                _this.App.LoadFiles((target).files);
             });
             $("#file-open-dialog").click();
         };
@@ -408,7 +420,7 @@ var AssureNote;
 
         HelpCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
-            $("#help-modal").modal();
+            ($("#help-modal")).modal();
         };
         return HelpCommand;
     })(Command);

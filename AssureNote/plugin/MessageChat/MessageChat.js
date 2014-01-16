@@ -48,7 +48,7 @@ var AssureNote;
         MessageCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (this.App.SocketManager.IsConnected()) {
                 this.App.SocketManager.Emit('message', Params.join(' '));
-                $.notify(Params.join(' '), 'info');
+                ($).notify(Params.join(' '), 'info');
             }
         };
         return MessageCommand;
@@ -89,7 +89,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
             this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {
                 console.log(data);
-                $.notify(data);
+                ($).notify(data);
             });
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }

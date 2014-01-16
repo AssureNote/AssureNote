@@ -56,7 +56,7 @@ var AssureNote;
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
                 var TargetType = TargetView.GetNodeType();
-                if (TargetType != 0 /* Goal */ && TargetType != 2 /* Strategy */) {
+                if (TargetType != AssureNote.GSNType.Goal && TargetType != AssureNote.GSNType.Strategy) {
                     this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
                     return;
                 }
@@ -79,11 +79,11 @@ var AssureNote;
             this.SetDoubleClicked(true);
 
             this.FoldingAction = function (event, TargetView) {
-                if (TargetView.GetNodeType() == 2 /* Strategy */) {
+                if (TargetView.GetNodeType() == AssureNote.GSNType.Strategy) {
                     if (TargetView.Children != null) {
                         for (var i = 0; i < TargetView.Children.length; i++) {
                             var SubView = TargetView.Children[i];
-                            if (SubView.GetNodeType() == 0 /* Goal */) {
+                            if (SubView.GetNodeType() == AssureNote.GSNType.Goal) {
                                 SubView.IsFolded = true;
                             }
                         }
@@ -112,7 +112,7 @@ var AssureNote;
         };
 
         FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            if (NodeView.GetNodeType() != 0 /* Goal */ && NodeView.GetNodeType() != 2 /* Strategy */) {
+            if (NodeView.GetNodeType() != AssureNote.GSNType.Goal && NodeView.GetNodeType() != AssureNote.GSNType.Strategy) {
                 return null;
             }
 

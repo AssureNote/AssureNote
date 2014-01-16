@@ -56,7 +56,7 @@ var AssureNote;
             var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                if (TargetView.GetNodeType() == 2 /* Strategy */) {
+                if (TargetView.GetNodeType() == AssureNote.GSNType.Strategy) {
                     this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
                     return;
                 }
@@ -95,7 +95,7 @@ var AssureNote;
         }
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
-            if (NodeView.GetNodeType() == 2 /* Strategy */) {
+            if (NodeView.GetNodeType() == AssureNote.GSNType.Strategy) {
                 return null;
             }
             return new AssureNote.NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor", function (event, TargetView) {
@@ -122,7 +122,6 @@ var AssureNote;
                 for (var i in Keys) {
                     var View = this.AssureNoteApp.PictgramPanel.ViewMap[Keys[i]];
 
-                    /* Node exists and visible */
                     if (View && View.Model && AssureNote.Lib.DecToHex(View.Model.UID) == UID) {
                         console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
                         this.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(View.GetCenterGX(), View.GetCenterGY());

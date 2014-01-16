@@ -39,6 +39,10 @@ module AssureNote {
 
         public Invoke(CommandName: string, ForcusedView: NodeView, Params: any[]) {
         }
+
+        public GetHelpHTML(): string {
+            return "<code>" + this.GetCommandLineNames().pop() + "</code>";
+        }
     }
 
     export class CommandMissingCommand extends Command {
@@ -101,6 +105,10 @@ module AssureNote {
                     break;
             }
             AssureNote.AssureNoteUtils.SaveAs(StringToWrite, Filename);
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>save [name]</code><br>Save editing GSN."
         }
 
         ConvertToDCaseXML(root: GSNNode): string {
@@ -193,6 +201,10 @@ module AssureNote {
         public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
             var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>save-as-svg [name]</code><br>Save editing GSN as SVG file."
         }
 
         ConvertToSVG(TopView: NodeView): string {
