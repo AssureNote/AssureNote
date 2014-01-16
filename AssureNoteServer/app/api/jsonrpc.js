@@ -111,4 +111,3 @@ exports.add('ping', function (params, userId, callback) {
 exports.add('ping2', function (params, userId, callback) {
     callback.onSuccess(userId);
 });
-

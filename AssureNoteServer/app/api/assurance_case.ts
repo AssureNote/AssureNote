@@ -34,7 +34,7 @@ export function upload(params:any, userIdKey: string, callback: type.Callback) {
                 userDAO.select(userIdKey, (err:any, user: model_user.User) => next(err, user));
             },
             (user:model_user.User, next) => {
-                caseDAO.insert(user.key, params.content, params.meta_data, (err:any, resultCheck) => next(err, resultCheck));
+                caseDAO.insert(user.key, params.content, params.meta_data, (err:any, result) => next(err, result));
             },
             (commitResult, next) => {
                 con.commit((err, result) => next(err, commitResult));
@@ -46,7 +46,7 @@ export function upload(params:any, userIdKey: string, callback: type.Callback) {
                 callback.onFailure(err);
                 return;
             }
-            callback.onSuccess(result);
+            callback.onSuccess({fileId: result});
         }
     );
 }

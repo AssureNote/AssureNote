@@ -40,8 +40,8 @@ function upload(params, userIdKey, callback) {
             });
         },
         function (user, next) {
-            caseDAO.insert(user.key, params.content, params.meta_data, function (err, resultCheck) {
-                return next(err, resultCheck);
+            caseDAO.insert(user.key, params.content, params.meta_data, function (err, result) {
+                return next(err, result);
             });
         },
         function (commitResult, next) {
@@ -55,7 +55,7 @@ function upload(params, userIdKey, callback) {
             callback.onFailure(err);
             return;
         }
-        callback.onSuccess(result);
+        callback.onSuccess({ fileId: result });
     });
 }
 exports.upload = upload;
@@ -80,4 +80,3 @@ function download(params, userIdKey, callback) {
     //TODO
 }
 exports.download = download;
-

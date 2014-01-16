@@ -49,7 +49,6 @@ export class AssuranceCaseDAO extends model.DAO {
         this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)'
                 , [hashKey, data, meta_data, userKey],
                 (err, result) => {
-                    console.log(result);
                     if (err) {
                         callback(err, null);
                         return;

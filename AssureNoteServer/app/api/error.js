@@ -24,7 +24,7 @@ exports.RPCError = RPCError;
 var ParseError = (function (_super) {
     __extends(ParseError, _super);
     function ParseError(msg, data) {
-        _super.call(this, HTTP_STATUS.INTERNAL_SERVER_ERROR, RPC_ERROR.PARSE_ERROR, 'Parse error: ' + msg, data);
+        _super.call(this, 500 /* INTERNAL_SERVER_ERROR */, -32700 /* PARSE_ERROR */, 'Parse error: ' + msg, data);
     }
     return ParseError;
 })(RPCError);
@@ -33,7 +33,7 @@ exports.ParseError = ParseError;
 var InvalidRequestError = (function (_super) {
     __extends(InvalidRequestError, _super);
     function InvalidRequestError(msg, data) {
-        _super.call(this, HTTP_STATUS.BAD_REQUEST, -32600, 'Invalid Request: ' + msg, data);
+        _super.call(this, 400 /* BAD_REQUEST */, -32600, 'Invalid Request: ' + msg, data);
     }
     return InvalidRequestError;
 })(RPCError);
@@ -41,7 +41,7 @@ exports.InvalidRequestError = InvalidRequestError;
 var MethodNotFoundError = (function (_super) {
     __extends(MethodNotFoundError, _super);
     function MethodNotFoundError(msg, data) {
-        _super.call(this, HTTP_STATUS.NOT_FOUND, -32601, 'Method not found: ' + msg, data);
+        _super.call(this, 404 /* NOT_FOUND */, -32601, 'Method not found: ' + msg, data);
     }
     return MethodNotFoundError;
 })(RPCError);
@@ -52,7 +52,7 @@ var InvalidParamsError = (function (_super) {
         if (msg instanceof Array) {
             msg = msg.join('\n');
         }
-        _super.call(this, HTTP_STATUS.OK, -32602, 'Invalid method parameter is found: \n' + msg, data);
+        _super.call(this, 200 /* OK */, -32602, 'Invalid method parameter is found: \n' + msg, data);
     }
     return InvalidParamsError;
 })(RPCError);
@@ -60,7 +60,7 @@ exports.InvalidParamsError = InvalidParamsError;
 var InternalError = (function (_super) {
     __extends(InternalError, _super);
     function InternalError(msg, data) {
-        _super.call(this, HTTP_STATUS.INTERNAL_SERVER_ERROR, -32603, 'Internal error: ' + msg, data);
+        _super.call(this, 500 /* INTERNAL_SERVER_ERROR */, -32603, 'Internal error: ' + msg, data);
     }
     return InternalError;
 })(RPCError);
@@ -86,7 +86,7 @@ exports.ApplicationError = ApplicationError;
 var ForbiddenError = (function (_super) {
     __extends(ForbiddenError, _super);
     function ForbiddenError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.FORBIDDEN, msg, data);
+        _super.call(this, 200 /* OK */, 23001 /* FORBIDDEN */, msg, data);
     }
     return ForbiddenError;
 })(ApplicationError);
@@ -95,7 +95,7 @@ exports.ForbiddenError = ForbiddenError;
 var NotFoundError = (function (_super) {
     __extends(NotFoundError, _super);
     function NotFoundError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.DATA_NOT_FOUND, msg, data);
+        _super.call(this, 200 /* OK */, 24001 /* DATA_NOT_FOUND */, msg, data);
     }
     return NotFoundError;
 })(ApplicationError);
@@ -104,7 +104,7 @@ exports.NotFoundError = NotFoundError;
 var DuplicatedError = (function (_super) {
     __extends(DuplicatedError, _super);
     function DuplicatedError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.NOT_DEFINED, msg, data);
+        _super.call(this, 200 /* OK */, 19999 /* NOT_DEFINED */, msg, data);
     }
     return DuplicatedError;
 })(ApplicationError);
@@ -113,7 +113,7 @@ exports.DuplicatedError = DuplicatedError;
 var LoginError = (function (_super) {
     __extends(LoginError, _super);
     function LoginError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
+        _super.call(this, 200 /* OK */, 23000 /* AUTH_ERROR */, msg, data);
     }
     return LoginError;
 })(ApplicationError);
@@ -122,7 +122,7 @@ exports.LoginError = LoginError;
 var UnauthorizedError = (function (_super) {
     __extends(UnauthorizedError, _super);
     function UnauthorizedError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.AUTH_ERROR, msg, data);
+        _super.call(this, 200 /* OK */, 23000 /* AUTH_ERROR */, msg, data);
     }
     return UnauthorizedError;
 })(ApplicationError);
@@ -131,7 +131,7 @@ exports.UnauthorizedError = UnauthorizedError;
 var VersionConflictError = (function (_super) {
     __extends(VersionConflictError, _super);
     function VersionConflictError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.DATA_VERSION_CONFLICT, msg, data);
+        _super.call(this, 200 /* OK */, 24002 /* DATA_VERSION_CONFLICT */, msg, data);
     }
     return VersionConflictError;
 })(ApplicationError);
@@ -140,7 +140,7 @@ exports.VersionConflictError = VersionConflictError;
 var ExternalParameterError = (function (_super) {
     __extends(ExternalParameterError, _super);
     function ExternalParameterError(msg, data) {
-        _super.call(this, HTTP_STATUS.OK, RPC_ERROR.CONFIG_ERROR, msg, data);
+        _super.call(this, 200 /* OK */, 22000 /* CONFIG_ERROR */, msg, data);
     }
     return ExternalParameterError;
 })(ApplicationError);
@@ -171,4 +171,3 @@ var RPC_ERROR = exports.RPC_ERROR;
     HTTP_STATUS[HTTP_STATUS["INTERNAL_SERVER_ERROR"] = 500] = "INTERNAL_SERVER_ERROR";
 })(exports.HTTP_STATUS || (exports.HTTP_STATUS = {}));
 var HTTP_STATUS = exports.HTTP_STATUS;
-

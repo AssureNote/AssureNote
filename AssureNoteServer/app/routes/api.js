@@ -10,4 +10,3 @@ jsonrpc.addModule(assurance_case);
 jsonrpc.requireAuth(['upload']);
 
 exports.httpHandler = jsonrpc.httpHandler;
-
