@@ -155,11 +155,17 @@ module AssureNote {
         }
 
         LoadDefaultWGSN(): void {
-            var lang: string = navigator.browserLanguage || navigator.language || navigator.userLanguage;
-            if (!lang || lang == "ja") {
-                this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+            if(window.location.pathname.match("/file/") != null) {
+                AssureNoteUtils.postJsonRPC("download", {fileId: window.location.pathname.replace(/\/file\//,"")}, (result: any) => {
+                    this.LoadNewWGSN("hello.wgsn", result.content);
+                });
             } else {
-                this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+                var lang: string = navigator.browserLanguage || navigator.language || navigator.userLanguage;
+                if (!lang || lang == "ja") {
+                    this.LoadNewWGSN("hello.wgsn", $("#default-case-ja").text());
+                } else {
+                    this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
+                }
             }
         }
 
