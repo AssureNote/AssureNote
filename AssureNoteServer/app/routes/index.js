@@ -41,7 +41,6 @@ var index_DummyUser = function (req, res, params) {
 
 exports.index = function (req, res) {
     var params = getBasicParam(req, res);
-    console.log(req.params);
     if (process.argv.length > 2 && process.argv[2] == '--debug') {
         index_DummyUser(req, res, params);
     } else {

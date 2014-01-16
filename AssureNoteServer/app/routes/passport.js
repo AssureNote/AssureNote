@@ -27,7 +27,7 @@ exports.login = function (req, res) {
     var UserName = GetUserName(user);
     if (!UserId || UserName) {
         console.log('Auth failed');
-        res.redirect(CONFIG.ads.basePath + '/');
+        res.redirect(CONFIG.assurenote.basepath + '/');
     }
 
     /* TODO Write some code for login */
@@ -36,14 +36,14 @@ exports.login = function (req, res) {
     console.log('Login. UserId: ' + UserId + ', UserName: ' + UserName);
     var auth = new util_auth.Auth(req, res);
     auth.set(UserId, UserName);
-    res.redirect(CONFIG.ads.basePath + '/');
+    res.redirect(CONFIG.assurenote.basepath + '/');
     //var con = new db.Database();
     //var userDAO = new model_user.UserDAO(con);
     //userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
     //	if (err) {
     //		// TODO: display error information
     //		console.error(err);
-    //		res.redirect(CONFIG.ads.basePath+'/');
+    //		res.redirect(CONFIG.assurenote.basepath+'/');
     //		// res.redirect('/');
     //		return;
     //	}
@@ -54,7 +54,7 @@ exports.logout = function (req, res) {
     var auth = new util_auth.Auth(req, res);
     auth.clear();
     req.logout();
-    res.redirect(CONFIG.ads.basePath + '/');
+    res.redirect(CONFIG.assurenote.basepath + '/');
 };
 
 (function () {
