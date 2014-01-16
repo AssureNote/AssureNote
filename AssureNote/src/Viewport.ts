@@ -71,14 +71,6 @@ module AssureNote {
             }
 		}
 
-		private CalcOffsetDX(): number {
-            return this.Dx;
-		}
-
-		private CalcOffsetDY(): number {
-            return this.Dy;
-		}
-
 		private GetMainPointer(): Pointer {
 			for (var i = 0; i < this.Pointers.length; ++i) {
 				if (this.Pointers[i].identifier === this.MainPointerID) {
@@ -131,7 +123,7 @@ module AssureNote {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.AddOffset(this.CalcOffsetDX(), this.CalcOffsetDY());
+                        Screen.AddOffset(this.Dx, this.Dy);
                     } else {
                         this.EndDrag();
                     }
@@ -150,7 +142,7 @@ module AssureNote {
 						this.CurrentY += this.Dy;
 						this.Dx *= 0.95;
 						this.Dy *= 0.95;
-                        Screen.AddOffset(this.CalcOffsetDX(), this.CalcOffsetDY());
+                        Screen.AddOffset(this.Dx, this.Dy);
 					}, 16);
 				}
                 this.EndDrag();

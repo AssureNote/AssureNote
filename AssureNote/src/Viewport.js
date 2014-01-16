@@ -66,14 +66,6 @@ var AssureNote;
             }
         };
 
-        ScrollManager.prototype.CalcOffsetDX = function () {
-            return this.Dx;
-        };
-
-        ScrollManager.prototype.CalcOffsetDY = function () {
-            return this.Dy;
-        };
-
         ScrollManager.prototype.GetMainPointer = function () {
             for (var i = 0; i < this.Pointers.length; ++i) {
                 if (this.Pointers[i].identifier === this.MainPointerID) {
@@ -124,7 +116,7 @@ var AssureNote;
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.AddOffset(this.CalcOffsetDX(), this.CalcOffsetDY());
+                        Screen.AddOffset(this.Dx, this.Dy);
                     } else {
                         this.EndDrag();
                     }
@@ -143,7 +135,7 @@ var AssureNote;
                         _this.CurrentY += _this.Dy;
                         _this.Dx *= 0.95;
                         _this.Dy *= 0.95;
-                        Screen.AddOffset(_this.CalcOffsetDX(), _this.CalcOffsetDY());
+                        Screen.AddOffset(_this.Dx, _this.Dy);
                     }, 16);
                 }
                 this.EndDrag();
@@ -228,14 +220,6 @@ var AssureNote;
             this.OffsetPageY = scaleChange * (this.OffsetPageY - cy) + cy;
             this.Scale = scale;
             this.UpdateAttr();
-        };
-
-        ViewportManager.prototype.GetOffsetPageX = function () {
-            return this.OffsetPageX;
-        };
-
-        ViewportManager.prototype.GetOffsetPageY = function () {
-            return this.OffsetPageY;
         };
 
         ViewportManager.prototype.SetOffset = function (PageX, PageY) {
