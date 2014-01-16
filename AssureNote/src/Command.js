@@ -428,7 +428,9 @@ var AssureNote;
         };
 
         UploadCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
-            AssureNote.AssureNoteUtils.postJsonRPC("upload", {}, function (result) {
+            var Writer = new AssureNote.StringWriter();
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {
                 console.log(result);
                 //TODO
             });

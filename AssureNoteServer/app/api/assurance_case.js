@@ -13,7 +13,7 @@ function upload(params, userIdKey, callback) {
         var checks = [];
         if (!params)
             checks.push('Parameter is required.');
-        if (params && !params.contents)
+        if (params && !params.content)
             checks.push('Contents is required.');
         if (checks.length > 0) {
             callback.onFailure(new error.InvalidParamsError(checks, null));
@@ -35,12 +35,13 @@ function upload(params, userIdKey, callback) {
             });
         },
         function (next) {
+            console.log(userIdKey);
             userDAO.select(userIdKey, function (err, user) {
                 return next(err, user);
             });
         },
         function (user, next) {
-            caseDAO.insert(user.key, params.contents, params.meta_data, function (err, resultCheck) {
+            caseDAO.insert(user.key, params.content, params.meta_data, function (err, resultCheck) {
                 return next(err, resultCheck);
             });
         },
@@ -60,7 +61,7 @@ function upload(params, userIdKey, callback) {
 }
 exports.upload = upload;
 
-function download(params, userId, callback) {
+function download(params, userIdKey, callback) {
     function validate(params) {
         var checks = [];
         if (!params)

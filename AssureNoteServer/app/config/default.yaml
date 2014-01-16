@@ -2,9 +2,9 @@ cookie:
   secret: 'REPLACE SECRET IN LOCAL.YAML'
 mysql:
   host: 'localhost'
-  user: 'root'
-  password: ''
-  database: 'ads'
+  user: 'assure'
+  password: 'assure_test'
+  database: 'assurenote'
 translator:
   CLIENT_ID: ''
   CLIENT_SECRET: ''
