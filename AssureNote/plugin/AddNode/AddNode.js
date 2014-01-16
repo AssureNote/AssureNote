@@ -43,15 +43,20 @@ var AssureNote;
             var _this = this;
             return function (event, TargetView) {
                 _this.AssureNoteApp.MasterRecord.OpenEditor(_this.AssureNoteApp.GetUserName(), "todo", null, "test");
-                var Node = _this.AssureNoteApp.MasterRecord.GetLatestDoc().GetNode(TargetView.Model.UID);
+                var Node = _this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
                 new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
-                var Doc = _this.AssureNoteApp.MasterRecord.GetLatestDoc();
+                var Doc = _this.AssureNoteApp.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 var TopGoal = Doc.TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+
+                /* TODO Need to remove this code */
+                TopGoal.ParentNode = new AssureNote.GSNNode(null, null, 0 /* Goal */, null, -1, null);
+
                 NewNodeView.SaveFoldedFlag(_this.AssureNoteApp.PictgramPanel.ViewMap);
                 _this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
                 _this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+                _this.AssureNoteApp.MasterRecord.CloseEditor();
             };
         };
 

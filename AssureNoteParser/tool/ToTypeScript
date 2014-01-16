@@ -31,7 +31,7 @@ if [ $# -ne 0 ]; then
 fi
 echo "}" >> ${build}${target}.ts
 
-tsc ${build}${target}.ts --module commonjs
+tsc ${build}${target}.ts --sourcemap --module commonjs
 cp ${build}${target}.ts ${clientdir}
 cp ${build}${target}.js ${clientdir}
 

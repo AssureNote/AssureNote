@@ -37,15 +37,20 @@ module AssureNote {
         CreateCallback(Type: GSNType): (Event, NodeView) => void {
             return (event: Event, TargetView: NodeView) => {
                 this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
-                var Node = this.AssureNoteApp.MasterRecord.GetLatestDoc().GetNode(TargetView.Model.UID);
+                var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
                 new GSNNode(Node.BaseDoc, Node, Type, null, AssureNoteUtils.GenerateUID(), null);
-                var Doc = this.AssureNoteApp.MasterRecord.GetLatestDoc();
+                var Doc = this.AssureNoteApp.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 var TopGoal = Doc.TopNode;
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
+
+                /* TODO Need to remove this code */
+                TopGoal.ParentNode = new GSNNode(null, null, GSNType.Goal, null, -1, null);
+
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
                 this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+                this.AssureNoteApp.MasterRecord.CloseEditor();
             };
         }
 
