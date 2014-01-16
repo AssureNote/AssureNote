@@ -21,10 +21,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
-document.createSVGElement = function (name) {
-    return document.createElementNS('http://www.w3.org/2000/svg', name);
-};
-
+///<reference path="../d.ts/jquery.d.ts" />
+///<reference path="../d.ts/pointer.d.ts" />
 /* VIEW (MVC) */
 var AssureNote;
 (function (AssureNote) {
@@ -66,14 +64,6 @@ var AssureNote;
             if (this.OnDragged) {
                 this.OnDragged(this.Viewport);
             }
-        };
-
-        ScrollManager.prototype.CalcOffsetDX = function () {
-            return this.Dx;
-        };
-
-        ScrollManager.prototype.CalcOffsetDY = function () {
-            return this.Dy;
         };
 
         ScrollManager.prototype.GetMainPointer = function () {
@@ -126,7 +116,7 @@ var AssureNote;
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(Screen.GetOffsetPageX() + this.CalcOffsetDX(), Screen.GetOffsetPageY() + this.CalcOffsetDY());
+                        Screen.AddOffset(this.Dx, this.Dy);
                     } else {
                         this.EndDrag();
                     }
@@ -145,7 +135,7 @@ var AssureNote;
                         _this.CurrentY += _this.Dy;
                         _this.Dx *= 0.95;
                         _this.Dy *= 0.95;
-                        Screen.SetOffset(Screen.GetOffsetPageX() + _this.CalcOffsetDX(), Screen.GetOffsetPageY() + _this.CalcOffsetDY());
+                        Screen.AddOffset(_this.Dx, _this.Dy);
                     }, 16);
                 }
                 this.EndDrag();
@@ -183,7 +173,6 @@ var AssureNote;
             this.IsEventMapUpper = false;
             window.addEventListener("resize", function (e) {
                 _this.UpdatePageRect();
-                console.log("resized!");
             });
             this.UpdatePageRect();
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
@@ -232,17 +221,15 @@ var AssureNote;
             this.UpdateAttr();
         };
 
-        ViewportManager.prototype.GetOffsetPageX = function () {
-            return this.OffsetPageX;
-        };
-
-        ViewportManager.prototype.GetOffsetPageY = function () {
-            return this.OffsetPageY;
-        };
-
         ViewportManager.prototype.SetOffset = function (PageX, PageY) {
             this.OffsetPageX = PageX;
             this.OffsetPageY = PageY;
+            this.UpdateAttr();
+        };
+
+        ViewportManager.prototype.AddOffset = function (PageX, PageY) {
+            this.OffsetPageX += PageX;
+            this.OffsetPageY += PageY;
             this.UpdateAttr();
         };
 
