@@ -89,7 +89,7 @@ module AssureNote {
 				}
 				var X0 = TargetView.GetGX();
 				var Y0 = TargetView.GetGY();
-				AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300);
+				AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, 300);
 				var X1 = TargetView.GetGX();
 				var Y1 = TargetView.GetGY();
 				var ViewPort = AssureNoteApp.PictgramPanel.Viewport;

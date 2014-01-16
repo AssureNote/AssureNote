@@ -25,20 +25,6 @@
 ///<reference path="../d.ts/jquery.d.ts" />
 ///<reference path="../d.ts/pointer.d.ts" />
 
-interface JQuery {
-	svg(loadUrl: string): JQuery;
-	svg(x: Function): JQuery;
-}
-
-interface Document {
-	createSVGElement: (name: string) => Element;
-}
-
-document.createSVGElement = function (name: string): Element {
-	return document.createElementNS('http://www.w3.org/2000/svg', name);
-}
-
-
 /* VIEW (MVC) */
 module AssureNote {
 
@@ -145,7 +131,7 @@ module AssureNote {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(Screen.GetOffsetPageX() + this.CalcOffsetDX(), Screen.GetOffsetPageY() + this.CalcOffsetDY());
+                        Screen.AddOffset(this.CalcOffsetDX(), this.CalcOffsetDY());
                     } else {
                         this.EndDrag();
                     }
@@ -164,7 +150,7 @@ module AssureNote {
 						this.CurrentY += this.Dy;
 						this.Dx *= 0.95;
 						this.Dy *= 0.95;
-                        Screen.SetOffset(Screen.GetOffsetPageX() + this.CalcOffsetDX(), Screen.GetOffsetPageY() + this.CalcOffsetDY());
+                        Screen.AddOffset(this.CalcOffsetDX(), this.CalcOffsetDY());
 					}, 16);
 				}
                 this.EndDrag();
@@ -238,19 +224,17 @@ module AssureNote {
 			this.UpdateAttr();
 		}
 
-        GetOffsetPageX(): number {
-            return this.OffsetPageX;
-        }
-
-        GetOffsetPageY(): number {
-            return this.OffsetPageY;
-        }
-
-		SetOffset(PageX: number, PageY: number): void {
+		private SetOffset(PageX: number, PageY: number): void {
 			this.OffsetPageX = PageX;
 			this.OffsetPageY = PageY;
 			this.UpdateAttr();
-		}
+        }
+
+        AddOffset(PageX: number, PageY: number): void {
+            this.OffsetPageX += PageX;
+            this.OffsetPageY += PageY;
+            this.UpdateAttr();
+        }
 
         GetCameraGX(): number {
             return (this.CameraCenterPageX - this.OffsetPageX) / this.Scale;

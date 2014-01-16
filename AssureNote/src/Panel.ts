@@ -253,7 +253,7 @@ module AssureNote {
             document.head.appendChild(StyleElement);
         }
 
-        Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number, Duration?: number): void {
+        Draw(Label?: string, Duration?: number): void {
 
             this.Clear();
             var TargetView = this.ViewMap[Label];
@@ -275,10 +275,6 @@ module AssureNote {
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
-            // Do scroll
-            if (wx != null && wy != null) {
-                this.Viewport.SetOffset(wx, wy);
-            }
         }
 
         private Clear(): void {

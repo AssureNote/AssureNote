@@ -21,10 +21,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
-document.createSVGElement = function (name) {
-    return document.createElementNS('http://www.w3.org/2000/svg', name);
-};
-
+///<reference path="../d.ts/jquery.d.ts" />
+///<reference path="../d.ts/pointer.d.ts" />
 /* VIEW (MVC) */
 var AssureNote;
 (function (AssureNote) {
@@ -126,7 +124,7 @@ var AssureNote;
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
-                        Screen.SetOffset(Screen.GetOffsetPageX() + this.CalcOffsetDX(), Screen.GetOffsetPageY() + this.CalcOffsetDY());
+                        Screen.AddOffset(this.CalcOffsetDX(), this.CalcOffsetDY());
                     } else {
                         this.EndDrag();
                     }
@@ -145,7 +143,7 @@ var AssureNote;
                         _this.CurrentY += _this.Dy;
                         _this.Dx *= 0.95;
                         _this.Dy *= 0.95;
-                        Screen.SetOffset(Screen.GetOffsetPageX() + _this.CalcOffsetDX(), Screen.GetOffsetPageY() + _this.CalcOffsetDY());
+                        Screen.AddOffset(_this.CalcOffsetDX(), _this.CalcOffsetDY());
                     }, 16);
                 }
                 this.EndDrag();
@@ -243,6 +241,12 @@ var AssureNote;
         ViewportManager.prototype.SetOffset = function (PageX, PageY) {
             this.OffsetPageX = PageX;
             this.OffsetPageY = PageY;
+            this.UpdateAttr();
+        };
+
+        ViewportManager.prototype.AddOffset = function (PageX, PageY) {
+            this.OffsetPageX += PageX;
+            this.OffsetPageY += PageY;
             this.UpdateAttr();
         };
 

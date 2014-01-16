@@ -230,7 +230,7 @@ var AssureNote;
             document.head.appendChild(StyleElement);
         };
 
-        PictgramPanel.prototype.Draw = function (Label, wx, wy, Duration) {
+        PictgramPanel.prototype.Draw = function (Label, Duration) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -251,10 +251,6 @@ var AssureNote;
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
-
-            if (wx != null && wy != null) {
-                this.Viewport.SetOffset(wx, wy);
-            }
         };
 
         PictgramPanel.prototype.Clear = function () {
