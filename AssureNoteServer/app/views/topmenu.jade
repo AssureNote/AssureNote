@@ -5,42 +5,42 @@
     .btn-group
       button#file-menu-button.btn.navbar-btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', oncontextmenu='return false')
         span.glyphicon.glyphicon-file
-        | File
+        | &nbsp;File&nbsp;
         span.caret
       ul#top-menu.dropdown-menu(role='menu', style='right: auto; width: 250px;', oncontextmenu='return false')
         li
           a#create-wgsn-menu(href='#')
             span.glyphicon.glyphicon-plus
-            | New&period;&period;&period;
+            | &nbsp;New...
         li
           a#open-menu(href='#')
             span.glyphicon.glyphicon-folder-open
-            | Open&period;&period;&period;
+            | &nbsp;Open...
         li
           a#upload-menu(href='#')
             span.glyphicon.glyphicon-cloud-upload
-            | Upload
+            | &nbsp;Upload
         li
           a#save-menu(href='#')
             span.glyphicon.glyphicon-floppy-save
-            | Save
+            | &nbsp;Save
         li.dropdown-submenu
           a(href='#')
             span.glyphicon.glyphicon-floppy-save
-            | Save As
+            | &nbsp;Save As
           ul.dropdown-menu
             li
               a#save-wgsn-menu(href='#')
                 span.glyphicon.glyphicon-floppy-save
-                | &midast;&period;wgsn&period;&period;&period;
+                | &nbsp;*.wgsn...
             li
               a#save-dcasemodel-menu(href='#')
                 span.glyphicon.glyphicon-floppy-save
-                | &midast;&period;dcase&UnderBar;model&period;&period;&period;
+                | &nbsp;*.dcase_model...
         li
           a#about-menu(href='#')
             span.glyphicon.glyphicon-question-sign
-            | About
+            | &nbsp;About
     span#filename-view(style="margin-left: 10px;")
 if !isLocal
   include user_info
