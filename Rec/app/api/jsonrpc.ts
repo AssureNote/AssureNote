@@ -35,6 +35,7 @@ export function httpHandler(req: any, res: any) {
 	}
 
 	res.header('Content-Type', 'application/json');
+	res.header('Access-Control-Allow-Origin', '*');
 
 	if (req.body.jsonrpc !== '2.0') {
 		onError(req.body.id, 400, new error.InvalidRequestError('JSON RPC version is invalid or missiong', null));
