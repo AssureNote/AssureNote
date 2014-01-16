@@ -50,19 +50,19 @@ module AssureNote {
         }
 
         CreateGoalMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-goal", "images/goal.png", "goal", this.CreateCallback(GSNType.Goal));
+            return new NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(GSNType.Goal));
         }
 
         CreateContextMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-context", "images/context.png", "context", this.CreateCallback(GSNType.Context));
+            return new NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(GSNType.Context));
         }
 
         CreateStrategyMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-strategy", "images/strategy.png", "strategy", this.CreateCallback(GSNType.Strategy));
+            return new NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(GSNType.Strategy));
         }
 
         CreateEvidenceMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-evidence", "images/evidence.png", "evidence", this.CreateCallback(GSNType.Evidence));
+            return new NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(GSNType.Evidence));
         }
 
         CreateMenuBarButtons(View: NodeView): NodeMenuItem[]{

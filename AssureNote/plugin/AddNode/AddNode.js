@@ -56,19 +56,19 @@ var AssureNote;
         };
 
         AddNodePlugin.prototype.CreateGoalMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-goal", "images/goal.png", "goal", this.CreateCallback(0 /* Goal */));
+            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(0 /* Goal */));
         };
 
         AddNodePlugin.prototype.CreateContextMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-context", "images/context.png", "context", this.CreateCallback(1 /* Context */));
+            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(1 /* Context */));
         };
 
         AddNodePlugin.prototype.CreateStrategyMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-strategy", "images/strategy.png", "strategy", this.CreateCallback(2 /* Strategy */));
+            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(2 /* Strategy */));
         };
 
         AddNodePlugin.prototype.CreateEvidenceMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-evidence", "images/evidence.png", "evidence", this.CreateCallback(3 /* Evidence */));
+            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(3 /* Evidence */));
         };
 
         AddNodePlugin.prototype.CreateMenuBarButtons = function (View) {
