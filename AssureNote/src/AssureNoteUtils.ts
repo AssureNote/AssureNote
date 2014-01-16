@@ -25,6 +25,27 @@
 module AssureNote{
     export module AssureNoteUtils {
 
+        export function postJsonRPC(methodName: string, params: any, Callback: (result: any) => void, ErrorCallback?: () => void/*FIXME*/) {
+            $.ajax({
+                type: "POST",
+                url: "/api/1.0",
+                data: JSON.stringify({ jsonrpc: "2.0", id: "1", method: methodName, params: params }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: (response: any) => {
+                    Callback(response.result);
+                },
+                error: (req: XMLHttpRequest, status: string, errorThrown: any) => {
+                    console.log("========== Ajax Error ==========");
+                    console.log(status);
+                    if (ErrorCallback != null) {
+                        ErrorCallback();
+                    }
+                    console.log("================================");
+                }
+            });
+        }
+
         export function SaveAs(ContentString: string, FileName: string): void {
             var blob = new Blob([ContentString], { type: 'text/plain; charset=UTF-8' });
             saveAs(blob, FileName);

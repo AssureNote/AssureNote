@@ -181,12 +181,12 @@ module AssureNote {
                 if (!this.MasterView) {
                     return;
                 }
-                var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
+                var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
                 this.MasterView.TraverseVisibleNode((Node: NodeView) => {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
-                        var R = 150 / this.Viewport.GetScale();
+                        var R = 150 / this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
                             this.AssureNoteApp.ExecDoubleClicked(Node);
                         }
@@ -253,7 +253,7 @@ module AssureNote {
             document.head.appendChild(StyleElement);
         }
 
-        Draw(Label?: string, wx?/*window x of the forcused node*/: number, wy?/*window y*/: number, Duration?: number): void {
+        Draw(Label?: string, Duration?: number): void {
 
             this.Clear();
             var TargetView = this.ViewMap[Label];
@@ -275,10 +275,6 @@ module AssureNote {
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
-            // Do scroll
-            if (wx != null && wy != null) {
-                this.Viewport.SetOffset(wx, wy);
-            }
         }
 
         private Clear(): void {

@@ -1,8 +1,8 @@
-.navbar.navbar-default
+.navbar.navbar-default.logo-offset
   .navbar-collapse
     a.logo-fixed(href='#')
       img#logo(src='images/logo.png', alt='AssureNote')
-    .dropdown.logo-offset
+    .btn-group
       button#file-menu-button.btn.navbar-btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', oncontextmenu='return false')
         span.glyphicon.glyphicon-file
         | File
@@ -16,6 +16,10 @@
           a#open-menu(href='#')
             span.glyphicon.glyphicon-folder-open
             | Open&period;&period;&period;
+        li
+          a#upload-menu(href='#')
+            span.glyphicon.glyphicon-cloud-upload
+            | Upload
         li
           a#save-menu(href='#')
             span.glyphicon.glyphicon-floppy-save
@@ -37,5 +41,6 @@
           a#about-menu(href='#')
             span.glyphicon.glyphicon-question-sign
             | About
-      span#filename-view
+    span#filename-view(style="margin-left: 10px;")
+include user_info
 input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')

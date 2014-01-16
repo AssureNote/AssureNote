@@ -81,7 +81,7 @@ module AssureNote {
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
-                this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+                this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
 
                 this.AssureNoteApp.PluginPanel.IsVisible = true;
                 /* TODO resolve conflict */

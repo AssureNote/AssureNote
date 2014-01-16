@@ -9,11 +9,12 @@ USE `assurenote` ;
 -- Table `assurenote`.`user`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `assurenote`.`user` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL ,
+  `id_key` VARCHAR(45) NOT NULL ,
+  `display_name` VARCHAR(45) NOT NULL ,
   `auth_id` VARCHAR(45) NULL ,
   `created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id_key`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id_key` ASC) )
 ENGINE = InnoDB;
 
 
@@ -21,18 +22,17 @@ ENGINE = InnoDB;
 -- Table `assurenote`.`assurance_case`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `assurenote`.`assurance_case` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
   `hash_key` VARCHAR(45) NOT NULL ,
   `data` TEXT NOT NULL ,
   `meta_data` TEXT NULL ,
-  `user_id` INT NOT NULL ,
   `created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`id`, `hash_key`) ,
-  INDEX `fk_case_user_idx` (`user_id` ASC) ,
+  `user_key` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`hash_key`) ,
   UNIQUE INDEX `hash_key_UNIQUE` (`hash_key` ASC) ,
-  CONSTRAINT `fk_case_user`
-    FOREIGN KEY (`user_id` )
-    REFERENCES `assurenote`.`user` (`id` )
+  INDEX `fk_assurance_case_user_idx` (`user_key` ASC) ,
+  CONSTRAINT `fk_assurance_case_user`
+    FOREIGN KEY (`user_key` )
+    REFERENCES `assurenote`.`user` (`id_key` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

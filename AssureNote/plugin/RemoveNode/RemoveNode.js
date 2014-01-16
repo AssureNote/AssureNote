@@ -67,7 +67,7 @@ var AssureNote;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
                 this.App.PictgramPanel.SetView(NewNodeView);
-                this.App.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+                this.App.PictgramPanel.Draw(TopGoal.GetLabel());
             } else {
                 console.log("Need paramter");
             }
@@ -118,7 +118,7 @@ var AssureNote;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(App.PictgramPanel.ViewMap);
                 App.PictgramPanel.SetView(NewNodeView);
-                App.PictgramPanel.Draw(TopGoal.GetLabel(), null, null);
+                App.PictgramPanel.Draw(TopGoal.GetLabel());
             });
         };
         return RemoveNodePlugin;

@@ -361,7 +361,7 @@ var AssureNote;
 
         SetScaleCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
-                this.App.PictgramPanel.Viewport.SetScale(Params[0] - 0);
+                this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
         };
         return SetScaleCommand;
@@ -413,5 +413,28 @@ var AssureNote;
         return HelpCommand;
     })(Command);
     AssureNote.HelpCommand = HelpCommand;
+
+    var UploadCommand = (function (_super) {
+        __extends(UploadCommand, _super);
+        function UploadCommand(App) {
+            _super.call(this, App);
+        }
+        UploadCommand.prototype.GetCommandLineNames = function () {
+            return ["upload"];
+        };
+
+        UploadCommand.prototype.GetDisplayName = function () {
+            return "Upload";
+        };
+
+        UploadCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+            AssureNote.AssureNoteUtils.postJsonRPC("upload", {}, function (result) {
+                console.log(result);
+                //TODO
+            });
+        };
+        return UploadCommand;
+    })(Command);
+    AssureNote.UploadCommand = UploadCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

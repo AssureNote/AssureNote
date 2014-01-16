@@ -160,12 +160,12 @@ var AssureNote;
                 if (!_this.MasterView) {
                     return;
                 }
-                var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
+                var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
                 _this.MasterView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
-                        var R = 150 / _this.Viewport.GetScale();
+                        var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
                             _this.AssureNoteApp.ExecDoubleClicked(Node);
                         }
@@ -230,7 +230,7 @@ var AssureNote;
             document.head.appendChild(StyleElement);
         };
 
-        PictgramPanel.prototype.Draw = function (Label, wx, wy, Duration) {
+        PictgramPanel.prototype.Draw = function (Label, Duration) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -251,10 +251,6 @@ var AssureNote;
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
-
-            if (wx != null && wy != null) {
-                this.Viewport.SetOffset(wx, wy);
-            }
         };
 
         PictgramPanel.prototype.Clear = function () {

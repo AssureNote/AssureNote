@@ -117,4 +117,3 @@ exports.logout = function (req, res) {
 })();
 
 exports.passport = passport;
-

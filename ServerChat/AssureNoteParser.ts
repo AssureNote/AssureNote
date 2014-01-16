@@ -676,7 +676,15 @@ export class GSNNode {
 		Writer.newline();
 		for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
-			Node.FormatNode(Writer);
+			if (Node.IsContext()) {
+				Node.FormatNode(Writer);
+			}
+		}
+		for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
+			if (!Node.IsContext()) {
+				Node.FormatNode(Writer);
+			}
 		}
 	}
 
@@ -702,7 +710,15 @@ export class GSNNode {
 		if (this.NonNullSubNodeList() != null) {
 			for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 				var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
-				Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+				if (Node.IsContext()) {
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+				}
+			}
+			for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+				var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
+				if (!Node.IsContext()) {
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+				}
 			}
 		}
 	}
@@ -1112,10 +1128,6 @@ export class GSNRecord {
 		else if(CommonHistory == Lib.Array_size(this.HistoryList)-1) {
 			this.MergeAsFastFoward(NewRecord);
 		}
-		else {
-			//#Local#GSNRecord Record1 = this.DeepCopy();
-			// MergeAsIncrementalAddition
-		}
 	}
 
 	public MergeAsFastFoward(NewRecord: GSNRecord): void {
@@ -1225,7 +1237,7 @@ export class ParserContext {
 	
 	GetStrategyOfGoal(Level: number): GSNNode {
 		if (Level - 1 < Lib.Array_size(this.GoalStack)) {
-			var ParentGoal: GSNNode = Lib.Array_get(this.GoalStack, Level - 1);
+			var ParentGoal: GSNNode = this.GetGoalStackAt(Level - 1);
 			if (ParentGoal != null) {
 				return ParentGoal.GetLastNode(GSNType.Strategy, true/*Creation*/);
 			}
@@ -1233,12 +1245,12 @@ export class ParserContext {
 		return null;
 	}
 
-//	GSNNode GetGoalStackAt(int Level) {
-//		if (Level - 1 < this.GoalStack.size()) {
-//			return this.GoalStack.get(Level-1);
-//		}
-//		return null;
-//	}
+	GetGoalStackAt(Level: number): GSNNode {
+		if (Level >= 0 && Level < Lib.Array_size(this.GoalStack)) {
+				return Lib.Array_get(this.GoalStack, Level);
+		}
+		return null;
+	}
 
 	SetGoalStackAt(Node: GSNNode): void {
 		var GoalLevel: number = Node.GetGoalLevel();
@@ -1268,14 +1280,14 @@ export class ParserContext {
 			return true;
 		}
 		if (NodeType == GSNType.Evidence) {
-			if(this.LastGoalNode == null || this.LastGoalNode.HasSubNode(GSNType.Strategy)) {
+			if(this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Strategy)) {
 				Reader.LogError("Evidence is only linked to Goal", Line);
 				return false;
 			}
 			return true;
 		}
 		if (NodeType == GSNType.Strategy) {
-			if(this.LastGoalNode == null || this.LastGoalNode.HasSubNode(GSNType.Evidence)) {
+			if(this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Evidence)) {
 				Reader.LogError("Strategy is only linked to Goal", Line);				
 				return false;
 			}
@@ -1303,10 +1315,7 @@ export class ParserContext {
 		if (NodeType == GSNType.Goal) {
 			ParentNode = this.GetStrategyOfGoal(Level);
 		} else {
-			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : Lib.Array_get(this.GoalStack, Level);
-//			if(ParentNode.GoalLevel != Level) {
-//				Reader.LogError("mismatched level", Line);
-//			}
+			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
 		}
 		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTriple);
 		if(this.FirstNode == null) {

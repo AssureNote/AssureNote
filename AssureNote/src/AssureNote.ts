@@ -59,9 +59,10 @@ module AssureNote {
             this.RegistCommand(new SetScaleCommand(this));
             this.RegistCommand(new HelpCommand(this));
             this.RegistCommand(new SaveSVGCommand(this));
+            this.RegistCommand(new UploadCommand(this));
 
             this.PluginManager.LoadPlugin();
-            this.UserName = $.cookie('UserName');
+            this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
 		}
 
         public RegistCommand(Command: Command) {
@@ -189,7 +190,7 @@ module AssureNote {
 			this.PictgramPanel.Draw();
 
             var TopGoal = this.PictgramPanel.MasterView;
-            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY(), 1);
+            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
 
             $("#filename-view").text(Name);
             $("title").text("AssureNote - " + Name);

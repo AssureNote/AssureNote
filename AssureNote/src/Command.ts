@@ -347,7 +347,7 @@ module AssureNote {
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (Params.length > 0) {
-                this.App.PictgramPanel.Viewport.SetScale(<number><any>Params[0] - 0);
+                this.App.PictgramPanel.Viewport.SetCameraScale(<number><any>Params[0] - 0);
             }
         }
     }
@@ -392,4 +392,26 @@ module AssureNote {
             (<any>$("#help-modal")).modal();
         }
     }
+
+    export class UploadCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["upload"];
+        }
+
+        public GetDisplayName(): string {
+            return "Upload";
+        }
+
+        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+            AssureNoteUtils.postJsonRPC("upload", {/*TODO*/}, (result: any) => {
+                console.log(result);
+                //TODO
+            });
+        }
+    }
+
 }

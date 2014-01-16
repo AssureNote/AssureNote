@@ -145,6 +145,10 @@ var AssureNote;
             this.Content.className = "node";
         };
 
+        GSNShape.prototype.FormatNewLine = function (doc) {
+            return doc.replace(/\n/g, '<br>');
+        };
+
         GSNShape.prototype.PrerenderHTMLContent = function (manager) {
             if (this.Content == null) {
                 var div = document.createElement("div");
@@ -158,7 +162,8 @@ var AssureNote;
 
                 var p = document.createElement("p");
                 var encoded = AssureNote.AssureNoteUtils.HTMLEncode(this.NodeView.NodeDoc.trim());
-                p.innerHTML = manager.InvokeHTMLRenderPlugin(encoded, this.NodeView.Model);
+                p.innerHTML = this.FormatNewLine(manager.InvokeHTMLRenderPlugin(encoded, this.NodeView.Model));
+
                 this.UpdateHtmlClass();
                 div.appendChild(h4);
                 div.appendChild(p);

@@ -41,9 +41,10 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
             this.RegistCommand(new AssureNote.HelpCommand(this));
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
+            this.RegistCommand(new AssureNote.UploadCommand(this));
 
             this.PluginManager.LoadPlugin();
-            this.UserName = $.cookie('UserName');
+            this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             var Names = Command.GetCommandLineNames();
@@ -170,7 +171,7 @@ var AssureNote;
             this.PictgramPanel.Draw();
 
             var TopGoal = this.PictgramPanel.MasterView;
-            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY(), 1);
+            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
 
             $("#filename-view").text(Name);
             $("title").text("AssureNote - " + Name);

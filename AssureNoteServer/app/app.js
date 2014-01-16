@@ -23,7 +23,7 @@ app.configure(function () {
     //console.log(uploadDir);
     //utilFs.mkdirpSync(uploadDir);
     //app.use(express.bodyParser({uploadDir: uploadDir}));
-    // app.use(express.bodyParser({uploadDir:'./upload'}));
+    app.use(express.bodyParser());
     app.use(express.cookieParser(CONFIG.cookie.secret));
 
     //	app.use(express.cookieSession());
@@ -95,4 +95,3 @@ if (!module.parent) {
         console.log('Express server listening on port ' + app.get('port'));
     });
 }
-

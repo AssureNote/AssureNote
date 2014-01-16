@@ -94,16 +94,14 @@ var AssureNote;
                 while (TopGoalView.Parent != null) {
                     TopGoalView = TopGoalView.Parent;
                 }
-                var wx0 = TargetView.GetGX();
-                var wy0 = TargetView.GetGY();
-                AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, null, null, 300);
-                var wx1 = TargetView.GetGX();
-                var wy1 = TargetView.GetGY();
-                //var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
-                //var OffX0 = ViewPort.GetLogicalOffsetX();
-                //var OffY0 = ViewPort.GetLogicalOffsetY();
-                //var Scale = ViewPort.GetScale();
-                //ViewPort.MoveTo(OffX0 + Scale * (wx0 - wx1), OffY0 + Scale * (wy0 - wy1), Scale, 300);
+                var X0 = TargetView.GetGX();
+                var Y0 = TargetView.GetGY();
+                AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, 300);
+                var X1 = TargetView.GetGX();
+                var Y1 = TargetView.GetGY();
+                var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
+                var Scale = ViewPort.GetCameraScale();
+                ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
             };
             this.AssureNoteApp.RegistCommand(new FoldingCommand(this.AssureNoteApp, this.FoldingAction));
         }
@@ -116,7 +114,9 @@ var AssureNote;
             if (NodeView.GetNodeType() != AssureNote.GSNType.Goal && NodeView.GetNodeType() != AssureNote.GSNType.Strategy) {
                 return null;
             }
-            return new AssureNote.NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
+
+            //return new NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
+            return null;
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);
