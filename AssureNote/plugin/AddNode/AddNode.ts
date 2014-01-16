@@ -37,6 +37,7 @@ module AssureNote {
         CreateCallback(Type: GSNType): (Event, NodeView) => void {
             return (event: Event, TargetView: NodeView) => {
                 var Node = TargetView.Model;
+                this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
                 new GSNNode(Node.BaseDoc, Node, Type, null, AssureNoteUtils.GenerateUID(), null);
                 var Doc = this.AssureNoteApp.MasterRecord.GetLatestDoc();
                 Doc.RenumberAll();
