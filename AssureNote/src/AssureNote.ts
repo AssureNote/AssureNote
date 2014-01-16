@@ -62,7 +62,7 @@ module AssureNote {
             this.RegistCommand(new UploadCommand(this));
 
             this.PluginManager.LoadPlugin();
-            this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
+            this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
 		}
 
         public RegistCommand(Command: Command) {

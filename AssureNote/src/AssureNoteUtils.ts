@@ -81,7 +81,6 @@ module AssureNote{
             }
         }
 
-        export function CreateSVGElement(name: string): SVGElement;
         export function CreateSVGElement(name: "a"): SVGAElement;
         export function CreateSVGElement(name: "circle"): SVGCircleElement;
         export function CreateSVGElement(name: "clippath"): SVGClipPathElement;
@@ -132,6 +131,7 @@ module AssureNote{
         export function CreateSVGElement(name: "title"): SVGTitleElement;
         export function CreateSVGElement(name: "use"): SVGUseElement;
         export function CreateSVGElement(name: "view"): SVGViewElement;
+        export function CreateSVGElement(name: string): SVGElement;
         export function CreateSVGElement(name: string): SVGElement {
             return <SVGElement>document.createElementNS('http://www.w3.org/2000/svg', name);
         }

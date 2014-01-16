@@ -48,7 +48,12 @@ var AssureNote;
 
         VariableInterpolationPlugin.prototype.Supplant = function (str, LabelMap, TagMap) {
             var _this = this;
-            return str.replace(/\[([^\[\]]*)\]/g, function (v, b) {
+            return str.replace(/\[([^\[\]]*)\]/g, (function (v) {
+                var params = [];
+                for (var _i = 0; _i < (arguments.length - 1); _i++) {
+                    params[_i] = arguments[_i + 1];
+                }
+                var b = params[0];
                 var value = TagMap[b];
                 if ((typeof value === 'string' && value != '') || typeof value === 'number') {
                     return _this.Style(value, 'node-variable');
@@ -58,7 +63,7 @@ var AssureNote;
                     return _this.Style(value, 'node-variable');
                 }
                 return _this.Style(v, 'node-variable-undefined');
-            });
+            }));
         };
 
         VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc, Model) {

@@ -49,7 +49,7 @@ var AssureNote;
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
                     var SubView = new NodeView(SubNode, IsRecursive);
-                    if (SubNode.NodeType == AssureNote.GSNType.Context) {
+                    if (SubNode.NodeType == 1 /* Context */) {
                         // Layout Engine allowed to move a node left-side
                         this.AppendRightNode(SubView);
                     } else {
@@ -208,22 +208,22 @@ var AssureNote;
             AssureNote.AssureNoteApp.Assert((this.Shape != null));
             var GlobalPosition = this.GetGlobalPosition();
             this.Shape.SetPosition(GlobalPosition.X, GlobalPosition.Y, Duration, CSSAnimationBuffer);
-            var P1 = this.GetConnectorPosition(AssureNote.Direction.Bottom, GlobalPosition);
+            var P1 = this.GetConnectorPosition(3 /* Bottom */, GlobalPosition);
             this.ForEachVisibleChildren(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(AssureNote.Direction.Top, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Bottom, Duration);
+                var P2 = SubNode.GetConnectorPosition(1 /* Top */, SubNode.GetGlobalPosition());
+                SubNode.SetArrowPosition(P1, P2, 3 /* Bottom */, Duration);
                 SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
             });
-            P1 = this.GetConnectorPosition(AssureNote.Direction.Right, GlobalPosition);
+            P1 = this.GetConnectorPosition(2 /* Right */, GlobalPosition);
             this.ForEachVisibleRightNodes(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(AssureNote.Direction.Left, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Left, Duration);
+                var P2 = SubNode.GetConnectorPosition(0 /* Left */, SubNode.GetGlobalPosition());
+                SubNode.SetArrowPosition(P1, P2, 0 /* Left */, Duration);
                 SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
             });
-            P1 = this.GetConnectorPosition(AssureNote.Direction.Left, GlobalPosition);
+            P1 = this.GetConnectorPosition(0 /* Left */, GlobalPosition);
             this.ForEachVisibleLeftNodes(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(AssureNote.Direction.Right, SubNode.GetGlobalPosition());
-                SubNode.SetArrowPosition(P1, P2, AssureNote.Direction.Right, Duration);
+                var P2 = SubNode.GetConnectorPosition(2 /* Right */, SubNode.GetGlobalPosition());
+                SubNode.SetArrowPosition(P1, P2, 2 /* Right */, Duration);
                 SubNode.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
             });
         };

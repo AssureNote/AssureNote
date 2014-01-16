@@ -126,13 +126,13 @@ var AssureNote;
 
             function NodeTypeToString(type) {
                 switch (type) {
-                    case AssureNote.GSNType.Goal:
+                    case 0 /* Goal */:
                         return "Goal";
-                    case AssureNote.GSNType.Strategy:
+                    case 2 /* Strategy */:
                         return "Strategy";
-                    case AssureNote.GSNType.Evidence:
+                    case 3 /* Evidence */:
                         return "Evidence";
-                    case AssureNote.GSNType.Context:
+                    case 1 /* Context */:
                         return "Context";
                     default:
                         return "";
@@ -145,7 +145,7 @@ var AssureNote;
 
                 var NodeXML = document.createElementNS(dcaseNS, "rootBasicNode");
                 NodeXML.setAttribute("xsi:type", "dcase:" + NodeTypeToString(node.NodeType));
-                NodeXML.setAttribute("id", UID);
+                NodeXML.setAttribute("id", UID); // label is also regarded as id in AssureNote
                 NodeXML.setAttribute("name", Label);
                 NodeXML.setAttribute("desc", node.NodeDoc.replace(/^\s*(.*?)\s*$/, "$1").replace(/\r/g, "&#xD;").replace(/\n/g, "&#xA;"));
 
@@ -155,7 +155,7 @@ var AssureNote;
                     var ParentUID = node.ParentNode.UID.toString();
                     var linkId = "LINK_" + ParentUID + "_" + UID;
                     var LinkXML = document.createElementNS(dcaseNS, "rootBasicLink");
-                    if (node.NodeType == AssureNote.GSNType.Context) {
+                    if (node.NodeType == 1 /* Context */) {
                         LinkXML.setAttribute("xsi:type", "dcase:InContextOf");
                     } else {
                         LinkXML.setAttribute("xsi:type", "dcase:SupportedBy");
@@ -385,7 +385,7 @@ var AssureNote;
             var _this = this;
             $("#file-open-dialog").change(function (e) {
                 var target = e.target || e.srcElement;
-                _this.App.LoadFiles((target).files);
+                _this.App.LoadFiles(target.files);
             });
             $("#file-open-dialog").click();
         };
@@ -408,7 +408,7 @@ var AssureNote;
 
         HelpCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
-            ($("#help-modal")).modal();
+            $("#help-modal").modal();
         };
         return HelpCommand;
     })(Command);

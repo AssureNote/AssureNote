@@ -50,7 +50,7 @@ var AssureNote;
             };
             var App = this.AssureNoteApp;
 
-            (this.TextArea).setValue(WGSN);
+            this.TextArea.setValue(WGSN);
             this.Element.off("blur");
             this.Element.off("keydown");
             this.Element.css({ display: "block" }).on("keydown", function (e) {
@@ -71,7 +71,7 @@ var AssureNote;
         };
         EditorUtil.prototype.DisableEditor = function (OldNodeView) {
             var _this = this;
-            var WGSN = (this.TextArea).getValue();
+            var WGSN = this.TextArea.getValue();
             this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
             var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode = Node.ReplaceSubNodeAsText(WGSN);
