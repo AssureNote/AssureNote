@@ -189,7 +189,7 @@ module AssureNote {
 			this.PictgramPanel.Draw();
 
             var TopGoal = this.PictgramPanel.MasterView;
-            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY(), 1);
+            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
 
             $("#filename-view").text(Name);
             $("title").text("AssureNote - " + Name);

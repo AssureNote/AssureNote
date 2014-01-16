@@ -160,12 +160,12 @@ var AssureNote;
                 if (!_this.MasterView) {
                     return;
                 }
-                var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetHeight() / 3));
+                var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
                 _this.MasterView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
-                        var R = 150 / _this.Viewport.GetScale();
+                        var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
                             _this.AssureNoteApp.ExecDoubleClicked(Node);
                         }

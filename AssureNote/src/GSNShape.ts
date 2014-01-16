@@ -147,6 +147,10 @@ module AssureNote {
             this.Content.className = "node";
         }
 
+        private FormatNewLine(doc: string) {
+            return doc.replace(/\n/g, '<br>');
+        }
+
         private PrerenderHTMLContent(manager: PluginManager): void {
             if (this.Content == null) {
                 var div = document.createElement("div");
@@ -160,7 +164,8 @@ module AssureNote {
 
                 var p = document.createElement("p");
                 var encoded: string = AssureNoteUtils.HTMLEncode(this.NodeView.NodeDoc.trim());
-                p.innerHTML = manager.InvokeHTMLRenderPlugin(encoded, this.NodeView.Model);
+                p.innerHTML = this.FormatNewLine(manager.InvokeHTMLRenderPlugin(encoded, this.NodeView.Model));
+
                 this.UpdateHtmlClass();
                 div.appendChild(h4);
                 div.appendChild(p);
