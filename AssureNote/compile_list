@@ -15,6 +15,7 @@ src/Plugin.ts
 src/SearchNode.ts
 src/Socket.ts
 src/Viewport.ts
+src/RecApi.ts
 
 plugin/FoldingViewSwitch/FoldingViewSwitch.ts
 plugin/FullScreenEditor/FullScreenEditor.ts

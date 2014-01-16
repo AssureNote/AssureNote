@@ -88,10 +88,9 @@ module AssureNote {
 			return false;	
 		}
 
-		Update(): void {
-			// TODO
+		Update(Rec: RecApi): void {
 			// Get latest data from REC
-			var LatestLog = { data: 50 };
+			var LatestLog = Rec.GetLatestData(this.Location, this.Type);
 
 			// Update past logs
 			if(!(this.PastLogs.length < 20)) {
@@ -113,11 +112,13 @@ module AssureNote {
 		NodeCount: number;
 		IsRunning: boolean;
 		Timer: number;
+		Rec: RecApi;
 
 		constructor(public App: AssureNote.AssureNoteApp) {
 			this.MonitorNodeMap = {};
 			this.NodeCount = 0;
 			this.IsRunning = false;
+			this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // FIXME make it configurable
 		}
 
 		SetMonitorNode(MNode: MonitorNode): void {
@@ -181,7 +182,7 @@ module AssureNote {
 					}
 
 					// Check red nodes
-					MNode.Update();
+					MNode.Update(self.Rec);
 					var View = MNode.View;
 					while(View != null) {
 						RedNodeMap[View.Label] = true;

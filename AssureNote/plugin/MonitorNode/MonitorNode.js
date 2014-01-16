@@ -83,10 +83,9 @@ var AssureNote;
             return false;
         };
 
-        MonitorNode.prototype.Update = function () {
-            // TODO
+        MonitorNode.prototype.Update = function (Rec) {
             // Get latest data from REC
-            var LatestLog = { data: 50 };
+            var LatestLog = Rec.GetLatestData(this.Location, this.Type);
 
             if (!(this.PastLogs.length < 20)) {
                 this.PastLogs.pop();
@@ -108,6 +107,7 @@ var AssureNote;
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
+            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/");
         }
         MonitorNodeManager.prototype.SetMonitorNode = function (MNode) {
             if (!(MNode.Label in this.MonitorNodeMap)) {
@@ -170,7 +170,7 @@ var AssureNote;
                     }
 
                     // Check red nodes
-                    MNode.Update();
+                    MNode.Update(self.Rec);
                     var View = MNode.View;
                     while (View != null) {
                         RedNodeMap[View.Label] = true;
