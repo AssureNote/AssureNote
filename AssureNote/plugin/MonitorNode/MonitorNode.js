@@ -62,11 +62,13 @@ var AssureNote;
                     break;
                 }
             }
-            console.log(this.Type);
         };
 
         MonitorNode.prototype.Validate = function () {
-            return true;
+            if (this.Location && this.Type && this.Condition) {
+                return true;
+            }
+            return false;
         };
         return MonitorNode;
     })();
@@ -75,25 +77,57 @@ var AssureNote;
     var MonitorNodeManager = (function () {
         function MonitorNodeManager() {
             this.MonitorNodeMap = {};
+            this.NodeCount = 0;
+            this.IsRunning = false;
         }
+        MonitorNodeManager.prototype.SetMonitorNode = function (Label, MonitorNode) {
+            if (!(Label in this.MonitorNodeMap)) {
+                this.NodeCount += 1;
+            }
+            this.MonitorNodeMap[Label] = MonitorNode;
+        };
+
+        MonitorNodeManager.prototype.DeleteMonitorNode = function (Label) {
+            if (Label in this.MonitorNodeMap) {
+                this.NodeCount -= 1;
+                delete this.MonitorNodeMap[Label];
+            }
+        };
+
+        MonitorNodeManager.prototype.StartMonitoring = function (Interval) {
+            this.IsRunning = true;
+            console.log("Start monitoring...");
+
+            this.Timer = setInterval(function () {
+                console.log("Monitoring...");
+            }, Interval);
+        };
+
+        MonitorNodeManager.prototype.StopMonitoring = function () {
+            this.IsRunning = false;
+            console.log("Stop monitoring...");
+            clearTimeout(this.Timer);
+        };
         return MonitorNodeManager;
     })();
     AssureNote.MonitorNodeManager = MonitorNodeManager;
 
-    var MonitorCommand = (function (_super) {
-        __extends(MonitorCommand, _super);
-        function MonitorCommand(App) {
+    var MNodeManager = null;
+
+    var MonitorStartCommand = (function (_super) {
+        __extends(MonitorStartCommand, _super);
+        function MonitorStartCommand(App) {
             _super.call(this, App);
         }
-        MonitorCommand.prototype.GetCommandLineNames = function () {
-            return ["monitor"];
+        MonitorStartCommand.prototype.GetCommandLineNames = function () {
+            return ["monitor-start"];
         };
 
-        MonitorCommand.prototype.GetDisplayName = function () {
-            return "Monitor";
+        MonitorStartCommand.prototype.GetDisplayName = function () {
+            return "Start Monitor";
         };
 
-        MonitorCommand.prototype.Invoke = function (CommandName, FocuseView, Params) {
+        MonitorStartCommand.prototype.Invoke = function (CommandName, FocuseView, Params) {
             if (Params.length == 1) {
                 var Param = Params[0];
                 if (Param == "all") {
@@ -108,10 +142,15 @@ var AssureNote;
                     }
 
                     var Model = this.App.PictgramPanel.ViewMap[Label].Model;
-                    var Monitor = new MonitorNode(Model);
-                    if (!Monitor.Validate()) {
+                    var MNode = new MonitorNode(Model);
+                    if (!MNode.Validate()) {
                         this.App.DebugP("This node is not monitor");
                         return;
+                    }
+
+                    MNodeManager.SetMonitorNode(Label, MNode);
+                    if (MNodeManager.NodeCount > 0 && !MNodeManager.IsRunning) {
+                        MNodeManager.StartMonitoring(5000);
                     }
                 }
             } else if (Params.length > 1) {
@@ -120,16 +159,60 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
-        return MonitorCommand;
+        return MonitorStartCommand;
     })(AssureNote.Command);
-    AssureNote.MonitorCommand = MonitorCommand;
+    AssureNote.MonitorStartCommand = MonitorStartCommand;
+
+    var MonitorStopCommand = (function (_super) {
+        __extends(MonitorStopCommand, _super);
+        function MonitorStopCommand(App) {
+            _super.call(this, App);
+        }
+        MonitorStopCommand.prototype.GetCommandLineNames = function () {
+            return ["monitor-stop"];
+        };
+
+        MonitorStopCommand.prototype.GetDisplayName = function () {
+            return "Stop Monitor";
+        };
+
+        MonitorStopCommand.prototype.Invoke = function (CommandName, FocuseView, Params) {
+            if (Params.length == 1) {
+                var Param = Params[0];
+                if (Param == "all") {
+                    // TODO
+                    // Stop all monitors
+                } else {
+                    var Label = Param;
+                    var View = this.App.PictgramPanel.ViewMap[Label];
+                    if (View == null) {
+                        this.App.DebugP("Node not found");
+                        return;
+                    }
+
+                    MNodeManager.DeleteMonitorNode(Label);
+                    if (MNodeManager.NodeCount < 1 && MNodeManager.IsRunning) {
+                        MNodeManager.StopMonitoring();
+                    }
+                }
+            } else if (Params.length > 1) {
+                console.log("Too many parameter");
+            } else {
+                console.log("Need parameter");
+            }
+        };
+        return MonitorStopCommand;
+    })(AssureNote.Command);
+    AssureNote.MonitorStopCommand = MonitorStopCommand;
 
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
-            this.AssureNoteApp.RegistCommand(new MonitorCommand(this.AssureNoteApp));
+            MNodeManager = new MonitorNodeManager();
+            this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
         }
         return MonitorNodePlugin;
     })(AssureNote.Plugin);

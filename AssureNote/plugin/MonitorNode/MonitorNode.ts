@@ -67,7 +67,10 @@ module AssureNote {
 		}
 
 		Validate(): boolean {
-			return true;	
+			if(this.Location && this.Type && this.Condition) {
+				return true;	
+			}
+			return false;	
 		}
 
 	}
@@ -75,28 +78,67 @@ module AssureNote {
 	export class MonitorNodeManager {
 
 		MonitorNodeMap: { [key: string]: MonitorNode };
+		NodeCount: number;
+		IsRunning: boolean;
+		Timer: number;
 
 		constructor() {
 			this.MonitorNodeMap = {};
+			this.NodeCount = 0;
+			this.IsRunning = false;
+		}
+
+		SetMonitorNode(Label: string, MonitorNode: MonitorNode): void {
+			if(!(Label in this.MonitorNodeMap)) {
+				this.NodeCount += 1;
+			}
+			this.MonitorNodeMap[Label] = MonitorNode;
+		}
+
+		DeleteMonitorNode(Label: string): void {
+			if(Label in this.MonitorNodeMap) {
+				this.NodeCount -= 1;
+				delete this.MonitorNodeMap[Label];
+			}
+		}
+
+		StartMonitoring(Interval: number): void {
+			this.IsRunning = true;
+			console.log("Start monitoring...");
+
+			this.Timer = setInterval(function() {
+				console.log("Monitoring...")
+			}, Interval);
+		}
+
+		StopMonitoring(): void {
+			this.IsRunning = false;
+			console.log("Stop monitoring...");
+			clearTimeout(this.Timer);
 		}
 
 	}
 
-	export class MonitorCommand extends Command {
+	var MNodeManager: MonitorNodeManager = null;
+
+	export class MonitorStartCommand extends Command {
 
 		constructor(App: AssureNote.AssureNoteApp) {
 			super(App);
 		}
 
 		public GetCommandLineNames(): string[] {
-			return ["monitor"];
+			return ["monitor-start"];
 		}
 
 		public GetDisplayName(): string {
-			return "Monitor";
+			return "Start Monitor";
 		}
 
 		public Invoke(CommandName: string, FocuseView: NodeView, Params: any[]): void {
+			// TODO
+			// Delete dead monitors before below process
+
 			if(Params.length == 1) {
 				var Param = Params[0];
 				if(Param == "all") {
@@ -112,10 +154,63 @@ module AssureNote {
 					}
 
 					var Model = this.App.PictgramPanel.ViewMap[Label].Model;
-					var Monitor = new MonitorNode(Model);
-					if(!Monitor.Validate()) {
+					var MNode = new MonitorNode(Model);
+					if(!MNode.Validate()) {
 						this.App.DebugP("This node is not monitor");
 						return;
+					}
+
+					MNodeManager.SetMonitorNode(Label, MNode);
+					if(MNodeManager.NodeCount > 0 && !MNodeManager.IsRunning) {
+						MNodeManager.StartMonitoring(5000);
+					}
+				}
+			}
+			else if(Params.length > 1) {
+				console.log("Too many parameter");
+			}
+			else {
+				console.log("Need parameter");
+			}
+		}
+
+	}
+
+	export class MonitorStopCommand extends Command {
+
+		constructor(App: AssureNote.AssureNoteApp) {
+			super(App);
+		}
+
+		public GetCommandLineNames(): string[] {
+			return ["monitor-stop"];
+		}
+
+		public GetDisplayName(): string {
+			return "Stop Monitor";
+		}
+
+		public Invoke(CommandName: string, FocuseView: NodeView, Params: any[]): void {
+			// TODO
+			// Delete dead monitors before below process
+
+			if(Params.length == 1) {
+				var Param = Params[0];
+				if(Param == "all") {
+					// TODO
+					// Stop all monitors
+				}
+				else {
+					var Label = Param;
+					var View = this.App.PictgramPanel.ViewMap[Label];
+					if(View == null) {
+						this.App.DebugP("Node not found");
+						return;
+					}
+
+					MNodeManager.DeleteMonitorNode(Label);
+					if(MNodeManager.NodeCount < 1 && MNodeManager.IsRunning) {
+						MNodeManager.StopMonitoring();
 					}
 				}
 			}
@@ -133,7 +228,9 @@ module AssureNote {
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			super();
-			this.AssureNoteApp.RegistCommand(new MonitorCommand(this.AssureNoteApp));
+			MNodeManager = new MonitorNodeManager();
+			this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
+			this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
 		}
 
 	}
