@@ -77,6 +77,14 @@ h4 {
 	margin-right: 5%;
 }
 
+.node-author-evidence {
+	font-size: small;
+	position: absolute;
+	bottom: 5%;
+	right: 25%;
+	color: Gray;
+	margin-right: 5%;
+}
 .assurenote-default {
 	fill: rgba(255, 255, 255, 1.0);
 	/*filli: #b4d8df;*/
