@@ -41,6 +41,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
             this.RegistCommand(new AssureNote.HelpCommand(this));
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
+            this.RegistCommand(new AssureNote.UploadCommand(this));
 
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';

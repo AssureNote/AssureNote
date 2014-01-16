@@ -59,6 +59,7 @@ module AssureNote {
             this.RegistCommand(new SetScaleCommand(this));
             this.RegistCommand(new HelpCommand(this));
             this.RegistCommand(new SaveSVGCommand(this));
+            this.RegistCommand(new UploadCommand(this));
 
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
