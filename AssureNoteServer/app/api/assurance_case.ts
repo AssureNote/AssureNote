@@ -1,12 +1,12 @@
 ///<reference path='../DefinitelyTyped/async/async.d.ts'/>
 
-var db                   = require('../db/db')
-import type                 = require('./type')
-var constant             = require('../constant')
-import model_assurance_case = require('../model/assurance_case')
-import model_user           = require('../model/user')
-var error                = require('./error')
-var async                = require('async')
+var db                   = require('../db/db');
+import type                 = require('./type');
+var constant             = require('../constant');
+import model_assurance_case = require('../model/assurance_case');
+import model_user           = require('../model/user');
+var error                = require('./error');
+var async                = require('async');
 var _                    = require('underscore');
 
 export function upload(params:any, userIdKey: string, callback: type.Callback) {
