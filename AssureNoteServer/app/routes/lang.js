@@ -74,4 +74,3 @@ exports.lang = {
         public: "Public project"
     }
 };
-

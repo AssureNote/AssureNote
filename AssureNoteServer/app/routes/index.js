@@ -7,14 +7,14 @@ var util_auth = require('../util/auth');
 var CONFIG = require('config');
 
 var getBasicParam = function (req, res) {
-    var params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, UserName: null };
+    var params = { basepath: CONFIG.assurenote.basepath, title: 'Assure-It', lang: lang.lang.en, UserName: null };
     var auth = new util_auth.Auth(req, res);
 
     if (!auth.isLogin()) {
         auth.clear();
         auth.set('guest', 'Guest');
     }
-    params = { basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, UserName: auth.getLoginName() };
+    params = { basepath: CONFIG.assurenote.basepath, title: 'Assure-It', lang: lang.lang.en, UserName: auth.getLoginName() };
     return params;
 };
 
@@ -30,7 +30,7 @@ var index_DummyUser = function (req, res, params) {
     //userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
     //    if (err) {
     //        console.error(err);
-    //        res.redirect(CONFIG.ads.basePath+'/');
+    //        res.redirect(CONFIG.ads.basepath+'/');
     //        return;
     //    }
     //    var auth = new util_auth.Auth(req, res);
@@ -47,4 +47,3 @@ exports.index = function (req, res) {
         res.render('index', params);
     }
 };
-

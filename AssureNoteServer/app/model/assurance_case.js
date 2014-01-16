@@ -8,8 +8,7 @@ var model = require('./model');
 
 var error = require('../api/error');
 
-
-//var async         = require('async'); //TODO no longer needed?
+var async = require('async');
 var _ = require('underscore');
 var crypto = require('crypto');
 
@@ -69,7 +68,6 @@ var AssuranceCaseDAO = (function (_super) {
 
         //async.waterfall([
         this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)', [hashKey, data, meta_data, userKey], function (err, result) {
-            console.log(result);
             if (err) {
                 callback(err, null);
                 return;
@@ -80,4 +78,3 @@ var AssuranceCaseDAO = (function (_super) {
     return AssuranceCaseDAO;
 })(model.DAO);
 exports.AssuranceCaseDAO = AssuranceCaseDAO;
-

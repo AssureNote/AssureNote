@@ -2,7 +2,7 @@ import model      = require('./model');
 import model_user = require('./user');
 import error      = require('../api/error');
 import constant   = require('../constant');
-//var async         = require('async'); //TODO no longer needed?
+var async   = require('async');
 var _          = require('underscore');
 var crypto     = require('crypto');
 
@@ -49,7 +49,6 @@ export class AssuranceCaseDAO extends model.DAO {
         this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)'
                 , [hashKey, data, meta_data, userKey],
                 (err, result) => {
-                    console.log(result);
                     if (err) {
                         callback(err, null);
                         return;

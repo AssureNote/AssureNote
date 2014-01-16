@@ -3,7 +3,7 @@
 var db                   = require('../db/db')
 import type                 = require('./type')
 var constant             = require('../constant')
-var model_assurance_case = require('../model/assurance_case')
+import model_assurance_case = require('../model/assurance_case')
 import model_user           = require('../model/user')
 var error                = require('./error')
 var async                = require('async')
@@ -34,7 +34,7 @@ export function upload(params:any, userIdKey: string, callback: type.Callback) {
                 userDAO.select(userIdKey, (err:any, user: model_user.User) => next(err, user));
             },
             (user:model_user.User, next) => {
-                caseDAO.insert(user.key, params.content, params.meta_data, (err:any, resultCheck) => next(err, resultCheck));
+                caseDAO.insert(user.key, params.content, params.meta_data, (err:any, result) => next(err, result));
             },
             (commitResult, next) => {
                 con.commit((err, result) => next(err, commitResult));
@@ -46,7 +46,7 @@ export function upload(params:any, userIdKey: string, callback: type.Callback) {
                 callback.onFailure(err);
                 return;
             }
-            callback.onSuccess(result);
+            callback.onSuccess({fileId: result});
         }
     );
 }
@@ -65,6 +65,20 @@ export function download(params:any, userIdKey: string, callback: type.Callback)
     if (!validate(params)) return;
 
     var con = new db.Database();
-    //TODO
+
+    var caseDAO = new model_assurance_case.AssuranceCaseDAO(con);
+    async.waterfall([
+        (next) => {
+            caseDAO.get(params.fileId, (err: any, acase: model_assurance_case.AssuranceCase) => next(err, acase));
+        }],
+        (err:any, result: model_assurance_case.AssuranceCase) => {
+            con.close();
+            if (err) {
+                callback.onFailure(err);
+                return;
+            }
+        callback.onSuccess({content: result.data});
+    });
+
 }
 

@@ -38,4 +38,3 @@ var Auth = (function () {
     return Auth;
 })();
 exports.Auth = Auth;
-

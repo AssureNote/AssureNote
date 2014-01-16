@@ -78,6 +78,10 @@ module AssureNote {
             if (NewNode) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();
                 var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
+                if (TopGoal.ParentNode == null) {
+                    /* TODO Need to remove this code */
+                    TopGoal.ParentNode = new GSNNode(null, null, GSNType.Goal, null, -1, null);
+                }
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
