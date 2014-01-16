@@ -158,7 +158,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>cd ..
-
+jade index.jade
 powershell -NoProfile -ExecutionPolicy unrestricted -Command ./compile_list_gen.ps1</PreBuildEvent>
   </PropertyGroup>
 </Project>
