@@ -10,8 +10,8 @@ translator:
   CLIENT_SECRET: ''
 debug_user:
   loginName: 'tsunade'
-ads:
-    basePath: ""
+assurenote:
+    basepath: ''
 passport:
     resolveURL: 'localhost:3000'
     FACEBOOK_APP_ID: ''

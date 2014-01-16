@@ -7,14 +7,14 @@ var util_auth    = require('../util/auth')
 var CONFIG = require('config')
 
 var getBasicParam = function(req: any, res: any) {
-    var params: any = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, UserName: null};
+    var params: any = {basepath: CONFIG.assurenote.basepath, title: 'Assure-It', lang: lang.lang.en, UserName: null};
     var auth = new util_auth.Auth(req, res);
 
     if(!auth.isLogin()) {
         auth.clear();
         auth.set('guest', 'Guest');
     }
-    params = {basepath: CONFIG.ads.basePath, title: 'Assure-It', lang: lang.lang.en, UserName: auth.getLoginName() };
+    params = {basepath: CONFIG.assurenote.basepath, title: 'Assure-It', lang: lang.lang.en, UserName: auth.getLoginName() };
     return params;
 }
 
@@ -29,7 +29,7 @@ var index_DummyUser = function(req: any, res: any, params: any) {
     //userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
     //    if (err) {
     //        console.error(err);
-    //        res.redirect(CONFIG.ads.basePath+'/');
+    //        res.redirect(CONFIG.ads.basepath+'/');
     //        return;
     //    }
     //    var auth = new util_auth.Auth(req, res);
@@ -146,12 +146,12 @@ export var index = function(req: any, res: any) {
 //    userDAO.register(req.body.username, req.body.password, req.body.mailAddress, (err:any, result: model_user.User) => {
 //        if (err) {
 //            // TODO: display error information
-//            res.redirect(CONFIG.ads.basePath+'/');
+//            res.redirect(CONFIG.ads.basepath+'/');
 //            return;
 //        }
 //        var auth = new util_auth.Auth(req, res);
 //        auth.set(result.id, result.loginName);
-//        res.redirect(CONFIG.ads.basePath+'/');
+//        res.redirect(CONFIG.ads.basepath+'/');
 //    });
 //
 //};
