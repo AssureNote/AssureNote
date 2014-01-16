@@ -407,9 +407,10 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
-            AssureNoteUtils.postJsonRPC("upload", {/*TODO*/}, (result: any) => {
-                console.log(result);
-                //TODO
+            var Writer = new StringWriter();
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNoteUtils.postJsonRPC("upload", {content: Writer.toString()}, (result: any) => {
+                window.location.href = "/file/" + result;
             });
         }
     }

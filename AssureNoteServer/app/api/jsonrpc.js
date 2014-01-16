@@ -51,19 +51,10 @@ function httpHandler(req, res) {
 
     function getUserId() {
         var userId = auth.getUserId();
-        if (!userId)
+        if (!userId) {
             userId = constant.SYSTEM_USER_ID;
+        }
         return userId;
-        // var userId: number = constant.SYSTEM_USER_ID;
-        // var cookies = {};
-        // req.headers.cookie && req.headers.cookie.split(';').forEach(function( cookie ) {
-        // 	var parts = cookie.split('=');
-        // 	cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
-        // });
-        // if (cookies['userId']) {
-        // 	userId = Number(cookies['userId']);
-        // }
-        // return userId;
     }
 
     res.header('Content-Type', 'application/json');

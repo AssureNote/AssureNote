@@ -62,19 +62,14 @@ var AssuranceCaseDAO = (function (_super) {
     };
 
     AssuranceCaseDAO.prototype.insert = function (userKey, data, meta_data, callback) {
-        var _this = this;
         if (!meta_data) {
             meta_data = '';
         }
         var hashKey = exports.getMd5String();
 
-        async.waterfall([
-            function (next) {
-                _this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)', [hashKey, data, meta_data, userKey], function (err, result) {
-                    return next(err, result);
-                });
-            }
-        ], function (err, result) {
+        //async.waterfall([
+        this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)', [hashKey, data, meta_data, userKey], function (err, result) {
+            console.log(result);
             if (err) {
                 callback(err, null);
                 return;

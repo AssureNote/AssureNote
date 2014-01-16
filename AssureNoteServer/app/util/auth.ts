@@ -4,7 +4,7 @@ export class Auth {
 		return this.req.session.UserId != null;
 	}
 
-	set(UserId:number, UserName:string): void {
+	set(UserId:string, UserName:string): void {
 		this.res.cookie('UserId', UserId);
 		this.res.cookie('UserName', UserName);
 		this.res.cookie('sessionUserId', UserId, { signed: true });
@@ -18,8 +18,8 @@ export class Auth {
 		return this.req.session.UserName;
 	}
 
-	getUserId(): number {
-		if (this.req.session.UserId) return parseInt(this.req.session.UserId, 10);
+	getUserId(): string {
+		if (this.req.session.UserId) return this.req.session.UserId;
 		return undefined;
 	}
 

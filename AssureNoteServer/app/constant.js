@@ -1,4 +1,4 @@
-exports.SYSTEM_USER_ID = 1;
+exports.SYSTEM_USER_ID = "guest";
 exports.SYSTEM_PROJECT_ID = 1;
 exports.UPLOAD_DIR = 'upload';
 exports.basepath = "";
