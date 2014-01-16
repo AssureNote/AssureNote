@@ -42,8 +42,8 @@ var AssureNote;
         AddNodePlugin.prototype.CreateCallback = function (Type) {
             var _this = this;
             return function (event, TargetView) {
-                var Node = TargetView.Model;
                 _this.AssureNoteApp.MasterRecord.OpenEditor(_this.AssureNoteApp.GetUserName(), "todo", null, "test");
+                var Node = _this.AssureNoteApp.MasterRecord.GetLatestDoc().GetNode(TargetView.Model.UID);
                 new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
                 var Doc = _this.AssureNoteApp.MasterRecord.GetLatestDoc();
                 Doc.RenumberAll();
