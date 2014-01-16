@@ -33,7 +33,7 @@ var AssureNote;
         }
         NodeMenuItem.prototype.EnableEventHandler = function (MenuBar) {
             var _this = this;
-            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + Config.BASEPATH + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
             $("#" + this.ElementId).click(function (event) {
                 _this.EventHandler(event, MenuBar.CurrentView);
                 MenuBar.Remove();

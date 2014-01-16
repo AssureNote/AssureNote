@@ -98,7 +98,7 @@ var AssureNote;
         }
         RemoveNodePlugin.prototype.CreateMenuBarButton = function (View) {
             var App = this.AssureNoteApp;
-            return new AssureNote.NodeMenuItem("remove-id", "images/remove.png", "remove", function (event, TargetView) {
+            return new AssureNote.NodeMenuItem("remove-id", "/images/remove.png", "remove", function (event, TargetView) {
                 var Node = TargetView.Model;
                 var Parent = Node.ParentNode;
                 if (Parent.SubNodeList == null) {

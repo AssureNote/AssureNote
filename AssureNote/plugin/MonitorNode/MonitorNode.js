@@ -43,7 +43,7 @@ var AssureNote;
             var ContextNode = null;
             for (var i = 0; i < GoalNode.SubNodeList.length; i++) {
                 var BroutherNode = GoalNode.SubNodeList[i];
-                if (BroutherNode.NodeType == AssureNote.GSNType.Context) {
+                if (BroutherNode.NodeType == 1 /* Context */) {
                     ContextNode = BroutherNode;
                     break;
                 }
@@ -87,6 +87,7 @@ var AssureNote;
             // Get latest data from REC
             var LatestLog = Rec.GetLatestData(this.Location, this.Type);
 
+            // Update past logs
             if (!(this.PastLogs.length < 20)) {
                 this.PastLogs.pop();
             }
@@ -95,7 +96,7 @@ var AssureNote;
             // Update status
             var script = "var " + this.Type + "=" + LatestLog.data + ";";
             script += this.Condition + ";";
-            this.Status = eval(script);
+            this.Status = eval(script); // TODO Don't use eval()
         };
         return MonitorNode;
     })();
@@ -107,7 +108,7 @@ var AssureNote;
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/");
+            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/"); // FIXME make it configurable
         }
         MonitorNodeManager.prototype.SetMonitorNode = function (MNode) {
             if (!(MNode.Label in this.MonitorNodeMap)) {
@@ -217,7 +218,7 @@ var AssureNote;
                 if (Param == "all") {
                     for (var Label in this.App.PictgramPanel.ViewMap) {
                         var View = this.App.PictgramPanel.ViewMap[Label];
-                        if (View.Model.NodeType != AssureNote.GSNType.Evidence) {
+                        if (View.Model.NodeType != 3 /* Evidence */) {
                             continue;
                         }
 

@@ -123,6 +123,9 @@ var AssureNote;
                 case "about-menu":
                     $('#about-modal').modal();
                     break;
+                case "upload-menu":
+                    Command = this.FindCommandByCommandLineName("upload");
+                    break;
             }
             if (Command != null) {
                 Command.Invoke(Id, this.PictgramPanel.MasterView, Args);

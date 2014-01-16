@@ -31,7 +31,7 @@ module AssureNote {
         }
 
         EnableEventHandler(MenuBar: NodeMenu) {
-            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + Config.BASEPATH + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
             $("#" + this.ElementId).click((event: Event) => {
                 this.EventHandler(event, MenuBar.CurrentView);
                 MenuBar.Remove();

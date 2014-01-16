@@ -43,32 +43,37 @@ var AssureNote;
             var _this = this;
             return function (event, TargetView) {
                 _this.AssureNoteApp.MasterRecord.OpenEditor(_this.AssureNoteApp.GetUserName(), "todo", null, "test");
-                var Node = _this.AssureNoteApp.MasterRecord.GetLatestDoc().GetNode(TargetView.Model.UID);
+                var Node = _this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
                 new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
-                var Doc = _this.AssureNoteApp.MasterRecord.GetLatestDoc();
+                var Doc = _this.AssureNoteApp.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 var TopGoal = Doc.TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+
+                /* TODO Need to remove this code */
+                TopGoal.ParentNode = new AssureNote.GSNNode(null, null, 0 /* Goal */, null, -1, null);
+
                 NewNodeView.SaveFoldedFlag(_this.AssureNoteApp.PictgramPanel.ViewMap);
                 _this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
                 _this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+                _this.AssureNoteApp.MasterRecord.CloseEditor();
             };
         };
 
         AddNodePlugin.prototype.CreateGoalMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-goal", "images/goal.png", "goal", this.CreateCallback(0 /* Goal */));
+            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(0 /* Goal */));
         };
 
         AddNodePlugin.prototype.CreateContextMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-context", "images/context.png", "context", this.CreateCallback(1 /* Context */));
+            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(1 /* Context */));
         };
 
         AddNodePlugin.prototype.CreateStrategyMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-strategy", "images/strategy.png", "strategy", this.CreateCallback(2 /* Strategy */));
+            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(2 /* Strategy */));
         };
 
         AddNodePlugin.prototype.CreateEvidenceMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-evidence", "images/evidence.png", "evidence", this.CreateCallback(3 /* Evidence */));
+            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(3 /* Evidence */));
         };
 
         AddNodePlugin.prototype.CreateMenuBarButtons = function (View) {

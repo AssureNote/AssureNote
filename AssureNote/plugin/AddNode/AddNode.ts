@@ -37,32 +37,37 @@ module AssureNote {
         CreateCallback(Type: GSNType): (Event, NodeView) => void {
             return (event: Event, TargetView: NodeView) => {
                 this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
-                var Node = this.AssureNoteApp.MasterRecord.GetLatestDoc().GetNode(TargetView.Model.UID);
+                var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
                 new GSNNode(Node.BaseDoc, Node, Type, null, AssureNoteUtils.GenerateUID(), null);
-                var Doc = this.AssureNoteApp.MasterRecord.GetLatestDoc();
+                var Doc = this.AssureNoteApp.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 var TopGoal = Doc.TopNode;
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
+
+                /* TODO Need to remove this code */
+                TopGoal.ParentNode = new GSNNode(null, null, GSNType.Goal, null, -1, null);
+
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
                 this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+                this.AssureNoteApp.MasterRecord.CloseEditor();
             };
         }
 
         CreateGoalMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-goal", "images/goal.png", "goal", this.CreateCallback(GSNType.Goal));
+            return new NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(GSNType.Goal));
         }
 
         CreateContextMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-context", "images/context.png", "context", this.CreateCallback(GSNType.Context));
+            return new NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(GSNType.Context));
         }
 
         CreateStrategyMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-strategy", "images/strategy.png", "strategy", this.CreateCallback(GSNType.Strategy));
+            return new NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(GSNType.Strategy));
         }
 
         CreateEvidenceMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-evidence", "images/evidence.png", "evidence", this.CreateCallback(GSNType.Evidence));
+            return new NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(GSNType.Evidence));
         }
 
         CreateMenuBarButtons(View: NodeView): NodeMenuItem[]{

@@ -138,6 +138,9 @@ module AssureNote {
                 case "about-menu":
                     (<any>$('#about-modal')).modal();
                     break;
+                case "upload-menu":
+                    Command = this.FindCommandByCommandLineName("upload");
+                    break;
             }
             if (Command != null) {
                 Command.Invoke(Id/*FIXME*/, this.PictgramPanel.MasterView, Args);
