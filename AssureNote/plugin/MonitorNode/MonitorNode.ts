@@ -29,13 +29,20 @@ module AssureNote {
 
 	export class MonitorNode {
 
+		Label: string;
 		Location: string;
 		Type: string;
 		Condition: string;
+		Status: boolean;
+		PastLogs: any[];
 
-		constructor(public Node: GSNNode) {
-			var GoalNode = Node.GetCloseGoal();
+		constructor(public View: NodeView) {
+			this.Label = View.Label;
+			this.Status = true;
+			this.PastLogs = [];
 
+			var ThisNode = View.Model;
+			var GoalNode = ThisNode.GetCloseGoal();
 			var ContextNode = null;
 			for(var i: number = 0; i < GoalNode.SubNodeList.length; i++) {
 				var BroutherNode = GoalNode.SubNodeList[i];
@@ -73,6 +80,31 @@ module AssureNote {
 			return false;	
 		}
 
+		IsDead(App: AssureNote.AssureNoteApp): boolean {
+			var View = App.PictgramPanel.ViewMap[this.Label];
+			if(View == null) {
+				return true;
+			}
+			return false;	
+		}
+
+		Update(): void {
+			// TODO
+			// Get latest data from REC
+			var LatestLog = { data: 50 };
+
+			// Update past logs
+			if(!(this.PastLogs.length < 20)) {
+				this.PastLogs.pop();
+			}
+			this.PastLogs.unshift(LatestLog);
+
+			// Update status
+			var script = "var "+this.Type+"="+LatestLog.data+";";
+			script += this.Condition+";";
+			this.Status = eval(script);   // TODO Don't use eval()
+		}
+
 	}
 
 	export class MonitorNodeManager {
@@ -82,17 +114,17 @@ module AssureNote {
 		IsRunning: boolean;
 		Timer: number;
 
-		constructor() {
+		constructor(public App: AssureNote.AssureNoteApp) {
 			this.MonitorNodeMap = {};
 			this.NodeCount = 0;
 			this.IsRunning = false;
 		}
 
-		SetMonitorNode(Label: string, MonitorNode: MonitorNode): void {
-			if(!(Label in this.MonitorNodeMap)) {
+		SetMonitorNode(MNode: MonitorNode): void {
+			if(!(MNode.Label in this.MonitorNodeMap)) {
 				this.NodeCount += 1;
 			}
-			this.MonitorNodeMap[Label] = MonitorNode;
+			this.MonitorNodeMap[MNode.Label] = MNode;
 		}
 
 		DeleteMonitorNode(Label: string): void {
@@ -106,8 +138,37 @@ module AssureNote {
 			this.IsRunning = true;
 			console.log("Start monitoring...");
 
+			var self = this;
 			this.Timer = setInterval(function() {
 				console.log("Monitoring...")
+
+				// Initialize red node map
+				var RedNodeMap: { [key: string]: boolean } = {};   // value doesn't make sense
+
+				for(var Label in self.MonitorNodeMap) {
+					var MNode = self.MonitorNodeMap[Label];
+					if(MNode.IsDead(self.App)) {
+						self.DeleteMonitorNode(Label);
+						if(self.NodeCount < 1 && self.IsRunning) {
+							self.StopMonitoring();
+							break;
+						}
+						continue;
+					}
+
+					// Check red nodes
+					MNode.Update();
+					var View = MNode.View;
+					while(View != null) {
+						RedNodeMap[View.Label] = true;
+						View = View.Parent;
+					}
+				}
+
+				// Update view
+				for(var Label in RedNodeMap) {
+					self.App.PictgramPanel.ViewMap[Label].ChangeColorStyle(ColorStyle.Danger);
+				}
 			}, Interval);
 		}
 
@@ -153,14 +214,13 @@ module AssureNote {
 						return;
 					}
 
-					var Model = this.App.PictgramPanel.ViewMap[Label].Model;
-					var MNode = new MonitorNode(Model);
+					var MNode = new MonitorNode(View);
 					if(!MNode.Validate()) {
 						this.App.DebugP("This node is not monitor");
 						return;
 					}
 
-					MNodeManager.SetMonitorNode(Label, MNode);
+					MNodeManager.SetMonitorNode(MNode);
 					if(MNodeManager.NodeCount > 0 && !MNodeManager.IsRunning) {
 						MNodeManager.StartMonitoring(5000);
 					}
@@ -228,7 +288,7 @@ module AssureNote {
 
 		constructor(public AssureNoteApp: AssureNoteApp) {
 			super();
-			MNodeManager = new MonitorNodeManager();
+			MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
 			this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
 			this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
 		}
