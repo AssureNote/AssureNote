@@ -1117,9 +1117,6 @@ var AssureNote;
                 this.MergeAsReplaceTopGoal(NewRecord);
             } else if (CommonHistory == Lib.Array_size(this.HistoryList) - 1) {
                 this.MergeAsFastFoward(NewRecord);
-            } else {
-                //#Local#GSNRecord Record1 = this.DeepCopy();
-                // MergeAsIncrementalAddition
             }
         };
 
@@ -1226,7 +1223,7 @@ var AssureNote;
 
         ParserContext.prototype.GetStrategyOfGoal = function (Level) {
             if (Level - 1 < Lib.Array_size(this.GoalStack)) {
-                var ParentGoal = Lib.Array_get(this.GoalStack, Level - 1);
+                var ParentGoal = this.GetGoalStackAt(Level - 1);
                 if (ParentGoal != null) {
                     return ParentGoal.GetLastNode(GSNType.Strategy, true);
                 }
@@ -1234,12 +1231,13 @@ var AssureNote;
             return null;
         };
 
-        //	GSNNode GetGoalStackAt(int Level) {
-        //		if (Level - 1 < this.GoalStack.size()) {
-        //			return this.GoalStack.get(Level-1);
-        //		}
-        //		return null;
-        //	}
+        ParserContext.prototype.GetGoalStackAt = function (Level) {
+            if (Level >= 0 && Level < Lib.Array_size(this.GoalStack)) {
+                return Lib.Array_get(this.GoalStack, Level);
+            }
+            return null;
+        };
+
         ParserContext.prototype.SetGoalStackAt = function (Node) {
             var GoalLevel = Node.GetGoalLevel();
 
@@ -1268,14 +1266,14 @@ var AssureNote;
                 return true;
             }
             if (NodeType == GSNType.Evidence) {
-                if (this.LastGoalNode == null || this.LastGoalNode.HasSubNode(GSNType.Strategy)) {
+                if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Strategy)) {
                     Reader.LogError("Evidence is only linked to Goal", Line);
                     return false;
                 }
                 return true;
             }
             if (NodeType == GSNType.Strategy) {
-                if (this.LastGoalNode == null || this.LastGoalNode.HasSubNode(GSNType.Evidence)) {
+                if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Evidence)) {
                     Reader.LogError("Strategy is only linked to Goal", Line);
                     return false;
                 }
@@ -1303,10 +1301,7 @@ var AssureNote;
             if (NodeType == GSNType.Goal) {
                 ParentNode = this.GetStrategyOfGoal(Level);
             } else {
-                ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : Lib.Array_get(this.GoalStack, Level);
-                //			if(ParentNode.GoalLevel != Level) {
-                //				Reader.LogError("mismatched level", Line);
-                //			}
+                ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
             }
             NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTriple);
             if (this.FirstNode == null) {
@@ -2136,4 +2131,3 @@ var AssureNote;
         $.md5 = md5;
     })(Lib));
 })(AssureNote || (AssureNote = {}));
-//# sourceMappingURL=AssureNoteParser.js.map

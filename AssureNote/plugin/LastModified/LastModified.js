@@ -43,7 +43,7 @@ var AssureNote;
                 var iconspan = document.createElement('span');
                 iconspan.className = 'glyphicon glyphicon-user';
                 var span = document.createElement('span');
-                span.className = 'node-author';
+                span.className = (Model.IsEvidence) ? 'node-author-evidence' : 'node-author';
                 span.textContent = Author;
                 span.innerHTML = iconspan.outerHTML + span.textContent;
                 return NodeDoc + span.outerHTML;

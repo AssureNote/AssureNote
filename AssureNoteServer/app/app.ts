@@ -23,7 +23,7 @@ app.configure(function() {
 	//console.log(uploadDir);
 	//utilFs.mkdirpSync(uploadDir);
 	//app.use(express.bodyParser({uploadDir: uploadDir}));
-	// app.use(express.bodyParser({uploadDir:'./upload'}));
+	app.use(express.bodyParser());
 	app.use(express.cookieParser(CONFIG.cookie.secret));
 //	app.use(express.cookieSession());
 	app.use(express.methodOverride());
@@ -100,6 +100,10 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
   passport.passport.authenticate('github', { failureRedirect: '/' }),
   passport.login
+);
+
+app.get('/logout',
+  passport.logout
 );
 
 if (!module.parent) {
