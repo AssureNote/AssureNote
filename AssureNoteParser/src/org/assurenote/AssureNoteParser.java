@@ -874,6 +874,7 @@ class GSNNode {
 			for(/*local*/int i = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
 				if(Lib.Array_get(this.ParentNode.SubNodeList, i) == this) {
 					Lib.Array_set(this.ParentNode.SubNodeList, i, NewNode);
+					NewNode.ParentNode = this.ParentNode;
 				}
 			}
 		}
