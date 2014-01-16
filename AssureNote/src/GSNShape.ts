@@ -191,14 +191,6 @@ module AssureNote {
         private GX = null;
         private GY = null;
 
-        private static CSSAnimationDefinitionCount = 0;
-        private static GetCSSAnimationID(): number {
-            return GSNShape.CSSAnimationDefinitionCount++;
-        }
-
-        private PreviousAnimateElement: SVGElement = null;
-        private PreviousArrowAnimateElement: SVGElement = null;
-
         private RemoveAnimateElement(Animate: SVGElement) {
             if (Animate) {
                 var Parent = Animate.parentNode;
@@ -208,15 +200,12 @@ module AssureNote {
             }
         }
 
-        SetPosition(x: number, y: number, Duration?: number, CSSAnimationBuffer?: string[]): void {
+        SetPosition(x: number, y: number): void {
             if (this.NodeView.IsVisible) {
                 var div = this.Content;
                 if (div != null) {
                     div.style.left = x + "px";
                     div.style.top = y + "px";
-                    if (Duration > 0) {
-                        this.MoveTo(x, y, Duration, CSSAnimationBuffer);
-                    }
                 }
                 var mat = this.ShapeGroup.transform.baseVal.getItem(0).matrix;
                 mat.e = x;
@@ -226,54 +215,80 @@ module AssureNote {
             this.GY = y;
         }
 
-        private MoveTo(x: number, y: number, Duration: number, CSSAnimationBuffer: string[]): void {
-            var AnimationName: string = "GSNNodeCSSAnim" + GSNShape.GetCSSAnimationID();
-            if (this.PreviousAnimateElement) {
-                this.RemoveAnimateElement(this.PreviousAnimateElement);
-                this.PreviousAnimateElement = null;
+        private SetOpacity(Opacity: number) {
+            this.Content.style.opacity = Opacity.toString();
+            this.ShapeGroup.style.opacity = Opacity.toString();
+        }
+
+        private AnimationFrameTimerHandle: number = 0;
+
+        private Fadein(Duration: number): void {
+            if (this.AnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.AnimationFrameTimerHandle);
+                this.AnimationFrameTimerHandle = 0;
             }
-                        
-            var AnimationStyleString = AnimationName + " " + Duration / 1000 + "s linear";
-            this.Content.style["animation"] = AnimationStyleString;
-            this.Content.style["MozAnimation"] = AnimationStyleString;
-            this.Content.style["webkitAnimation"] = AnimationStyleString;
-            this.Content.style["msAnimation"] = AnimationStyleString;
-            var AnimateElement: any;
+            var lastTime: number = performance.now();
+            var startTime = lastTime;
+
+            var V = 1 / Duration;
+            var Opacity = 0;
+
+            var update: any = () => {
+                var currentTime: number = performance.now();
+                var deltaT = currentTime - lastTime;
+                if (currentTime - startTime < Duration) {
+                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    deltaT = Duration - (lastTime - startTime);
+                }
+                Opacity += V * deltaT;
+                this.SetOpacity(Opacity);
+                lastTime = currentTime;
+            }
+            update();
+        }
+
+        public MoveTo(x: number, y: number, Duration: number): void {
+            if (Duration <= 0) {
+                this.SetPosition(x, y);
+                return;
+            }
+
             if (this.GX == null || this.GY == null) {
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-webkit-", AnimationName));
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-moz-", AnimationName));
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("-ms-", AnimationName));
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSFadeinAnimationDefinition("", AnimationName));
-                AnimateElement = AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
-            } else {
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-webkit-", AnimationName, this.GX, this.GY));
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-moz-", AnimationName, this.GX, this.GY));
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("-ms-", AnimationName, this.GX, this.GY));
-                CSSAnimationBuffer.push(AssureNoteUtils.CreateCSSMoveAnimationDefinition("", AnimationName, this.GX, this.GY));
-                AnimateElement = AssureNoteUtils.CreateSVGMoveAnimateElement(Duration, this.GX - x, this.GY - y);
+                this.SetPosition(x, y);
+                this.Fadein(Duration);
+                return;
             }
-            this.ShapeGroup.appendChild(AnimateElement);
-            AnimateElement.beginElement();
-            this.PreviousAnimateElement = AnimateElement;
+
+            if (this.AnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.AnimationFrameTimerHandle);
+                this.AnimationFrameTimerHandle = 0;
+            }
+            var lastTime: number = performance.now();
+            var startTime = lastTime;
+
+            var VX = (x - this.GX) / Duration;
+            var VY = (y - this.GY) / Duration;
+
+            this.SetOpacity(1);
+
+            var update: any = () => {
+                var currentTime: number = performance.now();
+                var deltaT = currentTime - lastTime;
+                if (currentTime - startTime < Duration) {
+                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    deltaT = Duration - (lastTime - startTime);
+                }
+                this.SetPosition(this.GX + VX * deltaT, this.GY + VY * deltaT);
+                lastTime = currentTime;
+            }
+            update();
         }
 
         ClearAnimationCache(): void {
             this.GX = null;
             this.GY = null;
-            if (this.Content) {
-                this.Content.style.removeProperty("animation");
-                this.Content.style.removeProperty("MozAnimation");
-                this.Content.style.removeProperty("webkitAnimation");
-                this.Content.style.removeProperty("msAnimation");
-            }
-            if (this.PreviousAnimateElement) {
-                this.RemoveAnimateElement(this.PreviousAnimateElement);
-                this.PreviousAnimateElement = null
-            }
-            if (this.PreviousArrowAnimateElement) {
-                this.RemoveAnimateElement(this.PreviousArrowAnimateElement);
-                this.PreviousArrowAnimateElement = null
-            }
         }
 
         PrerenderSVGContent(manager: PluginManager): void {
@@ -283,9 +298,12 @@ module AssureNote {
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         }
 
-        private OldArrowPath: string;
+        private ArrowAnimationFrameTimerHandle: number = 0;
 
-        SetArrowPosition(P1: Point, P2: Point, Dir: Direction, Duration?: number) {
+        private ArrowP1: Point;
+        private ArrowP2: Point;
+
+        SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
             var start = <SVGPathSegMovetoAbs>this.ArrowPath.pathSegList.getItem(0);
             var curve = <SVGPathSegCurvetoCubicAbs>this.ArrowPath.pathSegList.getItem(1);
             start.x = P1.X;
@@ -311,24 +329,84 @@ module AssureNote {
                 curve.x2 = (P1.X + P2.X) / 2;
                 curve.y2 = (9 * P2.Y + P1.Y) / 10;
             }
-            if (Duration > 0) {
+            this.ArrowP1 = P1;
+            this.ArrowP2 = P2;
+        }
 
-                var NewPath = this.ArrowPath.getAttribute("d");
-                if (this.PreviousArrowAnimateElement) {
-                    this.RemoveAnimateElement(this.PreviousArrowAnimateElement);
-                    this.PreviousArrowAnimateElement = null
-                }
-                if (this.GX == null || this.GY == null) {
-                    var AnimateElement: any = AssureNoteUtils.CreateSVGFadeinAnimateElement(Duration);
-                } else {
-                    var AnimateElement: any = AssureNoteUtils.CreateSVGArrowAnimateElement(Duration, this.OldArrowPath, NewPath);
-                }
+        private SetArrowOpacity(Opacity: number) {
+            this.ArrowPath.style.opacity = Opacity.toString();
+        }
 
-                this.ArrowPath.appendChild(AnimateElement);
-                AnimateElement.beginElement();
-                this.PreviousArrowAnimateElement = AnimateElement;
-                this.OldArrowPath = NewPath;
+        private FadeinArrow(Duration: number): void {
+            if (this.ArrowAnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.ArrowAnimationFrameTimerHandle);
+                this.ArrowAnimationFrameTimerHandle = 0;
             }
+            var lastTime: number = performance.now();
+            var startTime = lastTime;
+
+            var V = 1 / Duration;
+            var Opacity = 0;
+
+            var update: any = () => {
+                var currentTime: number = performance.now();
+                var deltaT = currentTime - lastTime;
+                if (currentTime - startTime < Duration) {
+                    this.ArrowAnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    deltaT = Duration - (lastTime - startTime);
+                }
+                Opacity += V * deltaT;
+                this.SetArrowOpacity(Opacity);
+                lastTime = currentTime;
+            }
+            update();
+        }
+
+        MoveArrowTo(P1: Point, P2: Point, Dir: Direction, Duration: number) {
+            if (Duration <= 0) {
+                this.SetArrowPosition(P1, P2, Dir);
+                return;
+            }
+
+            if (this.GX == null || this.GY == null) {
+                this.SetArrowPosition(P1, P2, Dir);
+                this.FadeinArrow(Duration);
+                return;
+            }
+
+            var P1VX = (P1.X - this.ArrowP1.X) / Duration;
+            var P1VY = (P1.Y - this.ArrowP1.Y) / Duration;
+            var P2VX = (P2.X - this.ArrowP2.X) / Duration;
+            var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
+
+            if (this.ArrowAnimationFrameTimerHandle) {
+                cancelAnimationFrame(this.ArrowAnimationFrameTimerHandle);
+                this.ArrowAnimationFrameTimerHandle = 0;
+            }
+            var lastTime: number = performance.now();
+            var startTime = lastTime;
+            
+            this.SetArrowOpacity(1);
+
+            var update: any = () => {
+                var currentTime: number = performance.now();
+                var deltaT = currentTime - lastTime;
+                if (currentTime - startTime < Duration) {
+                    this.ArrowAnimationFrameTimerHandle = requestAnimationFrame(update);
+                } else {
+                    deltaT = Duration - (lastTime - startTime);
+                }
+                var CurrentP1 = this.ArrowP1.Clone();
+                var CurrentP2 = this.ArrowP2.Clone();
+                CurrentP1.X += P1VX * deltaT;
+                CurrentP1.Y += P1VY * deltaT;
+                CurrentP2.X += P2VX * deltaT;
+                CurrentP2.Y += P2VY * deltaT;
+                this.SetArrowPosition(CurrentP1, CurrentP2, Dir);
+                lastTime = currentTime;
+            }
+            update();
         }
 
         SetArrowColorWhite(IsWhite: boolean) {

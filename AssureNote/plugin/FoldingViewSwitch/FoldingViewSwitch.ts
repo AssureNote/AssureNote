@@ -83,13 +83,13 @@ module AssureNote {
 				} else {
 					TargetView.IsFolded = TargetView.IsFolded != true;
 				}
-				var TopGoalView = TargetView;
+				var TopGoalView: NodeView = TargetView;
 				while (TopGoalView.Parent != null) {
 					TopGoalView = TopGoalView.Parent;
 				}
 				var X0 = TargetView.GetGX();
 				var Y0 = TargetView.GetGY();
-				AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, 300);
+                AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
 				var X1 = TargetView.GetGX();
 				var Y1 = TargetView.GetGY();
 				var ViewPort = AssureNoteApp.PictgramPanel.Viewport;

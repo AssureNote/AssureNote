@@ -235,24 +235,6 @@ module AssureNote {
 			this.AssureNoteApp.PluginPanel.Clear();
         }
 
-        private static GSNNodeAnimationDefinitionMaster :HTMLStyleElement;
-
-        private AppendCSSAnimationDefinition(Definitions: string[]) {
-            var Id = "GSNNodeAnimationDefinition";
-            if (PictgramPanel.GSNNodeAnimationDefinitionMaster == null) {
-                PictgramPanel.GSNNodeAnimationDefinitionMaster = document.createElement("style");
-                PictgramPanel.GSNNodeAnimationDefinitionMaster.id = Id;
-                PictgramPanel.GSNNodeAnimationDefinitionMaster.type = "text/css"
-            }
-            var StyleElement = <HTMLStyleElement>PictgramPanel.GSNNodeAnimationDefinitionMaster.cloneNode();
-            StyleElement.innerHTML = Definitions.join("\n");
-            var OldDefinition = document.getElementById(Id);
-            if (OldDefinition) {
-                OldDefinition.parentElement.removeChild(OldDefinition);
-            }
-            document.head.appendChild(StyleElement);
-        }
-
         Draw(Label?: string, Duration?: number): void {
 
             this.Clear();
@@ -266,10 +248,7 @@ module AssureNote {
             this.SVGLayer.style.display = "none";
             NodeView.SetGlobalPositionCacheEnabled(true);
 
-            var CSSAnimationBuffer: string[] = [];
-            TargetView.UpdateDocumentPosition(Duration, CSSAnimationBuffer);
-            this.AppendCSSAnimationDefinition(CSSAnimationBuffer);
-
+            TargetView.UpdateDocumentPosition(Duration);
             TargetView.ClearAnimationCache();
 
             NodeView.SetGlobalPositionCacheEnabled(false);
