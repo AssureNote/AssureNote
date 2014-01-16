@@ -24,6 +24,28 @@
 var AssureNote;
 (function (AssureNote) {
     (function (AssureNoteUtils) {
+        function postJsonRPC(methodName, params, Callback, ErrorCallback/*FIXME*/ ) {
+            $.ajax({
+                type: "POST",
+                url: "/api/1.0",
+                data: JSON.stringify({ jsonrpc: "2.0", id: "1", method: methodName, params: params }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    Callback(response.result);
+                },
+                error: function (req, status, errorThrown) {
+                    console.log("========== Ajax Error ==========");
+                    console.log(status);
+                    if (ErrorCallback != null) {
+                        ErrorCallback();
+                    }
+                    console.log("================================");
+                }
+            });
+        }
+        AssureNoteUtils.postJsonRPC = postJsonRPC;
+
         function SaveAs(ContentString, FileName) {
             var blob = new Blob([ContentString], { type: 'text/plain; charset=UTF-8' });
             saveAs(blob, FileName);
