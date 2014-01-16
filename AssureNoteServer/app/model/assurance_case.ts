@@ -2,7 +2,7 @@ import model      = require('./model');
 import model_user = require('./user');
 import error      = require('../api/error');
 import constant   = require('../constant');
-//var async         = require('async'); //TODO no longer needed?
+var async   = require('async');
 var _          = require('underscore');
 var crypto     = require('crypto');
 

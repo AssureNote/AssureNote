@@ -8,7 +8,7 @@ var model = require('./model');
 
 var error = require('../api/error');
 
-//var async         = require('async'); //TODO no longer needed?
+var async = require('async');
 var _ = require('underscore');
 var crypto = require('crypto');
 
