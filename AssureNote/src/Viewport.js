@@ -173,7 +173,6 @@ var AssureNote;
             this.IsEventMapUpper = false;
             window.addEventListener("resize", function (e) {
                 _this.UpdatePageRect();
-                console.log("resized!");
             });
             this.UpdatePageRect();
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());

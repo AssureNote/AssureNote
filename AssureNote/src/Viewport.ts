@@ -186,7 +186,7 @@ module AssureNote {
         }
 
         constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
-            window.addEventListener("resize", (e) => { this.UpdatePageRect(); console.log("resized!"); });
+            window.addEventListener("resize", (e) => { this.UpdatePageRect(); });
             this.UpdatePageRect();
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
