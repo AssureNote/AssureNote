@@ -89,7 +89,7 @@ var AssureNote;
                     } else {
                         index = (_this.NodeIndex == _this.HitNodes.length - 1) ? 0 : _this.NodeIndex + 1;
                     }
-                    ViewMap[_this.HitNodes[index].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.Searched); //Disable Highlight
+                    ViewMap[_this.HitNodes[index].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.Searched);
                     _this.IsMoving = false;
                 });
             }

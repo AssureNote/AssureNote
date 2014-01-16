@@ -97,28 +97,28 @@ var AssureNote;
 
         GSNShape.prototype.GetTreeWidth = function () {
             if (this.TreeBoundingBox.Width == 0) {
-                this.TreeBoundingBox.Width = 250; //FIXME
+                this.TreeBoundingBox.Width = 250;
             }
             return this.TreeBoundingBox.Width;
         };
 
         GSNShape.prototype.GetTreeHeight = function () {
             if (this.TreeBoundingBox.Height == 0) {
-                this.TreeBoundingBox.Height = 100; //FIXME
+                this.TreeBoundingBox.Height = 100;
             }
             return this.TreeBoundingBox.Height;
         };
 
         GSNShape.prototype.GetHeadWidth = function () {
             if (this.HeadBoundingBox.Width == 0) {
-                this.HeadBoundingBox.Width = 250; //FIXME
+                this.HeadBoundingBox.Width = 250;
             }
             return this.HeadBoundingBox.Width;
         };
 
         GSNShape.prototype.GetHeadHeight = function () {
             if (this.HeadBoundingBox.Height == 0) {
-                this.HeadBoundingBox.Height = 100; //FIXME
+                this.HeadBoundingBox.Height = 100;
             }
             return this.HeadBoundingBox.Height;
         };
@@ -300,7 +300,7 @@ var AssureNote;
             start.y = P1.Y;
             curve.x = P2.X;
             curve.y = P2.Y;
-            if (Dir == 3 /* Bottom */ || Dir == 1 /* Top */) {
+            if (Dir == AssureNote.Direction.Bottom || Dir == AssureNote.Direction.Top) {
                 var DiffX = Math.abs(P1.X - P2.X);
                 curve.x1 = (9 * P1.X + P2.X) / 10;
                 curve.y1 = P2.Y;
@@ -411,13 +411,13 @@ var AssureNote;
 
         GSNShape.prototype.GetConnectorPosition = function (Dir) {
             switch (Dir) {
-                case 2 /* Right */:
+                case AssureNote.Direction.Right:
                     return new AssureNote.Point(this.GetNodeWidth(), this.GetNodeHeight() / 2);
-                case 0 /* Left */:
+                case AssureNote.Direction.Left:
                     return new AssureNote.Point(0, this.GetNodeHeight() / 2);
-                case 1 /* Top */:
+                case AssureNote.Direction.Top:
                     return new AssureNote.Point(this.GetNodeWidth() / 2, 0);
-                case 3 /* Bottom */:
+                case AssureNote.Direction.Bottom:
                     return new AssureNote.Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
                 default:
                     return new AssureNote.Point(0, 0);
@@ -544,13 +544,13 @@ var AssureNote;
 
         GSNStrategyShape.prototype.GetConnectorPosition = function (Dir) {
             switch (Dir) {
-                case 2 /* Right */:
+                case AssureNote.Direction.Right:
                     return new AssureNote.Point(this.GetNodeWidth() - this.delta / 2, this.GetNodeHeight() / 2);
-                case 0 /* Left */:
+                case AssureNote.Direction.Left:
                     return new AssureNote.Point(this.delta / 2, this.GetNodeHeight() / 2);
-                case 1 /* Top */:
+                case AssureNote.Direction.Top:
                     return new AssureNote.Point(this.GetNodeWidth() / 2, 0);
-                case 3 /* Bottom */:
+                case AssureNote.Direction.Bottom:
                     return new AssureNote.Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
             }
         };

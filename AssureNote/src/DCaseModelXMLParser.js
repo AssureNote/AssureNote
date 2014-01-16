@@ -37,7 +37,7 @@ var AssureNote;
             this.Record = Record;
             this.nodes = {};
             this.links = {};
-            this.Text2NodeTypeMap = { "Goal": 0 /* Goal */, "Strategy": 2 /* Strategy */, "Context": 1 /* Context */, "Pattern": 1 /* Context */, "Evidence": 3 /* Evidence */ };
+            this.Text2NodeTypeMap = { "Goal": AssureNote.GSNType.Goal, "Strategy": AssureNote.GSNType.Strategy, "Context": AssureNote.GSNType.Context, "Pattern": AssureNote.GSNType.Context, "Evidence": AssureNote.GSNType.Evidence };
             this.Doc = new AssureNote.GSNDoc(this.Record);
 
             // TODO: set real date
@@ -90,7 +90,7 @@ var AssureNote;
                     IsRootNode = false;
                 }
                 while (Label.charAt(0).search(/[A-Za-z]/) == 0)
-                    Label = Label.substr(1); // G1.1 -> 1.1
+                    Label = Label.substr(1);
                 console.log(Label);
                 var Type = _this.Text2NodeTypeMap[NodeType];
                 var node = new AssureNote.GSNNode(_this.Doc, null, Type, NodeType.charAt(0), AssureNote.AssureNoteUtils.GenerateUID(), null);
@@ -98,7 +98,7 @@ var AssureNote;
                 _this.nodes[Id] = node;
 
                 /* TODO Need to remove this code */
-                node.ParentNode = new AssureNote.GSNNode(null, null, 0 /* Goal */, null, -1, null);
+                node.ParentNode = new AssureNote.GSNNode(null, null, AssureNote.GSNType.Goal, null, -1, null);
             });
 
             $XML.find("rootBasicLink").each(function (index, elem) {

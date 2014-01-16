@@ -21,10 +21,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
-///<reference path='Socket.ts'/>
-///<reference path='Command.ts'/>
-///<reference path='DCaseModelXMLParser.ts'/>
-
 var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
@@ -48,7 +44,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.UploadCommand(this));
 
             this.PluginManager.LoadPlugin();
-            this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
+            this.UserName = (($).cookie('UserName') != null) ? ($).cookie('UserName') : 'Guest';
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             var Names = Command.GetCommandLineNames();
@@ -121,7 +117,7 @@ var AssureNote;
                     }
                     break;
                 case "about-menu":
-                    $('#about-modal').modal();
+                    ($('#about-modal')).modal();
                     break;
             }
             if (Command != null) {
@@ -193,11 +189,11 @@ var AssureNote;
             if (Files[0]) {
                 var reader = new FileReader();
                 reader.onerror = function (event) {
-                    console.log('error', event.target.error.code);
+                    console.log('error', (event.target).error.code);
                 };
 
                 reader.onload = function (event) {
-                    var Contents = event.target.result;
+                    var Contents = (event.target).result;
                     var Name = Files[0].name;
                     _this.LoadNewWGSN(Name, Contents);
 
