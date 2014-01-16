@@ -42,5 +42,5 @@
             span.glyphicon.glyphicon-question-sign
             | About
     span#filename-view(style="margin-left: 10px;")
-include user_info
-input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')
+if !isLocal
+  include user_info
