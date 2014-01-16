@@ -254,6 +254,7 @@ var AssureNote;
             this.Scale += Scale;
             this.OffsetPageX -= GX * this.Scale;
             this.OffsetPageY -= GY * this.Scale;
+            this.UpdateAttr();
         };
 
         ViewportManager.prototype.GetCameraPageCenterX = function () {

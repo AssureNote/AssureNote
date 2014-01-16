@@ -72,6 +72,7 @@ var AssureNote;
     var FoldingViewSwitchPlugin = (function (_super) {
         __extends(FoldingViewSwitchPlugin, _super);
         function FoldingViewSwitchPlugin(AssureNoteApp) {
+            var _this = this;
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             this.SetMenuBarButton(true);
@@ -96,7 +97,7 @@ var AssureNote;
                 }
                 var X0 = TargetView.GetGX();
                 var Y0 = TargetView.GetGY();
-                AssureNoteApp.PictgramPanel.Draw(TopGoalView.Label, 300);
+                AssureNoteApp.PictgramPanel.Draw(_this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
                 var X1 = TargetView.GetGX();
                 var Y1 = TargetView.GetGY();
                 var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
