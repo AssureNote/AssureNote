@@ -8,7 +8,6 @@ var model = require('./model');
 
 var error = require('../api/error');
 
-
 //var async         = require('async'); //TODO no longer needed?
 var _ = require('underscore');
 var crypto = require('crypto');
@@ -80,4 +79,3 @@ var AssuranceCaseDAO = (function (_super) {
     return AssuranceCaseDAO;
 })(model.DAO);
 exports.AssuranceCaseDAO = AssuranceCaseDAO;
-

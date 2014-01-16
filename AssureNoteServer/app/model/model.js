@@ -4,7 +4,6 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-
 var events = require('events');
 
 var DAO = (function (_super) {
@@ -16,4 +15,3 @@ var DAO = (function (_super) {
     return DAO;
 })(events.EventEmitter);
 exports.DAO = DAO;
-
