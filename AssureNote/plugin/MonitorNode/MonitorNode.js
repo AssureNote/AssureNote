@@ -123,6 +123,30 @@ var AssureNote;
             }
         };
 
+        MonitorNodeManager.prototype.DeleteDeadMonitorNodes = function () {
+            for (var Label in this.MonitorNodeMap) {
+                var MNode = this.MonitorNodeMap[Label];
+                if (MNode.IsDead(this.App)) {
+                    this.DeleteMonitorNode(Label);
+                    if (this.NodeCount < 1 && this.IsRunning) {
+                        this.StopMonitoring();
+                        break;
+                    }
+                }
+            }
+        };
+
+        MonitorNodeManager.prototype.DeleteAllMonitorNodes = function () {
+            for (var Label in this.MonitorNodeMap) {
+                var MNode = this.MonitorNodeMap[Label];
+                this.DeleteMonitorNode(Label);
+                if (this.NodeCount < 1 && this.IsRunning) {
+                    this.StopMonitoring();
+                    break;
+                }
+            }
+        };
+
         MonitorNodeManager.prototype.StartMonitoring = function (Interval) {
             this.IsRunning = true;
             console.log("Start monitoring...");
@@ -185,11 +209,25 @@ var AssureNote;
         };
 
         MonitorStartCommand.prototype.Invoke = function (CommandName, FocuseView, Params) {
+            // Delete dead monitors before below process
+            MNodeManager.DeleteDeadMonitorNodes();
+
             if (Params.length == 1) {
                 var Param = Params[0];
                 if (Param == "all") {
-                    // TODO
-                    // Start all monitors
+                    for (var Label in this.App.PictgramPanel.ViewMap) {
+                        var View = this.App.PictgramPanel.ViewMap[Label];
+                        if (View.Model.NodeType != AssureNote.GSNType.Evidence) {
+                            continue;
+                        }
+
+                        var MNode = new MonitorNode(View);
+                        if (!MNode.Validate()) {
+                            continue;
+                        }
+
+                        MNodeManager.SetMonitorNode(MNode);
+                    }
                 } else {
                     var Label = Param;
                     var View = this.App.PictgramPanel.ViewMap[Label];
@@ -205,9 +243,10 @@ var AssureNote;
                     }
 
                     MNodeManager.SetMonitorNode(MNode);
-                    if (MNodeManager.NodeCount > 0 && !MNodeManager.IsRunning) {
-                        MNodeManager.StartMonitoring(5000);
-                    }
+                }
+
+                if (MNodeManager.NodeCount > 0 && !MNodeManager.IsRunning) {
+                    MNodeManager.StartMonitoring(5000);
                 }
             } else if (Params.length > 1) {
                 console.log("Too many parameter");
@@ -233,11 +272,14 @@ var AssureNote;
         };
 
         MonitorStopCommand.prototype.Invoke = function (CommandName, FocuseView, Params) {
+            // Delete dead monitors before below process
+            MNodeManager.DeleteDeadMonitorNodes();
+
             if (Params.length == 1) {
                 var Param = Params[0];
                 if (Param == "all") {
-                    // TODO
                     // Stop all monitors
+                    MNodeManager.DeleteAllMonitorNodes();
                 } else {
                     var Label = Param;
                     var View = this.App.PictgramPanel.ViewMap[Label];
