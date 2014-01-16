@@ -25,7 +25,7 @@ var UserDAO = (function (_super) {
     function UserDAO() {
         _super.apply(this, arguments);
     }
-    UserDAO.prototype.login = function (key, auth_id, callback) {
+    UserDAO.prototype.login = function (key, displayName, auth_id, callback) {
         var _this = this;
         function validate(key) {
             var checks = [];
@@ -44,22 +44,19 @@ var UserDAO = (function (_super) {
 
         this.select(key, function (err, resultSelect) {
             if (err) {
-                callback(err, null);
-                return;
-            }
-
-            if (resultSelect) {
-                callback(err, resultSelect);
-                return;
-            } else {
-                _this.insert(key, key, auth_id, function (err, resultInsert) {
+                _this.insert(key, displayName, auth_id, function (err, resultInsert) {
                     if (err) {
                         callback(err, null);
                         return;
                     }
+                    console.log(resultInsert);
                     callback(null, resultInsert);
                     return;
                 });
+                return;
+            } else {
+                callback(err, resultSelect);
+                return;
             }
         });
     };

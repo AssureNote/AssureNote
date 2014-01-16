@@ -156,7 +156,7 @@ module AssureNote {
 
         LoadDefaultWGSN(): void {
             if(window.location.pathname.match("/file/") != null) {
-                AssureNoteUtils.postJsonRPC("download", {fileId: window.location.pathname.replace(/\/file\//,"")}, (result: any) => {
+                AssureNoteUtils.postJsonRPC("download", {fileId: window.location.pathname.replace(/\/.*\//,"")}, (result: any) => {
                     this.LoadNewWGSN("hello.wgsn", result.content);
                 });
             } else {

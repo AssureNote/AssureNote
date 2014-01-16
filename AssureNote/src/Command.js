@@ -431,7 +431,7 @@ var AssureNote;
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {
-                window.location.href = "/file/" + result.fileId;
+                window.location.href = Config.BASEPATH + "/file/" + result.fileId;
             });
         };
         return UploadCommand;

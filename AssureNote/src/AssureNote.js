@@ -142,7 +142,7 @@ var AssureNote;
         AssureNoteApp.prototype.LoadDefaultWGSN = function () {
             var _this = this;
             if (window.location.pathname.match("/file/") != null) {
-                AssureNote.AssureNoteUtils.postJsonRPC("download", { fileId: window.location.pathname.replace(/\/file\//, "") }, function (result) {
+                AssureNote.AssureNoteUtils.postJsonRPC("download", { fileId: window.location.pathname.replace(/\/.*\//, "") }, function (result) {
                     _this.LoadNewWGSN("hello.wgsn", result.content);
                 });
             } else {

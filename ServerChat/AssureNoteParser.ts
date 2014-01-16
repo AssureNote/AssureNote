@@ -512,9 +512,6 @@ export class GSNNode {
 			this.Digest = null;
 			this.NodeDoc = Lib.LineFeed.trim();
 		}
-		if(!Lib.EqualsDigest(OldDigest, this.Digest) && this.BaseDoc != null) {
-			this.LastModified = this.BaseDoc.DocHistory;
-		}		
 	}
 
 	UpdateContent(TextDoc: string): void {

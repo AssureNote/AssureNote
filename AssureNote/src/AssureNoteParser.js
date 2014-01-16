@@ -505,9 +505,6 @@ var AssureNote;
                 this.Digest = null;
                 this.NodeDoc = Lib.LineFeed.trim();
             }
-            if (!Lib.EqualsDigest(OldDigest, this.Digest) && this.BaseDoc != null) {
-                this.LastModified = this.BaseDoc.DocHistory;
-            }
         };
 
         GSNNode.prototype.UpdateContent = function (TextDoc) {

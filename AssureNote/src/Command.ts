@@ -410,7 +410,7 @@ module AssureNote {
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             AssureNoteUtils.postJsonRPC("upload", {content: Writer.toString()}, (result: any) => {
-                window.location.href = "/file/" + result.fileId;
+                window.location.href = Config.BASEPATH + "/file/" + result.fileId;
             });
         }
     }

@@ -11,7 +11,7 @@ export class User {
 }
 
 export class UserDAO extends model.DAO {
-    login(key: string, auth_id: string, callback: (err:any, user: User) => void) {
+    login(key: string, displayName: string, auth_id: string, callback: (err:any, user: User) => void) {
         function validate(key: string) {
             var checks = [];
             if (key.length == 0) checks.push('User key is required.');
@@ -26,22 +26,19 @@ export class UserDAO extends model.DAO {
 
         this.select(key, (err, resultSelect) => {
             if (err) {
-                callback(err, null);
-                return;
-            }
-
-            if (resultSelect) {
-                callback(err, resultSelect);
-                return;
-            } else {
-                this.insert(key, key/*FIXME*/, auth_id, (err, resultInsert) => {
+                this.insert(key, displayName, auth_id, (err, resultInsert) => {
                     if (err) {
                         callback(err, null);
                         return;
                     }
+                    console.log(resultInsert);
                     callback(null, resultInsert);
                     return;
                 });
+                return;
+            } else {
+                callback(err, resultSelect);
+                return;
             }
 
         });

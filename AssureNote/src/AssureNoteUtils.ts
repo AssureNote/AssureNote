@@ -21,14 +21,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+///<reference path='../javascripts/config.ts'/>
 
-module AssureNote{
+module AssureNote {
     export module AssureNoteUtils {
 
         export function postJsonRPC(methodName: string, params: any, Callback: (result: any) => void, ErrorCallback?: () => void/*FIXME*/) {
             $.ajax({
                 type: "POST",
-                url: "/api/1.0",
+                url: Config.BASEPATH + "/api/1.0",
                 data: JSON.stringify({ jsonrpc: "2.0", id: "1", method: methodName, params: params }),
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
