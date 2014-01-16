@@ -35,7 +35,6 @@ function upload(params, userIdKey, callback) {
             });
         },
         function (next) {
-            console.log(userIdKey);
             userDAO.select(userIdKey, function (err, user) {
                 return next(err, user);
             });

@@ -14,7 +14,7 @@ var User = (function () {
         this.authId = authId;
     }
     User.tableToObject = function (row) {
-        return new User(row.id, row.name, row.auth_id);
+        return new User(row.id_key, row.display_name, row.auth_id);
     };
     return User;
 })();

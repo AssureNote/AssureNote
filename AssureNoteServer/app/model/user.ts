@@ -6,7 +6,7 @@ export class User {
     }
 
     static tableToObject(row:any) {
-        return new User(row.id, row.name, row.auth_id);
+        return new User(row.id_key, row.display_name, row.auth_id);
     }
 }
 
@@ -84,7 +84,7 @@ export class UserDAO extends model.DAO {
                 err = new error.NotFoundError('UserId Not Found.');
             } else {
                 resultUser = User.tableToObject(result[0]);
-            }	
+            }
             callback(err, resultUser);
         });
     }
