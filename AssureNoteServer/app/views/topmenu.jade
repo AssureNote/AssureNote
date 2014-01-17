@@ -37,10 +37,20 @@
               a#save-dcasemodel-menu(href='#')
                 span.glyphicon.glyphicon-floppy-save
                 | &nbsp;*.dcase_model...
+        li.divider
+        li
+          a#command-list-menu(href='#')
+            span.glyphicon.glyphicon-question-sign
+            | &nbsp;Command list
+        li
+          a#help-menu(href='#')
+            span.glyphicon.glyphicon-question-sign
+            | &nbsp;Help
         li
           a#about-menu(href='#')
             span.glyphicon.glyphicon-question-sign
             | &nbsp;About
     span#filename-view(style="margin-left: 10px;")
+
 if !isLocal
   include user_info

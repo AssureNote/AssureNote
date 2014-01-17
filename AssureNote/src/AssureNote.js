@@ -128,6 +128,12 @@ var AssureNote;
                 case "upload-menu":
                     Command = this.FindCommandByCommandLineName("upload");
                     break;
+                case "command-list-menu":
+                    Command = this.FindCommandByCommandLineName("help");
+                    break;
+                case "help-menu":
+                    window.open("https://github.com/AssureNote/AssureNote/blob/master/README.md");
+                    break;
             }
             if (Command != null) {
                 Command.Invoke(Id, this.PictgramPanel.MasterView, Args);
