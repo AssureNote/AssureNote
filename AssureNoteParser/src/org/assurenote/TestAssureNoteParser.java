@@ -341,4 +341,20 @@ public class TestAssureNoteParser {
 		assertEquals(LatestDoc.TopNode.SubNodeList.get(0).LastModified.Author, "shidasan");
 		assertEquals(LatestDoc.TopNode.SubNodeList.get(0).Created.Author, "unknown");
 	}
+	
+	@Test
+	public void HandWriting() {
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.OpenEditor("test", "test", null, "test");
+		GSNDoc Doc = MasterRecord.EditingDoc;
+	
+		GSNNode TopNode = new GSNNode(Doc, null, GSNType.Goal, null, -1, null);
+		GSNNode SubNode = new GSNNode(Doc, TopNode, GSNType.Context, null, -1, null);
+		
+		MasterRecord.CloseEditor();
+		StringWriter Writer = new StringWriter();
+		MasterRecord.FormatRecord(Writer);
+		System.out.println(Writer.toString());
+		System.out.println("hi");
+	}
 }
