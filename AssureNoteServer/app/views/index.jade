@@ -116,6 +116,7 @@ html
     script(type='text/javascript', src='#{basepath}/src/SearchNode.js')
     script(type='text/javascript', src='#{basepath}/src/Socket.js')
     script(type='text/javascript', src='#{basepath}/src/Editor.js')
+    script(type='text/javascript', src='#{basepath}/src/RecApi.js')
     script(type='text/javascript', src='#{basepath}/plugin/FullScreenEditor/FullScreenEditor.js')
     script(type='text/javascript', src='#{basepath}/plugin/FoldingViewSwitch/FoldingViewSwitch.js')
     script(type='text/javascript', src='#{basepath}/plugin/MessageChat/MessageChat.js')
@@ -124,6 +125,7 @@ html
     script(type='text/javascript', src='#{basepath}/plugin/RemoveNode/RemoveNode.js')
     script(type='text/javascript', src='#{basepath}/plugin/ToDo/ToDo.js')
     script(type='text/javascript', src='#{basepath}/plugin/LastModified/LastModified.js')
+    script(type='text/javascript', src='#{basepath}/plugin/MonitorNode/MonitorNode.js')
     script(type='text/javascript', src='#{basepath}/javascripts/config.js')
     script#default-case-ja(type='text/wgsn')
       | * G &2422f9c3
@@ -156,3 +158,5 @@ html
       | ** G &152377e9
       | Undeveloped
     script(type='text/javascript', src='#{basepath}/index.js')
+    if Analytics_UA != ''
+      include analytics 
