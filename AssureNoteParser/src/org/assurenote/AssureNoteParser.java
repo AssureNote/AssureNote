@@ -795,7 +795,7 @@ class GSNNode {
 	}
 
 	void FormatNode(StringWriter Writer) {
-		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
+		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
 		Writer.print(" ");
 		if (this.LabelName != null) {
 			Writer.print(this.LabelName);
@@ -1484,6 +1484,12 @@ class ParserContext {
 		}
 		return NewNode;
 	}
+	
+	void RemoveSentinel() {
+		if (this.FirstNode != null && this.FirstNode.ParentNode != null) {
+			this.FirstNode.ParentNode = null;
+		}
+	}
 
 	GSNNode ParseNode(StringReader Reader, HashMap<String, GSNNode> RefMap) {
 		while (Reader.HasNext()) {
@@ -1520,6 +1526,7 @@ class ParserContext {
 			Lib.Array_add(LineList, Line);
 		}
 		this.UpdateContent(LastNode, LineList);
+		this.RemoveSentinel();
 		return this.FirstNode;
 	}
 

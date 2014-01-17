@@ -95,9 +95,6 @@ module AssureNote {
                 var node: GSNNode = new GSNNode(this.Doc, null, Type, NodeType.charAt(0), AssureNoteUtils.GenerateUID(), null);
                 node.NodeDoc = Statement;
                 this.nodes[Id] = node;
-
-                /* TODO Need to remove this code */
-                node.ParentNode = new GSNNode(null, null, GSNType.Goal, null, -1, null);
             });
 
             $XML.find("rootBasicLink").each((index: any, elem: Element) => {

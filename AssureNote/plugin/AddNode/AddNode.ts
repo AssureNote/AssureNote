@@ -43,10 +43,6 @@ module AssureNote {
                 Doc.RenumberAll();
                 var TopGoal = Doc.TopNode;
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
-
-                /* TODO Need to remove this code */
-                TopGoal.ParentNode = new GSNNode(null, null, GSNType.Goal, null, -1, null);
-
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
                 this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());

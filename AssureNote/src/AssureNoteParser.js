@@ -645,7 +645,7 @@ var AssureNote;
         };
 
         GSNNode.prototype.FormatNode = function (Writer) {
-            Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel() - 1));
+            Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
             Writer.print(" ");
             if (this.LabelName != null) {
                 Writer.print(this.LabelName);
@@ -1324,6 +1324,12 @@ var AssureNote;
             return NewNode;
         };
 
+        ParserContext.prototype.RemoveSentinel = function () {
+            if (this.FirstNode != null && this.FirstNode.ParentNode != null) {
+                this.FirstNode.ParentNode = null;
+            }
+        };
+
         ParserContext.prototype.ParseNode = function (Reader, RefMap) {
             while (Reader.HasNext()) {
                 var Line = Reader.ReadLine();
@@ -1359,6 +1365,7 @@ var AssureNote;
                 Lib.Array_add(LineList, Line);
             }
             this.UpdateContent(LastNode, LineList);
+            this.RemoveSentinel();
             return this.FirstNode;
         };
 

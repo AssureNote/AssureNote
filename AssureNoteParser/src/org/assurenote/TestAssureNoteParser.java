@@ -348,13 +348,24 @@ public class TestAssureNoteParser {
 		MasterRecord.OpenEditor("test", "test", null, "test");
 		GSNDoc Doc = MasterRecord.EditingDoc;
 	
-		GSNNode TopNode = new GSNNode(Doc, null, GSNType.Goal, null, -1, null);
-		GSNNode SubNode = new GSNNode(Doc, TopNode, GSNType.Context, null, -1, null);
+		GSNNode TopNode = new GSNNode(Doc, null, GSNType.Goal, null, 1, null);
+		GSNNode SubNode = new GSNNode(Doc, TopNode, GSNType.Context, null, 1, null);
+		Doc.TopNode = TopNode;
 		
 		MasterRecord.CloseEditor();
 		StringWriter Writer = new StringWriter();
 		MasterRecord.FormatRecord(Writer);
-		System.out.println(Writer.toString());
-		System.out.println("hi");
+
+		GSNRecord NewRecord = new GSNRecord();
+		NewRecord.Parse(Writer.toString());
+		
+		GSNDoc NewDoc = NewRecord.GetLatestDoc();
+		assertEquals(true, NewDoc.TopNode.IsGoal());
+		assertEquals(1, NewDoc.TopNode.SubNodeList.size());
+		assertEquals(true, NewDoc.TopNode.SubNodeList.get(0).IsContext());
+		
+		StringWriter NewWriter = new StringWriter();
+		NewRecord.FormatRecord(NewWriter);
+		assertEquals(Writer.toString(), NewWriter.toString());
 	}
 }
