@@ -4,11 +4,13 @@
   if(UserName != "Guest")
     a.btn.clickable(href='#{basepath}/logout')
       button.btn.btn-default.btn-large
-        span.glyphicon.glyphicon-log-out LogOut
+        span.glyphicon.glyphicon-log-out
+        | &nbsp; Logout
   else
     a.btn.clickable(href='#{basepath}/auth/github')
       button.btn.btn-default.btn-large
-        span.glyphicon.glyphicon-log-out LogIn
+        span.glyphicon.glyphicon-log-out
+        | &nbsp; Login
   //.list-group-item-heading
     a(href='#{basepath}/case/${caseId}/${prevRevision}')
       span.glyphicon.glyphicon-circle-arrow-left
