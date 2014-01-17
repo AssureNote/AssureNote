@@ -51,7 +51,7 @@ var AssureNote;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
 
                 /* TODO Need to remove this code */
-                TopGoal.ParentNode = new AssureNote.GSNNode(null, null, AssureNote.GSNType.Goal, null, -1, null);
+                TopGoal.ParentNode = new AssureNote.GSNNode(null, null, 0 /* Goal */, null, -1, null);
 
                 NewNodeView.SaveFoldedFlag(_this.AssureNoteApp.PictgramPanel.ViewMap);
                 _this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
@@ -61,38 +61,37 @@ var AssureNote;
         };
 
         AddNodePlugin.prototype.CreateGoalMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(AssureNote.GSNType.Goal));
+            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(0 /* Goal */));
         };
 
         AddNodePlugin.prototype.CreateContextMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(AssureNote.GSNType.Context));
+            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(1 /* Context */));
         };
 
         AddNodePlugin.prototype.CreateStrategyMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(AssureNote.GSNType.Strategy));
+            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(2 /* Strategy */));
         };
 
         AddNodePlugin.prototype.CreateEvidenceMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(AssureNote.GSNType.Evidence));
+            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(3 /* Evidence */));
         };
 
         AddNodePlugin.prototype.CreateMenuBarButtons = function (View) {
             var res = [];
             var NodeType = View.GetNodeType();
             switch (NodeType) {
-                case AssureNote.GSNType.Goal:
+                case 0 /* Goal */:
                     res = res.concat([
                         this.CreateContextMenu(View),
                         this.CreateStrategyMenu(View),
-                        this.CreateEvidenceMenu(View)
-                    ]);
+                        this.CreateEvidenceMenu(View)]);
                     break;
-                case AssureNote.GSNType.Strategy:
+                case 2 /* Strategy */:
                     res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
                     break;
-                case AssureNote.GSNType.Context:
+                case 1 /* Context */:
                     break;
-                case AssureNote.GSNType.Evidence:
+                case 3 /* Evidence */:
                     res.push(this.CreateContextMenu(View));
                     break;
                 default:

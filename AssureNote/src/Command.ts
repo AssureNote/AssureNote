@@ -401,6 +401,14 @@ module AssureNote {
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
+            var Commands = this.App.Commands;
+            var Keys: string[] = [];
+            for (var Key in Commands) {
+                Keys.push(Key);
+            }
+            Keys.sort();
+            var Helps: string[] = jQuery.unique(jQuery.map(Keys, (Key: string, i: number): string => { return Commands[Key].GetHelpHTML(); }).sort());
+            $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
             (<any>$("#help-modal")).modal();
         }
     }

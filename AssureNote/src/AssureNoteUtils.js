@@ -25,7 +25,7 @@
 var AssureNote;
 (function (AssureNote) {
     (function (AssureNoteUtils) {
-        function postJsonRPC(methodName, params, Callback, ErrorCallback/*FIXME*/ ) {
+        function postJsonRPC(methodName, params, Callback, ErrorCallback /*FIXME*/ ) {
             $.ajax({
                 type: "POST",
                 url: Config.BASEPATH + "/api/1.0",
@@ -74,13 +74,13 @@ var AssureNote;
 
         function CreateGSNShape(NodeView) {
             switch (NodeView.GetNodeType()) {
-                case AssureNote.GSNType.Goal:
+                case 0 /* Goal */:
                     return new AssureNote.GSNGoalShape(NodeView);
-                case AssureNote.GSNType.Context:
+                case 1 /* Context */:
                     return new AssureNote.GSNContextShape(NodeView);
-                case AssureNote.GSNType.Strategy:
+                case 2 /* Strategy */:
                     return new AssureNote.GSNStrategyShape(NodeView);
-                case AssureNote.GSNType.Evidence:
+                case 3 /* Evidence */:
                     return new AssureNote.GSNEvidenceShape(NodeView);
             }
         }
