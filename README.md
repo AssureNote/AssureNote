@@ -1,6 +1,10 @@
 AssureNote
 ==========
 
+![Alt text](/sample/images/Overview.png)
+AssureNoteはブラウザ上でGSNを記述するためのツールです。
+シンプルなレイアウトと、WGSN（Wiki-style GSN）と呼ばれるテキストベースの編集方法をサポートしているのが特徴です。
+
 ## 対応フォーマット
 現在以下のフォーマットに対応しています。
 * Wiki-style GSN (*.wgsn)

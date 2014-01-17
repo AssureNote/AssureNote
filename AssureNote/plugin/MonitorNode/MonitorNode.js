@@ -83,9 +83,12 @@ var AssureNote;
             return false;
         };
 
-        MonitorNode.prototype.Update = function (Rec) {
+        MonitorNode.prototype.Update = function (Rec, ErrorCallback) {
             // Get latest data from REC
-            var LatestLog = Rec.GetLatestData(this.Location, this.Type);
+            var LatestLog = Rec.GetLatestData(this.Location, this.Type, ErrorCallback);
+            if (LatestLog == null) {
+                return;
+            }
 
             // Update past logs
             if (!(this.PastLogs.length < 20)) {
@@ -171,11 +174,19 @@ var AssureNote;
                     }
 
                     // Check red nodes
-                    MNode.Update(self.Rec);
-                    var View = MNode.View;
-                    while (View != null) {
-                        RedNodeMap[View.Label] = true;
-                        View = View.Parent;
+                    MNode.Update(self.Rec, function (Request, Status, Error) {
+                        self.StopMonitoring();
+                    } /* error handler */ );
+
+                    if (!self.IsRunning)
+                        break;
+
+                    if (MNode.Status == false) {
+                        var View = MNode.View;
+                        while (View != null) {
+                            RedNodeMap[View.Label] = true;
+                            View = View.Parent;
+                        }
                     }
                 }
 
