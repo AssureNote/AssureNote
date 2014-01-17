@@ -12,6 +12,9 @@ debug_user:
   loginName: 'tsunade'
 assurenote:
     basepath: ''
+analytics:
+    Analytics_UA: '' #e.g., UA-********-*
+    Analytics_Domain: '' #e.g., www.example.com
 passport:
     resolveURL: 'localhost:3000'
     FACEBOOK_APP_ID: ''

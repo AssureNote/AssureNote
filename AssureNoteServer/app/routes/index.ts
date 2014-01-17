@@ -6,15 +6,22 @@ var db           = require('../db/db')
 var util_auth    = require('../util/auth')
 var CONFIG = require('config')
 
+var getAnalyticsStatus = function(params: any) {
+    if (CONFIG.analytics && CONFIG.analytics.Analytics_UA && CONFIG.analytics.Analytics_Domain) {
+        params.Analytics_UA = CONFIG.analytics.Analytics_UA;
+        params.Analytics_Domain = CONFIG.analytics.Analytics_Domain;
+    }
+}
+
 var getBasicParam = function(req: any, res: any) {
-    var params: any = {basepath: CONFIG.assurenote.basepath, title: 'Assure-It', lang: lang.lang.en, UserName: null};
+    var params: any = {basepath: CONFIG.assurenote.basepath, title: 'AssureNote', lang: lang.lang.en, UserName: null};
     var auth = new util_auth.Auth(req, res);
 
     if(!auth.isLogin()) {
         auth.clear();
         auth.set('guest', 'Guest');
     }
-    params = {basepath: CONFIG.assurenote.basepath, title: 'Assure-It', lang: lang.lang.en, UserName: auth.getLoginName() };
+    params.UserName = auth.getLoginName();
     return params;
 }
 
