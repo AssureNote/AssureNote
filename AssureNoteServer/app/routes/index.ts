@@ -6,7 +6,7 @@ var db           = require('../db/db')
 var util_auth    = require('../util/auth')
 var CONFIG = require('config')
 
-var getAnalyticsStatus = function(params: any) {
+var setAnalyticsStatus = function(params: any) {
     if (CONFIG.analytics && CONFIG.analytics.Analytics_UA && CONFIG.analytics.Analytics_Domain) {
         params.Analytics_UA = CONFIG.analytics.Analytics_UA;
         params.Analytics_Domain = CONFIG.analytics.Analytics_Domain;
@@ -22,6 +22,7 @@ var getBasicParam = function(req: any, res: any) {
         auth.set('guest', 'Guest');
     }
     params.UserName = auth.getLoginName();
+    setAnalyticsStatus(params);
     return params;
 }
 
