@@ -46,6 +46,10 @@ var AssureNote;
             return "Editor";
         };
 
+        FullScreenEditorCommand.prototype.GetHelpHTML = function () {
+            return "<code>edit [label]</code><br>Open editor.";
+        };
+
         FullScreenEditorCommand.prototype.Invoke = function (CommandName, Target, Params) {
             var Label;
             if (Params.length < 1) {

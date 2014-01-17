@@ -45,6 +45,10 @@ var AssureNote;
             return "Message";
         };
 
+        MessageCommand.prototype.GetHelpHTML = function () {
+            return "<code>message msg</code><br>Send message to the chat server.";
+        };
+
         MessageCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (this.App.SocketManager.IsConnected()) {
                 this.App.SocketManager.Emit('message', Params.join(' '));
@@ -66,6 +70,10 @@ var AssureNote;
 
         ConnectCommand.prototype.GetDisplayName = function () {
             return "Connect";
+        };
+
+        ConnectCommand.prototype.GetHelpHTML = function () {
+            return "<code>connect [uri]</code><br>Connect to the chat server.";
         };
 
         ConnectCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {

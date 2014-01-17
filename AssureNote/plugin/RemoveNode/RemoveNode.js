@@ -44,6 +44,10 @@ var AssureNote;
             return "Remove";
         };
 
+        RemoveCommand.prototype.GetHelpHTML = function () {
+            return "<code>remove [label]</code><br>Remove a node and it's descendant.";
+        };
+
         RemoveCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
                 var Label = Params[0];

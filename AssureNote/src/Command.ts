@@ -108,7 +108,7 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>save [name]</code><br>Save editing GSN."
+            return "<code>save [name]</code><br>Save editing GSN.<dl><dt>[name]</dt><dd>File name to save.</dd></dl>"
         }
 
         ConvertToDCaseXML(root: GSNNode): string {
@@ -274,6 +274,10 @@ module AssureNote {
             return "New";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>new [name]</code><br>Create new file."
+        }
+
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], "* G1");
@@ -302,6 +306,10 @@ module AssureNote {
             return "Unfold All";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>unfold-all</code><br>Unfold all folded Goals"
+        }
+
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = (TargetView: NodeView) => {
@@ -326,6 +334,10 @@ module AssureNote {
 
         public GetDisplayName(): string {
             return "Set Color...";
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>set-color color</code><br>Change node color."
         }
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
@@ -357,6 +369,10 @@ module AssureNote {
             return "Set Scale...";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>set-scale scale</code><br>Change scale."
+        }
+
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(<number><any>Params[0] - 0);
@@ -377,6 +393,10 @@ module AssureNote {
             return "Open...";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>open</code><br>Open a file."
+        }
+
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             $("#file-open-dialog").change((e: Event) => {
                 var target = e.target || e.srcElement;
@@ -392,22 +412,19 @@ module AssureNote {
         }
 
         public GetCommandLineNames(): string[] {
-            return ["help"];
+            return ["help", "?"];
         }
 
         public GetDisplayName(): string {
             return "Help";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>help [name]</code><br>Show this message."
+        }
+
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
-            // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
-            var Commands = this.App.Commands;
-            var Keys: string[] = [];
-            for (var Key in Commands) {
-                Keys.push(Key);
-            }
-            Keys.sort();
-            var Helps: string[] = jQuery.unique(jQuery.map(Keys, (Key: string, i: number): string => { return Commands[Key].GetHelpHTML(); }).sort());
+            var Helps: string[] = jQuery.map(this.App.Commands, (Command: Command, i: number): string => { return Command.GetHelpHTML(); }).sort();
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
             (<any>$("#help-modal")).modal();
         }
@@ -424,6 +441,10 @@ module AssureNote {
 
         public GetDisplayName(): string {
             return "Upload";
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>upload</code><br>Upload editing GSN to the server(online version only)."
         }
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {

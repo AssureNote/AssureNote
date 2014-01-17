@@ -40,6 +40,10 @@ module AssureNote {
             return "Editor";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>edit [label]</code><br>Open editor."
+        }
+
         public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
             var Label: string;
             if (Params.length < 1) {

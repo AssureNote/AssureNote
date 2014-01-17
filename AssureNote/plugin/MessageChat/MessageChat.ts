@@ -37,6 +37,10 @@ module AssureNote {
             return "Message";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>message msg</code><br>Send message to the chat server."
+        }
+
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             if (this.App.SocketManager.IsConnected()) {
                 this.App.SocketManager.Emit('message', Params.join(' '));
@@ -52,6 +56,10 @@ module AssureNote {
 
         public GetDisplayName(): string {
             return "Connect";
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>connect [uri]</code><br>Connect to the chat server."
         }
 
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {

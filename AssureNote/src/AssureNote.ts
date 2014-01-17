@@ -37,13 +37,15 @@ module AssureNote {
 		IsDebugMode: boolean;
 		MasterRecord: GSNRecord;
 		WGSNName: string;
-        Commands: { [index: string]: Command };
+        Commands: Command[];
+        private CommandLineTable: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
 
         private UserName: string;
 
 		constructor() {
-            this.Commands = {};
+            this.Commands = [];
+            this.CommandLineTable = {};
 
             this.PluginManager = new PluginManager(this);
             this.SocketManager = new SocketManager(this);
@@ -66,9 +68,10 @@ module AssureNote {
 		}
 
         public RegistCommand(Command: Command) {
+            this.Commands.push(Command);
             var Names = Command.GetCommandLineNames();
             for (var i = 0; i < Names.length; ++i) {
-                this.Commands[Names[i].toLowerCase()] = Command;
+                this.CommandLineTable[Names[i].toLowerCase()] = Command;
             }
         }
 
@@ -90,7 +93,7 @@ module AssureNote {
         }
 
         FindCommandByCommandLineName(Name: string): Command {
-            return this.Commands[Name.toLowerCase()] || this.DefaultCommand;
+            return this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
         }
 
         ExecTopMenu(Id: string): void {

@@ -117,7 +117,7 @@ var AssureNote;
         };
 
         SaveCommand.prototype.GetHelpHTML = function () {
-            return "<code>save [name]</code><br>Save editing GSN.";
+            return "<code>save [name]</code><br>Save editing GSN.<dl><dt>[name]</dt><dd>File name to save.</dd></dl>";
         };
 
         SaveCommand.prototype.ConvertToDCaseXML = function (root) {
@@ -282,6 +282,10 @@ var AssureNote;
             return "New";
         };
 
+        NewCommand.prototype.GetHelpHTML = function () {
+            return "<code>new [name]</code><br>Create new file.";
+        };
+
         NewCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], "* G1");
@@ -312,6 +316,10 @@ var AssureNote;
             return "Unfold All";
         };
 
+        UnfoldAllCommand.prototype.GetHelpHTML = function () {
+            return "<code>unfold-all</code><br>Unfold all folded Goals";
+        };
+
         UnfoldAllCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = function (TargetView) {
@@ -338,6 +346,10 @@ var AssureNote;
 
         SetColorCommand.prototype.GetDisplayName = function () {
             return "Set Color...";
+        };
+
+        SetColorCommand.prototype.GetHelpHTML = function () {
+            return "<code>set-color color</code><br>Change node color.";
         };
 
         SetColorCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
@@ -371,6 +383,10 @@ var AssureNote;
             return "Set Scale...";
         };
 
+        SetScaleCommand.prototype.GetHelpHTML = function () {
+            return "<code>set-scale scale</code><br>Change scale.";
+        };
+
         SetScaleCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
@@ -393,6 +409,10 @@ var AssureNote;
             return "Open...";
         };
 
+        OpenCommand.prototype.GetHelpHTML = function () {
+            return "<code>open</code><br>Open a file.";
+        };
+
         OpenCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             var _this = this;
             $("#file-open-dialog").change(function (e) {
@@ -411,24 +431,21 @@ var AssureNote;
             _super.call(this, App);
         }
         HelpCommand.prototype.GetCommandLineNames = function () {
-            return ["help"];
+            return ["help", "?"];
         };
 
         HelpCommand.prototype.GetDisplayName = function () {
             return "Help";
         };
 
+        HelpCommand.prototype.GetHelpHTML = function () {
+            return "<code>help [name]</code><br>Show this message.";
+        };
+
         HelpCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
-            // TODO Impl interface like "GetHelpString" to all commands and collect message by it.
-            var Commands = this.App.Commands;
-            var Keys = [];
-            for (var Key in Commands) {
-                Keys.push(Key);
-            }
-            Keys.sort();
-            var Helps = jQuery.unique(jQuery.map(Keys, function (Key, i) {
-                return Commands[Key].GetHelpHTML();
-            }).sort());
+            var Helps = jQuery.map(this.App.Commands, function (Command, i) {
+                return Command.GetHelpHTML();
+            }).sort();
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
             $("#help-modal").modal();
         };
@@ -447,6 +464,10 @@ var AssureNote;
 
         UploadCommand.prototype.GetDisplayName = function () {
             return "Upload";
+        };
+
+        UploadCommand.prototype.GetHelpHTML = function () {
+            return "<code>upload</code><br>Upload editing GSN to the server(online version only).";
         };
 
         UploadCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {

@@ -29,7 +29,8 @@ var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
-            this.Commands = {};
+            this.Commands = [];
+            this.CommandLineTable = {};
 
             this.PluginManager = new AssureNote.PluginManager(this);
             this.SocketManager = new AssureNote.SocketManager(this);
@@ -51,9 +52,10 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
+            this.Commands.push(Command);
             var Names = Command.GetCommandLineNames();
             for (var i = 0; i < Names.length; ++i) {
-                this.Commands[Names[i].toLowerCase()] = Command;
+                this.CommandLineTable[Names[i].toLowerCase()] = Command;
             }
         };
 
@@ -75,7 +77,7 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
-            return this.Commands[Name.toLowerCase()] || this.DefaultCommand;
+            return this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
         };
 
         AssureNoteApp.prototype.ExecTopMenu = function (Id) {

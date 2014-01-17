@@ -46,6 +46,10 @@ var AssureNote;
             return "FoldingView";
         };
 
+        FoldingCommand.prototype.GetHelpHTML = function () {
+            return "<code>fold label</code><br>Toggle folding state of Goal.";
+        };
+
         FoldingCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
             if (Params.length < 1) {
                 this.App.DebugP("no args");
