@@ -2,11 +2,11 @@
   .glyphicon.glyphicon-user
   | &nbsp; #{UserName} 
   if(UserName != "Guest")
-    a.btn(href='#{basepath}/logout') 
+    a.btn.clickable(href='#{basepath}/logout')
       button.btn.btn-default.btn-large
         span.glyphicon.glyphicon-log-out LogOut
   else
-    a.btn(href='#{basepath}/auth/github') 
+    a.btn.clickable(href='#{basepath}/auth/github')
       button.btn.btn-default.btn-large
         span.glyphicon.glyphicon-log-out LogIn
   //.list-group-item-heading
