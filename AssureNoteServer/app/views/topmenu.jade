@@ -1,8 +1,8 @@
-.navbar.navbar-default.logo-offset
+.navbar.navbar-default.logo-offset.nonclickable
   .navbar-collapse
     a.logo-fixed(href='#')
       img#logo(src='#{basepath}/images/logo.png', alt='AssureNote')
-    .btn-group
+    .btn-group.clickable
       button#file-menu-button.btn.navbar-btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', oncontextmenu='return false')
         span.glyphicon.glyphicon-file
         | &nbsp;File&nbsp;

@@ -141,3 +141,11 @@ h4 {
     margin-top: -100px;
     display:none;
 }
+
+.nonclickable {
+	pointer-events: none;
+}
+
+.nonclickable .clickable {
+	pointer-events: initial;
+}
