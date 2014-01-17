@@ -29,15 +29,8 @@ export var login = function(req: any, res: any) {
     var user: any = req.user;
     var UserId = GetUserId(user);
     var UserName = GetUserName(user);
-    //if (!UserId || UserName) {
-    //    console.log('Auth failed');
-    //    res.redirect(CONFIG.assurenote.basepath+'/');
-    //}
+    var Referer = req.header('Referer');
 
-    /* TODO Write some code for login */
-    /* At this time, we just use UserName and UserId for identification. */
-    /* Possively it's not enough. */
-    //console.log('Login. UserId: ' + UserId + ', UserName: ' + UserName);
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
     console.log(UserId);
@@ -51,7 +44,7 @@ export var login = function(req: any, res: any) {
         }
         var auth = new util_auth.Auth(req, res);
         auth.set(UserId, UserName);
-        res.redirect(CONFIG.assurenote.basepath+'/');
+        res.redirect(Referer);
     });
 }
 
@@ -112,10 +105,6 @@ export var logout = function(req: any, res: any) {
             callbackURL: CONFIG.passport.resolveURL + "/auth/github/callback"
         },
         function(accessToken, refreshToken, profile, done) {
-            console.log('GitHub-Auth');
-            //profile.displayName = profile.username;
-            //profile.loginName = profile.username;
-            //console.log(profile);
             process.nextTick(function() {
                 return done(null, profile);
             });

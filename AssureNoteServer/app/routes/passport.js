@@ -28,6 +28,7 @@ exports.login = function (req, res) {
     var user = req.user;
     var UserId = GetUserId(user);
     var UserName = GetUserName(user);
+    var Referer = req.header('Referer');
 
     //if (!UserId || UserName) {
     //    console.log('Auth failed');
@@ -50,7 +51,7 @@ exports.login = function (req, res) {
         }
         var auth = new util_auth.Auth(req, res);
         auth.set(UserId, UserName);
-        res.redirect(CONFIG.assurenote.basepath + '/');
+        res.redirect(Referer);
     });
 };
 
