@@ -426,6 +426,7 @@ module AssureNote {
         public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
             var Helps: string[] = jQuery.map(this.App.Commands, (Command: Command, i: number): string => { return Command.GetHelpHTML(); }).sort();
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
+            $("#help-modal .modal-body").css({ "overflow-y": "scroll", "height": this.App.PictgramPanel.Viewport.GetPageHeight() * 0.6 });
             (<any>$("#help-modal")).modal();
         }
     }
