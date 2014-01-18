@@ -316,7 +316,7 @@ module AssureNote {
         constructor(public AssureNoteApp: AssureNoteApp) {
             var textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('editor'), {
                 lineNumbers: true,
-                mode: "text/x-asn",
+                mode: "wgsn",
                 lineWrapping: true,
             });
             this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');

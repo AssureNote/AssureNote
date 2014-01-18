@@ -300,7 +300,7 @@ var AssureNote;
             this.IsVisible = true;
             var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
                 lineNumbers: true,
-                mode: "text/x-asn",
+                mode: "wgsn",
                 lineWrapping: true
             });
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');

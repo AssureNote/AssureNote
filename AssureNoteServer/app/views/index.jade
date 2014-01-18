@@ -7,12 +7,13 @@ html
     title AssureNote
     link(rel='stylesheet', href='#{basepath}/lib/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='#{basepath}/lib//animate-custom.css')
-    link(rel='stylesheet', href='#{basepath}/lib/codemirror.css')
+    link(rel='stylesheet', href='#{basepath}/lib/codemirror/codemirror.css')
     link(rel='stylesheet', href='#{basepath}/css/dcase-node.css')
     link(rel='stylesheet', href='#{basepath}/css/sidemenu.css')
     link(rel='stylesheet', href='#{basepath}/css/historymenu.css')
     link(rel='stylesheet', href='#{basepath}/css/index.css')
     link(rel='stylesheet', href='#{basepath}/css/topmenu.css')
+    link(rel='stylesheet', href='#{basepath}/css/codehighlight.css')
   body(style='overflow: hidden; margin: 0px;')
     #assure-note(style='width: 100%; height: 100%;')
       input#file-open-dialog(type='file', accept='.wgsn,.dcase_model', style='display:none;')
@@ -73,7 +74,8 @@ html
     script(type='text/javascript', src='#{basepath}/lib/jquery.cookie.js')
     script(type='text/javascript', src='#{basepath}/lib/jquery.mousewheel.js')
     script(type='text/javascript', src='#{basepath}/lib/pointer.min.js')
-    script(type='text/javascript', src='#{basepath}/lib/codemirror.js')
+    script(type='text/javascript', src='#{basepath}/lib/codemirror/codemirror.js')
+    script(type='text/javascript', src='#{basepath}/lib/codemirror/highlight/wgsn.js')
     script(type='text/javascript', src='#{basepath}/lib/FileSaver.js')
     script(type='text/javascript', src='#{basepath}/lib/notify.min.js')
     script(type='text/javascript', src='#{basepath}/lib/bootstrap/js/bootstrap.min.js')
@@ -136,5 +138,5 @@ html
       | ** G &152377e9
       | Undeveloped
     script(type='text/javascript', src='#{basepath}/index.js')
-    if Analytics_UA != ''
+    if Analytics_UA != null && Analytics_UA != ''
       include analytics 
