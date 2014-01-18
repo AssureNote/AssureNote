@@ -93,6 +93,7 @@ var AssureNote;
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
+                console.log(event.keyCode);
                 switch (event.keyCode) {
                     case 58:
                         if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
@@ -114,6 +115,7 @@ var AssureNote;
                                 _this.Search.Search(_this.MasterView, true, ParsedCommand.GetArgs()[0]);
                             }
                             _this.AssureNoteApp.ExecCommand(ParsedCommand);
+                            _this.CmdLine.AddHistory(ParsedCommand.GetRawString());
                             _this.CmdLine.Hide();
                             _this.CmdLine.Clear();
                             return false;
@@ -128,6 +130,16 @@ var AssureNote;
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.Hide();
                             _this.CmdLine.Clear();
+                        }
+                        break;
+                    case 38:
+                        if (_this.CmdLine.IsVisible) {
+                            _this.CmdLine.ShowPrevHistory();
+                        }
+                        break;
+                    case 40:
+                        if (_this.CmdLine.IsVisible) {
+                            _this.CmdLine.ShowNextHistory();
                         }
                         break;
                 }

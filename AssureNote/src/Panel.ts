@@ -130,6 +130,7 @@ module AssureNote {
                                 this.Search.Search(this.MasterView, true/*FIXME*/, ParsedCommand.GetArgs()[0]);
                             }
                             this.AssureNoteApp.ExecCommand(ParsedCommand);
+                            this.CmdLine.AddHistory(ParsedCommand.GetRawString());
                             this.CmdLine.Hide();
                             this.CmdLine.Clear();
                             return false;
@@ -144,6 +145,16 @@ module AssureNote {
                         if (this.CmdLine.IsVisible) {
                             this.CmdLine.Hide();
                             this.CmdLine.Clear();
+                        }
+                        break;
+                    case 38: /*up*/
+                        if(this.CmdLine.IsVisible) {
+                            this.CmdLine.ShowPrevHistory();
+                        }
+                        break;
+                    case 40: /*down*/
+                        if(this.CmdLine.IsVisible) {
+                            this.CmdLine.ShowNextHistory();
                         }
                         break;
 				}

@@ -26,93 +26,135 @@
 
 module AssureNote {
 
-	export class CommandParser {
-		private Method: string;
-		private Args: string[];
+    export class CommandParser {
+        private Method: string;
+        private Args: string[];
+        private RawString: string;
 
-		constructor() {
-		}
+        constructor() {
+        }
 
-		Parse(line: string): void {
-			var s = line.split(" ");
+        Parse(line: string): void {
+            var s = line.split(" ");
             if (s.length > 0) {
                 if (s[0][0] == null) {
                     this.Method = "";
                     return;
                 }
-				if (s[0][0].match(/\//) != null) {
-					this.Method = "search";
-					this.Args = [];
-					this.Args.push(line.slice(1));
-					return;
-				} else if (s[0][0].match(/:/) != null) {
-					this.Method = s[0].slice(1);
-					if (s.length > 1) {
-						this.Args = s.slice(1);
-					}
-				} else if (s[0][0].match(/@/) != null) {
-					this.Method = "message";
-					this.Args = [];
-					this.Args.push(line.slice(1));
-				}
-			}
-		}
+                this.RawString = line;
+                if (s[0][0].match(/\//) != null) {
+                    this.Method = "search";
+                    this.Args = [];
+                    this.Args.push(line.slice(1));
+                    return;
+                } else if (s[0][0].match(/:/) != null) {
+                    this.Method = s[0].slice(1);
+                    if (s.length > 1) {
+                        this.Args = s.slice(1);
+                    }
+                } else if (s[0][0].match(/@/) != null) {
+                    this.Method = "message";
+                    this.Args = [];
+                    this.Args.push(line.slice(1));
+                }
+            }
+        }
 
-		GetMethod(): string {
-			AssureNoteApp.Assert(this.Method != null);
-			return this.Method;
-		}
+        GetRawString(): string {
+            return this.RawString;
+        }
 
-		GetArgs(): string[]{
-			if (this.Args == null) {
-				this.Args = [];
-			}
-			return this.Args;
-		}
+        GetMethod(): string {
+            AssureNoteApp.Assert(this.Method != null);
+            return this.Method;
+        }
 
-		GetArg(n: number): string {
-			return this.Args[n];
-		}
+        GetArgs(): string[]{
+            if (this.Args == null) {
+                this.Args = [];
+            }
+            return this.Args;
+        }
 
-	}
+        GetArg(n: number): string {
+            return this.Args[n];
+        }
 
-	export class CommandLine {
-		Element: JQuery;
-		IsVisible: boolean;
-		IsEnable: boolean;
-		constructor() {
-			this.Element = $("#command-line");
-			this.IsEnable = true;
-			this.IsVisible = false;
-		}
+    }
 
-		Enable(): void {
-			this.IsEnable = true;
-		}
+    export class CommandLine {
+        Element: JQuery;
+        IsVisible: boolean;
+        IsEnable: boolean;
+        private HistoryList: string[];
+        private HistoryIndex: number;
+        //TODO search libreadline API
+        constructor() {
+            this.Element = $("#command-line");
+            this.IsEnable = true;
+            this.IsVisible = false;
+            this.HistoryList = [];
+            this.HistoryIndex = 0;
+        }
 
-		Disable(): void {
-			this.IsEnable = false;
-			this.Hide();
-		}
+        Enable(): void {
+            this.IsEnable = true;
+        }
 
-		Clear(): void {
-			this.Element.val("");
-		}
+        Disable(): void {
+            this.IsEnable = false;
+            this.Hide();
+        }
 
-		Show(): void {
-			this.Element.css("display", "block");
-			this.Element.focus();
-			this.IsVisible = true;
-		}
+        Clear(): void {
+            this.Element.val("");
+        }
 
-		Hide(): void {
-			this.Element.css("display","none");
-			this.IsVisible = false;
-		}
+        Show(): void {
+            this.Element.css("display", "block");
+            this.Element.focus();
+            this.HistoryIndex = 0;
+            this.IsVisible = true;
+        }
 
-		GetValue(): string {
-			return this.Element.val();
-		}
-	}
+        Hide(): void {
+            this.Element.css("display","none");
+            this.IsVisible = false;
+        }
+
+        GetValue(): string {
+            return this.Element.val();
+        }
+
+        AddHistory(line: string): void {
+            this.HistoryList.splice(0,0, line);
+        }
+
+        SaveHistory(): void {
+            localStorage.setItem("commandline:history", JSON.stringify(this.HistoryList));
+        }
+
+        LoadHistory(): void {
+            var list = localStorage.getItem("commandline:history");
+            this.HistoryList = JSON.parse(list);
+        }
+
+        //TODO recognize : or / or @
+        ShowNextHistory(): void {
+            if(this.HistoryIndex > 0) {
+                this.Element.val(this.HistoryList[this.HistoryIndex]);
+                this.HistoryIndex -= 1;
+            } else if(this.HistoryIndex == 0) {
+                this.Element.val(":");
+            }
+        }
+
+        ShowPrevHistory(): void {
+            if(this.HistoryIndex < this.HistoryList.length) {
+                this.Element.val(this.HistoryList[this.HistoryIndex]);
+                this.HistoryIndex += 1;
+            }
+        }
+    }
 
 }

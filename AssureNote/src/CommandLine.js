@@ -34,6 +34,7 @@ var AssureNote;
                     this.Method = "";
                     return;
                 }
+                this.RawString = line;
                 if (s[0][0].match(/\//) != null) {
                     this.Method = "search";
                     this.Args = [];
@@ -50,6 +51,10 @@ var AssureNote;
                     this.Args.push(line.slice(1));
                 }
             }
+        };
+
+        CommandParser.prototype.GetRawString = function () {
+            return this.RawString;
         };
 
         CommandParser.prototype.GetMethod = function () {
@@ -72,10 +77,13 @@ var AssureNote;
     AssureNote.CommandParser = CommandParser;
 
     var CommandLine = (function () {
+        //TODO search libreadline API
         function CommandLine() {
             this.Element = $("#command-line");
             this.IsEnable = true;
             this.IsVisible = false;
+            this.HistoryList = [];
+            this.HistoryIndex = 0;
         }
         CommandLine.prototype.Enable = function () {
             this.IsEnable = true;
@@ -93,6 +101,7 @@ var AssureNote;
         CommandLine.prototype.Show = function () {
             this.Element.css("display", "block");
             this.Element.focus();
+            this.HistoryIndex = 0;
             this.IsVisible = true;
         };
 
@@ -103,6 +112,36 @@ var AssureNote;
 
         CommandLine.prototype.GetValue = function () {
             return this.Element.val();
+        };
+
+        CommandLine.prototype.AddHistory = function (line) {
+            this.HistoryList.splice(0, 0, line);
+        };
+
+        CommandLine.prototype.SaveHistory = function () {
+            localStorage.setItem("commandline:history", JSON.stringify(this.HistoryList));
+        };
+
+        CommandLine.prototype.LoadHistory = function () {
+            var list = localStorage.getItem("commandline:history");
+            this.HistoryList = JSON.parse(list);
+        };
+
+        //TODO recognize : or / or @
+        CommandLine.prototype.ShowNextHistory = function () {
+            if (this.HistoryIndex > 0) {
+                this.Element.val(this.HistoryList[this.HistoryIndex]);
+                this.HistoryIndex -= 1;
+            } else if (this.HistoryIndex == 0) {
+                this.Element.val(":");
+            }
+        };
+
+        CommandLine.prototype.ShowPrevHistory = function () {
+            if (this.HistoryIndex < this.HistoryList.length) {
+                this.Element.val(this.HistoryList[this.HistoryIndex]);
+                this.HistoryIndex += 1;
+            }
         };
         return CommandLine;
     })();
