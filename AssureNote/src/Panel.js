@@ -117,7 +117,7 @@ var AssureNote;
                             _this.CmdLine.AddHistory(ParsedCommand.GetRawString());
                             _this.CmdLine.Hide();
                             _this.CmdLine.Clear();
-                            return false;
+                            event.preventDefault();
                         } else if (!_this.CmdLine.IsVisible && _this.Search.IsSearching()) {
                             _this.Search.Search(_this.MasterView, event.shiftKey);
                         }

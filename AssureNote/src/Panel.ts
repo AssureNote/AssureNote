@@ -133,7 +133,7 @@ module AssureNote {
                             this.CmdLine.AddHistory(ParsedCommand.GetRawString());
                             this.CmdLine.Hide();
                             this.CmdLine.Clear();
-                            return false;
+                            event.preventDefault();
                         } else if (!this.CmdLine.IsVisible && this.Search.IsSearching()) {
                             this.Search.Search(this.MasterView, event.shiftKey);
                         }
