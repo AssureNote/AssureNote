@@ -157,6 +157,14 @@ module AssureNote {
                             this.CmdLine.ShowNextHistory();
                         }
                         break;
+                    case 8: /*BackSpace*/
+                        if(this.CmdLine.IsVisible && this.CmdLine.IsEmpty()) {
+                            this.CmdLine.Hide();
+                            this.CmdLine.Clear();
+                            event.preventDefault();
+                            break;
+                        }
+                        break;
 				}
 			});
 

@@ -143,6 +143,10 @@ var AssureNote;
                 this.HistoryIndex += 1;
             }
         };
+
+        CommandLine.prototype.IsEmpty = function () {
+            return this.Element.val() == "";
+        };
         return CommandLine;
     })();
     AssureNote.CommandLine = CommandLine;

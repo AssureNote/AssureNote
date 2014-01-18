@@ -155,6 +155,10 @@ module AssureNote {
                 this.HistoryIndex += 1;
             }
         }
+
+        IsEmpty(): boolean {
+            return this.Element.val() == "";
+        }
     }
 
 }
