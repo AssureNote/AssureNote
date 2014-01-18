@@ -76,7 +76,7 @@ module AssureNote {
 
     export class MessageChatPlugin extends Plugin {
         public EditorUtil: EditorUtil;
-		constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(public AssureNoteApp: AssureNoteApp) {
             super();
             this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {
                     console.log(data);
@@ -84,7 +84,7 @@ module AssureNote {
             });
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
-	}
+    }
 
     export class ConnectServerPlugin extends Plugin {
         socket: any;

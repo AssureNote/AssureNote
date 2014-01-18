@@ -23,26 +23,26 @@
 // **************************************************************************
 
 module AssureNote {
-	export class LayoutEngine {
-		constructor(public AssureNoteApp: AssureNoteApp) {
-		}
+    export class LayoutEngine {
+        constructor(public AssureNoteApp: AssureNoteApp) {
+        }
 
-		//FIXME Rename
-		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
-			//TODO
-		}
-	}
+        //FIXME Rename
+        DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
+            //TODO
+        }
+    }
 
-	
-	export class SimpleLayoutEngine extends LayoutEngine {
+    
+    export class SimpleLayoutEngine extends LayoutEngine {
         static ContextHorizontalMargin = 32;
         static ContextVerticalMargin = 10;
         static ChildrenVerticalMargin = 64;
         static ChildrenHorizontalMargin = 12;
 
         constructor(public AssureNoteApp: AssureNoteApp) {
-			super(AssureNoteApp);
-		}
+            super(AssureNoteApp);
+        }
 
         private Render(ThisNode: NodeView, DivFrag: DocumentFragment, SvgNodeFrag: DocumentFragment, SvgConnectionFrag: DocumentFragment): void {
             if (ThisNode.IsVisible) {
@@ -56,22 +56,22 @@ module AssureNote {
             }
         }
 
-		DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
+        DoLayout(PictgramPanel: PictgramPanel, NodeView: NodeView): void {
 
-			var DivFragment = document.createDocumentFragment();
-			var SvgNodeFragment = document.createDocumentFragment();
-			var SvgConnectionFragment = document.createDocumentFragment();
+            var DivFragment = document.createDocumentFragment();
+            var SvgNodeFragment = document.createDocumentFragment();
+            var SvgConnectionFragment = document.createDocumentFragment();
 
             this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
 
-			PictgramPanel.ContentLayer.appendChild(DivFragment);
-			PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
+            PictgramPanel.ContentLayer.appendChild(DivFragment);
+            PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
 
             this.Layout(NodeView);
-		}
+        }
 
-		private Layout(ThisNode: NodeView): void {
+        private Layout(ThisNode: NodeView): void {
             if (!ThisNode.IsVisible) {
                 return;
             }
@@ -86,8 +86,8 @@ module AssureNote {
                 Shape.SetTreeRect(0, 0, ThisNodeWidth, TreeHeight);
                 return;
             }
-			if (ThisNode.Left != null) {
-				var LeftNodesWidth = 0;
+            if (ThisNode.Left != null) {
+                var LeftNodesWidth = 0;
                 var LeftNodesHeight = -SimpleLayoutEngine.ContextVerticalMargin;
                 ThisNode.ForEachVisibleLeftNodes((SubNode: NodeView) => {
                     SubNode.GetShape().FitSizeToContent();
@@ -106,10 +106,10 @@ module AssureNote {
                 if (LeftNodesHeight > 0) {
                     TreeLeftX = -(LeftNodesWidth + SimpleLayoutEngine.ContextHorizontalMargin);
                     TreeHeight = Math.max(TreeHeight, LeftNodesHeight);
-				}
-			}
-			if (ThisNode.Right != null) {
-				var RightNodesWidth = 0;
+                }
+            }
+            if (ThisNode.Right != null) {
+                var RightNodesWidth = 0;
                 var RightNodesHeight = -SimpleLayoutEngine.ContextVerticalMargin;
                 ThisNode.ForEachVisibleRightNodes((SubNode: NodeView) => {
                     SubNode.GetShape().FitSizeToContent();
@@ -128,7 +128,7 @@ module AssureNote {
                 if (RightNodesHeight > 0) {
                     TreeRightX += RightNodesWidth + SimpleLayoutEngine.ContextHorizontalMargin;
                     TreeHeight = Math.max(TreeHeight, RightNodesHeight);
-				}
+                }
             }
 
             var HeadRightX = TreeRightX;
@@ -220,8 +220,8 @@ module AssureNote {
             }
             Shape.SetTreeRect(TreeLeftX, 0, TreeRightX - TreeLeftX, TreeHeight);
             //console.log(ThisNode.Label + ": " + (<any>ThisNode.Shape).TreeBoundingBox.toString());
-		}
+        }
 
-	}
+    }
 
 }

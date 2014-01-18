@@ -28,7 +28,7 @@
 
 module AssureNote {
     export class ToDoPlugin extends Plugin {
-		constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(public AssureNoteApp: AssureNoteApp) {
             super();
         }
 
@@ -45,7 +45,7 @@ module AssureNote {
                 }
             }
         }
-	}
+    }
 }
 
 AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {

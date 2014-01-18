@@ -28,24 +28,24 @@
 /* VIEW (MVC) */
 module AssureNote {
 
-	export class ScrollManager {
+    export class ScrollManager {
         private CurrentX: number = 0;
         private CurrentY: number = 0;
         private Dx: number = 0;
         private Dy: number = 0;
         private MainPointerID: number = null;
-		private Pointers: Pointer[] = [];
+        private Pointers: Pointer[] = [];
 
-		private timer: number = 0;
-		private ANIMATE_THRESHOLD: number = 5;
+        private timer: number = 0;
+        private ANIMATE_THRESHOLD: number = 5;
         private SPEED_MAX: number = 100;
 
 
         constructor(private Viewport: ViewportManager) {
         }
 
-		private StartDrag(InitialX: number, InitialY: number) {
-			this.CurrentX = InitialX;
+        private StartDrag(InitialX: number, InitialY: number) {
+            this.CurrentX = InitialX;
             this.CurrentY = InitialY;
             try {
                 if (this.OnStartDrag) {
@@ -53,41 +53,41 @@ module AssureNote {
                 }
             } catch (e) {
             }
-		}
+        }
 
-		private UpdateDrag(CurrentX: number, CurrentY: number) {
-			this.Dx = CurrentX - this.CurrentX;
-			this.Dy = CurrentY - this.CurrentY;
-			var speed = this.Dx * this.Dx + this.Dy + this.Dy;
-			if (speed > this.SPEED_MAX * this.SPEED_MAX) {
-				this.Dx *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
-				this.Dy *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
-			}
+        private UpdateDrag(CurrentX: number, CurrentY: number) {
+            this.Dx = CurrentX - this.CurrentX;
+            this.Dy = CurrentY - this.CurrentY;
+            var speed = this.Dx * this.Dx + this.Dy + this.Dy;
+            if (speed > this.SPEED_MAX * this.SPEED_MAX) {
+                this.Dx *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
+                this.Dy *= ((this.SPEED_MAX * this.SPEED_MAX) / speed);
+            }
 
-			this.CurrentX = CurrentX;
+            this.CurrentX = CurrentX;
             this.CurrentY = CurrentY;
             if (this.OnDragged) {
                 this.OnDragged(this.Viewport);
             }
-		}
+        }
 
-		private GetMainPointer(): Pointer {
-			for (var i = 0; i < this.Pointers.length; ++i) {
-				if (this.Pointers[i].identifier === this.MainPointerID) {
-					return this.Pointers[i]
-				}
-			};
-			return null;
-		}
+        private GetMainPointer(): Pointer {
+            for (var i = 0; i < this.Pointers.length; ++i) {
+                if (this.Pointers[i].identifier === this.MainPointerID) {
+                    return this.Pointers[i]
+                }
+            };
+            return null;
+        }
 
-		private IsDragging(): boolean {
-			return this.MainPointerID != null;
-		}
+        private IsDragging(): boolean {
+            return this.MainPointerID != null;
+        }
 
-		private StopAnimation(): void {
-			clearInterval(this.timer);
-			this.Dx = 0;
-			this.Dy = 0;
+        private StopAnimation(): void {
+            clearInterval(this.timer);
+            this.Dx = 0;
+            this.Dy = 0;
         }
 
         private EndDrag() {
@@ -105,7 +105,7 @@ module AssureNote {
         OnStartDrag: (Viewport: ViewportManager) => void;
         OnEndDrag: (Viewport: ViewportManager) => void;
 
-		OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
+        OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
             this.Pointers = e.getPointerList();
             var IsTherePointer: boolean = this.Pointers.length > 0;
             var HasDragJustStarted: boolean = IsTherePointer && !this.IsDragging();
@@ -119,7 +119,7 @@ module AssureNote {
                     this.MainPointerID = mainPointer.identifier;
                     this.Viewport.SetEventMapLayerPosition(true);
                     this.StartDrag(mainPointer.pageX, mainPointer.pageY);
-				} else {
+                } else {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
                         this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
@@ -127,44 +127,44 @@ module AssureNote {
                     } else {
                         this.EndDrag();
                     }
-				}
-			} else {
+                }
+            } else {
                 if (HasDragJustEnded) {
-					if (this.timer) {
-						this.StopAnimation();
-						this.timer = null;
-					}
-					this.timer = setInterval(() => {
-						if (Math.abs(this.Dx) < this.ANIMATE_THRESHOLD && Math.abs(this.Dy) < this.ANIMATE_THRESHOLD) {
-							this.StopAnimation();
-						}
-						this.CurrentX += this.Dx;
-						this.CurrentY += this.Dy;
-						this.Dx *= 0.95;
-						this.Dy *= 0.95;
+                    if (this.timer) {
+                        this.StopAnimation();
+                        this.timer = null;
+                    }
+                    this.timer = setInterval(() => {
+                        if (Math.abs(this.Dx) < this.ANIMATE_THRESHOLD && Math.abs(this.Dy) < this.ANIMATE_THRESHOLD) {
+                            this.StopAnimation();
+                        }
+                        this.CurrentX += this.Dx;
+                        this.CurrentY += this.Dy;
+                        this.Dx *= 0.95;
+                        this.Dy *= 0.95;
                         Screen.AddOffset(this.Dx, this.Dy);
-					}, 16);
-				}
+                    }, 16);
+                }
                 this.EndDrag();
-			}
-		}
+            }
+        }
 
-		OnDoubleTap(e: PointerEvent, Screen: ViewportManager) {
-			var width: number = Screen.ContentLayer.clientWidth;
-			var height: number = Screen.ContentLayer.clientHeight;
-			var pointer = this.Pointers[0];
+        OnDoubleTap(e: PointerEvent, Screen: ViewportManager) {
+            var width: number = Screen.ContentLayer.clientWidth;
+            var height: number = Screen.ContentLayer.clientHeight;
+            var pointer = this.Pointers[0];
         }
 
         OnMouseWheel(e: { deltaX: number; deltaY: number }, Screen: ViewportManager) {
             Screen.SetCameraScale(Screen.GetCameraScale() * (1 + e.deltaY * 0.02));
         }
-	}
+    }
 
-	export class ViewportManager {
-		//windowX, windowY
-		ScrollManager: ScrollManager = new ScrollManager(this);
-		private OffsetPageX: number = 0;
-		private OffsetPageY: number = 0;
+    export class ViewportManager {
+        //windowX, windowY
+        ScrollManager: ScrollManager = new ScrollManager(this);
+        private OffsetPageX: number = 0;
+        private OffsetPageY: number = 0;
         private Scale: number = 1.0;
         private PageWidth: number = window.innerWidth;
         private PageHeight: number = window.innerHeight;
@@ -191,12 +191,12 @@ module AssureNote {
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
-			this.UpdateAttr();
-			var OnPointer = (e: PointerEvent) => { this.ScrollManager.OnPointerEvent(e, this); };
-			this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
-			this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
-			this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
-			//this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
+            this.UpdateAttr();
+            var OnPointer = (e: PointerEvent) => { this.ScrollManager.OnPointerEvent(e, this); };
+            this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
+            //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
             $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { this.ScrollManager.OnMouseWheel(e, this); });
         }
@@ -213,13 +213,13 @@ module AssureNote {
             this.OffsetPageX = scaleChange * (this.OffsetPageX - cx) + cx;
             this.OffsetPageY = scaleChange * (this.OffsetPageY - cy) + cy;
             this.Scale = scale;
-			this.UpdateAttr();
-		}
+            this.UpdateAttr();
+        }
 
-		private SetOffset(PageX: number, PageY: number): void {
-			this.OffsetPageX = PageX;
-			this.OffsetPageY = PageY;
-			this.UpdateAttr();
+        private SetOffset(PageX: number, PageY: number): void {
+            this.OffsetPageX = PageX;
+            this.OffsetPageY = PageY;
+            this.UpdateAttr();
         }
 
         AddOffset(PageX: number, PageY: number): void {
@@ -275,9 +275,9 @@ module AssureNote {
 
         GXFromPageX(PageX: number): number {
             return (PageX - this.OffsetPageX) / this.Scale;
-		}
+        }
 
-		GYFromPageY(PageY: number): number {
+        GYFromPageY(PageY: number): number {
             return (PageY - this.OffsetPageY) / this.Scale;
         }
 
@@ -289,21 +289,21 @@ module AssureNote {
             return new Rect(x1, y1, x2 - x1, y2 - y1); 
         }
 
-		GetPageWidth(): number {
+        GetPageWidth(): number {
             return this.PageWidth;
-		}
+        }
 
-		GetPageHeight(): number {
+        GetPageHeight(): number {
             return this.PageHeight;
         }
 
-		GetPageCenterX(): number {
-			return this.GetPageWidth() * 0.5;
-		}
+        GetPageCenterX(): number {
+            return this.GetPageWidth() * 0.5;
+        }
 
-		GetPageCenterY(): number {
+        GetPageCenterY(): number {
             return this.GetPageHeight() * 0.5;
-		}
+        }
 
         private AnimationFrameTimerHandle: number = 0;
 
@@ -388,5 +388,5 @@ module AssureNote {
             this.SetTransformToElement(this.ContentLayer, style);
             this.SetTransformToElement(this.ControlLayer, style);
         }
-	}
+    }
 }

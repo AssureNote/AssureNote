@@ -29,27 +29,27 @@
 declare function saveAs(data: Blob, filename: String): void;
 
 module AssureNote {
-	export class AssureNoteApp {
+    export class AssureNoteApp {
         PluginManager: PluginManager;
         SocketManager: SocketManager;
-		PictgramPanel: PictgramPanel;
-		PluginPanel: PluginPanel;
-		IsDebugMode: boolean;
-		MasterRecord: GSNRecord;
-		WGSNName: string;
+        PictgramPanel: PictgramPanel;
+        PluginPanel: PluginPanel;
+        IsDebugMode: boolean;
+        MasterRecord: GSNRecord;
+        WGSNName: string;
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
 
         private UserName: string;
 
-		constructor() {
+        constructor() {
             this.Commands = [];
             this.CommandLineTable = {};
 
             this.PluginManager = new PluginManager(this);
             this.SocketManager = new SocketManager(this);
-			this.PictgramPanel = new PictgramPanel(this);
+            this.PictgramPanel = new PictgramPanel(this);
             this.PluginPanel = new PluginPanel(this);
 
             this.DefaultCommand = new CommandMissingCommand(this);
@@ -65,7 +65,7 @@ module AssureNote {
 
             this.PluginManager.LoadPlugin();
             this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
-		}
+        }
 
         public RegistCommand(Command: Command) {
             this.Commands.push(Command);
@@ -76,20 +76,20 @@ module AssureNote {
         }
 
         // Deprecated
-		DebugP(Message: string): void {
-			console.log(Message);
-		}
+        DebugP(Message: string): void {
+            console.log(Message);
+        }
 
-		static Assert(b: boolean, message?: string): void {
-			if (b == false) {
-				console.log("Assert: " + message);
-				throw "Assert: " + message;
-			}
-		}
+        static Assert(b: boolean, message?: string): void {
+            if (b == false) {
+                console.log("Assert: " + message);
+                throw "Assert: " + message;
+            }
+        }
 
-		ExecDoubleClicked(NodeView: NodeView): void {
-			var Plugin = this.PluginManager.GetDoubleClicked();
-			Plugin.ExecDoubleClicked(NodeView);
+        ExecDoubleClicked(NodeView: NodeView): void {
+            var Plugin = this.PluginManager.GetDoubleClicked();
+            Plugin.ExecDoubleClicked(NodeView);
         }
 
         FindCommandByCommandLineName(Name: string): Command {
@@ -156,10 +156,10 @@ module AssureNote {
             }
         }
 
-		ExecCommand(ParsedCommand: CommandParser): void {
-			var CommandName = ParsedCommand.GetMethod();
-			if (CommandName == "search") {
-				return;
+        ExecCommand(ParsedCommand: CommandParser): void {
+            var CommandName = ParsedCommand.GetMethod();
+            if (CommandName == "search") {
+                return;
             }
 
             var Command = this.FindCommandByCommandLineName(CommandName);
@@ -187,7 +187,7 @@ module AssureNote {
 
         LoadNewWGSN(Name: string, WGSN: string): void {
             var Extention = Name.split(".").pop();
-			this.WGSNName = Name;
+            this.WGSNName = Name;
             this.MasterRecord = new GSNRecord();
             switch (Extention) {
                 case "dcase_model":
@@ -199,40 +199,40 @@ module AssureNote {
                     this.MasterRecord.RenumberAll();
                     break;
             }
-			var LatestDoc = this.MasterRecord.GetLatestDoc();
-			var TopGoalNode = LatestDoc.TopNode;
+            var LatestDoc = this.MasterRecord.GetLatestDoc();
+            var TopGoalNode = LatestDoc.TopNode;
 
-			this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
-			this.PictgramPanel.SetFoldedAllGoalNode(this.PictgramPanel.MasterView);
+            this.PictgramPanel.SetView(new NodeView(TopGoalNode, true));
+            this.PictgramPanel.SetFoldedAllGoalNode(this.PictgramPanel.MasterView);
 
-			this.PictgramPanel.Draw();
+            this.PictgramPanel.Draw();
 
             var TopGoal = this.PictgramPanel.MasterView;
             this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
 
             $("#filename-view").text(Name);
             $("title").text("AssureNote - " + Name);
-		}
+        }
 
-		LoadFiles(Files: File[]): void {
-			if (Files[0]) {
-				var reader = new FileReader();
-				reader.onerror = (event: Event) => {
-					console.log('error', (<any>event.target).error.code);
-				};
+        LoadFiles(Files: File[]): void {
+            if (Files[0]) {
+                var reader = new FileReader();
+                reader.onerror = (event: Event) => {
+                    console.log('error', (<any>event.target).error.code);
+                };
 
-				reader.onload = (event) => {
-					var Contents: string = (<any>event.target).result;
-					var Name: string = Files[0].name;
+                reader.onload = (event) => {
+                    var Contents: string = (<any>event.target).result;
+                    var Name: string = Files[0].name;
                     this.LoadNewWGSN(Name, Contents);
 
                     /* TODO resolve conflict */
                     this.SocketManager.UpdateWGSN();
-				};
-				reader.readAsText(Files[0], 'utf-8');
-			}
+                };
+                reader.readAsText(Files[0], 'utf-8');
+            }
         }
-	}
+    }
 
 }
 

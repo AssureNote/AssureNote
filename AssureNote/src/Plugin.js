@@ -93,15 +93,15 @@ var AssureNote;
     AssureNote.Plugin = Plugin;
 
     //export class SamplePlugin extends Plugin {
-    //	constructor() {
-    //		super();
-    //		this.HasMenuBarButton = true;
-    //	}
-    //	CreateMenuBarButton(): MenuBarButton {
-    //		return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
-    //			alert(TargetView.Label);
-    //		});
-    //	}
+    //    constructor() {
+    //        super();
+    //        this.HasMenuBarButton = true;
+    //    }
+    //    CreateMenuBarButton(): MenuBarButton {
+    //        return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
+    //            alert(TargetView.Label);
+    //        });
+    //    }
     //}
     function OnLoadPlugin(Callback) {
         PluginManager.OnLoadPlugin.push(Callback);

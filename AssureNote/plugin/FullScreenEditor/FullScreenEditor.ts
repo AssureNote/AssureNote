@@ -69,8 +69,8 @@ module AssureNote {
 
     export class FullScreenEditorPlugin extends Plugin {
         public EditorUtil: EditorUtil;
-		constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
-			super();
+        constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
+            super();
             this.SetMenuBarButton(true);
             this.SetEditor(true);
             this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
@@ -84,16 +84,16 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new FullScreenEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
 
-		CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-			if (NodeView.GetNodeType() == GSNType.Strategy) {
-				return null;
-			}
-			return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
-				(event: Event, TargetView: NodeView) => {
-					var Writer = new StringWriter();
-					TargetView.Model.FormatSubNode(1, Writer);
+        CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
+            if (NodeView.GetNodeType() == GSNType.Strategy) {
+                return null;
+            }
+            return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
+                (event: Event, TargetView: NodeView) => {
+                    var Writer = new StringWriter();
+                    TargetView.Model.FormatSubNode(1, Writer);
                     this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-			});
+            });
         }
 
         /* This focuses on the node where the cursor of CodeMirror indicate */
@@ -120,7 +120,7 @@ module AssureNote {
                 }
             }
         }
-	}
+    }
 }
 
 AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {

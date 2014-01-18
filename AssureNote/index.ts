@@ -38,8 +38,8 @@
 var Debug = <any>{};
 
 $(() => {
-	var App = new AssureNote.AssureNoteApp();
-	Debug.AssureNote = App;
+    var App = new AssureNote.AssureNoteApp();
+    Debug.AssureNote = App;
 
     App.LoadDefaultWGSN();
 });
