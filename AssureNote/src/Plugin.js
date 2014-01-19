@@ -48,7 +48,7 @@ var AssureNote;
             return null;
         };
 
-        Plugin.prototype.CreateTooltip = function (NodeView) {
+        Plugin.prototype.CreateTooltipContents = function (NodeView) {
             return null;
         };
 
@@ -167,7 +167,7 @@ var AssureNote;
         PluginManager.prototype.GetTooltipContents = function (TargetView) {
             var ret = [];
             $.each(this.PluginMap, function (key, value) {
-                var Tooltip = value.CreateTooltip(TargetView);
+                var Tooltip = value.CreateTooltipContents(TargetView);
                 if (Tooltip)
                     ret = ret.concat(Tooltip);
             });
