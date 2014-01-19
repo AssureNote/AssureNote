@@ -183,8 +183,8 @@ module AssureNote {
 
             this.ContentLayer.addEventListener("mouseleave", (event: MouseEvent) => {
                 /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
-                   every time the pointer enter the sub-element of ContentLayer.
-                   Mouseleave can prevent this annloying event firing. */
+                   every time the pointer enters the sub-element of ContentLayer.
+                   Mouseleave can prevent this annoying event firing. */
                 if (!this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
