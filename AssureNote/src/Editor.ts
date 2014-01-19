@@ -40,7 +40,7 @@ module AssureNote {
             this.Element.css({ display: "none" });
         }
 
-        EnableEditor(WGSN: string, NodeView: NodeView): void {
+        EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive: boolean): void {
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
 
@@ -61,19 +61,23 @@ module AssureNote {
             }).on("blur", (e: JQueryEventObject) => {
                 e.stopPropagation();
                 e.preventDefault();
-                this.DisableEditor(NodeView);
+                this.DisableEditor(NodeView, IsRecursive);
                 App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
             });
             this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);
             this.TextArea.refresh();
             this.TextArea.focus();
         }
-        DisableEditor(OldNodeView: NodeView): void {
+        DisableEditor(OldNodeView: NodeView, IsRecursive: boolean): void {
             var WGSN: string = (<any>this.TextArea).getValue();
             this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
             var Node: GSNNode = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
-            var NewNode: GSNNode = Node.ReplaceSubNodeAsText(WGSN);
-            console.log(NewNode);
+            var NewNode: GSNNode;
+            if (IsRecursive) {
+                NewNode = Node.ReplaceSubNodeAsText(WGSN);
+            } else {
+               // NewNode = 
+            }
 
             if (NewNode) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();

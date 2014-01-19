@@ -329,7 +329,7 @@ module AssureNote {
                 mode: 'wgsn',
                 lineWrapping: true,
             });
-            this.SingleNodeEditor = new SingleNodeEditorPlugin(AssureNoteApp, textarea, 'singlenode-editor-wrapper');
+            this.SingleNodeEditor = new SingleNodeEditorPlugin(AssureNoteApp, textarea, '#singlenode-editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open-single", this.SingleNodeEditor);
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }

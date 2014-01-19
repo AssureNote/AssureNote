@@ -59,8 +59,8 @@ module AssureNote {
                     return;
                 }
                 var Writer = new StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer);
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+                TargetView.Model.FormatSubNode(1, Writer, true);
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
@@ -91,8 +91,8 @@ module AssureNote {
             return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
                 (event: Event, TargetView: NodeView) => {
                     var Writer = new StringWriter();
-                    TargetView.Model.FormatSubNode(1, Writer);
-                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+                    TargetView.Model.FormatSubNode(1, Writer, true);
+                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
             });
         }
 

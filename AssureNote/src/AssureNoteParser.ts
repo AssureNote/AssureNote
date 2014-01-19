@@ -687,7 +687,7 @@ export class GSNNode {
     }
 
     // SubNode
-    FormatSubNode(GoalLevel: number, Writer: StringWriter): void {
+    FormatSubNode(GoalLevel: number, Writer: StringWriter, IsRecursive: boolean): void {
         Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
         Writer.print(" ");
         if (this.LabelName != null) {
@@ -704,18 +704,19 @@ export class GSNNode {
             Writer.print(this.NodeDoc);
             Writer.newline();
         }
+        if (!IsRecursive) return;
         Writer.newline();
         if (this.NonNullSubNodeList() != null) {
             for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                 var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
                 if (Node.IsContext()) {
-                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer, IsRecursive);
                 }
             }
             for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                 var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
                 if (!Node.IsContext()) {
-                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer, IsRecursive);
                 }
             }
         }

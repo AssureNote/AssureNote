@@ -94,15 +94,13 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new SingleNodeEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
         SingleNodeEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            var _this = this;
-            if (NodeView.GetNodeType() == 2 /* Strategy */) {
-                return null;
-            }
-            return new AssureNote.NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor", function (event, TargetView) {
-                var Writer = new AssureNote.StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer);
-                _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-            });
+            return null;
+            //return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
+            //    (event: Event, TargetView: NodeView) => {
+            //        var Writer = new StringWriter();
+            //        TargetView.Model.FormatSubNode(1, Writer, false);
+            //        this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+            //});
         };
         return SingleNodeEditorPlugin;
     })(AssureNote.Plugin);

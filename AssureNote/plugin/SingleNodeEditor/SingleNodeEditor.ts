@@ -84,15 +84,13 @@ module AssureNote {
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-            if (NodeView.GetNodeType() == GSNType.Strategy) {
-                return null;
-            }
-            return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
-                (event: Event, TargetView: NodeView) => {
-                    var Writer = new StringWriter();
-                    TargetView.Model.FormatSubNode(1, Writer);
-                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-            });
+            return null;
+            //return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
+            //    (event: Event, TargetView: NodeView) => {
+            //        var Writer = new StringWriter();
+            //        TargetView.Model.FormatSubNode(1, Writer, false);
+            //        this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+            //});
         }
     }
 }
