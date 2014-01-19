@@ -25,4 +25,5 @@ plugin/VariableInterpolation/VariableInterpolation.ts
 plugin/SingleNodeEditor/SingleNodeEditor.ts
 plugin/ToDo/ToDo.ts
 plugin/AddNode/AddNode.ts
+plugin/LastModified/LastModified.ts
 plugin/MonitorNode/MonitorNode.ts

@@ -169,7 +169,7 @@ var AssureNote;
             $.each(this.PluginMap, function (key, value) {
                 var Tooltip = value.CreateTooltip(TargetView);
                 if (Tooltip)
-                    ret.push(Tooltip);
+                    ret = ret.concat(Tooltip);
             });
             return ret;
         };

@@ -53,8 +53,16 @@ module AssureNote {
             }
         }
 
-        CreateTooltip(NodeView: NodeView): HTMLLIElement[] {
-            return null;
+        CreateTooltip(NodeView: NodeView): HTMLLIElement[]{
+            var res: HTMLLIElement[] = [];
+            var li = document.createElement('li');
+            li.innerText = NodeView.Model.Created.Author + ' created.';
+            res.push(li);
+            li = document.createElement('li');
+            li.innerText = NodeView.Model.LastModified.Author + ' last modified.';
+            res.push(li);
+
+            return res;
         }
     }
 }

@@ -17,13 +17,14 @@ body {
 }
 
 #tooltip {
+	white-space: nowrap;
 	background-color: #f7f7f9;
 	border-color: black;
-    border: 1px solid #e1e1e8;
+	border: 1px solid #e1e1e8;
 	opacity: 0.85;
 	font-family: Arial, Meiryo;
 	font-size: small;
-    border-radius: 5px;
+	border-radius: 5px;
 }
 
 .logo-offset {

@@ -49,24 +49,27 @@ var AssureNote;
         };
 
         Tooltip.prototype.Create = function (CurrentView, ControlLayer, Contents) {
-            var _this = this;
             if (this.Tooltip != null)
                 this.Remove();
             this.IsEnable = true;
             this.CurrentView = CurrentView;
-            this.Tooltip = $('<div id="tooltip">hello tooltip</div>');
+            this.Tooltip = $('<div"></div>');
+            var pre = $('<pre id="tooltip"></pre>');
 
             var ul = $(document.createElement('ul'));
+            ul.addClass('list-unstyled');
             for (var i = 0; i < Contents.length; i++) {
+                console.log("add");
                 ul.append(Contents[i]);
             }
-            this.Tooltip.append(ul);
+            pre.append(ul);
+            this.Tooltip.append(pre);
             this.Tooltip.appendTo(ControlLayer);
 
             var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
             var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3) / 4;
             this.Tooltip.css({
-                width: '250px',
+                //width: '250px',
                 //height: '150px',
                 position: 'absolute',
                 top: Top,
@@ -74,24 +77,6 @@ var AssureNote;
                 display: 'block',
                 opacity: 100
             });
-
-            var refresh = function () {
-                AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);
-                var Node = _this.CurrentView;
-            };
-
-            console.log('hi');
-            //(<any>this.Menu).jqDock({
-            //    align: 'bottom',
-            //    idle: 1500,
-            //    size: 45,
-            //    distance: 60,
-            //    labels: 'tc',
-            //    duration: 200,
-            //    fadeIn: 200,
-            //    source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
-            //    onReady: refresh,
-            //});
         };
         return Tooltip;
     })(AssureNote.Pane);

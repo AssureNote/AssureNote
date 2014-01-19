@@ -55,7 +55,7 @@ module AssureNote {
             return null;
         }
 
-        CreateTooltip(NodeView: NodeView): HTMLLIElement {
+        CreateTooltip(NodeView: NodeView): HTMLLIElement[] {
             return null;
         }
 
@@ -179,7 +179,7 @@ module AssureNote {
             var ret: HTMLLIElement[] = [];
             $.each(this.PluginMap, (key, value: Plugin) => {
                 var Tooltip = value.CreateTooltip(TargetView);
-                if (Tooltip) ret.push(Tooltip);
+                if (Tooltip) ret = ret.concat(Tooltip);
             });
             return ret;
         }
