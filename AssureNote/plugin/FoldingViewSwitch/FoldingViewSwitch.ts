@@ -45,7 +45,7 @@ module AssureNote {
             return "<code>fold label</code><br>Toggle folding state of Goal."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             if (Params.length < 1) {
                 this.App.DebugP("no args");
                 return;

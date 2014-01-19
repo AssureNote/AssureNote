@@ -24,6 +24,7 @@
 
 ///<reference path="../../src/AssureNoteParser.ts" />
 ///<reference path="../../src/Plugin.ts" />
+///<reference path="../../src/RecApi.ts" />
 
 module AssureNote {
 
@@ -231,7 +232,7 @@ module AssureNote {
             return "Start Monitor";
         }
 
-        public Invoke(CommandName: string, FocuseView: NodeView, Params: any[]): void {
+        public Invoke(CommandName: string, Params: any[]): void {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
 
@@ -298,7 +299,7 @@ module AssureNote {
             return "Stop Monitor";
         }
 
-        public Invoke(CommandName: string, FocuseView: NodeView, Params: any[]): void {
+        public Invoke(CommandName: string, Params: any[]): void {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
 

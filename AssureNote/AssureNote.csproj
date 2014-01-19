@@ -67,6 +67,7 @@
     <TypeScriptCompile Include="plugin\FoldingViewSwitch\FoldingViewSwitch.ts" />
     <TypeScriptCompile Include="plugin\LastModified\LastModified.ts" />
     <TypeScriptCompile Include="plugin\MessageChat\MessageChat.ts" />
+    <TypeScriptCompile Include="plugin\MonitorNode\MonitorNode.ts" />
     <TypeScriptCompile Include="plugin\RemoveNode\RemoveNode.ts" />
     <TypeScriptCompile Include="plugin\SingleNodeEditor\SingleNodeEditor.ts" />
     <TypeScriptCompile Include="plugin\ToDo\ToDo.ts" />
@@ -97,6 +98,7 @@
     <TypeScriptCompile Include="src\old\PluginManager.ts" />
     <TypeScriptCompile Include="src\old\Api.ts" />
     <TypeScriptCompile Include="src\Plugin.ts" />
+    <TypeScriptCompile Include="src\RecApi.ts" />
     <TypeScriptCompile Include="plugin\FullScreenEditor\FullScreenEditor.ts" />
   </ItemGroup>
   <ItemGroup>

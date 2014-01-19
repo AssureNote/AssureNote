@@ -44,7 +44,7 @@ module AssureNote {
             return "<code>edit [label]</code><br>Open editor."
         }
 
-        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             var Label: string;
             if (Params.length < 1) {
                 Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();

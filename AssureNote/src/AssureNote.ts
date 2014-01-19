@@ -163,7 +163,7 @@ module AssureNote {
             }
 
             var Command = this.FindCommandByCommandLineName(CommandName);
-            Command.Invoke(CommandName, this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
+            Command.Invoke(CommandName, ParsedCommand.GetArgs());
         }
 
         LoadDefaultWGSN(): void {

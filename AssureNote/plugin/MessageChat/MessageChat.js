@@ -49,7 +49,7 @@ var AssureNote;
             return "<code>message msg</code><br>Send message to the chat server.";
         };
 
-        MessageCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        MessageCommand.prototype.Invoke = function (CommandName, Params) {
             if (this.App.SocketManager.IsConnected()) {
                 this.App.SocketManager.Emit('message', Params.join(' '));
                 $.notify(Params.join(' '), 'info');
@@ -76,7 +76,7 @@ var AssureNote;
             return "<code>connect [uri]</code><br>Connect to the chat server.";
         };
 
-        ConnectCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        ConnectCommand.prototype.Invoke = function (CommandName, Params) {
             console.log(Params);
             if (Params.length > 1) {
                 this.App.DebugP('Invalid parameter: ' + Params);

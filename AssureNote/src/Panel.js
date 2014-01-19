@@ -158,8 +158,25 @@ var AssureNote;
                     return;
                 }
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
-                if (Label) {
-                    //this.AssureNoteApp.DebugP("mouseover:"+Label);
+                var NodeView = _this.ViewMap[Label];
+                if (NodeView != null && _this.FocusedLabel != Label) {
+                    _this.FocusedLabel = Label;
+                    _this.AssureNoteApp.DebugP("mouseover:" + Label);
+                }
+            });
+
+            this.ContentLayer.addEventListener("mouseleave", function (event) {
+                /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
+                every time the pointer enter the sub-element of ContentLayer.
+                Mouseleave can prevent this annloying event firing. */
+                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
+                    return;
+                }
+                var Label = _this.FocusedLabel;
+                var NodeView = _this.ViewMap[Label];
+                if (NodeView != null && Label == _this.FocusedLabel) {
+                    _this.FocusedLabel = null;
+                    _this.AssureNoteApp.DebugP("mouseout:" + Label);
                 }
             });
 

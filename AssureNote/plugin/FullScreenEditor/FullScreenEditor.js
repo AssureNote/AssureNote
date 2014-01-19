@@ -50,7 +50,7 @@ var AssureNote;
             return "<code>edit [label]</code><br>Open editor.";
         };
 
-        FullScreenEditorCommand.prototype.Invoke = function (CommandName, Target, Params) {
+        FullScreenEditorCommand.prototype.Invoke = function (CommandName, Params) {
             var Label;
             if (Params.length < 1) {
                 Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();

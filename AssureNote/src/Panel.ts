@@ -47,7 +47,7 @@ module AssureNote {
         Search: Search;
 
         CurrentDoc: GSNDoc;// Convert to caseview
-        FocusedLabel: string;
+        FocusedLabel: string;// A label pointed out or clicked.
         FocusedWx: number;
         FocusedWy: number;
 
@@ -174,8 +174,25 @@ module AssureNote {
                     return;
                 }
                 var Label = AssureNoteUtils.GetNodeLabelFromEvent(event);
-                if (Label) {
-                    //this.AssureNoteApp.DebugP("mouseover:"+Label);
+                var NodeView = this.ViewMap[Label];
+                if (NodeView != null && this.FocusedLabel != Label) {
+                    this.FocusedLabel = Label;
+                    this.AssureNoteApp.DebugP("mouseover:"+Label);
+                }
+            });
+
+            this.ContentLayer.addEventListener("mouseleave", (event: MouseEvent) => {
+                /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
+                   every time the pointer enter the sub-element of ContentLayer.
+                   Mouseleave can prevent this annloying event firing. */
+                if (!this.AssureNoteApp.PluginPanel.IsVisible) {
+                    return;
+                }
+                var Label = this.FocusedLabel;
+                var NodeView = this.ViewMap[Label];
+                if (NodeView != null && Label == this.FocusedLabel) {
+                    this.FocusedLabel = null;
+                    this.AssureNoteApp.DebugP("mouseout:"+Label);
                 }
             });
 
