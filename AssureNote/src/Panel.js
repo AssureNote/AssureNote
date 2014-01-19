@@ -305,7 +305,6 @@ var AssureNote;
                 lineWrapping: true
             });
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
-            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
             $("#plugin-layer").on('mousewheel', function (event) {
                 event.stopPropagation();
             });
@@ -316,6 +315,8 @@ var AssureNote;
                 lineWrapping: true
             });
             this.SingleNodeEditor = new AssureNote.SingleNodeEditorPlugin(AssureNoteApp, textarea, 'singlenode-editor-wrapper');
+            AssureNoteApp.PluginManager.SetPlugin("open-single", this.SingleNodeEditor);
+            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }
         PluginPanel.prototype.Clear = function () {
         };

@@ -87,7 +87,7 @@ module AssureNote {
             if (NodeView.GetNodeType() == GSNType.Strategy) {
                 return null;
             }
-            return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
+            return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
                 (event: Event, TargetView: NodeView) => {
                     var Writer = new StringWriter();
                     TargetView.Model.FormatSubNode(1, Writer);

@@ -322,7 +322,6 @@ module AssureNote {
                 lineWrapping: true,
             });
             this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
-            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
             $("#plugin-layer").on('mousewheel', (event: MouseWheelEvent) => { event.stopPropagation(); });
 
             textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('singlenode-editor'), {
@@ -331,6 +330,8 @@ module AssureNote {
                 lineWrapping: true,
             });
             this.SingleNodeEditor = new SingleNodeEditorPlugin(AssureNoteApp, textarea, 'singlenode-editor-wrapper');
+            AssureNoteApp.PluginManager.SetPlugin("open-single", this.SingleNodeEditor);
+            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }
 
         Clear(): void {
