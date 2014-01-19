@@ -16,6 +16,16 @@ body {
 	top: -3px;
 }
 
+#tooltip {
+	background-color: #f7f7f9;
+	border-color: black;
+    border: 1px solid #e1e1e8;
+	opacity: 0.85;
+	font-family: Arial, Meiryo;
+	font-size: small;
+    border-radius: 5px;
+}
+
 .logo-offset {
     left : 180px;
 }

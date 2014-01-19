@@ -59,10 +59,8 @@ var AssureNote;
             }
         };
 
-        LastModifiedPlugin.prototype.MouseOut = function (NodeView) {
-        };
-
-        LastModifiedPlugin.prototype.MouseOver = function (NodeView) {
+        LastModifiedPlugin.prototype.CreateTooltip = function (NodeView) {
+            return null;
         };
         return LastModifiedPlugin;
     })(AssureNote.Plugin);

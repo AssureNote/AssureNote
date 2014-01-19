@@ -44,7 +44,7 @@ var AssureNote;
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new AssureNote.NodeMenu(AssureNoteApp);
-            var Tooltip = new Tooltip(AssureNoteApp);
+            var Tooltip = new AssureNote.Tooltip(AssureNoteApp);
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 _this.AssureNoteApp.DebugP("click:" + Label);
@@ -175,7 +175,7 @@ var AssureNote;
                 if (NodeView != null && _this.FocusedLabel != Label) {
                     _this.FocusedLabel = Label;
                     _this.AssureNoteApp.DebugP("mouseover:" + Label);
-                    var Tooltips = _this.AssureNoteApp.PluginManager.GetTooltips(NodeView);
+                    var Tooltips = _this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
                     Tooltip.Create(NodeView, _this.ControlLayer, Tooltips);
                 }
             });

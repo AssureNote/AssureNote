@@ -35,16 +35,66 @@ var AssureNote;
         function Tooltip(AssureNoteApp) {
             _super.call(this, AssureNoteApp);
             this.AssureNoteApp = AssureNoteApp;
+            this.Tooltip = null;
+            this.CurrentView = null;
         }
         Tooltip.prototype.Enable = function () {
         };
 
-        Tooltip.prototype.Disable = function () {
+        Tooltip.prototype.Remove = function () {
+            this.Tooltip.remove();
+            this.Tooltip = null;
+            this.CurrentView = null;
+            this.IsEnable = false;
         };
 
-        Tooltip.prototype.Create = function () {
+        Tooltip.prototype.Create = function (CurrentView, ControlLayer, Contents) {
+            var _this = this;
+            if (this.Tooltip != null)
+                this.Remove();
+            this.IsEnable = true;
+            this.CurrentView = CurrentView;
+            this.Tooltip = $('<div id="tooltip">hello tooltip</div>');
+
+            var ul = $(document.createElement('ul'));
+            for (var i = 0; i < Contents.length; i++) {
+                ul.append(Contents[i]);
+            }
+            this.Tooltip.append(ul);
+            this.Tooltip.appendTo(ControlLayer);
+
+            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
+            var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3) / 4;
+            this.Tooltip.css({
+                width: '250px',
+                //height: '150px',
+                position: 'absolute',
+                top: Top,
+                left: Left,
+                display: 'block',
+                opacity: 100
+            });
+
+            var refresh = function () {
+                AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);
+                var Node = _this.CurrentView;
+            };
+
+            console.log('hi');
+            //(<any>this.Menu).jqDock({
+            //    align: 'bottom',
+            //    idle: 1500,
+            //    size: 45,
+            //    distance: 60,
+            //    labels: 'tc',
+            //    duration: 200,
+            //    fadeIn: 200,
+            //    source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
+            //    onReady: refresh,
+            //});
         };
         return Tooltip;
     })(AssureNote.Pane);
+    AssureNote.Tooltip = Tooltip;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Tooltip.js.map

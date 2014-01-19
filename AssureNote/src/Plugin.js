@@ -164,7 +164,7 @@ var AssureNote;
             return ret;
         };
 
-        PluginManager.prototype.GetTooltips = function (TargetView) {
+        PluginManager.prototype.GetTooltipContents = function (TargetView) {
             var ret = [];
             $.each(this.PluginMap, function (key, value) {
                 var Tooltip = value.CreateTooltip(TargetView);

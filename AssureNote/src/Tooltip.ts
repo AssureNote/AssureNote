@@ -25,18 +25,68 @@
 ///<reference path="./AssureNote.ts" />
 
 module AssureNote {
-    class Tooltip extends Pane{
+    export class Tooltip extends Pane{
+        Tooltip: JQuery;
+        CurrentView: NodeView;
         constructor(public AssureNoteApp: AssureNoteApp) {
             super(AssureNoteApp);
+            this.Tooltip = null;
+            this.CurrentView = null;
         }
 
         Enable() {
         }
 
-        Disable() {
+        Remove() {
+            this.Tooltip.remove();
+            this.Tooltip = null;
+            this.CurrentView = null;
+            this.IsEnable = false;
         }
 
-        Create() {
+        Create(CurrentView: NodeView, ControlLayer: HTMLDivElement, Contents: HTMLLIElement[]): void {
+            if (this.Tooltip != null) this.Remove();
+            this.IsEnable = true;
+            this.CurrentView = CurrentView;
+            this.Tooltip = $('<div id="tooltip">hello tooltip</div>');
+
+            var ul: JQuery = $(document.createElement('ul'));
+            for (var i = 0; i < Contents.length; i++) {
+                ul.append(Contents[i]);
+            }
+            this.Tooltip.append(ul);
+            this.Tooltip.appendTo(ControlLayer);
+
+            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
+            var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3 ) / 4;
+            this.Tooltip.css({
+                width: '250px',
+                //height: '150px',
+                position: 'absolute',
+                top: Top,
+                left: Left,
+                display: 'block',
+                opacity: 100
+            });
+
+            var refresh = () => {
+                AssureNoteApp.Assert(this.CurrentView != null);
+                var Node = this.CurrentView;
+            };
+
+            console.log('hi');
+
+            //(<any>this.Menu).jqDock({
+            //    align: 'bottom',
+            //    idle: 1500,
+            //    size: 45,
+            //    distance: 60,
+            //    labels: 'tc',
+            //    duration: 200,
+            //    fadeIn: 200,
+            //    source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
+            //    onReady: refresh,
+            //});
         }
     }
 }

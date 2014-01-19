@@ -53,10 +53,8 @@ module AssureNote {
             }
         }
 
-        MouseOut(NodeView: NodeView): void {
-        }
-
-        MouseOver(NodeView: NodeView): void {
+        CreateTooltip(NodeView: NodeView): HTMLLIElement[] {
+            return null;
         }
     }
 }

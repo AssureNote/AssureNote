@@ -55,7 +55,7 @@ module AssureNote {
             return null;
         }
 
-        CreateTooltip(NodeView: NodeView): HTMLDivElement {
+        CreateTooltip(NodeView: NodeView): HTMLLIElement {
             return null;
         }
 
@@ -175,8 +175,8 @@ module AssureNote {
             return ret;
         }
 
-        GetTooltips(TargetView: NodeView): HTMLDivElement[]{
-            var ret: HTMLDivElement[] = [];
+        GetTooltipContents(TargetView: NodeView): HTMLLIElement[]{
+            var ret: HTMLLIElement[] = [];
             $.each(this.PluginMap, (key, value: Plugin) => {
                 var Tooltip = value.CreateTooltip(TargetView);
                 if (Tooltip) ret.push(Tooltip);
