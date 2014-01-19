@@ -21,6 +21,7 @@ plugin/FoldingViewSwitch/FoldingViewSwitch.ts
 plugin/FullScreenEditor/FullScreenEditor.ts
 plugin/MessageChat/MessageChat.ts
 plugin/VariableInterpolation/VariableInterpolation.ts
+plugin/SingleNodeEditor/SingleNodeEditor.ts
 plugin/ToDo/ToDo.ts
 plugin/AddNode/AddNode.ts
 plugin/MonitorNode/MonitorNode.ts

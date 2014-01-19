@@ -31,6 +31,7 @@
 ///<reference path='../d.ts/codemirror.d.ts'/>
 
 ///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='../plugin/SingleNodeEditor/SingleNodeEditor.ts'/>
 
 module AssureNote {
     export class PictgramPanel {
@@ -311,17 +312,25 @@ module AssureNote {
 
     export class PluginPanel {
         FullScreenEditor: Plugin;
+        SingleNodeEditor: Plugin;
         IsVisible: boolean = true;
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             var textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('editor'), {
                 lineNumbers: true,
-                mode: "wgsn",
+                mode: 'wgsn',
                 lineWrapping: true,
             });
             this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
             $("#plugin-layer").on('mousewheel', (event: MouseWheelEvent) => { event.stopPropagation(); });
+
+            textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('single-editor'), {
+                lineNumbers: false,
+                mode: 'wgsn',
+                lineWrapping: true,
+            });
+            this.SingleNodeEditor = new SingleNodeEditorPlugin(AssureNoteApp, textarea, 'singlenode-editor-wrapper');
         }
 
         Clear(): void {

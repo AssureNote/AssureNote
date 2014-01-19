@@ -29,6 +29,7 @@
 ///<reference path='./Editor.ts'/>
 ///<reference path='../d.ts/codemirror.d.ts'/>
 ///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='../plugin/SingleNodeEditor/SingleNodeEditor.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var PictgramPanel = (function () {
@@ -300,7 +301,7 @@ var AssureNote;
             this.IsVisible = true;
             var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
                 lineNumbers: true,
-                mode: "wgsn",
+                mode: 'wgsn',
                 lineWrapping: true
             });
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
@@ -308,6 +309,13 @@ var AssureNote;
             $("#plugin-layer").on('mousewheel', function (event) {
                 event.stopPropagation();
             });
+
+            textarea = CodeMirror.fromTextArea(document.getElementById('single-editor'), {
+                lineNumbers: false,
+                mode: 'wgsn',
+                lineWrapping: true
+            });
+            this.SingleNodeEditor = new AssureNote.SingleNodeEditorPlugin(AssureNoteApp, textarea, 'singlenode-editor-wrapper');
         }
         PluginPanel.prototype.Clear = function () {
         };

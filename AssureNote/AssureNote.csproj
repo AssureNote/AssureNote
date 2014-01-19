@@ -68,6 +68,7 @@
     <TypeScriptCompile Include="plugin\LastModified\LastModified.ts" />
     <TypeScriptCompile Include="plugin\MessageChat\MessageChat.ts" />
     <TypeScriptCompile Include="plugin\RemoveNode\RemoveNode.ts" />
+    <TypeScriptCompile Include="plugin\SingleNodeEditor\SingleNodeEditor.ts" />
     <TypeScriptCompile Include="plugin\ToDo\ToDo.ts" />
     <TypeScriptCompile Include="plugin\VariableInterpolation\VariableInterpolation.ts" />
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
