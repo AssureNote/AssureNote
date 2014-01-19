@@ -162,6 +162,7 @@ var AssureNote;
                 if (NodeView != null && _this.FocusedLabel != Label) {
                     _this.FocusedLabel = Label;
                     _this.AssureNoteApp.DebugP("mouseover:" + Label);
+                    _this.AssureNoteApp.PluginManager.InvokeMouseOverEvent(NodeView);
                 }
             });
 
@@ -177,6 +178,7 @@ var AssureNote;
                 if (NodeView != null && Label == _this.FocusedLabel) {
                     _this.FocusedLabel = null;
                     _this.AssureNoteApp.DebugP("mouseout:" + Label);
+                    _this.AssureNoteApp.PluginManager.InvokeMouseOutEvent(NodeView);
                 }
             });
 

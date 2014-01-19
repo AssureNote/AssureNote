@@ -72,6 +72,14 @@ module AssureNote {
             /* Do nothing */
         }
 
+        MouseOver(NodeView: NodeView): void {
+            /* Do nothing */
+        }
+
+        MouseOut(NodeView: NodeView): void {
+            /* Do nothing */
+        }
+
         SetMenuBarButton(b: boolean) {
             this.hasMenuBarButton = b;
         }
@@ -193,6 +201,18 @@ module AssureNote {
         InvokeSVGRenderPlugin(ShapeGroup: SVGGElement, NodeView: NodeView): void {
             $.each(this.PluginMap, (key: string, value: Plugin) => {
                 value.RenderSVG(ShapeGroup, NodeView);
+            });
+        }
+
+        InvokeMouseOverEvent(NodeView: NodeView): void {
+            $.each(this.PluginMap, (key: string, value: Plugin) => {
+                value.MouseOver(NodeView);
+            });
+        }
+
+        InvokeMouseOutEvent(NodeView: NodeView): void {
+            $.each(this.PluginMap, (key: string, value: Plugin) => {
+                value.MouseOver(NodeView);
             });
         }
     }

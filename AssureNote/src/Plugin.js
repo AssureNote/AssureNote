@@ -65,6 +65,14 @@ var AssureNote;
             /* Do nothing */
         };
 
+        Plugin.prototype.MouseOver = function (NodeView) {
+            /* Do nothing */
+        };
+
+        Plugin.prototype.MouseOut = function (NodeView) {
+            /* Do nothing */
+        };
+
         Plugin.prototype.SetMenuBarButton = function (b) {
             this.hasMenuBarButton = b;
         };
@@ -183,6 +191,18 @@ var AssureNote;
         PluginManager.prototype.InvokeSVGRenderPlugin = function (ShapeGroup, NodeView) {
             $.each(this.PluginMap, function (key, value) {
                 value.RenderSVG(ShapeGroup, NodeView);
+            });
+        };
+
+        PluginManager.prototype.InvokeMouseOverEvent = function (NodeView) {
+            $.each(this.PluginMap, function (key, value) {
+                value.MouseOver(NodeView);
+            });
+        };
+
+        PluginManager.prototype.InvokeMouseOutEvent = function (NodeView) {
+            $.each(this.PluginMap, function (key, value) {
+                value.MouseOver(NodeView);
             });
         };
         PluginManager.OnLoadPlugin = [];

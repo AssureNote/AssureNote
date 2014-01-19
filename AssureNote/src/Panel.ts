@@ -177,7 +177,8 @@ module AssureNote {
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null && this.FocusedLabel != Label) {
                     this.FocusedLabel = Label;
-                    this.AssureNoteApp.DebugP("mouseover:"+Label);
+                    this.AssureNoteApp.DebugP("mouseover:" + Label);
+                    this.AssureNoteApp.PluginManager.InvokeMouseOverEvent(NodeView);
                 }
             });
 
@@ -192,7 +193,8 @@ module AssureNote {
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null && Label == this.FocusedLabel) {
                     this.FocusedLabel = null;
-                    this.AssureNoteApp.DebugP("mouseout:"+Label);
+                    this.AssureNoteApp.DebugP("mouseout:" + Label);
+                    this.AssureNoteApp.PluginManager.InvokeMouseOutEvent(NodeView);
                 }
             });
 
