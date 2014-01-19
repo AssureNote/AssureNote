@@ -39,12 +39,13 @@ module AssureNote {
         }
     }
 
-    export class NodeMenu {
+    export class NodeMenu extends Pane{
         Menu: JQuery;
         CurrentView: NodeView;
         IsEnable: boolean;
 
         constructor(public AssureNoteApp: AssureNoteApp) {
+            super(AssureNoteApp);
             this.IsEnable = false;
         }
 

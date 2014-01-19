@@ -58,6 +58,12 @@ var AssureNote;
                 return NodeDoc;
             }
         };
+
+        LastModifiedPlugin.prototype.MouseOut = function (NodeView) {
+        };
+
+        LastModifiedPlugin.prototype.MouseOver = function (NodeView) {
+        };
         return LastModifiedPlugin;
     })(AssureNote.Plugin);
     AssureNote.LastModifiedPlugin = LastModifiedPlugin;

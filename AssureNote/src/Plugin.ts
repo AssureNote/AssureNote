@@ -55,6 +55,10 @@ module AssureNote {
             return null;
         }
 
+        CreateTooltip(NodeView: NodeView): HTMLDivElement {
+            return null;
+        }
+
         EditorEnableCallback(): () => void {
             return null;
         }
@@ -69,14 +73,6 @@ module AssureNote {
         }
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
-            /* Do nothing */
-        }
-
-        MouseOver(NodeView: NodeView): void {
-            /* Do nothing */
-        }
-
-        MouseOut(NodeView: NodeView): void {
             /* Do nothing */
         }
 
@@ -179,6 +175,15 @@ module AssureNote {
             return ret;
         }
 
+        GetTooltips(TargetView: NodeView): HTMLDivElement[]{
+            var ret: HTMLDivElement[] = [];
+            $.each(this.PluginMap, (key, value: Plugin) => {
+                var Tooltip = value.CreateTooltip(TargetView);
+                if (Tooltip) ret.push(Tooltip);
+            });
+            return ret;
+        }
+
         GetDoubleClicked(): Plugin {
             var ret: Plugin = null;
             //FIXME Editing mode
@@ -201,18 +206,6 @@ module AssureNote {
         InvokeSVGRenderPlugin(ShapeGroup: SVGGElement, NodeView: NodeView): void {
             $.each(this.PluginMap, (key: string, value: Plugin) => {
                 value.RenderSVG(ShapeGroup, NodeView);
-            });
-        }
-
-        InvokeMouseOverEvent(NodeView: NodeView): void {
-            $.each(this.PluginMap, (key: string, value: Plugin) => {
-                value.MouseOver(NodeView);
-            });
-        }
-
-        InvokeMouseOutEvent(NodeView: NodeView): void {
-            $.each(this.PluginMap, (key: string, value: Plugin) => {
-                value.MouseOver(NodeView);
             });
         }
     }

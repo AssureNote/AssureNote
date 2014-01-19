@@ -85,6 +85,7 @@
     <TypeScriptCompile Include="src\old\CaseModel.ts" />
     <TypeScriptCompile Include="src\SearchNode.ts" />
     <TypeScriptCompile Include="src\Socket.ts" />
+    <TypeScriptCompile Include="src\Tooltip.ts" />
     <TypeScriptCompile Include="src\Viewport.ts" />
     <TypeScriptCompile Include="src\old\CaseViewer.ts" />
     <TypeScriptCompile Include="src\old\ColorMap.ts" />

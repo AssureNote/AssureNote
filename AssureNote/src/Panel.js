@@ -44,11 +44,15 @@ var AssureNote;
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new AssureNote.NodeMenu(AssureNoteApp);
+            var Tooltip = new Tooltip(AssureNoteApp);
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 _this.AssureNoteApp.DebugP("click:" + Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
                 }
                 event.preventDefault();
             });
@@ -59,6 +63,9 @@ var AssureNote;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
+                }
             });
 
             this.ContentLayer.addEventListener("contextmenu", function (event) {
@@ -68,6 +75,9 @@ var AssureNote;
                     _this.FocusedLabel = Label;
                     if (Bar.IsEnable) {
                         Bar.Remove();
+                    }
+                    if (Tooltip.IsEnable) {
+                        Tooltip.Remove;
                     }
                     var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
                     Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
@@ -83,6 +93,9 @@ var AssureNote;
                 _this.AssureNoteApp.DebugP("double click:" + Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
                 }
                 _this.AssureNoteApp.ExecDoubleClicked(NodeView);
                 event.preventDefault();
@@ -162,7 +175,8 @@ var AssureNote;
                 if (NodeView != null && _this.FocusedLabel != Label) {
                     _this.FocusedLabel = Label;
                     _this.AssureNoteApp.DebugP("mouseover:" + Label);
-                    _this.AssureNoteApp.PluginManager.InvokeMouseOverEvent(NodeView);
+                    var Tooltips = _this.AssureNoteApp.PluginManager.GetTooltips(NodeView);
+                    Tooltip.Create(NodeView, _this.ControlLayer, Tooltips);
                 }
             });
 
@@ -178,7 +192,9 @@ var AssureNote;
                 if (NodeView != null && Label == _this.FocusedLabel) {
                     _this.FocusedLabel = null;
                     _this.AssureNoteApp.DebugP("mouseout:" + Label);
-                    _this.AssureNoteApp.PluginManager.InvokeMouseOutEvent(NodeView);
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
                 }
             });
 
@@ -342,5 +358,19 @@ var AssureNote;
         return PluginPanel;
     })();
     AssureNote.PluginPanel = PluginPanel;
+
+    var Pane = (function () {
+        function Pane(AssureNoteApp) {
+            this.AssureNoteApp = AssureNoteApp;
+        }
+        Pane.prototype.Create = function (NodeView, ControlLayer, contents) {
+            /* Do nothing */
+        };
+
+        Pane.prototype.Remove = function () {
+        };
+        return Pane;
+    })();
+    AssureNote.Pane = Pane;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Panel.js.map

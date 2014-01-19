@@ -52,6 +52,12 @@ module AssureNote {
                 return NodeDoc;
             }
         }
+
+        MouseOut(NodeView: NodeView): void {
+        }
+
+        MouseOver(NodeView: NodeView): void {
+        }
     }
 }
 

@@ -48,6 +48,10 @@ var AssureNote;
             return null;
         };
 
+        Plugin.prototype.CreateTooltip = function (NodeView) {
+            return null;
+        };
+
         Plugin.prototype.EditorEnableCallback = function () {
             return null;
         };
@@ -62,14 +66,6 @@ var AssureNote;
         };
 
         Plugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
-            /* Do nothing */
-        };
-
-        Plugin.prototype.MouseOver = function (NodeView) {
-            /* Do nothing */
-        };
-
-        Plugin.prototype.MouseOut = function (NodeView) {
             /* Do nothing */
         };
 
@@ -168,6 +164,16 @@ var AssureNote;
             return ret;
         };
 
+        PluginManager.prototype.GetTooltips = function (TargetView) {
+            var ret = [];
+            $.each(this.PluginMap, function (key, value) {
+                var Tooltip = value.CreateTooltip(TargetView);
+                if (Tooltip)
+                    ret.push(Tooltip);
+            });
+            return ret;
+        };
+
         PluginManager.prototype.GetDoubleClicked = function () {
             var ret = null;
 
@@ -191,18 +197,6 @@ var AssureNote;
         PluginManager.prototype.InvokeSVGRenderPlugin = function (ShapeGroup, NodeView) {
             $.each(this.PluginMap, function (key, value) {
                 value.RenderSVG(ShapeGroup, NodeView);
-            });
-        };
-
-        PluginManager.prototype.InvokeMouseOverEvent = function (NodeView) {
-            $.each(this.PluginMap, function (key, value) {
-                value.MouseOver(NodeView);
-            });
-        };
-
-        PluginManager.prototype.InvokeMouseOutEvent = function (NodeView) {
-            $.each(this.PluginMap, function (key, value) {
-                value.MouseOver(NodeView);
             });
         };
         PluginManager.OnLoadPlugin = [];
