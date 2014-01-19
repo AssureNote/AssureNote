@@ -310,7 +310,7 @@ var AssureNote;
                 event.stopPropagation();
             });
 
-            textarea = CodeMirror.fromTextArea(document.getElementById('single-editor'), {
+            textarea = CodeMirror.fromTextArea(document.getElementById('singlenode-editor'), {
                 lineNumbers: false,
                 mode: 'wgsn',
                 lineWrapping: true

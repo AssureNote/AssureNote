@@ -325,7 +325,7 @@ module AssureNote {
             AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
             $("#plugin-layer").on('mousewheel', (event: MouseWheelEvent) => { event.stopPropagation(); });
 
-            textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('single-editor'), {
+            textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('singlenode-editor'), {
                 lineNumbers: false,
                 mode: 'wgsn',
                 lineWrapping: true,
