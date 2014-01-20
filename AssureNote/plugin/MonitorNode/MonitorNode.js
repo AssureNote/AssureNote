@@ -44,7 +44,7 @@ var AssureNote;
             var ContextNode = null;
             for (var i = 0; i < GoalNode.SubNodeList.length; i++) {
                 var BroutherNode = GoalNode.SubNodeList[i];
-                if (BroutherNode.NodeType == 1 /* Context */) {
+                if (BroutherNode.IsContext()) {
                     ContextNode = BroutherNode;
                     break;
                 }
@@ -234,7 +234,7 @@ var AssureNote;
                 if (Param == "all") {
                     for (var Label in this.App.PictgramPanel.ViewMap) {
                         var View = this.App.PictgramPanel.ViewMap[Label];
-                        if (View.Model.NodeType != 3 /* Evidence */) {
+                        if (!View.Model.IsEvidence()) {
                             continue;
                         }
 

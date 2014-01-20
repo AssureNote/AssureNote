@@ -47,7 +47,7 @@ module AssureNote {
             var ContextNode = null;
             for(var i: number = 0; i < GoalNode.SubNodeList.length; i++) {
                 var BroutherNode = GoalNode.SubNodeList[i];
-                if(BroutherNode.NodeType == GSNType.Context) {
+                if(BroutherNode.IsContext()) {
                     ContextNode = BroutherNode;
                     break;
                 }
@@ -246,7 +246,7 @@ module AssureNote {
                     // Start all monitors
                     for(var Label in this.App.PictgramPanel.ViewMap) {
                         var View = this.App.PictgramPanel.ViewMap[Label];
-                        if(View.Model.NodeType != GSNType.Evidence) {
+                        if(!View.Model.IsEvidence()) {
                             continue;
                         }
 
