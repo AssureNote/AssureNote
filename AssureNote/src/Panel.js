@@ -260,7 +260,7 @@ var AssureNote;
             });
         };
 
-        PictgramPanel.prototype.SetView = function (NodeView) {
+        PictgramPanel.prototype.InitializeView = function (NodeView) {
             this.MasterView = NodeView;
             this.ViewMap = {};
             this.MasterView.UpdateViewMap(this.ViewMap);

@@ -280,7 +280,7 @@ module AssureNote {
             });
         }
 
-        SetView(NodeView: NodeView): void {
+        InitializeView(NodeView: NodeView): void {
             this.MasterView = NodeView;
             this.ViewMap = {};
             this.MasterView.UpdateViewMap(this.ViewMap);

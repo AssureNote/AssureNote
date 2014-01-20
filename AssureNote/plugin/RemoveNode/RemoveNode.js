@@ -1,4 +1,4 @@
-﻿// ***************************************************************************
+// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -70,7 +70,7 @@ var AssureNote;
                 var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.SetView(NewNodeView);
+                this.App.PictgramPanel.InitializeView(NewNodeView);
                 this.App.PictgramPanel.Draw(TopGoal.GetLabel());
             } else {
                 console.log("Need paramter");
@@ -121,7 +121,7 @@ var AssureNote;
                 var TopGoal = App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(App.PictgramPanel.ViewMap);
-                App.PictgramPanel.SetView(NewNodeView);
+                App.PictgramPanel.InitializeView(NewNodeView);
                 App.PictgramPanel.Draw(TopGoal.GetLabel());
             });
         };

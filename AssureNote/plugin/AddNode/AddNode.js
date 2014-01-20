@@ -50,7 +50,7 @@ var AssureNote;
                 var TopGoal = Doc.TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(_this.AssureNoteApp.PictgramPanel.ViewMap);
-                _this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
+                _this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
                 _this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
                 _this.AssureNoteApp.MasterRecord.CloseEditor();
             };

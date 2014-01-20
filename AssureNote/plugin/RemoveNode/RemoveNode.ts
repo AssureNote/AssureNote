@@ -66,7 +66,7 @@ module AssureNote {
                 var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.SetView(NewNodeView);
+                this.App.PictgramPanel.InitializeView(NewNodeView);
                 this.App.PictgramPanel.Draw(TopGoal.GetLabel());
             } else {
                 console.log("Need paramter");
@@ -115,7 +115,7 @@ module AssureNote {
                 var TopGoal = App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(App.PictgramPanel.ViewMap);
-                App.PictgramPanel.SetView(NewNodeView);
+                App.PictgramPanel.InitializeView(NewNodeView);
                 App.PictgramPanel.Draw(TopGoal.GetLabel());
             });
         }

@@ -86,7 +86,7 @@ var AssureNote;
                 var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
-                this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
+                this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
                 this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
 
                 this.AssureNoteApp.PluginPanel.IsVisible = true;
