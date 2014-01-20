@@ -33,10 +33,6 @@ module AssureNote {
             return [];
         }
 
-        public GetDisplayName(): string {
-            return "";
-        }
-
         public Invoke(CommandName: string, Params: any[]) {
         }
 
@@ -80,10 +76,6 @@ module AssureNote {
 
         public GetCommandLineNames(): string[] {
             return ["w", "save"];
-        }
-
-        public GetDisplayName(): string {
-            return "Save";
         }
 
         public Invoke(CommandName: string, Params: any[]) {
@@ -192,10 +184,6 @@ module AssureNote {
 
         public GetCommandLineNames(): string[] {
             return ["saveassvg", "save-as-svg"];
-        }
-
-        public GetDisplayName(): string {
-            return "Save As SVG";
         }
 
         public Invoke(CommandName: string, Params: any[]) {
@@ -307,10 +295,6 @@ module AssureNote {
             return ["unfoldAll", "unfold-all"];
         }
 
-        public GetDisplayName(): string {
-            return "Unfold All";
-        }
-
         public GetHelpHTML(): string {
             return "<code>unfold-all</code><br>Unfold all folded Goals"
         }
@@ -335,10 +319,6 @@ module AssureNote {
 
         public GetCommandLineNames(): string[] {
             return ["setcolor", "set-color"];
-        }
-
-        public GetDisplayName(): string {
-            return "Set Color...";
         }
 
         public GetHelpHTML(): string {
@@ -370,10 +350,6 @@ module AssureNote {
             return ["setscale", "set-scale"];
         }
 
-        public GetDisplayName(): string {
-            return "Set Scale...";
-        }
-
         public GetHelpHTML(): string {
             return "<code>set-scale scale</code><br>Change scale."
         }
@@ -392,10 +368,6 @@ module AssureNote {
 
         public GetCommandLineNames(): string[] {
             return ["e", "open"];
-        }
-
-        public GetDisplayName(): string {
-            return "Open...";
         }
 
         public GetHelpHTML(): string {
@@ -420,10 +392,6 @@ module AssureNote {
             return ["help", "?"];
         }
 
-        public GetDisplayName(): string {
-            return "Help";
-        }
-
         public GetHelpHTML(): string {
             return "<code>help [name]</code><br>Show this message."
         }
@@ -443,10 +411,6 @@ module AssureNote {
 
         public GetCommandLineNames(): string[] {
             return ["upload"];
-        }
-
-        public GetDisplayName(): string {
-            return "Upload";
         }
 
         public GetHelpHTML(): string {

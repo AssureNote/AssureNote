@@ -217,10 +217,6 @@ var AssureNote;
             return ["monitor-start"];
         };
 
-        MonitorStartCommand.prototype.GetDisplayName = function () {
-            return "Start Monitor";
-        };
-
         MonitorStartCommand.prototype.GetHelpHTML = function () {
             return "<code>monitor-start</code><br>Start monitoring.";
         };
@@ -282,10 +278,6 @@ var AssureNote;
         }
         MonitorStopCommand.prototype.GetCommandLineNames = function () {
             return ["monitor-stop"];
-        };
-
-        MonitorStopCommand.prototype.GetDisplayName = function () {
-            return "Stop Monitor";
         };
 
         MonitorStopCommand.prototype.GetHelpHTML = function () {

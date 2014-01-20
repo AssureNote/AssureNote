@@ -41,10 +41,6 @@ var AssureNote;
             return ["message"];
         };
 
-        MessageCommand.prototype.GetDisplayName = function () {
-            return "Message";
-        };
-
         MessageCommand.prototype.GetHelpHTML = function () {
             return "<code>message msg</code><br>Send message to the chat server.";
         };
@@ -66,10 +62,6 @@ var AssureNote;
         }
         ConnectCommand.prototype.GetCommandLineNames = function () {
             return ["connect"];
-        };
-
-        ConnectCommand.prototype.GetDisplayName = function () {
-            return "Connect";
         };
 
         ConnectCommand.prototype.GetHelpHTML = function () {

@@ -33,10 +33,6 @@ module AssureNote {
             return ["message"];
         }
 
-        public GetDisplayName(): string {
-            return "Message";
-        }
-
         public GetHelpHTML(): string {
             return "<code>message msg</code><br>Send message to the chat server."
         }
@@ -52,10 +48,6 @@ module AssureNote {
     export class ConnectCommand extends Command {
         public GetCommandLineNames(): string[] {
             return ["connect"];
-        }
-
-        public GetDisplayName(): string {
-            return "Connect";
         }
 
         public GetHelpHTML(): string {

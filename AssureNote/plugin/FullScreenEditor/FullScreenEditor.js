@@ -42,10 +42,6 @@ var AssureNote;
             return ["edit"];
         };
 
-        FullScreenEditorCommand.prototype.GetDisplayName = function () {
-            return "Editor";
-        };
-
         FullScreenEditorCommand.prototype.GetHelpHTML = function () {
             return "<code>edit [label]</code><br>Open editor.";
         };

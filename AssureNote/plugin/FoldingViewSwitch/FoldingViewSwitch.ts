@@ -37,10 +37,6 @@ module AssureNote {
             return ["fold"];
         }
 
-        public GetDisplayName(): string {
-            return "FoldingView";
-        }
-
         public GetHelpHTML(): string {
             return "<code>fold label</code><br>Toggle folding state of Goal."
         }

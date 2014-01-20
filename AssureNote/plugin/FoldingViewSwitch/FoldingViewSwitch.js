@@ -41,10 +41,6 @@ var AssureNote;
             return ["fold"];
         };
 
-        FoldingCommand.prototype.GetDisplayName = function () {
-            return "FoldingView";
-        };
-
         FoldingCommand.prototype.GetHelpHTML = function () {
             return "<code>fold label</code><br>Toggle folding state of Goal.";
         };

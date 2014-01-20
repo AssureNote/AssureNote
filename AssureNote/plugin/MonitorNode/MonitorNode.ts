@@ -228,10 +228,6 @@ module AssureNote {
             return ["monitor-start"];
         }
 
-        public GetDisplayName(): string {
-            return "Start Monitor";
-        }
-
         public GetHelpHTML(): string {
             return "<code>monitor-start</code><br>Start monitoring."
         }
@@ -297,10 +293,6 @@ module AssureNote {
 
         public GetCommandLineNames(): string[] {
             return ["monitor-stop"];
-        }
-
-        public GetDisplayName(): string {
-            return "Stop Monitor";
         }
 
         public GetHelpHTML(): string {

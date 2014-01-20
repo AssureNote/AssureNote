@@ -36,10 +36,6 @@ module AssureNote {
             return ["edit"];
         }
 
-        public GetDisplayName(): string {
-            return "Editor";
-        }
-
         public GetHelpHTML(): string {
             return "<code>edit [label]</code><br>Open editor."
         }

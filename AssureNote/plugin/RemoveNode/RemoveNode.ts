@@ -36,10 +36,6 @@ module AssureNote {
             return ["rm", "remove"];
         }
 
-        public GetDisplayName(): string {
-            return "Remove";
-        }
-
         public GetHelpHTML(): string {
             return "<code>remove label</code><br>Remove a node and it's descendant."
         }

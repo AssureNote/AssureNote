@@ -38,10 +38,6 @@ var AssureNote;
             return [];
         };
 
-        Command.prototype.GetDisplayName = function () {
-            return "";
-        };
-
         Command.prototype.Invoke = function (CommandName, Params) {
         };
 
@@ -89,10 +85,6 @@ var AssureNote;
         }
         SaveCommand.prototype.GetCommandLineNames = function () {
             return ["w", "save"];
-        };
-
-        SaveCommand.prototype.GetDisplayName = function () {
-            return "Save";
         };
 
         SaveCommand.prototype.Invoke = function (CommandName, Params) {
@@ -204,10 +196,6 @@ var AssureNote;
             return ["saveassvg", "save-as-svg"];
         };
 
-        SaveSVGCommand.prototype.GetDisplayName = function () {
-            return "Save As SVG";
-        };
-
         SaveSVGCommand.prototype.Invoke = function (CommandName, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
@@ -317,10 +305,6 @@ var AssureNote;
             return ["unfoldAll", "unfold-all"];
         };
 
-        UnfoldAllCommand.prototype.GetDisplayName = function () {
-            return "Unfold All";
-        };
-
         UnfoldAllCommand.prototype.GetHelpHTML = function () {
             return "<code>unfold-all</code><br>Unfold all folded Goals";
         };
@@ -347,10 +331,6 @@ var AssureNote;
         }
         SetColorCommand.prototype.GetCommandLineNames = function () {
             return ["setcolor", "set-color"];
-        };
-
-        SetColorCommand.prototype.GetDisplayName = function () {
-            return "Set Color...";
         };
 
         SetColorCommand.prototype.GetHelpHTML = function () {
@@ -384,10 +364,6 @@ var AssureNote;
             return ["setscale", "set-scale"];
         };
 
-        SetScaleCommand.prototype.GetDisplayName = function () {
-            return "Set Scale...";
-        };
-
         SetScaleCommand.prototype.GetHelpHTML = function () {
             return "<code>set-scale scale</code><br>Change scale.";
         };
@@ -408,10 +384,6 @@ var AssureNote;
         }
         OpenCommand.prototype.GetCommandLineNames = function () {
             return ["e", "open"];
-        };
-
-        OpenCommand.prototype.GetDisplayName = function () {
-            return "Open...";
         };
 
         OpenCommand.prototype.GetHelpHTML = function () {
@@ -439,10 +411,6 @@ var AssureNote;
             return ["help", "?"];
         };
 
-        HelpCommand.prototype.GetDisplayName = function () {
-            return "Help";
-        };
-
         HelpCommand.prototype.GetHelpHTML = function () {
             return "<code>help [name]</code><br>Show this message.";
         };
@@ -466,10 +434,6 @@ var AssureNote;
         }
         UploadCommand.prototype.GetCommandLineNames = function () {
             return ["upload"];
-        };
-
-        UploadCommand.prototype.GetDisplayName = function () {
-            return "Upload";
         };
 
         UploadCommand.prototype.GetHelpHTML = function () {

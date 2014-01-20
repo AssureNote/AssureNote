@@ -40,10 +40,6 @@ var AssureNote;
             return ["rm", "remove"];
         };
 
-        RemoveCommand.prototype.GetDisplayName = function () {
-            return "Remove";
-        };
-
         RemoveCommand.prototype.GetHelpHTML = function () {
             return "<code>remove label</code><br>Remove a node and it's descendant.";
         };
