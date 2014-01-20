@@ -315,6 +315,14 @@ var AssureNote;
             return null;
         };
 
+        PictgramPanel.prototype.GetNodeViewFromUID = function (UID) {
+            for (var i in this.ViewMap) {
+                if (this.ViewMap[i].Model.UID == UID)
+                    return this.ViewMap[i];
+            }
+            return null;
+        };
+
         //TODO
         PictgramPanel.prototype.NavigateUp = function () {
         };

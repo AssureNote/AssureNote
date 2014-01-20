@@ -336,6 +336,13 @@ module AssureNote {
             return null;
         }
 
+        GetNodeViewFromUID(UID: number): NodeView {
+            for (var i in this.ViewMap) {
+                if (this.ViewMap[i].Model.UID == UID) return this.ViewMap[i];
+            }
+            return null;
+        }
+
         //TODO
         NavigateUp(): void { }
         NavigateDown(): void { }
