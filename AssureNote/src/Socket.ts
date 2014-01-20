@@ -53,7 +53,7 @@ module AssureNote {
     export class SocketManager {
         private socket: any;
         private handler: { [key: string]: (any) => void };
-        EdtitingNodesID: number[] = [];
+        EditingNodesID: number[] = [];
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             if (!this.IsOperational()) {
@@ -72,6 +72,12 @@ module AssureNote {
                 this.AssureNoteApp.DebugP('Socket not enable.');
                 return;
             }
+
+            if (method == 'startedit' && !this.IsEditable(params.UID)) {
+                (<any>$).notify("Warning:Other user edits this Node!", "warn");
+                return;
+            }
+
             this.socket.emit(method, params);
         }
 
@@ -94,8 +100,13 @@ module AssureNote {
             });
             this.socket.on('startedit', function(data) {
                 console.log('edit');
-            //    this.EditingNodesID.push(data.UID);
-                (<any>$).notify(data.Label + "is now edited by other user", "warn");
+                self.EditingNodesID.push(data.UID);
+                console.log('here is ID array = ' + self.EditingNodesID);
+            });
+            this.socket.on('finishedit', function(data) {
+                console.log('finishedit');
+                self.DeleteID(data.UID);
+                console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
             for (var key in this.handler) {
@@ -125,6 +136,25 @@ module AssureNote {
         IsOperational() {
             /* Checks the existence of socked.io.js */
             return io != null && io.connect != null;
+        }
+
+        DeleteID(UID:number) {
+            for (var i:number = 0; i < this.EditingNodesID.length; i++) {
+                if (this.EditingNodesID[i] == UID) {
+                    this.EditingNodesID.splice(i, 1); 
+                    return;
+                }
+            }
+        }
+
+        IsEditable(UID: number) {
+            if (this.EditingNodesID.length == 0) return true;
+            for (var i:number = 0; i < this.EditingNodesID.length; i++) {
+                if (this.EditingNodesID[i] == UID) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         StartEdit(data: {Label: string; UID: number}) {

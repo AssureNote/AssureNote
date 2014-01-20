@@ -63,6 +63,7 @@ module AssureNote {
                 e.stopPropagation();
                 e.preventDefault();
                 this.DisableEditor(NodeView, IsRecursive);
+                this.AssureNoteApp.SocketManager.Emit('finishedit', {Label: NodeView.Model.GetLabel(), UID:  NodeView.Model.UID});
                 App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
             });
             this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);

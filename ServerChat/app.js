@@ -6,7 +6,7 @@ var parser = require('./AssureNoteParser');
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
         this.room = 'room';
-        this.EditingNodes = new Array();
+        this.EditingNodes = [];
         var self = this;
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
@@ -24,6 +24,7 @@ var AssureNoteServer = (function () {
         });
     }
     AssureNoteServer.prototype.EnableListeners = function (socket) {
+        var self = this;
         socket.on('message', function (message) {
             socket.broadcast.emit('message', message);
         });
@@ -32,9 +33,12 @@ var AssureNoteServer = (function () {
         });
         socket.on('startedit', function (data) {
             data['socketId'] = socket.id;
-
-            //   this.EditingNodes.push(data.UID);
+            self.EditingNodes.push(data);
+            console.log("this is editing list" + this.EditingNodes);
             socket.broadcast.emit('startedit', data);
+        });
+        socket.on('finishedit', function (data) {
+            socket.broadcast.emit('finishedit', data);
         });
     };
 
@@ -45,6 +49,14 @@ var AssureNoteServer = (function () {
             res.push(Clients[i].id);
         }
         return res;
+    };
+
+    AssureNoteServer.prototype.IsEditable = function (UID) {
+        for (var i = 0; i < this.EditingNodes.length; i++) {
+            if (this.EditingNodes[i]['UID'] == UID)
+                return false;
+        }
+        return true;
     };
 
     AssureNoteServer.prototype.Parse = function (WGSN) {

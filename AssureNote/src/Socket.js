@@ -55,7 +55,7 @@ var AssureNote;
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
-            this.EdtitingNodesID = [];
+            this.EditingNodesID = [];
             if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found');
             }
@@ -71,6 +71,12 @@ var AssureNote;
                 this.AssureNoteApp.DebugP('Socket not enable.');
                 return;
             }
+
+            if (method == 'startedit' && !this.IsEditable(params.UID)) {
+                $.notify("Warning:Other user edits this Node!", "warn");
+                return;
+            }
+
             this.socket.emit(method, params);
         };
 
@@ -93,9 +99,13 @@ var AssureNote;
             });
             this.socket.on('startedit', function (data) {
                 console.log('edit');
-
-                //    this.EditingNodesID.push(data.UID);
-                $.notify(data.Label + "is now edited by other user", "warn");
+                self.EditingNodesID.push(data.UID);
+                console.log('here is ID array = ' + self.EditingNodesID);
+            });
+            this.socket.on('finishedit', function (data) {
+                console.log('finishedit');
+                self.DeleteID(data.UID);
+                console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
             for (var key in this.handler) {
@@ -125,6 +135,26 @@ var AssureNote;
         SocketManager.prototype.IsOperational = function () {
             /* Checks the existence of socked.io.js */
             return io != null && io.connect != null;
+        };
+
+        SocketManager.prototype.DeleteID = function (UID) {
+            for (var i = 0; i < this.EditingNodesID.length; i++) {
+                if (this.EditingNodesID[i] == UID) {
+                    this.EditingNodesID.splice(i, 1);
+                    return;
+                }
+            }
+        };
+
+        SocketManager.prototype.IsEditable = function (UID) {
+            if (this.EditingNodesID.length == 0)
+                return true;
+            for (var i = 0; i < this.EditingNodesID.length; i++) {
+                if (this.EditingNodesID[i] == UID) {
+                    return false;
+                }
+            }
+            return true;
         };
 
         SocketManager.prototype.StartEdit = function (data) {
