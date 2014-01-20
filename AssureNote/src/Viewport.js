@@ -228,7 +228,7 @@ var AssureNote;
 
         ViewportManager.prototype.SetOffset = function (PageX, PageY) {
             this.CameraGX = (this.CameraCenterPageX - PageX) / this.Scale;
-            this.CameraGX = (this.CameraCenterPageY - PageY) / this.Scale;
+            this.CameraGY = (this.CameraCenterPageY - PageY) / this.Scale;
             this.UpdateAttr();
         };
 
