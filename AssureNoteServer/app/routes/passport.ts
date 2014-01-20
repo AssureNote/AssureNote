@@ -30,12 +30,13 @@ export var login = function(req: any, res: any) {
     var UserId = GetUserId(user);
     var UserName = GetUserName(user);
     var Referer = req.header('Referer');
+    if(Referer == null) {
+        Referer = CONFIG.assurenote.basepath+'/';
+    }
 
     var con = new db.Database();
     var userDAO = new model_user.UserDAO(con);
-    console.log(UserId);
     userDAO.login(UserId, UserName, UserId, (err:any, result: model_user.User) => {
-        console.log(err);
         if (err) {
             // TODO: display error information
             console.error(err);

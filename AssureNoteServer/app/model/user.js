@@ -44,9 +44,9 @@ var UserDAO = (function (_super) {
 
         this.select(key, function (err, resultSelect) {
             if (err) {
-                _this.insert(key, displayName, auth_id, function (err, resultInsert) {
-                    if (err) {
-                        callback(err, null);
+                _this.insert(key, displayName, auth_id, function (error, resultInsert) {
+                    if (error) {
+                        callback(error, null);
                         return;
                     }
                     console.log(resultInsert);

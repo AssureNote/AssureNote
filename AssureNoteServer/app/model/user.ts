@@ -26,9 +26,9 @@ export class UserDAO extends model.DAO {
 
         this.select(key, (err, resultSelect) => {
             if (err) {
-                this.insert(key, displayName, auth_id, (err, resultInsert) => {
-                    if (err) {
-                        callback(err, null);
+                this.insert(key, displayName, auth_id, (error, resultInsert) => {
+                    if (error) {
+                        callback(error, null);
                         return;
                     }
                     console.log(resultInsert);
