@@ -128,6 +128,11 @@ var AssureNote;
             return Math.floor(Math.random() * 2147483647);
         }
         AssureNoteUtils.GenerateUID = GenerateUID;
+
+        function GenerateRandomString() {
+            return GenerateUID().toString(36);
+        }
+        AssureNoteUtils.GenerateRandomString = GenerateRandomString;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

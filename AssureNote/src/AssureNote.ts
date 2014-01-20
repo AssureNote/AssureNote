@@ -24,6 +24,7 @@
 
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
+///<reference path='TopMenu.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
@@ -40,6 +41,8 @@ module AssureNote {
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
+
+        TopMenu: TopMenuItem;
 
         private UserName: string;
 
@@ -65,6 +68,25 @@ module AssureNote {
 
             this.PluginManager.LoadPlugin();
             this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
+
+            this.TopMenu = new TopMenuTopItem([
+                new SubMenuItem("File", "file", [
+                    new NewMenuItem(),
+                    new OpenMenuItem(),
+                    new UploadMenuItem(),
+                    new SaveMenuItem(),
+                    new SubMenuItem("Save As", "floppy-save", [
+                        new SaveAsWGSNMenuItem(),
+                        new SaveAsDCaseMenuItem(),
+                        new SaveAsSVGMenuItem()
+                    ]),
+                    new DividerMenuItem(),
+                    new HelpMenuItem(),
+                    new CommandListMenuItem(),
+                    new AboutMenuItem()
+                ])
+            ]);
+            this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
         }
 
         public RegistCommand(Command: Command) {
@@ -98,7 +120,7 @@ module AssureNote {
 
         ExecTopMenu(Id: string): void {
             // temporary code
-            var Command = null;
+            var Command: Command = null;
             var Args = [];
             switch (Id) {
                 case "create-wgsn-menu":
@@ -152,7 +174,7 @@ module AssureNote {
                     break;
             }
             if (Command != null) {
-                Command.Invoke(Id/*FIXME*/, this.PictgramPanel.MasterView, Args);
+                Command.Invoke(Id/*FIXME*/, Args);
             }
         }
 

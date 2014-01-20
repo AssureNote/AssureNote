@@ -170,6 +170,10 @@ module AssureNote {
         export function GenerateUID(): number {
             return Math.floor(Math.random() * 2147483647);
         }
+
+        export function GenerateRandomString(): string {
+            return GenerateUID().toString(36);
+        }
     }
 
     export class ColorStyle {

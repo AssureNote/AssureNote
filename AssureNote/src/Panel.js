@@ -234,17 +234,6 @@ var AssureNote;
             this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
                 $("#auto-expand-area").hide(100);
             };
-
-            $("#top-menu").click(function (event) {
-                var target = event.target || event.srcElement;
-                var id = target.id;
-                if (id == "" || id == null) {
-                    return;
-                }
-                _this.AssureNoteApp.ExecTopMenu(id);
-            });
-
-            $(".dropdown-toggle").dropdown();
         }
         PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
             var _this = this;

@@ -255,16 +255,6 @@ module AssureNote {
                 $("#auto-expand-area").hide(100);
             };
 
-            $("#top-menu").click((event: MouseEvent) => {
-                var target = (<any>event.target) || (<any>event.srcElement);
-                var id = target.id;
-                if (id == "" || id == null) {
-                    return;
-                }
-                this.AssureNoteApp.ExecTopMenu(id);
-            });
-
-            (<any>$(".dropdown-toggle")).dropdown();
         }
 
         SetFoldedAllGoalNode(NodeView: NodeView): void {

@@ -23,6 +23,7 @@
 // **************************************************************************
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
+///<reference path='TopMenu.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
 
 var AssureNote;
@@ -50,6 +51,25 @@ var AssureNote;
 
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
+
+            this.TopMenu = new AssureNote.TopMenuTopItem([
+                new AssureNote.SubMenuItem("File", "file", [
+                    new AssureNote.NewMenuItem(),
+                    new AssureNote.OpenMenuItem(),
+                    new AssureNote.UploadMenuItem(),
+                    new AssureNote.SaveMenuItem(),
+                    new AssureNote.SubMenuItem("Save As", "floppy-save", [
+                        new AssureNote.SaveAsWGSNMenuItem(),
+                        new AssureNote.SaveAsDCaseMenuItem(),
+                        new AssureNote.SaveAsSVGMenuItem()
+                    ]),
+                    new AssureNote.DividerMenuItem(),
+                    new AssureNote.HelpMenuItem(),
+                    new AssureNote.CommandListMenuItem(),
+                    new AssureNote.AboutMenuItem()
+                ])
+            ]);
+            this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
         }
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             this.Commands.push(Command);
@@ -136,7 +156,7 @@ var AssureNote;
                     break;
             }
             if (Command != null) {
-                Command.Invoke(Id, this.PictgramPanel.MasterView, Args);
+                Command.Invoke(Id, Args);
             }
         };
 
