@@ -161,10 +161,9 @@ module AssureNote {
     }
 
     export class ViewportManager {
-        //windowX, windowY
         ScrollManager: ScrollManager = new ScrollManager(this);
-        private OffsetPageX: number = 0;
-        private OffsetPageY: number = 0;
+        private CameraGX: number = 0;
+        private CameraGY: number = 0;
         private Scale: number = 1.0;
         private PageWidth: number = window.innerWidth;
         private PageHeight: number = window.innerHeight;
@@ -205,35 +204,41 @@ module AssureNote {
             return this.Scale;
         }
 
-        SetCameraScale(scale: number): void {
-            scale = Math.max(0.02, Math.min(20.0, scale));
-            var scaleChange = scale / this.Scale;
-            var cx = this.CameraCenterPageX;
-            var cy = this.CameraCenterPageY;
-            this.OffsetPageX = scaleChange * (this.OffsetPageX - cx) + cx;
-            this.OffsetPageY = scaleChange * (this.OffsetPageY - cy) + cy;
-            this.Scale = scale;
+        private static LimitScale(Scale: number): number {
+            return Math.max(0.02, Math.min(20.0, Scale));
+        }
+
+        SetCameraScale(Scale: number): void {
+            this.Scale = ViewportManager.LimitScale(Scale);
             this.UpdateAttr();
         }
 
+        private GetOffsetPageX() {
+            return this.CameraCenterPageX - this.CameraGX * this.Scale;
+        }
+
+        private GetOffsetPageY() {
+            return this.CameraCenterPageY - this.CameraGY * this.Scale;
+        }
+
         private SetOffset(PageX: number, PageY: number): void {
-            this.OffsetPageX = PageX;
-            this.OffsetPageY = PageY;
+            this.CameraGX = (this.CameraCenterPageX - PageX) / this.Scale;
+            this.CameraGX = (this.CameraCenterPageY - PageY) / this.Scale;
             this.UpdateAttr();
         }
 
         AddOffset(PageX: number, PageY: number): void {
-            this.OffsetPageX += PageX;
-            this.OffsetPageY += PageY;
+            this.CameraGX -= PageX / this.Scale;
+            this.CameraGY -= PageY / this.Scale;
             this.UpdateAttr();
         }
 
         GetCameraGX(): number {
-            return (this.CameraCenterPageX - this.OffsetPageX) / this.Scale;
+            return this.CameraGX;
         }
 
         GetCameraGY(): number {
-            return (this.CameraCenterPageY - this.OffsetPageY) / this.Scale;
+            return this.CameraGY;
         }
 
         SetCameraPosition(GX: number, GY: number): void {
@@ -247,8 +252,8 @@ module AssureNote {
 
         private MoveCamera(GX: number, GY: number, Scale: number): void {
             this.Scale += Scale;
-            this.OffsetPageX -= GX * this.Scale;
-            this.OffsetPageY -= GY * this.Scale;
+            this.CameraGX += GX;
+            this.CameraGY += GY;
             this.UpdateAttr();
         }
 
@@ -266,19 +271,19 @@ module AssureNote {
         }
 
         PageXFromGX(GX: number): number {
-            return this.OffsetPageX + this.Scale * GX;
+            return this.CameraCenterPageX + (GX - this.CameraGX) * this.Scale;
         }
 
         PageYFromGY(GY: number): number {
-            return this.OffsetPageY + this.Scale * GY;
+            return this.CameraCenterPageX + (GY - this.CameraGY) * this.Scale;
         }
 
         GXFromPageX(PageX: number): number {
-            return (PageX - this.OffsetPageX) / this.Scale;
+            return (PageX - this.CameraCenterPageX) / this.Scale + this.CameraGX;
         }
 
         GYFromPageY(PageY: number): number {
-            return (PageY - this.OffsetPageY) / this.Scale;
+            return (PageY - this.CameraCenterPageY) / this.Scale + this.CameraGY;
         }
 
         ConvertRectGlobalXYFromPageXY(PageRect: Rect): Rect {
@@ -307,21 +312,26 @@ module AssureNote {
 
         private AnimationFrameTimerHandle: number = 0;
 
-        Move(GX: number, GY: number, scale: number, duration: number): void {
-            this.MoveTo(this.GetCameraGX() + GX, this.GetCameraGY() + GY, scale, duration);
+        Move(GX: number, GY: number, Scale: number, Duration: number): void {
+            this.MoveTo(this.GetCameraGX() + GX, this.GetCameraGY() + GY, Scale, Duration);
         }
 
-        MoveTo(GX: number, GY: number, scale: number, duration: number): void {
-            if (duration <= 0) {
-                this.SetCamera(GX, GY, scale);
+        MoveTo(GX: number, GY: number, Scale: number, Duration: number): void {
+            Scale = ViewportManager.LimitScale(Scale);
+            if (Duration <= 0) {
+                this.SetCamera(GX, GY, Scale);
                 return;
             }
 
-            var VX = (GX - this.GetCameraGX()) / duration;
-            var VY = (GY - this.GetCameraGY()) / duration;
-            var VS = (scale - this.GetCameraScale()) / duration;
+            var VX = (GX - this.GetCameraGX()) / Duration;
+            var VY = (GY - this.GetCameraGY()) / Duration;
 
-            if (VY == 0 && VX == 0 && VS == 0) {
+            var S0 = this.GetCameraScale();
+            var ScaleRate = Scale / S0;
+            var DInv = 1 / Duration;
+            var ScaleFunction = (t: number) => { return S0 * Math.pow(ScaleRate, t * DInv); }
+
+            if (VY == 0 && VX == 0 && (Scale == S0)) {
                 return;
             }
 
@@ -336,12 +346,13 @@ module AssureNote {
             var update: any = () => {
                 var currentTime: number = performance.now();
                 var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < duration) {
+                if (currentTime - startTime < Duration) {
                     this.AnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
-                    deltaT = duration - (lastTime - startTime);
+                    deltaT = Duration - (lastTime - startTime);
                 }
-                this.MoveCamera(VX * deltaT, VY * deltaT, VS * deltaT);
+                var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(lastTime - startTime);
+                this.MoveCamera(VX * deltaT, VY * deltaT, DeltaS);
                 lastTime = currentTime;
             }
             update();
@@ -382,8 +393,10 @@ module AssureNote {
         }
 
         private UpdateAttr(): void {
-            var attr: string = ViewportManager.translateA(this.OffsetPageX, this.OffsetPageY) + ViewportManager.scaleA(this.Scale);
-            var style: string = ViewportManager.translateS(this.OffsetPageX, this.OffsetPageY) + ViewportManager.scaleS(this.Scale);
+            var OffsetPageX = this.GetOffsetPageX();
+            var OffsetPageY = this.GetOffsetPageY();
+            var attr: string = ViewportManager.translateA(OffsetPageX, OffsetPageY) + ViewportManager.scaleA(this.Scale);
+            var style: string = ViewportManager.translateS(OffsetPageX, OffsetPageY) + ViewportManager.scaleS(this.Scale);
             this.SVGLayer.setAttribute("transform", attr);
             this.SetTransformToElement(this.ContentLayer, style);
             this.SetTransformToElement(this.ControlLayer, style);
