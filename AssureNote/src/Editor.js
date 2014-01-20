@@ -40,6 +40,10 @@ var AssureNote;
             this.Element.css(CSS);
             this.Element.css({ display: "none" });
         }
+        EditorUtil.prototype.UpdateCSS = function (CSS) {
+            this.Element.css(CSS);
+        };
+
         EditorUtil.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive) {
             var _this = this;
             var Model = NodeView.Model;

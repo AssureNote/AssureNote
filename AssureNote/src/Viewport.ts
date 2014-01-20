@@ -275,7 +275,7 @@ module AssureNote {
         }
 
         PageYFromGY(GY: number): number {
-            return this.CameraCenterPageX + (GY - this.CameraGY) * this.Scale;
+            return this.CameraCenterPageY + (GY - this.CameraGY) * this.Scale;
         }
 
         GXFromPageX(PageX: number): number {

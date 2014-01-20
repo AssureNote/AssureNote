@@ -42,21 +42,42 @@ var AssureNote;
             this.SetMenuBarButton(true);
             this.SetEditor(true);
             this.EditorUtil = new AssureNote.EditorUtil(AssureNoteApp, textarea, selector, {
-                position: "fixed",
-                top: "5%",
-                left: "5%",
-                width: "90%",
-                height: "90%"
+                position: "absolute"
             });
         }
         SingleNodeEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            return null;
-            //return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
-            //    (event: Event, TargetView: NodeView) => {
-            //        var Writer = new StringWriter();
-            //        TargetView.Model.FormatSubNode(1, Writer, false);
-            //        this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
-            //});
+            var _this = this;
+            return new AssureNote.NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor", function (event, TargetView) {
+                var Writer = new AssureNote.StringWriter();
+                TargetView.Model.FormatSubNode(1, Writer, false);
+
+                //var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
+                //var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3) / 4;
+                //this.Tooltip.css({
+                //    //width: '250px',
+                //    //height: '150px',
+                //    position: 'absolute',
+                //    top: Top,
+                //    left: Left,
+                //    display: 'block',
+                //    opacity: 100
+                //});
+                var Top = _this.AssureNoteApp.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
+                var Left = _this.AssureNoteApp.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
+                console.log(Top, Left);
+                var Width = NodeView.GetShape().GetNodeWidth();
+                var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
+                _this.EditorUtil.UpdateCSS({
+                    position: "fixed",
+                    top: Top,
+                    left: Left,
+                    width: Width,
+                    height: Height,
+                    background: "rgba(255, 255, 255, 1.00)"
+                });
+
+                _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+            });
         };
         return SingleNodeEditorPlugin;
     })(AssureNote.Plugin);
