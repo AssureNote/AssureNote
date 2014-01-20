@@ -27,10 +27,14 @@ AssureNoteはブラウザ上でGSNを記述するためのツールです。
 * `File`
     * `New...` 新しいファイルを作成する
     * `Open...` ファイルを開く
+    * `Upload` ファイルをサーバにアップロードする(アップロード成功後、固有のURLに移動します)
     * `Save` ファイルを保存する
     * `Save As`
         * `*.wgsn...` WGSN形式でファイルを保存する
         * `*.dcase_model...` D-Case Editor形式でファイルを保存する
+    * `Command list` コマンドの簡単な説明を表示する
+    * `Help` このファイルを表示する
+    * `About` AssureNoteのバージョンを表示する
 
 ### コマンドライン
 AssureNoteではコマンドラインから操作を行うことができます。
