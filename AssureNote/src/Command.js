@@ -349,7 +349,7 @@ var AssureNote;
         };
 
         SetColorCommand.prototype.GetHelpHTML = function () {
-            return "<code>set-color color</code><br>Change node color.";
+            return "<code>set-color label color</code><br>Change node color.";
         };
 
         SetColorCommand.prototype.Invoke = function (CommandName, Params) {

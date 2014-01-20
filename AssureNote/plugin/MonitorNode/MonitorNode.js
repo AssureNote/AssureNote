@@ -221,6 +221,10 @@ var AssureNote;
             return "Start Monitor";
         };
 
+        MonitorStartCommand.prototype.GetHelpHTML = function () {
+            return "<code>monitor-start</code><br>Start monitoring.";
+        };
+
         MonitorStartCommand.prototype.Invoke = function (CommandName, Params) {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
@@ -282,6 +286,10 @@ var AssureNote;
 
         MonitorStopCommand.prototype.GetDisplayName = function () {
             return "Stop Monitor";
+        };
+
+        MonitorStopCommand.prototype.GetHelpHTML = function () {
+            return "<code>monitor-stop</code><br>Stop monitoring.";
         };
 
         MonitorStopCommand.prototype.Invoke = function (CommandName, Params) {

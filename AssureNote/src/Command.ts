@@ -337,7 +337,7 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>set-color color</code><br>Change node color."
+            return "<code>set-color label color</code><br>Change node color."
         }
 
         public Invoke(CommandName: string, Params: any[]) {

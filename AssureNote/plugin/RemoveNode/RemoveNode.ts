@@ -41,7 +41,7 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>remove [label]</code><br>Remove a node and it's descendant."
+            return "<code>remove label</code><br>Remove a node and it's descendant."
         }
 
         public Invoke(CommandName: string, Params: any[]): void {

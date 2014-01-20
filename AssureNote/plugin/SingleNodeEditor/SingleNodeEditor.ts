@@ -27,45 +27,6 @@
 ///<reference path="../../src/Editor.ts" />
 
 module AssureNote {
-    export class SingleNodeEditorCommand extends Command {
-        constructor(App: AssureNote.AssureNoteApp, public EditorUtil: EditorUtil) {
-            super(App);
-        }
-
-        public GetCommandLineNames(): string[]{
-            return ["edit"];
-        }
-
-        public GetDisplayName(): string {
-            return "Editor";
-        }
-
-        public GetHelpHTML(): string {
-            return "<code>edit [label]</code><br>Open editor."
-        }
-
-        public Invoke(CommandName: string, Params: any[]) {
-            //var Label: string;
-            //if (Params.length < 1) {
-            //    Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
-            //} else {
-            //    Label = Params[0].toUpperCase();
-            //}
-            //var event = document.createEvent("UIEvents");
-            //var TargetView = this.App.PictgramPanel.ViewMap[Label];
-            //if (TargetView != null) {
-            //    if (TargetView.GetNodeType() == GSNType.Strategy) {
-            //        this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
-            //        return;
-            //    }
-            //    var Writer = new StringWriter();
-            //    TargetView.Model.FormatSubNode(1, Writer);
-            //    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-            //} else {
-            //    this.App.DebugP(Label + " not found.");
-            //}
-        }
-    }
 
     export class SingleNodeEditorPlugin extends Plugin {
         public EditorUtil: EditorUtil;
@@ -80,7 +41,6 @@ module AssureNote {
                 width: "90%",
                 height: "90%"
             });
-            this.AssureNoteApp.RegistCommand(new SingleNodeEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {

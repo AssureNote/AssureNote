@@ -232,6 +232,10 @@ module AssureNote {
             return "Start Monitor";
         }
 
+        public GetHelpHTML(): string {
+            return "<code>monitor-start</code><br>Start monitoring."
+        }
+
         public Invoke(CommandName: string, Params: any[]): void {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
@@ -297,6 +301,10 @@ module AssureNote {
 
         public GetDisplayName(): string {
             return "Stop Monitor";
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>monitor-stop</code><br>Stop monitoring."
         }
 
         public Invoke(CommandName: string, Params: any[]): void {

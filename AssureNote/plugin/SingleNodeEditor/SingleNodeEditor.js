@@ -32,49 +32,6 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path="../../src/Editor.ts" />
 var AssureNote;
 (function (AssureNote) {
-    var SingleNodeEditorCommand = (function (_super) {
-        __extends(SingleNodeEditorCommand, _super);
-        function SingleNodeEditorCommand(App, EditorUtil) {
-            _super.call(this, App);
-            this.EditorUtil = EditorUtil;
-        }
-        SingleNodeEditorCommand.prototype.GetCommandLineNames = function () {
-            return ["edit"];
-        };
-
-        SingleNodeEditorCommand.prototype.GetDisplayName = function () {
-            return "Editor";
-        };
-
-        SingleNodeEditorCommand.prototype.GetHelpHTML = function () {
-            return "<code>edit [label]</code><br>Open editor.";
-        };
-
-        SingleNodeEditorCommand.prototype.Invoke = function (CommandName, Params) {
-            //var Label: string;
-            //if (Params.length < 1) {
-            //    Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
-            //} else {
-            //    Label = Params[0].toUpperCase();
-            //}
-            //var event = document.createEvent("UIEvents");
-            //var TargetView = this.App.PictgramPanel.ViewMap[Label];
-            //if (TargetView != null) {
-            //    if (TargetView.GetNodeType() == GSNType.Strategy) {
-            //        this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
-            //        return;
-            //    }
-            //    var Writer = new StringWriter();
-            //    TargetView.Model.FormatSubNode(1, Writer);
-            //    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-            //} else {
-            //    this.App.DebugP(Label + " not found.");
-            //}
-        };
-        return SingleNodeEditorCommand;
-    })(AssureNote.Command);
-    AssureNote.SingleNodeEditorCommand = SingleNodeEditorCommand;
-
     var SingleNodeEditorPlugin = (function (_super) {
         __extends(SingleNodeEditorPlugin, _super);
         function SingleNodeEditorPlugin(AssureNoteApp, textarea, selector) {
@@ -91,7 +48,6 @@ var AssureNote;
                 width: "90%",
                 height: "90%"
             });
-            this.AssureNoteApp.RegistCommand(new SingleNodeEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
         SingleNodeEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             return null;

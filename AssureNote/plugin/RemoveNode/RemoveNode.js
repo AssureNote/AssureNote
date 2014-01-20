@@ -45,7 +45,7 @@ var AssureNote;
         };
 
         RemoveCommand.prototype.GetHelpHTML = function () {
-            return "<code>remove [label]</code><br>Remove a node and it's descendant.";
+            return "<code>remove label</code><br>Remove a node and it's descendant.";
         };
 
         RemoveCommand.prototype.Invoke = function (CommandName, Params) {
