@@ -34,9 +34,8 @@ var AssureNote;
 (function (AssureNote) {
     var FoldingCommand = (function (_super) {
         __extends(FoldingCommand, _super);
-        function FoldingCommand(App, FoldingAction) {
+        function FoldingCommand(App) {
             _super.call(this, App);
-            this.FoldingAction = FoldingAction;
         }
         FoldingCommand.prototype.GetCommandLineNames = function () {
             return ["fold"];
@@ -64,10 +63,39 @@ var AssureNote;
                     this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
                     return;
                 }
-                this.FoldingAction(event, TargetView);
+                this.Fold(TargetView);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
+        };
+
+        FoldingCommand.prototype.Fold = function (TargetView) {
+            var Panel = this.App.PictgramPanel;
+            var ViewPort = Panel.Viewport;
+
+            if (TargetView.GetNodeType() == 2 /* Strategy */) {
+                if (TargetView.Children != null) {
+                    for (var i = 0; i < TargetView.Children.length; i++) {
+                        var SubView = TargetView.Children[i];
+                        if (SubView.GetNodeType() == 0 /* Goal */) {
+                            SubView.IsFolded = true;
+                        }
+                    }
+                }
+            } else {
+                TargetView.IsFolded = TargetView.IsFolded != true;
+            }
+            var TopGoalView = TargetView;
+            while (TopGoalView.Parent != null) {
+                TopGoalView = TopGoalView.Parent;
+            }
+            var X0 = TargetView.GetGX();
+            var Y0 = TargetView.GetGY();
+            Panel.Draw(Panel.MasterView.Label, 300);
+            var X1 = TargetView.GetGX();
+            var Y1 = TargetView.GetGY();
+            var Scale = ViewPort.GetCameraScale();
+            ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
         };
         return FoldingCommand;
     })(AssureNote.Command);
@@ -76,52 +104,13 @@ var AssureNote;
     var FoldingViewSwitchPlugin = (function (_super) {
         __extends(FoldingViewSwitchPlugin, _super);
         function FoldingViewSwitchPlugin(AssureNoteApp) {
-            var _this = this;
             _super.call(this);
-            this.AssureNoteApp = AssureNoteApp;
-            this.SetMenuBarButton(true);
             this.SetDoubleClicked(true);
-
-            this.FoldingAction = function (event, TargetView) {
-                if (TargetView.GetNodeType() == 2 /* Strategy */) {
-                    if (TargetView.Children != null) {
-                        for (var i = 0; i < TargetView.Children.length; i++) {
-                            var SubView = TargetView.Children[i];
-                            if (SubView.GetNodeType() == 0 /* Goal */) {
-                                SubView.IsFolded = true;
-                            }
-                        }
-                    }
-                } else {
-                    TargetView.IsFolded = TargetView.IsFolded != true;
-                }
-                var TopGoalView = TargetView;
-                while (TopGoalView.Parent != null) {
-                    TopGoalView = TopGoalView.Parent;
-                }
-                var X0 = TargetView.GetGX();
-                var Y0 = TargetView.GetGY();
-                AssureNoteApp.PictgramPanel.Draw(_this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
-                var X1 = TargetView.GetGX();
-                var Y1 = TargetView.GetGY();
-                var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
-                var Scale = ViewPort.GetCameraScale();
-                ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
-            };
-            this.AssureNoteApp.RegistCommand(new FoldingCommand(this.AssureNoteApp, this.FoldingAction));
+            this.FoldingCommand = new FoldingCommand(AssureNoteApp);
+            AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
         FoldingViewSwitchPlugin.prototype.ExecDoubleClicked = function (NodeView) {
-            var event = document.createEvent("UIEvents");
-            this.FoldingAction(event, NodeView);
-        };
-
-        FoldingViewSwitchPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            if (NodeView.GetNodeType() != 0 /* Goal */ && NodeView.GetNodeType() != 2 /* Strategy */) {
-                return null;
-            }
-
-            //return new NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
-            return null;
+            this.FoldingCommand.Fold(NodeView);
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);
