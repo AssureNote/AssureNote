@@ -29,6 +29,7 @@
 ///<reference path='./Editor.ts'/>
 ///<reference path='../d.ts/codemirror.d.ts'/>
 ///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='../plugin/SingleNodeEditor/SingleNodeEditor.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var PictgramPanel = (function () {
@@ -43,11 +44,15 @@ var AssureNote;
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new AssureNote.NodeMenu(AssureNoteApp);
+            var Tooltip = new AssureNote.Tooltip(AssureNoteApp);
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 _this.AssureNoteApp.DebugP("click:" + Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
                 }
                 event.preventDefault();
             });
@@ -58,6 +63,9 @@ var AssureNote;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
+                }
             });
 
             this.ContentLayer.addEventListener("contextmenu", function (event) {
@@ -67,6 +75,9 @@ var AssureNote;
                     _this.FocusedLabel = Label;
                     if (Bar.IsEnable) {
                         Bar.Remove();
+                    }
+                    if (Tooltip.IsEnable) {
+                        Tooltip.Remove;
                     }
                     var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
                     Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
@@ -82,6 +93,9 @@ var AssureNote;
                 _this.AssureNoteApp.DebugP("double click:" + Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
                 }
                 _this.AssureNoteApp.ExecDoubleClicked(NodeView);
                 event.preventDefault();
@@ -157,8 +171,30 @@ var AssureNote;
                     return;
                 }
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
-                if (Label) {
-                    //this.AssureNoteApp.DebugP("mouseover:"+Label);
+                var NodeView = _this.ViewMap[Label];
+                if (NodeView != null && _this.FocusedLabel != Label) {
+                    _this.FocusedLabel = Label;
+                    _this.AssureNoteApp.DebugP("mouseover:" + Label);
+                    var Tooltips = _this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
+                    Tooltip.Create(NodeView, _this.ControlLayer, Tooltips);
+                }
+            });
+
+            this.ContentLayer.addEventListener("mouseleave", function (event) {
+                /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
+                every time the pointer enters the sub-element of ContentLayer.
+                Mouseleave can prevent this annoying event firing. */
+                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
+                    return;
+                }
+                var Label = _this.FocusedLabel;
+                var NodeView = _this.ViewMap[Label];
+                if (NodeView != null && Label == _this.FocusedLabel) {
+                    _this.FocusedLabel = null;
+                    _this.AssureNoteApp.DebugP("mouseout:" + Label);
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
                 }
             });
 
@@ -300,19 +336,41 @@ var AssureNote;
             this.IsVisible = true;
             var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
                 lineNumbers: true,
-                mode: "text/x-asn",
+                mode: 'wgsn',
                 lineWrapping: true
             });
             this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
-            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
             $("#plugin-layer").on('mousewheel', function (event) {
                 event.stopPropagation();
             });
+
+            textarea = CodeMirror.fromTextArea(document.getElementById('singlenode-editor'), {
+                lineNumbers: false,
+                mode: 'wgsn',
+                lineWrapping: true
+            });
+            this.SingleNodeEditor = new AssureNote.SingleNodeEditorPlugin(AssureNoteApp, textarea, '#singlenode-editor-wrapper');
+            AssureNoteApp.PluginManager.SetPlugin("open-single", this.SingleNodeEditor);
+            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }
         PluginPanel.prototype.Clear = function () {
         };
         return PluginPanel;
     })();
     AssureNote.PluginPanel = PluginPanel;
+
+    var Pane = (function () {
+        function Pane(AssureNoteApp) {
+            this.AssureNoteApp = AssureNoteApp;
+        }
+        Pane.prototype.Create = function (NodeView, ControlLayer, contents) {
+            /* Do nothing */
+        };
+
+        Pane.prototype.Remove = function () {
+        };
+        return Pane;
+    })();
+    AssureNote.Pane = Pane;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Panel.js.map

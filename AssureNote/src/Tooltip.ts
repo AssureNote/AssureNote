@@ -22,33 +22,56 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
 
-///<reference path="../../src/AssureNoteParser.ts" />
-///<reference path="../../src/Plugin.ts" />
-///<reference path="../../src/Editor.ts" />
+///<reference path="./AssureNote.ts" />
 
 module AssureNote {
-    export class ToDoPlugin extends Plugin {
+    export class Tooltip extends Pane{
+        Tooltip: JQuery;
+        CurrentView: NodeView;
         constructor(public AssureNoteApp: AssureNoteApp) {
-            super();
+            super(AssureNoteApp);
+            this.Tooltip = null;
+            this.CurrentView = null;
         }
 
-        RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
-            var TagMap: HashMap<string, string> = NodeView.Model.GetTagMap();
-            if (!TagMap) return;
-            if (TagMap.get('TODO') || TagMap.get('TODO') == '') {
-                NodeView.ChangeColorStyle(ColorStyle.ToDo);
+        Enable() {
+        }
+
+        Remove() {
+            this.Tooltip.remove();
+            this.Tooltip = null;
+            this.CurrentView = null;
+            this.IsEnable = false;
+        }
+
+        Create(CurrentView: NodeView, ControlLayer: HTMLDivElement, Contents: HTMLLIElement[]): void {
+            if (this.Tooltip != null) this.Remove();
+            this.IsEnable = true;
+            this.CurrentView = CurrentView;
+            this.Tooltip = $('<div"></div>');
+            var pre = $('<pre id="tooltip"></pre>');
+
+            var ul: JQuery = $(document.createElement('ul'));
+            ul.addClass('list-unstyled');
+            for (var i = 0; i < Contents.length; i++) {
+                console.log("add");
+                ul.append(Contents[i]);
             }
-            var KeySet: string[] = TagMap.keySet();
-            for (var key in KeySet) {
-                if (TagMap.get(KeySet[key]) == '') {
-                    NodeView.ChangeColorStyle(ColorStyle.ToDo);
-                }
-            }
+            pre.append(ul);
+            this.Tooltip.append(pre);
+            this.Tooltip.appendTo(ControlLayer);
+
+            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
+            var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3 ) / 4;
+            this.Tooltip.css({
+                //width: '250px',
+                //height: '150px',
+                position: 'absolute',
+                top: Top,
+                left: Left,
+                display: 'block',
+                opacity: 100
+            });
         }
     }
 }
-
-AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
-    var ToDoPlugin = new AssureNote.ToDoPlugin(App);
-    App.PluginManager.SetPlugin("todo", ToDoPlugin);
-});

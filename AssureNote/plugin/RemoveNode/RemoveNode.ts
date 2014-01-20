@@ -44,7 +44,7 @@ module AssureNote {
             return "<code>remove [label]</code><br>Remove a node and it's descendant."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]): void {
+        public Invoke(CommandName: string, Params: any[]): void {
             if (Params.length > 0) {
                 var Label = Params[0];
                 var View = this.App.PictgramPanel.ViewMap[Label];

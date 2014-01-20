@@ -26,85 +26,85 @@
 
 module AssureNote {
 
-	export class Search {
+    export class Search {
 
-		private SearchWord: string;
-		private DestinationX: number;
-		private DestinationY: number;
-		private NodeIndex: number;
-		private IsMoving: boolean;
+        private SearchWord: string;
+        private DestinationX: number;
+        private DestinationY: number;
+        private NodeIndex: number;
+        private IsMoving: boolean;
         private HitNodes: GSNNode[];
         private Searching: boolean;
 
-		constructor(public AssureNoteApp: AssureNoteApp) {
-			this.SearchWord = "";
-			this.DestinationX = 0;
-			this.DestinationY = 0;
-			this.NodeIndex = 0;
-			this.IsMoving = false;
+        constructor(public AssureNoteApp: AssureNoteApp) {
+            this.SearchWord = "";
+            this.DestinationX = 0;
+            this.DestinationY = 0;
+            this.NodeIndex = 0;
+            this.IsMoving = false;
             this.HitNodes = [];
             this.Searching = false;
-		}
+        }
 
-		Search(TargetView: NodeView, IsTurn: boolean, SearchWord?: string): void {
-			var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-			var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-			if (SearchWord != null) {
-				this.SearchWord = SearchWord;
+        Search(TargetView: NodeView, IsTurn: boolean, SearchWord?: string): void {
+            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
+            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
+            if (SearchWord != null) {
+                this.SearchWord = SearchWord;
 
-				if (this.SearchWord == "") {
-					return;
-				}
-				this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
-				this.AssureNoteApp.DebugP(<any>this.HitNodes);
+                if (this.SearchWord == "") {
+                    return;
+                }
+                this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
+                this.AssureNoteApp.DebugP(<any>this.HitNodes);
 
-				if (this.HitNodes.length == 0) {
-					this.SearchWord = "";
-					return;
-				}
+                if (this.HitNodes.length == 0) {
+                    this.SearchWord = "";
+                    return;
+                }
 
                 this.IsMoving = true;
                 this.Searching = true;
                 this.CreateHitNodeView(ViewMap);
 
                 this.SetAllNodesColor(ViewMap, ColorStyle.Searched);
-				this.SetDestination(this.HitNodes[0]);
+                this.SetDestination(this.HitNodes[0]);
                 ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
-				this.MoveToNext(ViewPort, () => {
-					this.IsMoving = false;
-				});
-			} else {
-				if (this.HitNodes.length == 1) {
-					return;
-				}
+                this.MoveToNext(ViewPort, () => {
+                    this.IsMoving = false;
+                });
+            } else {
+                if (this.HitNodes.length == 1) {
+                    return;
+                }
                 if (!IsTurn) {
-					this.NodeIndex++;
-					if (this.NodeIndex >= this.HitNodes.length) {
-						this.NodeIndex = 0;
-					}
-				} else {
-					this.NodeIndex--;
-					if (this.NodeIndex < 0) {
-						this.NodeIndex = this.HitNodes.length - 1;
-					}
-				}
+                    this.NodeIndex++;
+                    if (this.NodeIndex >= this.HitNodes.length) {
+                        this.NodeIndex = 0;
+                    }
+                } else {
+                    this.NodeIndex--;
+                    if (this.NodeIndex < 0) {
+                        this.NodeIndex = this.HitNodes.length - 1;
+                    }
+                }
 
 
-				this.IsMoving = true;
-				this.SetDestination(this.HitNodes[this.NodeIndex]);
-				this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, () => {
+                this.IsMoving = true;
+                this.SetDestination(this.HitNodes[this.NodeIndex]);
+                this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, () => {
                     ViewMap[this.HitNodes[this.NodeIndex].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
                     var index = 0;
                     if (!IsTurn) {
                         index = (this.NodeIndex == 0) ? this.HitNodes.length - 1 : this.NodeIndex - 1;
                     } else {
                         index = (this.NodeIndex == this.HitNodes.length - 1) ? 0 : this.NodeIndex + 1;
-					}
+                    }
                     ViewMap[this.HitNodes[index].GetLabel()].Shape.ChangeColorStyle(ColorStyle.Searched); //Disable Highlight
-					this.IsMoving = false;
-				});
-			}
-		}
+                    this.IsMoving = false;
+                });
+            }
+        }
 
         private CreateHitNodeView(ViewMap: { [index: string]: NodeView }): void {
             for (var i = 0; i < this.HitNodes.length; i++) {
@@ -126,13 +126,13 @@ module AssureNote {
             return this.Searching;
         }
 
-		ResetParam(): void {
+        ResetParam(): void {
             this.SetAllNodesColor(this.AssureNoteApp.PictgramPanel.ViewMap, ColorStyle.Default);
             this.HitNodes = [];
-			this.NodeIndex = 0;
+            this.NodeIndex = 0;
             this.SearchWord = "";
             this.Searching = false;
-		}
+        }
 
         private SetAllNodesColor(ViewMap: { [index: string]: NodeView }, ColorCode: string): void {
             for (var i = 0; i < this.HitNodes.length; i++) {
@@ -144,21 +144,21 @@ module AssureNote {
             }
         }
 
-		private SetDestination(HitNode: GSNNode): void {
-			if (HitNode == null) {
-				return;
-			}
+        private SetDestination(HitNode: GSNNode): void {
+            if (HitNode == null) {
+                return;
+            }
             var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-			var TargetView = ViewMap[HitNode.GetLabel()];
+            var TargetView = ViewMap[HitNode.GetLabel()];
             this.DestinationX = TargetView.GetCenterGX();
             this.DestinationY = TargetView.GetCenterGY();
-		}
+        }
 
-		private MoveToNext(ViewPort: ViewportManager, Callback: () => void): void {
+        private MoveToNext(ViewPort: ViewportManager, Callback: () => void): void {
             ViewPort.MoveTo(this.DestinationX, this.DestinationY, ViewPort.GetCameraScale(), 100);
-			Callback();
-		}
+            Callback();
+        }
 
 
-	}
+    }
 }

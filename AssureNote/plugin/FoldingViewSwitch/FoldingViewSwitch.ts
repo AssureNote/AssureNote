@@ -45,7 +45,7 @@ module AssureNote {
             return "<code>fold label</code><br>Toggle folding state of Goal."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             if (Params.length < 1) {
                 this.App.DebugP("no args");
                 return;
@@ -67,55 +67,55 @@ module AssureNote {
     }
 
     export class FoldingViewSwitchPlugin extends Plugin {
-		FoldingAction: (event: Event, TargetView: NodeView) => void;
+        FoldingAction: (event: Event, TargetView: NodeView) => void;
 
-		constructor(public AssureNoteApp: AssureNoteApp) {
-			super();
+        constructor(public AssureNoteApp: AssureNoteApp) {
+            super();
             this.SetMenuBarButton(true);
-			this.SetDoubleClicked(true);
+            this.SetDoubleClicked(true);
 
-			this.FoldingAction = (event: Event, TargetView: NodeView) => {
-				if (TargetView.GetNodeType() == GSNType.Strategy) {
-					if (TargetView.Children != null) {
-						for (var i = 0; i < TargetView.Children.length; i++) {
-							var SubView = TargetView.Children[i];
-							if (SubView.GetNodeType() == GSNType.Goal) {
-								SubView.IsFolded = true;
-							}
-						}
-					}
-				} else {
-					TargetView.IsFolded = TargetView.IsFolded != true;
-				}
-				var TopGoalView: NodeView = TargetView;
-				while (TopGoalView.Parent != null) {
-					TopGoalView = TopGoalView.Parent;
-				}
-				var X0 = TargetView.GetGX();
-				var Y0 = TargetView.GetGY();
+            this.FoldingAction = (event: Event, TargetView: NodeView) => {
+                if (TargetView.GetNodeType() == GSNType.Strategy) {
+                    if (TargetView.Children != null) {
+                        for (var i = 0; i < TargetView.Children.length; i++) {
+                            var SubView = TargetView.Children[i];
+                            if (SubView.GetNodeType() == GSNType.Goal) {
+                                SubView.IsFolded = true;
+                            }
+                        }
+                    }
+                } else {
+                    TargetView.IsFolded = TargetView.IsFolded != true;
+                }
+                var TopGoalView: NodeView = TargetView;
+                while (TopGoalView.Parent != null) {
+                    TopGoalView = TopGoalView.Parent;
+                }
+                var X0 = TargetView.GetGX();
+                var Y0 = TargetView.GetGY();
                 AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
-				var X1 = TargetView.GetGX();
-				var Y1 = TargetView.GetGY();
-				var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
+                var X1 = TargetView.GetGX();
+                var Y1 = TargetView.GetGY();
+                var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
                 var Scale = ViewPort.GetCameraScale();
                 ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
             };
             this.AssureNoteApp.RegistCommand(new FoldingCommand(this.AssureNoteApp, this.FoldingAction));
-		}
+        }
 
-		ExecDoubleClicked(NodeView: NodeView): void {
-			var event = document.createEvent("UIEvents");
-			this.FoldingAction(event, NodeView);
-		}
+        ExecDoubleClicked(NodeView: NodeView): void {
+            var event = document.createEvent("UIEvents");
+            this.FoldingAction(event, NodeView);
+        }
 
-		CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-			if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
-				return null;
-			}
+        CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
+            if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
+                return null;
+            }
             //return new NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
             return null;
-		}
-	}
+        }
+    }
 }
 
 AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {

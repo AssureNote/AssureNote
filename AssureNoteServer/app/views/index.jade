@@ -7,12 +7,13 @@ html
     title AssureNote
     link(rel='stylesheet', href='#{basepath}/lib/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='#{basepath}/lib//animate-custom.css')
-    link(rel='stylesheet', href='#{basepath}/lib/codemirror.css')
+    link(rel='stylesheet', href='#{basepath}/lib/codemirror/codemirror.css')
     link(rel='stylesheet', href='#{basepath}/css/dcase-node.css')
     link(rel='stylesheet', href='#{basepath}/css/sidemenu.css')
     link(rel='stylesheet', href='#{basepath}/css/historymenu.css')
     link(rel='stylesheet', href='#{basepath}/css/index.css')
     link(rel='stylesheet', href='#{basepath}/css/topmenu.css')
+    link(rel='stylesheet', href='#{basepath}/css/codehighlight.css')
   body(style='overflow: hidden; margin: 0px;')
     #assure-note(style='width: 100%; height: 100%;')
       input#file-open-dialog(type='file', accept='.wgsn,.dcase_model', style='display:none;')
@@ -28,6 +29,8 @@ html
       #plugin-layer(style='width: 0px; height: 0px; position: absolute;')
         #editor-wrapper(style='border: 1px solid black')
           textarea#editor(placeholder='Type something...', style='display: none;')
+        #singlenode-editor-wrapper(style='border: 1px solid black')
+          textarea#singlenode-editor(placeholder='Type something...', style='display: none;')
         // Help Modal
         #help-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='help-modal-label', aria-hidden='true')
           .modal-dialog
@@ -73,7 +76,8 @@ html
     script(type='text/javascript', src='#{basepath}/lib/jquery.cookie.js')
     script(type='text/javascript', src='#{basepath}/lib/jquery.mousewheel.js')
     script(type='text/javascript', src='#{basepath}/lib/pointer.min.js')
-    script(type='text/javascript', src='#{basepath}/lib/codemirror.js')
+    script(type='text/javascript', src='#{basepath}/lib/codemirror/codemirror.js')
+    script(type='text/javascript', src='#{basepath}/lib/codemirror/highlight/wgsn.js')
     script(type='text/javascript', src='#{basepath}/lib/FileSaver.js')
     script(type='text/javascript', src='#{basepath}/lib/notify.min.js')
     script(type='text/javascript', src='#{basepath}/lib/bootstrap/js/bootstrap.min.js')
@@ -95,6 +99,8 @@ html
     script(type='text/javascript', src='#{basepath}/src/Socket.js')
     script(type='text/javascript', src='#{basepath}/src/Editor.js')
     script(type='text/javascript', src='#{basepath}/src/RecApi.js')
+    script(type='text/javascript', src='#{basepath}/src/Tooltip.js')
+    script(type='text/javascript', src='#{basepath}/plugin/SingleNodeEditor/SingleNodeEditor.js')
     script(type='text/javascript', src='#{basepath}/plugin/FullScreenEditor/FullScreenEditor.js')
     script(type='text/javascript', src='#{basepath}/plugin/FoldingViewSwitch/FoldingViewSwitch.js')
     script(type='text/javascript', src='#{basepath}/plugin/MessageChat/MessageChat.js')
@@ -136,5 +142,5 @@ html
       | ** G &152377e9
       | Undeveloped
     script(type='text/javascript', src='#{basepath}/index.js')
-    if Analytics_UA != ''
+    if Analytics_UA != null && Analytics_UA != ''
       include analytics 

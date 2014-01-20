@@ -41,7 +41,7 @@ module AssureNote {
             return "<code>message msg</code><br>Send message to the chat server."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             if (this.App.SocketManager.IsConnected()) {
                 this.App.SocketManager.Emit('message', Params.join(' '));
                 (<any>$).notify(Params.join(' '), 'info');
@@ -62,7 +62,7 @@ module AssureNote {
             return "<code>connect [uri]</code><br>Connect to the chat server."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             console.log(Params);
             if (Params.length > 1) {
                 this.App.DebugP('Invalid parameter: ' + Params);
@@ -76,7 +76,7 @@ module AssureNote {
 
     export class MessageChatPlugin extends Plugin {
         public EditorUtil: EditorUtil;
-		constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(public AssureNoteApp: AssureNoteApp) {
             super();
             this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {
                     console.log(data);
@@ -84,7 +84,7 @@ module AssureNote {
             });
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
-	}
+    }
 
     export class ConnectServerPlugin extends Plugin {
         socket: any;

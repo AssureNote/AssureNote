@@ -50,7 +50,7 @@ var AssureNote;
             return "<code>edit [label]</code><br>Open editor.";
         };
 
-        FullScreenEditorCommand.prototype.Invoke = function (CommandName, Target, Params) {
+        FullScreenEditorCommand.prototype.Invoke = function (CommandName, Params) {
             var Label;
             if (Params.length < 1) {
                 Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
@@ -65,8 +65,8 @@ var AssureNote;
                     return;
                 }
                 var Writer = new AssureNote.StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer);
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+                TargetView.Model.FormatSubNode(1, Writer, true);
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
@@ -104,8 +104,8 @@ var AssureNote;
             }
             return new AssureNote.NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Writer = new AssureNote.StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer);
-                _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+                TargetView.Model.FormatSubNode(1, Writer, true);
+                _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
             });
         };
 

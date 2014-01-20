@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ var AssureNote;
             return "<code>remove [label]</code><br>Remove a node and it's descendant.";
         };
 
-        RemoveCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        RemoveCommand.prototype.Invoke = function (CommandName, Params) {
             if (Params.length > 0) {
                 var Label = Params[0];
                 var View = this.App.PictgramPanel.ViewMap[Label];

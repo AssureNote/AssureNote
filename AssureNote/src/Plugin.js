@@ -48,6 +48,10 @@ var AssureNote;
             return null;
         };
 
+        Plugin.prototype.CreateTooltipContents = function (NodeView) {
+            return null;
+        };
+
         Plugin.prototype.EditorEnableCallback = function () {
             return null;
         };
@@ -93,15 +97,15 @@ var AssureNote;
     AssureNote.Plugin = Plugin;
 
     //export class SamplePlugin extends Plugin {
-    //	constructor() {
-    //		super();
-    //		this.HasMenuBarButton = true;
-    //	}
-    //	CreateMenuBarButton(): MenuBarButton {
-    //		return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
-    //			alert(TargetView.Label);
-    //		});
-    //	}
+    //    constructor() {
+    //        super();
+    //        this.HasMenuBarButton = true;
+    //    }
+    //    CreateMenuBarButton(): MenuBarButton {
+    //        return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
+    //            alert(TargetView.Label);
+    //        });
+    //    }
     //}
     function OnLoadPlugin(Callback) {
         PluginManager.OnLoadPlugin.push(Callback);
@@ -156,6 +160,16 @@ var AssureNote;
                         ret = ret.concat(Buttons);
                     }
                 }
+            });
+            return ret;
+        };
+
+        PluginManager.prototype.GetTooltipContents = function (TargetView) {
+            var ret = [];
+            $.each(this.PluginMap, function (key, value) {
+                var Tooltip = value.CreateTooltipContents(TargetView);
+                if (Tooltip)
+                    ret = ret.concat(Tooltip);
             });
             return ret;
         };

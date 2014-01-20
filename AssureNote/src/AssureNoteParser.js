@@ -682,7 +682,7 @@ var AssureNote;
         };
 
         // SubNode
-        GSNNode.prototype.FormatSubNode = function (GoalLevel, Writer) {
+        GSNNode.prototype.FormatSubNode = function (GoalLevel, Writer, IsRecursive) {
             Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
             Writer.print(" ");
             if (this.LabelName != null) {
@@ -700,18 +700,20 @@ var AssureNote;
                 Writer.print(this.NodeDoc);
                 Writer.newline();
             }
+            if (!IsRecursive)
+                return;
             Writer.newline();
             if (this.NonNullSubNodeList() != null) {
                 for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                     var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
                     if (Node.IsContext()) {
-                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer);
+                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
                     }
                 }
                 for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                     var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
                     if (!Node.IsContext()) {
-                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer);
+                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
                     }
                 }
             }

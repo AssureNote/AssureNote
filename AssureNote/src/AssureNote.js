@@ -147,7 +147,7 @@ var AssureNote;
             }
 
             var Command = this.FindCommandByCommandLineName(CommandName);
-            Command.Invoke(CommandName, this.PictgramPanel.GetFocusedView(), ParsedCommand.GetArgs());
+            Command.Invoke(CommandName, ParsedCommand.GetArgs());
         };
 
         AssureNoteApp.prototype.LoadDefaultWGSN = function () {

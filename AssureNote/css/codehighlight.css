@@ -1,0 +1,24 @@
+.cm-highlight-asterisks {
+	color: #0B4C5F; 
+}
+
+.cm-highlight-uid {
+	color: #BDBDBD;
+	font-size: x-small;
+}
+
+.cm-highlight-variable {
+	color: #848484;
+}
+
+.cm-highlight-tag-key {
+	color: #848484;
+}
+
+.cm-highlight-tag-value {
+	color: #848484;
+}
+
+.cm-highlight-tag {
+	color: #BDBDBD;
+}

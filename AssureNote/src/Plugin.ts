@@ -27,31 +27,35 @@
 
 module AssureNote {
 
-	export class Plugin {
+    export class Plugin {
         private hasMenuBarButton: boolean;
-		private hasEditor: boolean;
-		private hasDoubleClicked: boolean;
+        private hasEditor: boolean;
+        private hasDoubleClicked: boolean;
 
-		constructor() {
+        constructor() {
             this.hasMenuBarButton = false;
-			this.hasEditor = false;
-			this.hasDoubleClicked = false;
-		}
+            this.hasEditor = false;
+            this.hasDoubleClicked = false;
+        }
 
-		ExecCommand(AssureNote: AssureNoteApp, Args: string[]): void {
-		}
+        ExecCommand(AssureNote: AssureNoteApp, Args: string[]): void {
+        }
 
-		Display(PluginPanel: PluginPanel, GSNDoc: GSNDoc, Label: string): void {
-		}
+        Display(PluginPanel: PluginPanel, GSNDoc: GSNDoc, Label: string): void {
+        }
 
-		ExecDoubleClicked(NodeView: NodeView): void {
-		}
+        ExecDoubleClicked(NodeView: NodeView): void {
+        }
 
-		CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-			return null;
+        CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
+            return null;
         }
 
         CreateMenuBarButtons(NodeView: NodeView): NodeMenuItem[] {
+            return null;
+        }
+
+        CreateTooltipContents(NodeView: NodeView): HTMLLIElement[] {
             return null;
         }
 
@@ -98,17 +102,17 @@ module AssureNote {
     }
 
 
-	//export class SamplePlugin extends Plugin {
-	//	constructor() {
-	//		super();
-	//		this.HasMenuBarButton = true;
-	//	}
+    //export class SamplePlugin extends Plugin {
+    //    constructor() {
+    //        super();
+    //        this.HasMenuBarButton = true;
+    //    }
 
-	//	CreateMenuBarButton(): MenuBarButton {
-	//		return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
-	//			alert(TargetView.Label);
-	//		});
-	//	}
+    //    CreateMenuBarButton(): MenuBarButton {
+    //        return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
+    //            alert(TargetView.Label);
+    //        });
+    //    }
     //}
 
     export function OnLoadPlugin(Callback: (App: AssureNoteApp) => void) {
@@ -118,9 +122,9 @@ module AssureNote {
         }
     }
 
-	export class PluginManager {
-		private PluginMap: {[index: string]: Plugin};
-		constructor(public AssureNoteApp: AssureNoteApp) {
+    export class PluginManager {
+        private PluginMap: {[index: string]: Plugin};
+        constructor(public AssureNoteApp: AssureNoteApp) {
             this.PluginMap = {};
             PluginManager.Current = this;
         }
@@ -144,43 +148,52 @@ module AssureNote {
             }
         }
 
-		GetPanelPlugin(Name: string, Label?: string): Plugin {
-			//TODO change plugin by Label
-			return this.PluginMap[Name];
-		}
+        GetPanelPlugin(Name: string, Label?: string): Plugin {
+            //TODO change plugin by Label
+            return this.PluginMap[Name];
+        }
 
-		GetCommandPlugin(Name: string): Plugin {
-			return this.PluginMap[Name];
-		}
+        GetCommandPlugin(Name: string): Plugin {
+            return this.PluginMap[Name];
+        }
 
-		GetMenuBarButtons(TargetView: NodeView): NodeMenuItem[]{
-			var ret: NodeMenuItem[] = [];
-			$.each(this.PluginMap, (key, value: Plugin) => {
-				if (value.HasMenuBarButton()) {
-					this.AssureNoteApp.DebugP("Menu: key=" + key);
-					var Button = value.CreateMenuBarButton(TargetView);
-					if (Button != null) {
-						ret.push(Button);
+        GetMenuBarButtons(TargetView: NodeView): NodeMenuItem[]{
+            var ret: NodeMenuItem[] = [];
+            $.each(this.PluginMap, (key, value: Plugin) => {
+                if (value.HasMenuBarButton()) {
+                    this.AssureNoteApp.DebugP("Menu: key=" + key);
+                    var Button = value.CreateMenuBarButton(TargetView);
+                    if (Button != null) {
+                        ret.push(Button);
                     }
                     var Buttons = value.CreateMenuBarButtons(TargetView);
                     if (Buttons != null) {
                         ret = ret.concat(Buttons);
                     }
-				}
-			});
-			return ret;
-		}
+                }
+            });
+            return ret;
+        }
 
-		GetDoubleClicked(): Plugin {
-			var ret: Plugin = null;
-			//FIXME Editing mode
-			$.each(this.PluginMap, (key, value: Plugin) => {
-				if (value.HasDoubleClicked()) {
-					ret = value;
-					return false;
-				}
-			});
-			return ret;
+        GetTooltipContents(TargetView: NodeView): HTMLLIElement[]{
+            var ret: HTMLLIElement[] = [];
+            $.each(this.PluginMap, (key, value: Plugin) => {
+                var Tooltip = value.CreateTooltipContents(TargetView);
+                if (Tooltip) ret = ret.concat(Tooltip);
+            });
+            return ret;
+        }
+
+        GetDoubleClicked(): Plugin {
+            var ret: Plugin = null;
+            //FIXME Editing mode
+            $.each(this.PluginMap, (key, value: Plugin) => {
+                if (value.HasDoubleClicked()) {
+                    ret = value;
+                    return false;
+                }
+            });
+            return ret;
         }
 
         InvokeHTMLRenderPlugin(NodeDoc: string, Model: GSNNode): string {
@@ -195,6 +208,6 @@ module AssureNote {
                 value.RenderSVG(ShapeGroup, NodeView);
             });
         }
-	}
+    }
 }
 

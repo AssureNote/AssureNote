@@ -40,7 +40,7 @@ var AssureNote;
             this.Element.css(CSS);
             this.Element.css({ display: "none" });
         }
-        EditorUtil.prototype.EnableEditor = function (WGSN, NodeView) {
+        EditorUtil.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive) {
             var _this = this;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
@@ -62,20 +62,24 @@ var AssureNote;
             }).on("blur", function (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                _this.DisableEditor(NodeView);
+                _this.DisableEditor(NodeView, IsRecursive);
                 App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
             });
             this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);
             this.TextArea.refresh();
             this.TextArea.focus();
         };
-        EditorUtil.prototype.DisableEditor = function (OldNodeView) {
+        EditorUtil.prototype.DisableEditor = function (OldNodeView, IsRecursive) {
             var _this = this;
             var WGSN = this.TextArea.getValue();
             this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
             var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
-            var NewNode = Node.ReplaceSubNodeAsText(WGSN);
-            console.log(NewNode);
+            var NewNode;
+            if (IsRecursive) {
+                NewNode = Node.ReplaceSubNodeAsText(WGSN);
+            } else {
+                // NewNode =
+            }
 
             if (NewNode) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();

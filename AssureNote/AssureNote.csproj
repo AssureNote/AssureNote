@@ -67,7 +67,9 @@
     <TypeScriptCompile Include="plugin\FoldingViewSwitch\FoldingViewSwitch.ts" />
     <TypeScriptCompile Include="plugin\LastModified\LastModified.ts" />
     <TypeScriptCompile Include="plugin\MessageChat\MessageChat.ts" />
+    <TypeScriptCompile Include="plugin\MonitorNode\MonitorNode.ts" />
     <TypeScriptCompile Include="plugin\RemoveNode\RemoveNode.ts" />
+    <TypeScriptCompile Include="plugin\SingleNodeEditor\SingleNodeEditor.ts" />
     <TypeScriptCompile Include="plugin\ToDo\ToDo.ts" />
     <TypeScriptCompile Include="plugin\VariableInterpolation\VariableInterpolation.ts" />
     <TypeScriptCompile Include="src\AssureNoteParser.ts" />
@@ -83,6 +85,7 @@
     <TypeScriptCompile Include="src\old\CaseModel.ts" />
     <TypeScriptCompile Include="src\SearchNode.ts" />
     <TypeScriptCompile Include="src\Socket.ts" />
+    <TypeScriptCompile Include="src\Tooltip.ts" />
     <TypeScriptCompile Include="src\Viewport.ts" />
     <TypeScriptCompile Include="src\old\CaseViewer.ts" />
     <TypeScriptCompile Include="src\old\ColorMap.ts" />
@@ -96,6 +99,7 @@
     <TypeScriptCompile Include="src\old\PluginManager.ts" />
     <TypeScriptCompile Include="src\old\Api.ts" />
     <TypeScriptCompile Include="src\Plugin.ts" />
+    <TypeScriptCompile Include="src\RecApi.ts" />
     <TypeScriptCompile Include="plugin\FullScreenEditor\FullScreenEditor.ts" />
   </ItemGroup>
   <ItemGroup>

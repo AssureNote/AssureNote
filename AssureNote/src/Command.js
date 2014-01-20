@@ -42,7 +42,7 @@ var AssureNote;
             return "";
         };
 
-        Command.prototype.Invoke = function (CommandName, ForcusedView, Params) {
+        Command.prototype.Invoke = function (CommandName, Params) {
         };
 
         Command.prototype.GetHelpHTML = function () {
@@ -57,7 +57,7 @@ var AssureNote;
         function CommandMissingCommand(App) {
             _super.call(this, App);
         }
-        CommandMissingCommand.prototype.Invoke = function (CommandName, Target, Params) {
+        CommandMissingCommand.prototype.Invoke = function (CommandName, Params) {
             var Label = CommandName.toUpperCase();
             if (this.App.PictgramPanel.ViewMap == null) {
                 this.App.DebugP("Jump is diabled.");
@@ -95,7 +95,7 @@ var AssureNote;
             return "Save";
         };
 
-        SaveCommand.prototype.Invoke = function (CommandName, Target, Params) {
+        SaveCommand.prototype.Invoke = function (CommandName, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             var Extention = Filename.split(".").pop();
             var StringToWrite = "";
@@ -208,7 +208,7 @@ var AssureNote;
             return "Save As SVG";
         };
 
-        SaveSVGCommand.prototype.Invoke = function (CommandName, Target, Params) {
+        SaveSVGCommand.prototype.Invoke = function (CommandName, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
         };
@@ -286,7 +286,7 @@ var AssureNote;
             return "<code>new [name]</code><br>Create new file.";
         };
 
-        NewCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        NewCommand.prototype.Invoke = function (CommandName, Params) {
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], "* G1");
             } else {
@@ -320,7 +320,7 @@ var AssureNote;
             return "<code>unfold-all</code><br>Unfold all folded Goals";
         };
 
-        UnfoldAllCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        UnfoldAllCommand.prototype.Invoke = function (CommandName, Params) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = function (TargetView) {
                 TargetView.IsFolded = false;
@@ -352,7 +352,7 @@ var AssureNote;
             return "<code>set-color color</code><br>Change node color.";
         };
 
-        SetColorCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        SetColorCommand.prototype.Invoke = function (CommandName, Params) {
             if (Params.length > 1) {
                 var TargetLabel = Params[0];
                 var Color = Params[1];
@@ -387,7 +387,7 @@ var AssureNote;
             return "<code>set-scale scale</code><br>Change scale.";
         };
 
-        SetScaleCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        SetScaleCommand.prototype.Invoke = function (CommandName, Params) {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
@@ -413,7 +413,7 @@ var AssureNote;
             return "<code>open</code><br>Open a file.";
         };
 
-        OpenCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        OpenCommand.prototype.Invoke = function (CommandName, Params) {
             var _this = this;
             $("#file-open-dialog").change(function (e) {
                 var target = e.target || e.srcElement;
@@ -442,7 +442,7 @@ var AssureNote;
             return "<code>help [name]</code><br>Show this message.";
         };
 
-        HelpCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        HelpCommand.prototype.Invoke = function (CommandName, Params) {
             var Helps = jQuery.map(this.App.Commands, function (Command, i) {
                 return Command.GetHelpHTML();
             }).sort();
@@ -471,7 +471,7 @@ var AssureNote;
             return "<code>upload</code><br>Upload editing GSN to the server(online version only).";
         };
 
-        UploadCommand.prototype.Invoke = function (CommandName, FocusedView, Params) {
+        UploadCommand.prototype.Invoke = function (CommandName, Params) {
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {

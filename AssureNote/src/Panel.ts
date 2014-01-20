@@ -31,48 +31,56 @@
 ///<reference path='../d.ts/codemirror.d.ts'/>
 
 ///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
+///<reference path='../plugin/SingleNodeEditor/SingleNodeEditor.ts'/>
 
 module AssureNote {
-	export class PictgramPanel {
-		LayoutEngine: LayoutEngine;
+    export class PictgramPanel {
+        LayoutEngine: LayoutEngine;
         SVGLayer: SVGGElement;
         EventMapLayer: HTMLDivElement;
-		ContentLayer: HTMLDivElement;
-		ControlLayer: HTMLDivElement;
-		Viewport: ViewportManager;
-		ViewMap: { [index: string]: NodeView };
-		MasterView: NodeView;
+        ContentLayer: HTMLDivElement;
+        ControlLayer: HTMLDivElement;
+        Viewport: ViewportManager;
+        ViewMap: { [index: string]: NodeView };
+        MasterView: NodeView;
         CmdLine: CommandLine;
         Search: Search;
 
-		CurrentDoc: GSNDoc;// Convert to caseview
-		FocusedLabel: string;
-		FocusedWx: number;
-		FocusedWy: number;
+        CurrentDoc: GSNDoc;// Convert to caseview
+        FocusedLabel: string;// A label pointed out or clicked.
+        FocusedWx: number;
+        FocusedWy: number;
 
-		constructor(public AssureNoteApp: AssureNoteApp) {
-			this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));
-			this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
-			this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
+        constructor(public AssureNoteApp: AssureNoteApp) {
+            this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));
+            this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
+            this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
             this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
-			this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
+            this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
 
             var Bar = new NodeMenu(AssureNoteApp);
+            var Tooltip: Tooltip = new AssureNote.Tooltip(AssureNoteApp);
             this.ContentLayer.addEventListener("click", (event: MouseEvent) => {
-				var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
-				this.AssureNoteApp.DebugP("click:" + Label);
-				if (Bar.IsEnable) {
-					Bar.Remove();
-				}
+                var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
+                this.AssureNoteApp.DebugP("click:" + Label);
+                if (Bar.IsEnable) {
+                    Bar.Remove();
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
+                }
                 event.preventDefault();
-			});
+            });
 
             //FIXME
             this.EventMapLayer.addEventListener("pointerdown", (event: MouseEvent) => {
                 //this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
                 }
             });
 
@@ -84,6 +92,9 @@ module AssureNote {
                     if (Bar.IsEnable) {
                         Bar.Remove();
                     }
+                    if (Tooltip.IsEnable) {
+                        Tooltip.Remove;
+                    }
                     var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
                     Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
                 } else {
@@ -93,36 +104,39 @@ module AssureNote {
             });
 
             this.ContentLayer.addEventListener("dblclick", (event: MouseEvent) => {
-				var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
-				var NodeView = this.ViewMap[Label];
-				this.AssureNoteApp.DebugP("double click:" + Label);
-				if (Bar.IsEnable) { //TODO cancel click event
-					Bar.Remove();
-				}
-				this.AssureNoteApp.ExecDoubleClicked(NodeView);
+                var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
+                var NodeView = this.ViewMap[Label];
+                this.AssureNoteApp.DebugP("double click:" + Label);
+                if (Bar.IsEnable) { //TODO cancel click event
+                    Bar.Remove();
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
+                }
+                this.AssureNoteApp.ExecDoubleClicked(NodeView);
                 event.preventDefault();
-			});
+            });
 
             this.CmdLine = new CommandLine();
             this.Search = new Search(AssureNoteApp);
             document.addEventListener("keydown", (event: KeyboardEvent) => {
-				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-					return;
-				}
+                if (!this.AssureNoteApp.PluginPanel.IsVisible) {
+                    return;
+                }
                 switch (event.keyCode) {
-					case 58: /*: in Firefox*/
-						if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
-							break;
-						}
-					case 186: /*:*/
-					case 191: /*/*/
+                    case 58: /*: in Firefox*/
+                        if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
+                            break;
+                        }
+                    case 186: /*:*/
+                    case 191: /*/*/
                     case 219: /*@*/
                         if (this.Search.IsSearching()) {
                             this.Search.ResetParam();
                         }
                         this.CmdLine.Show();
                         break;
-					case 13: /*Enter*/
+                    case 13: /*Enter*/
                         if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
                             var ParsedCommand = new CommandParser();
                             ParsedCommand.Parse(this.CmdLine.GetValue());
@@ -165,35 +179,57 @@ module AssureNote {
                             break;
                         }
                         break;
-				}
-			});
+                }
+            });
 
-			this.ContentLayer.addEventListener("mouseover", (event: MouseEvent) => {
-				if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-					return;
-				}
-				var Label = AssureNoteUtils.GetNodeLabelFromEvent(event);
-				if (Label) {
-					//this.AssureNoteApp.DebugP("mouseover:"+Label);
-				}
-			});
+            this.ContentLayer.addEventListener("mouseover", (event: MouseEvent) => {
+                if (!this.AssureNoteApp.PluginPanel.IsVisible) {
+                    return;
+                }
+                var Label = AssureNoteUtils.GetNodeLabelFromEvent(event);
+                var NodeView = this.ViewMap[Label];
+                if (NodeView != null && this.FocusedLabel != Label) {
+                    this.FocusedLabel = Label;
+                    this.AssureNoteApp.DebugP("mouseover:" + Label);
+                    var Tooltips = this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
+                    Tooltip.Create(NodeView, this.ControlLayer, Tooltips);
+                }
+            });
 
-			var DragHandler = (e) => {
-				if (this.AssureNoteApp.PluginPanel.IsVisible) {
-					e.stopPropagation();
-					e.preventDefault();
-				}
-			};
-			$(this.EventMapLayer)
-				.on('dragenter', DragHandler)
-				.on('dragover', DragHandler)
-				.on('dragleave', DragHandler)
-				.on('drop', (event: JQueryEventObject) => {
-					if (this.AssureNoteApp.PluginPanel.IsVisible) {
-						event.stopPropagation();
-						event.preventDefault();
-						this.AssureNoteApp.LoadFiles((<any>(<any>event.originalEvent).dataTransfer).files);
-					}
+            this.ContentLayer.addEventListener("mouseleave", (event: MouseEvent) => {
+                /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
+                   every time the pointer enters the sub-element of ContentLayer.
+                   Mouseleave can prevent this annoying event firing. */
+                if (!this.AssureNoteApp.PluginPanel.IsVisible) {
+                    return;
+                }
+                var Label = this.FocusedLabel;
+                var NodeView = this.ViewMap[Label];
+                if (NodeView != null && Label == this.FocusedLabel) {
+                    this.FocusedLabel = null;
+                    this.AssureNoteApp.DebugP("mouseout:" + Label);
+                }
+                if (Tooltip.IsEnable) {
+                    Tooltip.Remove();
+                }
+            });
+
+            var DragHandler = (e) => {
+                if (this.AssureNoteApp.PluginPanel.IsVisible) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            };
+            $(this.EventMapLayer)
+                .on('dragenter', DragHandler)
+                .on('dragover', DragHandler)
+                .on('dragleave', DragHandler)
+                .on('drop', (event: JQueryEventObject) => {
+                    if (this.AssureNoteApp.PluginPanel.IsVisible) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        this.AssureNoteApp.LoadFiles((<any>(<any>event.originalEvent).dataTransfer).files);
+                    }
                 });
 
             this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
@@ -231,27 +267,27 @@ module AssureNote {
             });
 
             (<any>$(".dropdown-toggle")).dropdown();
-		}
+        }
 
-		SetFoldedAllGoalNode(NodeView: NodeView): void {
-			NodeView.ForEachVisibleChildren((SubNode: NodeView) => {
-				this.SetFoldedAllGoalNode(SubNode);
-				if (SubNode.GetNodeType() == GSNType.Goal && SubNode.Children != null) {
-					if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != GSNType.Evidence) {
-						SubNode.IsFolded = true;
-					}
-				}
-			});
-		}
+        SetFoldedAllGoalNode(NodeView: NodeView): void {
+            NodeView.ForEachVisibleChildren((SubNode: NodeView) => {
+                this.SetFoldedAllGoalNode(SubNode);
+                if (SubNode.GetNodeType() == GSNType.Goal && SubNode.Children != null) {
+                    if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != GSNType.Evidence) {
+                        SubNode.IsFolded = true;
+                    }
+                }
+            });
+        }
 
-		SetView(NodeView: NodeView): void {
-			this.MasterView = NodeView;
-			this.ViewMap = {};
-			this.MasterView.UpdateViewMap(this.ViewMap);
-		}
+        SetView(NodeView: NodeView): void {
+            this.MasterView = NodeView;
+            this.ViewMap = {};
+            this.MasterView.UpdateViewMap(this.ViewMap);
+        }
 
-		DisplayPictgram(): void {
-			this.AssureNoteApp.PluginPanel.Clear();
+        DisplayPictgram(): void {
+            this.AssureNoteApp.PluginPanel.Clear();
         }
 
         Draw(Label?: string, Duration?: number): void {
@@ -259,9 +295,9 @@ module AssureNote {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
-			if (TargetView == null) {
-				TargetView = this.MasterView;
-			}
+            if (TargetView == null) {
+                TargetView = this.MasterView;
+            }
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
@@ -288,9 +324,9 @@ module AssureNote {
             this.SVGLayer.style.display = "";
         }
 
-		DisplayPluginPanel(PluginName: string, Label?: string): void {
-			var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-			Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.MasterRecord.GetLatestDoc(), Label);
+        DisplayPluginPanel(PluginName: string, Label?: string): void {
+            var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
+            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.MasterRecord.GetLatestDoc(), Label);
         }
 
         GetFocusedView(): NodeView {
@@ -300,32 +336,52 @@ module AssureNote {
             return null;
         }
 
-		//TODO
-		NavigateUp(): void { }
-		NavigateDown(): void { }
-		NavigateLeft(): void { }
-		NavigateRight(): void { }
-		NavigateHome(): void { }
+        //TODO
+        NavigateUp(): void { }
+        NavigateDown(): void { }
+        NavigateLeft(): void { }
+        NavigateRight(): void { }
+        NavigateHome(): void { }
 
-	}
+    }
 
     export class PluginPanel {
-		FullScreenEditor: Plugin;
-		IsVisible: boolean = true;
+        FullScreenEditor: Plugin;
+        SingleNodeEditor: Plugin;
+        IsVisible: boolean = true;
 
-		constructor(public AssureNoteApp: AssureNoteApp) {
-			var textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('editor'), {
-				lineNumbers: true,
-				mode: "text/x-asn",
-				lineWrapping: true,
+        constructor(public AssureNoteApp: AssureNoteApp) {
+            var textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('editor'), {
+                lineNumbers: true,
+                mode: 'wgsn',
+                lineWrapping: true,
             });
             this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
-            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
             $("#plugin-layer").on('mousewheel', (event: MouseWheelEvent) => { event.stopPropagation(); });
+
+            textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('singlenode-editor'), {
+                lineNumbers: false,
+                mode: 'wgsn',
+                lineWrapping: true,
+            });
+            this.SingleNodeEditor = new SingleNodeEditorPlugin(AssureNoteApp, textarea, '#singlenode-editor-wrapper');
+            AssureNoteApp.PluginManager.SetPlugin("open-single", this.SingleNodeEditor);
+            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
         }
 
-		Clear(): void {
-		}
-	}
+        Clear(): void {
+        }
+    }
 
+    export class Pane {
+        IsEnable: boolean;
+        constructor(public AssureNoteApp: AssureNoteApp) { }
+
+        Create(NodeView: NodeView, ControlLayer: HTMLDivElement, contents: any) {
+            /* Do nothing */
+        }
+
+        Remove(): void {
+        }
+    }
 }

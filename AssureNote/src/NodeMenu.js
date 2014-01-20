@@ -21,6 +21,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 ///<reference path="./AssureNote.ts" />
 var AssureNote;
 (function (AssureNote) {
@@ -43,8 +49,10 @@ var AssureNote;
     })();
     AssureNote.NodeMenuItem = NodeMenuItem;
 
-    var NodeMenu = (function () {
+    var NodeMenu = (function (_super) {
+        __extends(NodeMenu, _super);
         function NodeMenu(AssureNoteApp) {
+            _super.call(this, AssureNoteApp);
             this.AssureNoteApp = AssureNoteApp;
             this.IsEnable = false;
         }
@@ -94,7 +102,7 @@ var AssureNote;
             this.IsEnable = false;
         };
         return NodeMenu;
-    })();
+    })(AssureNote.Pane);
     AssureNote.NodeMenu = NodeMenu;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=NodeMenu.js.map

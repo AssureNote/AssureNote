@@ -37,7 +37,7 @@ module AssureNote {
             return "";
         }
 
-        public Invoke(CommandName: string, ForcusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
         }
 
         public GetHelpHTML(): string {
@@ -50,7 +50,7 @@ module AssureNote {
             super(App);
         }
 
-        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+        public Invoke(CommandName: string,Params: any[]) {
             var Label = CommandName.toUpperCase();
             if (this.App.PictgramPanel.ViewMap == null) {
                 this.App.DebugP("Jump is diabled.");
@@ -86,7 +86,7 @@ module AssureNote {
             return "Save";
         }
 
-        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             var Extention = Filename.split(".").pop();
             var StringToWrite: string = "";
@@ -198,7 +198,7 @@ module AssureNote {
             return "Save As SVG";
         }
 
-        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
         }
@@ -278,7 +278,7 @@ module AssureNote {
             return "<code>new [name]</code><br>Create new file."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], "* G1");
             } else {
@@ -310,7 +310,7 @@ module AssureNote {
             return "<code>unfold-all</code><br>Unfold all folded Goals"
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = (TargetView: NodeView) => {
                 TargetView.IsFolded = false;
@@ -340,7 +340,7 @@ module AssureNote {
             return "<code>set-color color</code><br>Change node color."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             if (Params.length > 1) {
                 var TargetLabel = Params[0];
                 var Color = Params[1];
@@ -373,7 +373,7 @@ module AssureNote {
             return "<code>set-scale scale</code><br>Change scale."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(<number><any>Params[0] - 0);
             }
@@ -397,7 +397,7 @@ module AssureNote {
             return "<code>open</code><br>Open a file."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             $("#file-open-dialog").change((e: Event) => {
                 var target = e.target || e.srcElement;
                 this.App.LoadFiles(<any>(<HTMLInputElement>target).files);
@@ -423,7 +423,7 @@ module AssureNote {
             return "<code>help [name]</code><br>Show this message."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             var Helps: string[] = jQuery.map(this.App.Commands, (Command: Command, i: number): string => { return Command.GetHelpHTML(); }).sort();
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
             $("#help-modal .modal-body").css({ "overflow-y": "scroll", "height": this.App.PictgramPanel.Viewport.GetPageHeight() * 0.6 });
@@ -448,7 +448,7 @@ module AssureNote {
             return "<code>upload</code><br>Upload editing GSN to the server(online version only)."
         }
 
-        public Invoke(CommandName: string, FocusedView: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             AssureNoteUtils.postJsonRPC("upload", {content: Writer.toString()}, (result: any) => {

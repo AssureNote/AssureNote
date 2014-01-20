@@ -58,6 +58,18 @@ var AssureNote;
                 return NodeDoc;
             }
         };
+
+        LastModifiedPlugin.prototype.CreateTooltip = function (NodeView) {
+            var res = [];
+            var li = document.createElement('li');
+            li.innerText = NodeView.Model.Created.Author + ' created.';
+            res.push(li);
+            li = document.createElement('li');
+            li.innerText = NodeView.Model.LastModified.Author + ' last modified.';
+            res.push(li);
+
+            return res;
+        };
         return LastModifiedPlugin;
     })(AssureNote.Plugin);
     AssureNote.LastModifiedPlugin = LastModifiedPlugin;

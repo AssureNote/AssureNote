@@ -44,7 +44,7 @@ module AssureNote {
             return "<code>edit [label]</code><br>Open editor."
         }
 
-        public Invoke(CommandName: string, Target: NodeView, Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
             var Label: string;
             if (Params.length < 1) {
                 Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
@@ -59,8 +59,8 @@ module AssureNote {
                     return;
                 }
                 var Writer = new StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer);
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+                TargetView.Model.FormatSubNode(1, Writer, true);
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
@@ -69,8 +69,8 @@ module AssureNote {
 
     export class FullScreenEditorPlugin extends Plugin {
         public EditorUtil: EditorUtil;
-		constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
-			super();
+        constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
+            super();
             this.SetMenuBarButton(true);
             this.SetEditor(true);
             this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
@@ -84,16 +84,16 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new FullScreenEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
 
-		CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-			if (NodeView.GetNodeType() == GSNType.Strategy) {
-				return null;
-			}
-			return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
-				(event: Event, TargetView: NodeView) => {
-					var Writer = new StringWriter();
-					TargetView.Model.FormatSubNode(1, Writer);
-                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
-			});
+        CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
+            if (NodeView.GetNodeType() == GSNType.Strategy) {
+                return null;
+            }
+            return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
+                (event: Event, TargetView: NodeView) => {
+                    var Writer = new StringWriter();
+                    TargetView.Model.FormatSubNode(1, Writer, true);
+                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
+            });
         }
 
         /* This focuses on the node where the cursor of CodeMirror indicate */
@@ -120,7 +120,7 @@ module AssureNote {
                 }
             }
         }
-	}
+    }
 }
 
 AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {

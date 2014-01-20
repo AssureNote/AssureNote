@@ -29,7 +29,7 @@
 
 module AssureNote {
     export class VariableInterpolationPlugin extends Plugin {
-		constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(public AssureNoteApp: AssureNoteApp) {
             super();
         }
 
@@ -63,7 +63,7 @@ module AssureNote {
             var LabelMap: HashMap<String, String> = Model.BaseDoc.GetLabelMap();
             return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
         }
-	}
+    }
 }
 
 AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {

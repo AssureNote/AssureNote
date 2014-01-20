@@ -29,6 +29,7 @@ var __extends = this.__extends || function (d, b) {
 };
 ///<reference path="../../src/AssureNoteParser.ts" />
 ///<reference path="../../src/Plugin.ts" />
+///<reference path="../../src/RecApi.ts" />
 var AssureNote;
 (function (AssureNote) {
     var MonitorNode = (function () {
@@ -220,7 +221,7 @@ var AssureNote;
             return "Start Monitor";
         };
 
-        MonitorStartCommand.prototype.Invoke = function (CommandName, FocuseView, Params) {
+        MonitorStartCommand.prototype.Invoke = function (CommandName, Params) {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
 
@@ -283,7 +284,7 @@ var AssureNote;
             return "Stop Monitor";
         };
 
-        MonitorStopCommand.prototype.Invoke = function (CommandName, FocuseView, Params) {
+        MonitorStopCommand.prototype.Invoke = function (CommandName, Params) {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
 
