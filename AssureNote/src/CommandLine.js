@@ -130,8 +130,8 @@ var AssureNote;
         //TODO recognize : or / or @
         CommandLine.prototype.ShowNextHistory = function () {
             if (this.HistoryIndex > 0) {
-                this.Element.val(this.HistoryList[this.HistoryIndex]);
                 this.HistoryIndex -= 1;
+                this.Element.val(this.HistoryList[this.HistoryIndex]);
             } else if (this.HistoryIndex == 0) {
                 this.Element.val(":");
             }
