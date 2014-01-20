@@ -106,7 +106,6 @@ var AssureNote;
                     Node = Node.Parent;
                 }
             }
-
             this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
         };
 

@@ -187,7 +187,7 @@ var AssureNote;
             var LatestDoc = this.MasterRecord.GetLatestDoc();
             var TopGoalNode = LatestDoc.TopNode;
 
-            this.PictgramPanel.SetView(new AssureNote.NodeView(TopGoalNode, true));
+            this.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoalNode, true));
             this.PictgramPanel.SetFoldedAllGoalNode(this.PictgramPanel.MasterView);
 
             this.PictgramPanel.Draw();
