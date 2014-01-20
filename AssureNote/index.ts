@@ -40,6 +40,14 @@ var Debug = <any>{};
 $(() => {
     var App = new AssureNote.AssureNoteApp();
     Debug.AssureNote = App;
+    Debug.ShowCameraInfo = () => {
+        setInterval(() => {
+            var p = Debug.AssureNote.PictgramPanel.Viewport;
+            var x = p.GetCameraGX(); var y = p.GetCameraGY();
+            var s = p.GetCameraScale();
+            document.title = ["(", ~~x, ", ", ~~y, ") ", ~~(s * 100), "%"].join("");
+        }, 100);
+    }
 
     App.LoadDefaultWGSN();
 });
