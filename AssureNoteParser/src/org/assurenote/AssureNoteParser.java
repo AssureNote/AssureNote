@@ -104,6 +104,7 @@ class Lib {
 		}
 		return sb.toString();
 	}
+	
 	public static int parseInt(String numText) {
 		return Integer.parseInt(numText);
 	}
@@ -315,7 +316,7 @@ class GSNHistory {
 
 }
 
-class WikiSyntax {
+class WikiSyntax {	
 	static int ParseInt(String NumText, int DefVal) {
 		try {
 			return Lib.parseInt(NumText);
@@ -463,6 +464,22 @@ class WikiSyntax {
 	}
 	public static String FormatRefKey(GSNType NodeType, String HistoryTriple) {
 		return WikiSyntax.FormatNodeType(NodeType) + HistoryTriple;
+	}
+	
+	public static String CommentOutSubNode(String DocText) {
+		/*local*/StringReader Reader = new StringReader(DocText);
+		/*local*/StringWriter Writer = new StringWriter();
+		/*local*/int NodeCount = 0;
+		while (Reader.HasNext()) {
+			/*local*/String line = Reader.ReadLine();
+			if (Lib.String_startsWith(line, "*")) NodeCount++;
+			if (NodeCount >= 2) {
+				line = "#" + line;
+			}
+			Writer.print(line);
+			Writer.newline();
+		}
+		return Writer.toString();
 	}
 }
 
@@ -866,7 +883,7 @@ class GSNNode {
 		}
 	}
 	
-	GSNNode ReplaceSubNode(GSNNode NewNode) {
+	GSNNode ReplaceSubNode(GSNNode NewNode, boolean IsRecursive) {
 		this.MergeSubNode(NewNode);
 		if(this.ParentNode != null) {
 			for(/*local*/int i = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
@@ -880,15 +897,21 @@ class GSNNode {
 			assert(NewNode.IsGoal());
 			this.BaseDoc.TopNode = NewNode;
 		}
+		if (!IsRecursive) {
+			NewNode.SubNodeList = this.SubNodeList;
+		}
 		return NewNode;
 	}
 
-	GSNNode ReplaceSubNodeAsText(String DocText) {
+	GSNNode ReplaceSubNodeAsText(String DocText, boolean IsRecursive) {
+		if (!IsRecursive) {
+			DocText = WikiSyntax.CommentOutSubNode(DocText);
+		}
 		/*local*/StringReader Reader = new StringReader(DocText);
 		/*local*/ParserContext Parser = new ParserContext(null);
 		/*local*/GSNNode NewNode = Parser.ParseNode(Reader);
 		if(NewNode != null) {
-			NewNode = this.ReplaceSubNode(NewNode);
+			NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
 		}
 		return NewNode;
 	}
@@ -1294,7 +1317,7 @@ class GSNRecord {
 			/*local*/GSNDoc Doc = NewHistory != null ? NewHistory.Doc : null;
 			if(Doc != null) {
 				this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
-				this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode);
+				this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode, true);
 				this.CloseEditor();
 			}
 		}
@@ -1316,12 +1339,12 @@ class GSNRecord {
 			}
 			if(History1.CompareDate(History2) < 0) {
 				this.OpenEditor(History1.Author, History1.Role, History1.Date, History1.Process); Rev1++;
-				this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode);
+				this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode, true);
 				this.CloseEditor();
 			}
 			else {
 				this.OpenEditor(History2.Author, History2.Role, History2.Date, History2.Process); Rev2++;
-				this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode);
+				this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode, true);
 				this.CloseEditor();
 			}
 		}
@@ -1564,7 +1587,7 @@ public class AssureNoteParser {
 			//AssureNoteParser.merge(argv[0], argv[1]);
 			/*local*/GSNRecord MasterRecord = new GSNRecord();
 			MasterRecord.Parse(Lib.ReadFile(argv[0]));
-			/*local*/GSNNode NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+			/*local*/GSNNode NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]), true);
 			/*local*/StringWriter Writer = new StringWriter();
 			NewNode.FormatNode(Writer);
 			//MasterRecord.FormatRecord(Writer);

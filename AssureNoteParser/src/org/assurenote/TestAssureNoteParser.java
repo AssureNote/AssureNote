@@ -368,4 +368,15 @@ public class TestAssureNoteParser {
 		NewRecord.FormatRecord(NewWriter);
 		assertEquals(Writer.toString(), NewWriter.toString());
 	}
+	
+	@Test
+	public void CommentOut() {
+		String input = WikiSyntax.CommentOutSubNode("*G\n*S\n**G\n**G");
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		assertEquals(1, LatestDoc.GetNodeCount());
+		assertNull(LatestDoc.TopNode.SubNodeList);
+	}
 }

@@ -49,7 +49,7 @@ module AssureNote {
             //    (event: Event, TargetView: NodeView) => {
             //        var Writer = new StringWriter();
             //        TargetView.Model.FormatSubNode(1, Writer, false);
-            //        this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView);
+            //        this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
             //});
         }
     }

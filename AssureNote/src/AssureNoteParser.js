@@ -327,6 +327,23 @@ var AssureNote;
         WikiSyntax.FormatRefKey = function (NodeType, HistoryTriple) {
             return WikiSyntax.FormatNodeType(NodeType) + HistoryTriple;
         };
+
+        WikiSyntax.CommentOutSubNode = function (DocText) {
+            var Reader = new StringReader(DocText);
+            var Writer = new StringWriter();
+            var NodeCount = 0;
+            while (Reader.HasNext()) {
+                var line = Reader.ReadLine();
+                if (Lib.String_startsWith(line, "*"))
+                    NodeCount++;
+                if (NodeCount >= 2) {
+                    line = "#" + line;
+                }
+                Writer.print(line);
+                Writer.newline();
+            }
+            return Writer.toString();
+        };
         return WikiSyntax;
     })();
     AssureNote.WikiSyntax = WikiSyntax;
@@ -719,7 +736,7 @@ var AssureNote;
             }
         };
 
-        GSNNode.prototype.ReplaceSubNode = function (NewNode) {
+        GSNNode.prototype.ReplaceSubNode = function (NewNode, IsRecursive) {
             this.MergeSubNode(NewNode);
             if (this.ParentNode != null) {
                 for (var i = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
@@ -732,15 +749,21 @@ var AssureNote;
                 (NewNode.IsGoal());
                 this.BaseDoc.TopNode = NewNode;
             }
+            if (!IsRecursive) {
+                NewNode.SubNodeList = this.SubNodeList;
+            }
             return NewNode;
         };
 
-        GSNNode.prototype.ReplaceSubNodeAsText = function (DocText) {
+        GSNNode.prototype.ReplaceSubNodeAsText = function (DocText, IsRecursive) {
+            if (!IsRecursive) {
+                DocText = WikiSyntax.CommentOutSubNode(DocText);
+            }
             var Reader = new StringReader(DocText);
             var Parser = new ParserContext(null);
             var NewNode = Parser.ParseNode(Reader);
             if (NewNode != null) {
-                NewNode = this.ReplaceSubNode(NewNode);
+                NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
             }
             return NewNode;
         };
@@ -1138,7 +1161,7 @@ var AssureNote;
                 var Doc = NewHistory != null ? NewHistory.Doc : null;
                 if (Doc != null) {
                     this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
-                    this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode);
+                    this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode, true);
                     this.CloseEditor();
                 }
             }
@@ -1163,12 +1186,12 @@ var AssureNote;
                 if (History1.CompareDate(History2) < 0) {
                     this.OpenEditor(History1.Author, History1.Role, History1.Date, History1.Process);
                     Rev1++;
-                    this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode);
+                    this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode, true);
                     this.CloseEditor();
                 } else {
                     this.OpenEditor(History2.Author, History2.Role, History2.Date, History2.Process);
                     Rev2++;
-                    this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode);
+                    this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode, true);
                     this.CloseEditor();
                 }
             }
@@ -1406,7 +1429,7 @@ var AssureNote;
                 //AssureNoteParser.merge(argv[0], argv[1]);
                 var MasterRecord = new GSNRecord();
                 MasterRecord.Parse(Lib.ReadFile(argv[0]));
-                var NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+                var NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]), true);
                 var Writer = new StringWriter();
                 NewNode.FormatNode(Writer);
 

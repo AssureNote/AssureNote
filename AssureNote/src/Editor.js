@@ -75,12 +75,9 @@ var AssureNote;
             this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
             var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode;
-            if (IsRecursive) {
-                NewNode = Node.ReplaceSubNodeAsText(WGSN);
-            } else {
-                // NewNode =
-            }
-
+            NewNode = Node.ReplaceSubNodeAsText(WGSN, IsRecursive);
+            console.log(Node);
+            console.log(NewNode);
             if (NewNode) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();
                 var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
