@@ -47,7 +47,6 @@ module AssureNote {
                 */
                 item = document.createElement("li");
                 var a = document.createElement("a");
-                a.id = TopMenuItem.CreateID();
                 a.href = "#";
                 a.appendChild(icon);
                 a.appendChild(text);
@@ -77,6 +76,8 @@ module AssureNote {
         }
 
         Render(App: AssureNoteApp, Target: Element, IsTopLevel: boolean): void {
+            var icon = TopMenuItem.CreateIconElement(this.GetIconName());
+            var text = document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0");
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -93,11 +94,9 @@ module AssureNote {
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
                 button.className = "btn navbar-btn btn-default dropdown-toggle";
-                var text = document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0");
-                var span = TopMenuItem.CreateIconElement(this.GetIconName());
                 var caret = document.createElement("span");
                 caret.className = "caret";
-                button.appendChild(span);
+                button.appendChild(icon);
                 button.appendChild(text);
                 button.appendChild(caret);
 
@@ -126,12 +125,9 @@ module AssureNote {
                 var li = document.createElement("li");
                 li.className = "dropdown-submenu";
                 var a = document.createElement("a");
-                a.id = TopMenuItem.CreateID();
                 a.href = "#";
-                var span = TopMenuItem.CreateIconElement(this.GetIconName());
-                var text = document.createTextNode("\u00a0" + this.GetDisplayName());
                 li.appendChild(a);
-                a.appendChild(span);
+                a.appendChild(icon);
                 a.appendChild(text);
 
                 var ul = document.createElement("ul");
@@ -143,7 +139,6 @@ module AssureNote {
                 }
 
                 li.appendChild(ul);
-
                 Target.appendChild(li);
             }
         }

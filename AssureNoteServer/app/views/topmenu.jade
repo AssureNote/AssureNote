@@ -3,68 +3,6 @@
     a.logo-fixed(href='#')
       img#logo(src='#{basepath}/images/logo.png', alt='AssureNote')
     #top-menu
-      .dropdown.clickable.navbar-left
-        button#file-menu-button.btn.navbar-btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', oncontextmenu='return false')
-          span.glyphicon.glyphicon-file
-          | &nbsp;File&nbsp;
-          span.caret
-        ul#file-menu.dropdown-menu(role='menu', style='right: auto; width: 250px;', oncontextmenu='return false')
-          li
-            a#create-wgsn-menu(href='#')
-              span.glyphicon.glyphicon-plus
-              | &nbsp;New...
-          li
-            a#open-menu(href='#')
-              span.glyphicon.glyphicon-folder-open
-              | &nbsp;Open...
-          li
-            a#upload-menu(href='#')
-              span.glyphicon.glyphicon-cloud-upload
-              | &nbsp;Upload
-          li
-            a#save-menu(href='#')
-              span.glyphicon.glyphicon-floppy-save
-              | &nbsp;Save
-          li.dropdown-submenu
-            a(href='#')
-              span.glyphicon.glyphicon-floppy-save
-              | &nbsp;Save As
-            ul.dropdown-menu
-              li
-                a#save-wgsn-menu(href='#')
-                  span.glyphicon.glyphicon-floppy-save
-                  | &nbsp;*.wgsn...
-              li
-                a#save-dcasemodel-menu(href='#')
-                  span.glyphicon.glyphicon-floppy-save
-                  | &nbsp;*.dcase_model...
-          li.divider
-          li
-            a#command-list-menu(href='#')
-              span.glyphicon.glyphicon-question-sign
-              | &nbsp;Command list
-          li
-            a#help-menu(href='#')
-              span.glyphicon.glyphicon-question-sign
-              | &nbsp;Help
-          li
-            a#about-menu(href='#')
-              span.glyphicon.glyphicon-question-sign
-              | &nbsp;About
-      .dropdown.clickable.navbar-left
-        button#hoge-menu-button.btn.navbar-btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', oncontextmenu='return false')
-          span.glyphicon.glyphicon-file
-          | &nbsp;File&nbsp;
-          span.caret
-        ul#hoge-menu.dropdown-menu(role='menu', style='right: auto; width: 250px;', oncontextmenu='return false')
-          li
-            a#hoge-1-menu(href='#')
-              span.glyphicon.glyphicon-plus
-              | &nbsp;New...
-          li
-            a#hoge-1-menu(href='#')
-              span.glyphicon.glyphicon-folder-open
-              | &nbsp;Open...
     p.navbar-text#filename-view(style="margin-left: 10px;")
     if !isLocal
       include user_info
