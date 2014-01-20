@@ -59,7 +59,7 @@ var AssureNote;
             }
         };
 
-        LastModifiedPlugin.prototype.CreateTooltip = function (NodeView) {
+        LastModifiedPlugin.prototype.CreateTooltipContents = function (NodeView) {
             var res = [];
             var li = document.createElement('li');
             li.innerText = NodeView.Model.Created.Author + ' created.';
