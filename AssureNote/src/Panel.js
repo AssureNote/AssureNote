@@ -125,7 +125,7 @@ var AssureNote;
                             var ParsedCommand = new AssureNote.CommandParser();
                             ParsedCommand.Parse(_this.CmdLine.GetValue());
                             if (ParsedCommand.GetMethod() == "search") {
-                                _this.Search.Search(_this.MasterView, true, ParsedCommand.GetArgs()[0]);
+                                _this.Search.Search(_this.MasterView, ParsedCommand.GetArgs()[0]);
                             }
                             _this.AssureNoteApp.ExecCommand(ParsedCommand);
                             _this.CmdLine.AddHistory(ParsedCommand.GetRawString());
@@ -133,7 +133,7 @@ var AssureNote;
                             _this.CmdLine.Clear();
                             event.preventDefault();
                         } else if (!_this.CmdLine.IsVisible && _this.Search.IsSearching()) {
-                            _this.Search.Search(_this.MasterView, event.shiftKey);
+                            _this.Search.SearchNext(_this.MasterView, event.shiftKey);
                         }
                         break;
                     case 27:

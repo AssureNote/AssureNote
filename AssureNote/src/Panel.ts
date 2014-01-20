@@ -141,7 +141,7 @@ module AssureNote {
                             var ParsedCommand = new CommandParser();
                             ParsedCommand.Parse(this.CmdLine.GetValue());
                             if (ParsedCommand.GetMethod() == "search") {
-                                this.Search.Search(this.MasterView, true/*FIXME*/, ParsedCommand.GetArgs()[0]);
+                                this.Search.Search(this.MasterView, ParsedCommand.GetArgs()[0]);
                             }
                             this.AssureNoteApp.ExecCommand(ParsedCommand);
                             this.CmdLine.AddHistory(ParsedCommand.GetRawString());
@@ -149,7 +149,7 @@ module AssureNote {
                             this.CmdLine.Clear();
                             event.preventDefault();
                         } else if (!this.CmdLine.IsVisible && this.Search.IsSearching()) {
-                            this.Search.Search(this.MasterView, event.shiftKey);
+                            this.Search.SearchNext(this.MasterView, event.shiftKey);
                         }
                         break;
                     case 27: /*Esc*/

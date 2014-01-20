@@ -46,64 +46,66 @@ module AssureNote {
             this.Searching = false;
         }
 
-        Search(TargetView: NodeView, IsTurn: boolean, SearchWord?: string): void {
+        Search(TargetView: NodeView, SearchWord: string): void {
             var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
             var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            if (SearchWord != null) {
-                this.SearchWord = SearchWord;
+            this.SearchWord = SearchWord;
 
-                if (this.SearchWord == "") {
-                    return;
-                }
-                this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
-                this.AssureNoteApp.DebugP(<any>this.HitNodes);
-
-                if (this.HitNodes.length == 0) {
-                    this.SearchWord = "";
-                    return;
-                }
-
-                this.IsMoving = true;
-                this.Searching = true;
-                this.CreateHitNodeView(ViewMap);
-
-                this.SetAllNodesColor(ViewMap, ColorStyle.Searched);
-                this.SetDestination(this.HitNodes[0]);
-                ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
-                this.MoveToNext(ViewPort, () => {
-                    this.IsMoving = false;
-                });
-            } else {
-                if (this.HitNodes.length == 1) {
-                    return;
-                }
-                if (!IsTurn) {
-                    this.NodeIndex++;
-                    if (this.NodeIndex >= this.HitNodes.length) {
-                        this.NodeIndex = 0;
-                    }
-                } else {
-                    this.NodeIndex--;
-                    if (this.NodeIndex < 0) {
-                        this.NodeIndex = this.HitNodes.length - 1;
-                    }
-                }
-
-
-                this.IsMoving = true;
-                this.SetDestination(this.HitNodes[this.NodeIndex]);
-                this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, () => {
-                    ViewMap[this.HitNodes[this.NodeIndex].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
-                    var index = 0;
-                    if (!IsTurn) {
-                        index = (this.NodeIndex == 0) ? this.HitNodes.length - 1 : this.NodeIndex - 1;
-                    } else {
-                        index = (this.NodeIndex == this.HitNodes.length - 1) ? 0 : this.NodeIndex + 1;
-                    }
-                    ViewMap[this.HitNodes[index].GetLabel()].Shape.ChangeColorStyle(ColorStyle.Searched); //Disable Highlight
-                    this.IsMoving = false;
-                });
+            if (this.SearchWord == "") {
+                return;
             }
+            this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
+            this.AssureNoteApp.DebugP(<any>this.HitNodes);
+
+            if (this.HitNodes.length == 0) {
+                this.SearchWord = "";
+                return;
+            }
+
+            this.IsMoving = true;
+            this.Searching = true;
+            this.CreateHitNodeView(ViewMap);
+
+            this.SetDestination(this.HitNodes[0]);
+            this.SetAllNodesColor(ViewMap, ColorStyle.Searched);
+            ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
+            this.MoveToNext(ViewPort, () => {
+                this.IsMoving = false;
+            });
+        }
+
+        SearchNext(TargetView: NodeView, IsTurn: boolean): void {
+            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
+            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
+            if (this.HitNodes.length == 1) {
+                return;
+            }
+            if (!IsTurn) {
+                this.NodeIndex++;
+                if (this.NodeIndex >= this.HitNodes.length) {
+                    this.NodeIndex = 0;
+                }
+            } else {
+                this.NodeIndex--;
+                if (this.NodeIndex < 0) {
+                    this.NodeIndex = this.HitNodes.length - 1;
+                }
+            }
+
+
+            this.IsMoving = true;
+            this.SetDestination(this.HitNodes[this.NodeIndex]);
+            this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, () => {
+                ViewMap[this.HitNodes[this.NodeIndex].GetLabel()].Shape.ChangeColorStyle(ColorStyle.SearchHighlight);
+                var index = 0;
+                if (!IsTurn) {
+                    index = (this.NodeIndex == 0) ? this.HitNodes.length - 1 : this.NodeIndex - 1;
+                } else {
+                    index = (this.NodeIndex == this.HitNodes.length - 1) ? 0 : this.NodeIndex + 1;
+                }
+                ViewMap[this.HitNodes[index].GetLabel()].Shape.ChangeColorStyle(ColorStyle.Searched); //Disable Highlight
+                this.IsMoving = false;
+            });
         }
 
         private CreateHitNodeView(ViewMap: { [index: string]: NodeView }): void {
@@ -115,11 +117,7 @@ module AssureNote {
                 }
             }
 
-            var TopGoal = this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode;
-            var NewNodeView: NodeView = new NodeView(TopGoal, true);
-            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
-            this.AssureNoteApp.PictgramPanel.SetView(NewNodeView);
-            this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
         }
 
         IsSearching(): boolean {
