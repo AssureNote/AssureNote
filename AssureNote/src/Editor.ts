@@ -40,6 +40,10 @@ module AssureNote {
             this.Element.css({ display: "none" });
         }
 
+        UpdateCSS(CSS: any) {
+            this.Element.css(CSS);
+        }
+
         EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive: boolean): void {
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;

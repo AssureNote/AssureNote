@@ -280,7 +280,7 @@ var AssureNote;
         };
 
         ViewportManager.prototype.PageYFromGY = function (GY) {
-            return this.CameraCenterPageX + (GY - this.CameraGY) * this.Scale;
+            return this.CameraCenterPageY + (GY - this.CameraGY) * this.Scale;
         };
 
         ViewportManager.prototype.GXFromPageX = function (PageX) {

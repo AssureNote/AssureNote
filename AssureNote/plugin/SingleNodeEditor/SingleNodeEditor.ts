@@ -35,22 +35,46 @@ module AssureNote {
             this.SetMenuBarButton(true);
             this.SetEditor(true);
             this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
-                position: "fixed",
-                top: "5%",
-                left: "5%",
-                width: "90%",
-                height: "90%"
+                position: "absolute",
+                //top: "5%",
+                //left: "5%",
+                //width: "90%",
+                //height: "90%"
             });
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-            return null;
-            //return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
-            //    (event: Event, TargetView: NodeView) => {
-            //        var Writer = new StringWriter();
-            //        TargetView.Model.FormatSubNode(1, Writer, false);
-            //        this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
-            //});
+            return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
+                (event: Event, TargetView: NodeView) => {
+                    var Writer = new StringWriter();
+                    TargetView.Model.FormatSubNode(1, Writer, false);
+                    //var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
+                    //var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3) / 4;
+                    //this.Tooltip.css({
+                    //    //width: '250px',
+                    //    //height: '150px',
+                    //    position: 'absolute',
+                    //    top: Top,
+                    //    left: Left,
+                    //    display: 'block',
+                    //    opacity: 100
+                    //});
+                    var Top = this.AssureNoteApp.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
+                    var Left = this.AssureNoteApp.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
+                    console.log(Top, Left);
+                    var Width = NodeView.GetShape().GetNodeWidth();
+                    var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
+                    this.EditorUtil.UpdateCSS({
+                        position: "fixed",
+                        top: Top,
+                        left: Left,
+                        width: Width,
+                        height: Height,
+                        background: "rgba(255, 255, 255, 1.00)",
+                    });
+
+                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+            });
         }
     }
 }
