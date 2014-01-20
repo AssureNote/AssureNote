@@ -7,6 +7,8 @@ import parser = require('./AssureNoteParser');
 class AssureNoteServer {
     io: SocketManager;
     room: string = 'room';
+    EditingNodes: number[] = new Array();
+
     constructor() {
         var self = this;
         this.io = socketio.listen(3002);
@@ -17,7 +19,7 @@ class AssureNoteServer {
             socket.emit('init', {id: socket.id, list: self.GetUserList()});
             socket.broadcast.emit('join', {id: socket.id, list: self.GetUserList()});
         });
-        
+
         this.io.sockets.on('disconnect', function (socket: Socket) {
             socket.unjoin(self.room);
             console.log('id: ' + socket.id + ' leave');
@@ -32,6 +34,11 @@ class AssureNoteServer {
         socket.on('update', function(data: {name: string; WGSN: string}) {
             socket.broadcast.emit('update', data);
         });
+        socket.on('startedit', function(data: {Label: string; UID: number}) {
+            data['socketId'] = socket.id;
+       //   this.EditingNodes.push(data.UID);
+            socket.broadcast.emit('startedit', data);
+        });
     }
 
     GetUserList() {
@@ -41,6 +48,13 @@ class AssureNoteServer {
             res.push(Clients[i].id);
         }
         return res;
+    }
+
+    Parse(WGSN: string) : parser.GSNNode {
+        var Reader: parser.StringReader  = new parser.StringReader(WGSN);
+        var Parser: parser.ParserContext = new parser.ParserContext(null);
+        var GSNNode: parser.GSNNode      = Parser.ParseNode(Reader);
+        return GSNNode;
     }
 }
 

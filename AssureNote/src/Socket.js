@@ -55,6 +55,7 @@ var AssureNote;
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
+            this.EdtitingNodesID = [];
             if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found');
             }
@@ -90,6 +91,12 @@ var AssureNote;
                 console.log('update');
                 self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
             });
+            this.socket.on('startedit', function (data) {
+                console.log('edit');
+
+                //    this.EditingNodesID.push(data.UID);
+                $.notify(data.Label + "is now edited by other user", "warn");
+            });
 
             for (var key in this.handler) {
                 this.socket.on(key, this.handler[key]);
@@ -118,6 +125,10 @@ var AssureNote;
         SocketManager.prototype.IsOperational = function () {
             /* Checks the existence of socked.io.js */
             return io != null && io.connect != null;
+        };
+
+        SocketManager.prototype.StartEdit = function (data) {
+            this.Emit('startedit', data);
         };
 
         SocketManager.prototype.UpdateWGSN = function () {

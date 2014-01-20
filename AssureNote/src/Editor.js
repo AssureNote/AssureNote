@@ -44,6 +44,7 @@ var AssureNote;
             var _this = this;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
+            this.AssureNoteApp.SocketManager.StartEdit({ Label: Model.GetLabel(), UID: Model.UID });
 
             var Callback = function (event) {
                 _this.Element.blur();

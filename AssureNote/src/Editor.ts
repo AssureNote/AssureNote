@@ -43,6 +43,7 @@ module AssureNote {
         EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive: boolean): void {
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
+            this.AssureNoteApp.SocketManager.StartEdit({Label: Model.GetLabel(), UID: Model.UID});
 
             var Callback = (event: MouseEvent) => {
                 this.Element.blur();

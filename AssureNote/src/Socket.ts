@@ -53,6 +53,7 @@ module AssureNote {
     export class SocketManager {
         private socket: any;
         private handler: { [key: string]: (any) => void };
+        EdtitingNodesID: number[] = [];
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             if (!this.IsOperational()) {
@@ -70,7 +71,7 @@ module AssureNote {
             if (!this.IsConnected()) {
                 this.AssureNoteApp.DebugP('Socket not enable.');
                 return;
-            }   
+            }
             this.socket.emit(method, params);
         }
 
@@ -90,6 +91,11 @@ module AssureNote {
             this.socket.on('update', function (data) {
                 console.log('update');
                 self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
+            });
+            this.socket.on('startedit', function(data) {
+                console.log('edit');
+            //    this.EditingNodesID.push(data.UID);
+                (<any>$).notify(data.Label + "is now edited by other user", "warn");
             });
 
             for (var key in this.handler) {
@@ -119,6 +125,10 @@ module AssureNote {
         IsOperational() {
             /* Checks the existence of socked.io.js */
             return io != null && io.connect != null;
+        }
+
+        StartEdit(data: {Label: string; UID: number}) {
+            this.Emit('startedit' ,data);
         }
 
         UpdateWGSN() {

@@ -1,11 +1,12 @@
 ///<reference path='../AssureNote/src/AssureNoteParser.ts'/>
 ///<reference path='d.ts/socket.io/socket.io.d.ts' />
 var socketio = require('socket.io');
-
+var parser = require('./AssureNoteParser');
 
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
         this.room = 'room';
+        this.EditingNodes = new Array();
         var self = this;
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
@@ -29,6 +30,12 @@ var AssureNoteServer = (function () {
         socket.on('update', function (data) {
             socket.broadcast.emit('update', data);
         });
+        socket.on('startedit', function (data) {
+            data['socketId'] = socket.id;
+
+            //   this.EditingNodes.push(data.UID);
+            socket.broadcast.emit('startedit', data);
+        });
     };
 
     AssureNoteServer.prototype.GetUserList = function () {
@@ -39,8 +46,14 @@ var AssureNoteServer = (function () {
         }
         return res;
     };
+
+    AssureNoteServer.prototype.Parse = function (WGSN) {
+        var Reader = new parser.StringReader(WGSN);
+        var Parser = new parser.ParserContext(null);
+        var GSNNode = Parser.ParseNode(Reader);
+        return GSNNode;
+    };
     return AssureNoteServer;
 })();
 
 new AssureNoteServer();
-
