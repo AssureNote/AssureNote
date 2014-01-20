@@ -118,66 +118,6 @@ module AssureNote {
             return this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
         }
 
-        ExecTopMenu(Id: string): void {
-            // temporary code
-            var Command: Command = null;
-            var Args = [];
-            switch (Id) {
-                case "create-wgsn-menu":
-                    Command = this.FindCommandByCommandLineName("new");
-                    break;
-                case "open-menu":
-                    Command = this.FindCommandByCommandLineName("open");
-                    break;
-                case "save-menu":
-                    var DefaultName = this.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
-                    Command = this.FindCommandByCommandLineName("w");
-                    Args = [DefaultName];
-                    break;
-                case "save-wgsn-menu":
-                    var DefaultName = this.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
-                    Command = this.FindCommandByCommandLineName("w");
-                    var Name = prompt("Enter the file name", DefaultName);
-                    if (Name == null) {
-                        return;
-                    }
-                    if (Name == "") {
-                        Args = [DefaultName];
-                    } else {
-                        Args = [Name.replace(/(\.\w+)?$/, ".wgsn")];
-                    }
-                    break;
-                case "save-dcasemodel-menu":
-                    var DefaultName = this.WGSNName.replace(/(\.\w+)?$/, ".dcase_model");
-                    Command = this.FindCommandByCommandLineName("w");
-                    var Name = prompt("Enter the file name", DefaultName);
-                    if (Name == null) {
-                        return;
-                    }
-                    if (Name == "") {
-                        Args = [DefaultName];
-                    } else {
-                        Args = [Name.replace(/(\.\w+)?$/, ".dcase_model")];
-                    }
-                    break;
-                case "about-menu":
-                    (<any>$('#about-modal')).modal();
-                    break;
-                case "upload-menu":
-                    Command = this.FindCommandByCommandLineName("upload");
-                    break;
-                case "command-list-menu":
-                    Command = this.FindCommandByCommandLineName("help");
-                    break;
-                case "help-menu":
-                    window.open("https://github.com/AssureNote/AssureNote/blob/master/README.md");
-                    break;
-            }
-            if (Command != null) {
-                Command.Invoke(Id/*FIXME*/, Args);
-            }
-        }
-
         ExecCommand(ParsedCommand: CommandParser): void {
             var CommandName = ParsedCommand.GetMethod();
             if (CommandName == "search") {
