@@ -172,7 +172,7 @@ export class GSNHistory {
 
 }
 
-export class WikiSyntax {
+export class WikiSyntax {	
 	static ParseInt(NumText: string, DefVal: number): number {
 		try {
 			return Lib.parseInt(NumText);
@@ -320,6 +320,22 @@ export class WikiSyntax {
 	}
 	public static FormatRefKey(NodeType: GSNType, HistoryTriple: string): string {
 		return WikiSyntax.FormatNodeType(NodeType) + HistoryTriple;
+	}
+	
+	public static CommentOutSubNode(DocText: string): string {
+		var Reader: StringReader = new StringReader(DocText);
+		var Writer: StringWriter = new StringWriter();
+		var NodeCount: number = 0;
+		while (Reader.HasNext()) {
+			var line: string = Reader.ReadLine();
+			if (Lib.String_startsWith(line, "*")) NodeCount++;
+			if (NodeCount >= 2) {
+				line = "#" + line;
+			}
+			Writer.print(line);
+			Writer.newline();
+		}
+		return Writer.toString();
 	}
 }
 
@@ -722,7 +738,7 @@ export class GSNNode {
 		}
 	}
 	
-	ReplaceSubNode(NewNode: GSNNode): GSNNode {
+	ReplaceSubNode(NewNode: GSNNode, IsRecursive: boolean): GSNNode {
 		this.MergeSubNode(NewNode);
 		if(this.ParentNode != null) {
 			for(var i: number = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
@@ -735,15 +751,21 @@ export class GSNNode {
 		else {(NewNode.IsGoal());
 			this.BaseDoc.TopNode = NewNode;
 		}
+		if (!IsRecursive) {
+			NewNode.SubNodeList = this.SubNodeList;
+		}
 		return NewNode;
 	}
 
-	ReplaceSubNodeAsText(DocText: string): GSNNode {
+	ReplaceSubNodeAsText(DocText: string, IsRecursive: boolean): GSNNode {
+		if (!IsRecursive) {
+			DocText = WikiSyntax.CommentOutSubNode(DocText);
+		}
 		var Reader: StringReader = new StringReader(DocText);
 		var Parser: ParserContext = new ParserContext(null);
 		var NewNode: GSNNode = Parser.ParseNode(Reader);
 		if(NewNode != null) {
-			NewNode = this.ReplaceSubNode(NewNode);
+			NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
 		}
 		return NewNode;
 	}
@@ -1146,7 +1168,7 @@ export class GSNRecord {
 			var Doc: GSNDoc = NewHistory != null ? NewHistory.Doc : null;
 			if(Doc != null) {
 				this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
-				this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode);
+				this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode, true);
 				this.CloseEditor();
 			}
 		}
@@ -1168,12 +1190,12 @@ export class GSNRecord {
 			}
 			if(History1.CompareDate(History2) < 0) {
 				this.OpenEditor(History1.Author, History1.Role, History1.Date, History1.Process); Rev1++;
-				this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode);
+				this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode, true);
 				this.CloseEditor();
 			}
 			else {
 				this.OpenEditor(History2.Author, History2.Role, History2.Date, History2.Process); Rev2++;
-				this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode);
+				this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode, true);
 				this.CloseEditor();
 			}
 		}
@@ -1416,7 +1438,7 @@ export class AssureNoteParser {
 			//AssureNoteParser.merge(argv[0], argv[1]);
 			var MasterRecord: GSNRecord = new GSNRecord();
 			MasterRecord.Parse(Lib.ReadFile(argv[0]));
-			var NewNode: GSNNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]));
+			var NewNode: GSNNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]), true);
 			var Writer: StringWriter = new StringWriter();
 			NewNode.FormatNode(Writer);
 			//MasterRecord.FormatRecord(Writer);
