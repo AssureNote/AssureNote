@@ -55,6 +55,7 @@ var AssureNote;
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
+            this.EditingNodesID = [];
             if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found');
             }
@@ -70,6 +71,12 @@ var AssureNote;
                 this.AssureNoteApp.DebugP('Socket not enable.');
                 return;
             }
+
+            if (method == 'startedit' && !this.IsEditable(params.UID)) {
+                $.notify("Warning:Other user edits this Node!", "warn");
+                return;
+            }
+
             this.socket.emit(method, params);
         };
 
@@ -89,6 +96,16 @@ var AssureNote;
             this.socket.on('update', function (data) {
                 console.log('update');
                 self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
+            });
+            this.socket.on('startedit', function (data) {
+                console.log('edit');
+                self.EditingNodesID.push(data.UID);
+                console.log('here is ID array = ' + self.EditingNodesID);
+            });
+            this.socket.on('finishedit', function (data) {
+                console.log('finishedit');
+                self.DeleteID(data.UID);
+                console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
             for (var key in this.handler) {
@@ -118,6 +135,36 @@ var AssureNote;
         SocketManager.prototype.IsOperational = function () {
             /* Checks the existence of socked.io.js */
             return io != null && io.connect != null;
+        };
+
+        SocketManager.prototype.DeleteID = function (UID) {
+            for (var i = 0; i < this.EditingNodesID.length; i++) {
+                if (this.EditingNodesID[i] == UID) {
+                    this.EditingNodesID.splice(i, 1);
+                    return;
+                }
+            }
+        };
+
+        SocketManager.prototype.IsEditable = function (UID) {
+            var index = 0;
+            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID);
+
+            if (this.EditingNodesID.length == 0)
+                return true;
+            while (CurrentView != null) {
+                for (var i = 0; i < this.EditingNodesID.length; i++) {
+                    if (this.EditingNodesID[i] == CurrentView.Model.UID) {
+                        return false;
+                    }
+                }
+                CurrentView = CurrentView.Parent;
+            }
+            return true;
+        };
+
+        SocketManager.prototype.StartEdit = function (data) {
+            this.Emit('startedit', data);
         };
 
         SocketManager.prototype.UpdateWGSN = function () {

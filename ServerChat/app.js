@@ -1,11 +1,12 @@
 ///<reference path='../AssureNote/src/AssureNoteParser.ts'/>
 ///<reference path='d.ts/socket.io/socket.io.d.ts' />
 var socketio = require('socket.io');
-
+var parser = require('./AssureNoteParser');
 
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
         this.room = 'room';
+        this.EditingNodes = [];
         var self = this;
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
@@ -23,11 +24,21 @@ var AssureNoteServer = (function () {
         });
     }
     AssureNoteServer.prototype.EnableListeners = function (socket) {
+        var self = this;
         socket.on('message', function (message) {
             socket.broadcast.emit('message', message);
         });
         socket.on('update', function (data) {
             socket.broadcast.emit('update', data);
+        });
+        socket.on('startedit', function (data) {
+            data['socketId'] = socket.id;
+            self.EditingNodes.push(data);
+            console.log("this is editing list" + this.EditingNodes);
+            socket.broadcast.emit('startedit', data);
+        });
+        socket.on('finishedit', function (data) {
+            socket.broadcast.emit('finishedit', data);
         });
     };
 
@@ -39,8 +50,14 @@ var AssureNoteServer = (function () {
         }
         return res;
     };
+
+    AssureNoteServer.prototype.Parse = function (WGSN) {
+        var Reader = new parser.StringReader(WGSN);
+        var Parser = new parser.ParserContext(null);
+        var GSNNode = Parser.ParseNode(Reader);
+        return GSNNode;
+    };
     return AssureNoteServer;
 })();
 
 new AssureNoteServer();
-
