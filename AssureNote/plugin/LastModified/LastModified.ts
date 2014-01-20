@@ -53,7 +53,7 @@ module AssureNote {
             }
         }
 
-        CreateTooltip(NodeView: NodeView): HTMLLIElement[]{
+        CreateTooltipContents(NodeView: NodeView): HTMLLIElement[]{
             var res: HTMLLIElement[] = [];
             var li = document.createElement('li');
             li.innerText = NodeView.Model.Created.Author + ' created.';

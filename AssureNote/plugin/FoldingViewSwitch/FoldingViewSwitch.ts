@@ -29,7 +29,7 @@
 module AssureNote {
 
     export class FoldingCommand extends Command {
-        constructor(App: AssureNoteApp, public FoldingAction: (event: Event, TargetView: NodeView) => void) {
+        constructor(App: AssureNoteApp) {
             super(App);
         }
 
@@ -59,61 +59,54 @@ module AssureNote {
                     this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
                     return;
                 }
-                this.FoldingAction(event, TargetView);
+                this.Fold(TargetView);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
         }
+
+        public Fold(TargetView: NodeView) {
+            var Panel = this.App.PictgramPanel;
+            var ViewPort = Panel.Viewport;
+
+            if (TargetView.GetNodeType() == GSNType.Strategy) {
+                if (TargetView.Children != null) {
+                    for (var i = 0; i < TargetView.Children.length; i++) {
+                        var SubView = TargetView.Children[i];
+                        if (SubView.GetNodeType() == GSNType.Goal) {
+                            SubView.IsFolded = true;
+                        }
+                    }
+                }
+            } else {
+                TargetView.IsFolded = TargetView.IsFolded != true;
+            }
+            var TopGoalView: NodeView = TargetView;
+            while (TopGoalView.Parent != null) {
+                TopGoalView = TopGoalView.Parent;
+            }
+            var X0 = TargetView.GetGX();
+            var Y0 = TargetView.GetGY();
+            Panel.Draw(Panel.MasterView.Label, 300);
+            var X1 = TargetView.GetGX();
+            var Y1 = TargetView.GetGY();
+            var Scale = ViewPort.GetCameraScale();
+            ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
+        }
     }
 
     export class FoldingViewSwitchPlugin extends Plugin {
-        FoldingAction: (event: Event, TargetView: NodeView) => void;
+        private FoldingCommand: FoldingCommand;
 
-        constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(AssureNoteApp: AssureNoteApp) {
             super();
-            this.SetMenuBarButton(true);
             this.SetDoubleClicked(true);
-
-            this.FoldingAction = (event: Event, TargetView: NodeView) => {
-                if (TargetView.GetNodeType() == GSNType.Strategy) {
-                    if (TargetView.Children != null) {
-                        for (var i = 0; i < TargetView.Children.length; i++) {
-                            var SubView = TargetView.Children[i];
-                            if (SubView.GetNodeType() == GSNType.Goal) {
-                                SubView.IsFolded = true;
-                            }
-                        }
-                    }
-                } else {
-                    TargetView.IsFolded = TargetView.IsFolded != true;
-                }
-                var TopGoalView: NodeView = TargetView;
-                while (TopGoalView.Parent != null) {
-                    TopGoalView = TopGoalView.Parent;
-                }
-                var X0 = TargetView.GetGX();
-                var Y0 = TargetView.GetGY();
-                AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
-                var X1 = TargetView.GetGX();
-                var Y1 = TargetView.GetGY();
-                var ViewPort = AssureNoteApp.PictgramPanel.Viewport;
-                var Scale = ViewPort.GetCameraScale();
-                ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
-            };
-            this.AssureNoteApp.RegistCommand(new FoldingCommand(this.AssureNoteApp, this.FoldingAction));
+            this.FoldingCommand = new FoldingCommand(AssureNoteApp);
+            AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
 
         ExecDoubleClicked(NodeView: NodeView): void {
-            var event = document.createEvent("UIEvents");
-            this.FoldingAction(event, NodeView);
-        }
-
-        CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-            if (NodeView.GetNodeType() != GSNType.Goal && NodeView.GetNodeType() != GSNType.Strategy) {
-                return null;
-            }
-            //return new NodeMenuItem("folded-id", "images/copy.png", "fold", this.FoldingAction);
-            return null;
+            this.FoldingCommand.Fold(NodeView);
         }
     }
 }
