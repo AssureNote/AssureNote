@@ -46,6 +46,11 @@ var AssureNote;
 
         EditorUtil.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive) {
             var _this = this;
+            if (this.Timeout) {
+                this.Element.removeClass();
+                clearInterval(this.Timeout);
+            }
+            this.Timeout = null;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
 
@@ -67,9 +72,15 @@ var AssureNote;
                 e.stopPropagation();
                 e.preventDefault();
                 _this.DisableEditor(NodeView, IsRecursive);
+                App.PictgramPanel.ContentLayer.removeEventListener("pointerdown", Callback);
+                App.PictgramPanel.ContentLayer.removeEventListener("contextmenu", Callback);
                 App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
+                App.PictgramPanel.EventMapLayer.removeEventListener("contextmenu", Callback);
             });
+            this.AssureNoteApp.PictgramPanel.ContentLayer.addEventListener("pointerdown", Callback);
+            this.AssureNoteApp.PictgramPanel.ContentLayer.addEventListener("contextmenu", Callback);
             this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);
+            this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("contextmenu", Callback);
             this.TextArea.refresh();
             this.TextArea.focus();
         };
@@ -99,9 +110,10 @@ var AssureNote;
             $(this.Selector).addClass("animated fadeOutUp");
 
             /* Need to wait a bit for the end of animation */
-            setTimeout(function () {
+            this.Timeout = setTimeout(function () {
                 _this.Element.removeClass();
                 _this.Element.css({ display: "none" });
+                _this.Timeout = null;
                 //this.StopEventFlag = false;
             }, 1300);
             return null;

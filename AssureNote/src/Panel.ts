@@ -93,7 +93,7 @@ module AssureNote {
                         Bar.Remove();
                     }
                     if (Tooltip.IsEnable) {
-                        Tooltip.Remove;
+                        Tooltip.Remove();
                     }
                     var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
                     Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
