@@ -279,15 +279,20 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
+            var History: GSNHistory = new GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
+            var Writer: StringWriter = new StringWriter();
+            TagUtils.FormatHistoryTag([History], Writer);
+            console.log(Writer.toString());
+            var WGSN = Writer.toString() + 'Revision:: 0\n*G';
             if (Params.length > 0) {
-                this.App.LoadNewWGSN(Params[0], "* G1");
+                this.App.LoadNewWGSN(Params[0], WGSN);
             } else {
                 var Name = prompt("Enter the file name");
                 if (Name != null) {
                     if (Name == "") {
                         Name = "default.wgsn";
                     }
-                    this.App.LoadNewWGSN(Name, "* G1");
+                    this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
         }
