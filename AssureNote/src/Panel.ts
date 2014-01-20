@@ -190,7 +190,6 @@ module AssureNote {
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null && this.FocusedLabel != Label) {
                     this.FocusedLabel = Label;
-                    this.AssureNoteApp.DebugP("mouseover:" + Label);
                     var Tooltips = this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
                     Tooltip.Create(NodeView, this.ControlLayer, Tooltips);
                 }
@@ -207,7 +206,6 @@ module AssureNote {
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null && Label == this.FocusedLabel) {
                     this.FocusedLabel = null;
-                    this.AssureNoteApp.DebugP("mouseout:" + Label);
                 }
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();

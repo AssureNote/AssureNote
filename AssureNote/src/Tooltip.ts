@@ -54,7 +54,6 @@ module AssureNote {
             var ul: JQuery = $(document.createElement('ul'));
             ul.addClass('list-unstyled');
             for (var i = 0; i < Contents.length; i++) {
-                console.log("add");
                 ul.append(Contents[i]);
             }
             pre.append(ul);
@@ -69,7 +68,7 @@ module AssureNote {
                 position: 'absolute',
                 top: Top,
                 left: Left,
-                display: 'block',
+                display: 'none',
                 opacity: 100
             });
         }
