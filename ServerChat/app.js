@@ -51,14 +51,6 @@ var AssureNoteServer = (function () {
         return res;
     };
 
-    AssureNoteServer.prototype.IsEditable = function (UID) {
-        for (var i = 0; i < this.EditingNodes.length; i++) {
-            if (this.EditingNodes[i]['UID'] == UID)
-                return false;
-        }
-        return true;
-    };
-
     AssureNoteServer.prototype.Parse = function (WGSN) {
         var Reader = new parser.StringReader(WGSN);
         var Parser = new parser.ParserContext(null);

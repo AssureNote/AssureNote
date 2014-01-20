@@ -55,13 +55,6 @@ class AssureNoteServer {
         return res;
     }
 
-    IsEditable(UID: number) {
-        for (var i:number = 0; i < this.EditingNodes.length; i++) {
-            if (this.EditingNodes[i]['UID'] == UID) return false;
-        }
-        return true;
-    }
-
     Parse(WGSN: string) : parser.GSNNode {
         var Reader: parser.StringReader  = new parser.StringReader(WGSN);
         var Parser: parser.ParserContext = new parser.ParserContext(null);

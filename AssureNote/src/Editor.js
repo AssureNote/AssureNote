@@ -68,7 +68,6 @@ var AssureNote;
                 e.stopPropagation();
                 e.preventDefault();
                 _this.DisableEditor(NodeView, IsRecursive);
-                _this.AssureNoteApp.SocketManager.Emit('finishedit', { Label: NodeView.Model.GetLabel(), UID: NodeView.Model.UID });
                 App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
             });
             this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);
@@ -97,6 +96,7 @@ var AssureNote;
                 /* TODO resolve conflict */
                 this.AssureNoteApp.SocketManager.UpdateWGSN();
             }
+            this.AssureNoteApp.SocketManager.Emit('finishedit', { Label: OldNodeView.Model.GetLabel(), UID: OldNodeView.Model.UID });
             this.AssureNoteApp.MasterRecord.CloseEditor();
             $(this.Selector).addClass("animated fadeOutUp");
 

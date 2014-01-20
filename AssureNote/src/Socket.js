@@ -1,4 +1,4 @@
-﻿// ***************************************************************************
+// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -147,12 +147,18 @@ var AssureNote;
         };
 
         SocketManager.prototype.IsEditable = function (UID) {
+            var index = 0;
+            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID);
+
             if (this.EditingNodesID.length == 0)
                 return true;
-            for (var i = 0; i < this.EditingNodesID.length; i++) {
-                if (this.EditingNodesID[i] == UID) {
-                    return false;
+            while (CurrentView != null) {
+                for (var i = 0; i < this.EditingNodesID.length; i++) {
+                    if (this.EditingNodesID[i] == CurrentView.Model.UID) {
+                        return false;
+                    }
                 }
+                CurrentView = CurrentView.Parent;
             }
             return true;
         };
