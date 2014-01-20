@@ -738,7 +738,7 @@ var AssureNote;
         GSNNode.prototype.ReplaceSubNodeAsText = function (DocText) {
             var Reader = new StringReader(DocText);
             var Parser = new ParserContext(null);
-            var NewNode = Parser.ParseNode(Reader, null);
+            var NewNode = Parser.ParseNode(Reader);
             if (NewNode != null) {
                 NewNode = this.ReplaceSubNode(NewNode);
             }
@@ -1076,7 +1076,7 @@ var AssureNote;
             while (Reader.HasNext()) {
                 var Doc = new GSNDoc(this);
                 var Parser = new ParserContext(Doc);
-                Doc.TopNode = Parser.ParseNode(Reader, RefMap);
+                Doc.TopNode = Parser.ParseNode(Reader);
                 Doc.RenumberAll();
             }
         };
@@ -1285,18 +1285,13 @@ var AssureNote;
             return false;
         };
 
-        ParserContext.prototype.CreateNewNode = function (LabelLine, RefMap, Reader) {
+        ParserContext.prototype.CreateNewNode = function (LabelLine, Reader) {
             var NodeType = WikiSyntax.ParseNodeType(LabelLine);
             var LabelName = WikiSyntax.ParseLabelName(LabelLine);
             var LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
             var UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
             var RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
-            var RefNode = null;
             var NewNode = null;
-            if (RefMap != null && LabelNumber != null && RevisionHistory != null) {
-                var RefKey = WikiSyntax.FormatRefKey(NodeType, RevisionHistory);
-                RefNode = RefMap.get(RefKey);
-            }
             var ParentNode = null;
             var HistoryTriple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
             var Level = WikiSyntax.ParseGoalLevel(LabelLine);
@@ -1313,16 +1308,6 @@ var AssureNote;
             if (this.NullableDoc != null) {
                 this.NullableDoc.AddNode(NewNode);
             }
-            if (RefMap != null && HistoryTriple != null) {
-                var RefKey = WikiSyntax.FormatRefKey(NodeType, NewNode.GetHistoryTriple());
-                RefMap.put(RefKey, NewNode);
-            }
-            if (RefNode != null) {
-                NewNode.HasTag = RefNode.HasTag;
-                NewNode.NodeDoc = RefNode.NodeDoc;
-                NewNode.Digest = RefNode.Digest;
-                return null;
-            }
             return NewNode;
         };
 
@@ -1332,7 +1317,7 @@ var AssureNote;
             }
         };
 
-        ParserContext.prototype.ParseNode = function (Reader, RefMap) {
+        ParserContext.prototype.ParseNode = function (Reader) {
             while (Reader.HasNext()) {
                 var Line = Reader.ReadLine();
                 if (Lib.String_startsWith(Line, "*")) {
@@ -1360,7 +1345,7 @@ var AssureNote;
                     }
                     if (this.IsValidSection(Line, Reader)) {
                         this.UpdateContent(LastNode, LineList);
-                        LastNode = this.CreateNewNode(Line, RefMap, Reader);
+                        LastNode = this.CreateNewNode(Line, Reader);
                         continue;
                     }
                 }

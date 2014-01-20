@@ -831,7 +831,7 @@ class GSNNode {
 	}
 
 	// SubNode
-	void FormatSubNode(int GoalLevel, StringWriter Writer) {
+	void FormatSubNode(int GoalLevel, StringWriter Writer, boolean IsRecursive) {
 		Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
 		Writer.print(" ");
 		if (this.LabelName != null) {
@@ -848,18 +848,19 @@ class GSNNode {
 			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
+		if (!IsRecursive) return;
 		Writer.newline();
 		if (this.NonNullSubNodeList() != null) {
 			for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 				/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 				if (Node.IsContext()) {
-					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer, IsRecursive);
 				}
 			}
 			for (/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 				/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
 				if (!Node.IsContext()) {
-					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer, IsRecursive);
 				}
 			}
 		}
@@ -885,7 +886,7 @@ class GSNNode {
 	GSNNode ReplaceSubNodeAsText(String DocText) {
 		/*local*/StringReader Reader = new StringReader(DocText);
 		/*local*/ParserContext Parser = new ParserContext(null);
-		/*local*/GSNNode NewNode = Parser.ParseNode(Reader, null);
+		/*local*/GSNNode NewNode = Parser.ParseNode(Reader);
 		if(NewNode != null) {
 			NewNode = this.ReplaceSubNode(NewNode);
 		}
@@ -1230,7 +1231,7 @@ class GSNRecord {
 		while (Reader.HasNext()) {
 			/*local*/GSNDoc Doc = new GSNDoc(this);
 			/*local*/ParserContext Parser = new ParserContext(Doc);
-			Doc.TopNode = Parser.ParseNode(Reader, RefMap);
+			Doc.TopNode = Parser.ParseNode(Reader);
 			Doc.RenumberAll();
 		}
 	}
@@ -1444,18 +1445,13 @@ class ParserContext {
 		return false;
 	}
 
-	GSNNode CreateNewNode(String LabelLine, HashMap<String, GSNNode> RefMap, StringReader Reader) {
+	GSNNode CreateNewNode(String LabelLine, StringReader Reader) {
 		/*local*/GSNType NodeType = WikiSyntax.ParseNodeType(LabelLine);
 		/*local*/String LabelName = WikiSyntax.ParseLabelName(LabelLine);
 		/*local*/String LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine); /* NOTE: LabelNumber WILL BE NEVER USED */
 		/*local*/int UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
 		/*local*/String RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
-		/*local*/GSNNode RefNode = null;
 		/*local*/GSNNode NewNode = null;
-		if (RefMap != null && LabelNumber != null && RevisionHistory != null) {
-			/*local*/String RefKey = WikiSyntax.FormatRefKey(NodeType, RevisionHistory);
-			RefNode = RefMap.get(RefKey);
-		}
 		/*local*/GSNNode ParentNode = null;
 		/*local*/GSNHistory[] HistoryTriple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
 		/*local*/int Level = WikiSyntax.ParseGoalLevel(LabelLine);
@@ -1472,16 +1468,6 @@ class ParserContext {
 		if(this.NullableDoc != null) {
 			this.NullableDoc.AddNode(NewNode);
 		}
-		if (RefMap != null && HistoryTriple != null) {
-			/*local*/String RefKey = WikiSyntax.FormatRefKey(NodeType, NewNode.GetHistoryTriple());
-			RefMap.put(RefKey, NewNode);
-		}
-		if(RefNode != null) {
-			NewNode.HasTag = RefNode.HasTag;
-			NewNode.NodeDoc = RefNode.NodeDoc;
-			NewNode.Digest = RefNode.Digest;
-			return null;
-		}
 		return NewNode;
 	}
 	
@@ -1491,7 +1477,7 @@ class ParserContext {
 		}
 	}
 
-	GSNNode ParseNode(StringReader Reader, HashMap<String, GSNNode> RefMap) {
+	GSNNode ParseNode(StringReader Reader) {
 		while (Reader.HasNext()) {
 			/*local*/String Line = Reader.ReadLine();
 			if (Lib.String_startsWith(Line, "*")) {
@@ -1519,7 +1505,7 @@ class ParserContext {
 				}
 				if (this.IsValidSection(Line, Reader)) {
 					this.UpdateContent(LastNode, LineList);
-					LastNode = this.CreateNewNode(Line, RefMap, Reader);
+					LastNode = this.CreateNewNode(Line, Reader);
 					continue;
 				}
 			}

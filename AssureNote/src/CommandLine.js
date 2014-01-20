@@ -124,7 +124,9 @@ var AssureNote;
 
         CommandLine.prototype.LoadHistory = function () {
             var list = localStorage.getItem("commandline:history");
-            this.HistoryList = JSON.parse(list);
+            if (list != null) {
+                this.HistoryList = JSON.parse(list);
+            }
         };
 
         //TODO recognize : or / or @

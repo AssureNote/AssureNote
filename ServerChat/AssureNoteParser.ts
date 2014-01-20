@@ -686,7 +686,7 @@ export class GSNNode {
 	}
 
 	// SubNode
-	FormatSubNode(GoalLevel: number, Writer: StringWriter): void {
+	FormatSubNode(GoalLevel: number, Writer: StringWriter, IsRecursive: boolean): void {
 		Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
 		Writer.print(" ");
 		if (this.LabelName != null) {
@@ -703,18 +703,19 @@ export class GSNNode {
 			Writer.print(this.NodeDoc);
 			Writer.newline();
 		}
+		if (!IsRecursive) return;
 		Writer.newline();
 		if (this.NonNullSubNodeList() != null) {
 			for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 				var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 				if (Node.IsContext()) {
-					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer, IsRecursive);
 				}
 			}
 			for (var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 				var Node: GSNNode = Lib.Array_get(this.NonNullSubNodeList(), i);
 				if (!Node.IsContext()) {
-					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer);
+					Node.FormatSubNode(Node.IsGoal() ? GoalLevel+1 : GoalLevel, Writer, IsRecursive);
 				}
 			}
 		}
@@ -739,7 +740,7 @@ export class GSNNode {
 	ReplaceSubNodeAsText(DocText: string): GSNNode {
 		var Reader: StringReader = new StringReader(DocText);
 		var Parser: ParserContext = new ParserContext(null);
-		var NewNode: GSNNode = Parser.ParseNode(Reader, null);
+		var NewNode: GSNNode = Parser.ParseNode(Reader);
 		if(NewNode != null) {
 			NewNode = this.ReplaceSubNode(NewNode);
 		}
@@ -1081,7 +1082,7 @@ export class GSNRecord {
 		while (Reader.HasNext()) {
 			var Doc: GSNDoc = new GSNDoc(this);
 			var Parser: ParserContext = new ParserContext(Doc);
-			Doc.TopNode = Parser.ParseNode(Reader, RefMap);
+			Doc.TopNode = Parser.ParseNode(Reader);
 			Doc.RenumberAll();
 		}
 	}
@@ -1295,18 +1296,13 @@ export class ParserContext {
 		return false;
 	}
 
-	CreateNewNode(LabelLine: string, RefMap: HashMap<string, GSNNode>, Reader: StringReader): GSNNode {
+	CreateNewNode(LabelLine: string, Reader: StringReader): GSNNode {
 		var NodeType: GSNType = WikiSyntax.ParseNodeType(LabelLine);
 		var LabelName: string = WikiSyntax.ParseLabelName(LabelLine);
 		var LabelNumber: string = WikiSyntax.ParseLabelNumber(LabelLine); /* NOTE: LabelNumber WILL BE NEVER USED */
 		var UID: number = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
 		var RevisionHistory: string = WikiSyntax.ParseRevisionHistory(LabelLine);
-		var RefNode: GSNNode = null;
 		var NewNode: GSNNode = null;
-		if (RefMap != null && LabelNumber != null && RevisionHistory != null) {
-			var RefKey: string = WikiSyntax.FormatRefKey(NodeType, RevisionHistory);
-			RefNode = RefMap.get(RefKey);
-		}
 		var ParentNode: GSNNode = null;
 		var HistoryTriple: GSNHistory[] = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
 		var Level: number = WikiSyntax.ParseGoalLevel(LabelLine);
@@ -1323,16 +1319,6 @@ export class ParserContext {
 		if(this.NullableDoc != null) {
 			this.NullableDoc.AddNode(NewNode);
 		}
-		if (RefMap != null && HistoryTriple != null) {
-			var RefKey: string = WikiSyntax.FormatRefKey(NodeType, NewNode.GetHistoryTriple());
-			RefMap.put(RefKey, NewNode);
-		}
-		if(RefNode != null) {
-			NewNode.HasTag = RefNode.HasTag;
-			NewNode.NodeDoc = RefNode.NodeDoc;
-			NewNode.Digest = RefNode.Digest;
-			return null;
-		}
 		return NewNode;
 	}
 	
@@ -1342,7 +1328,7 @@ export class ParserContext {
 		}
 	}
 
-	ParseNode(Reader: StringReader, RefMap: HashMap<string, GSNNode>): GSNNode {
+	ParseNode(Reader: StringReader): GSNNode {
 		while (Reader.HasNext()) {
 			var Line: string = Reader.ReadLine();
 			if (Lib.String_startsWith(Line, "*")) {
@@ -1370,7 +1356,7 @@ export class ParserContext {
 				}
 				if (this.IsValidSection(Line, Reader)) {
 					this.UpdateContent(LastNode, LineList);
-					LastNode = this.CreateNewNode(Line, RefMap, Reader);
+					LastNode = this.CreateNewNode(Line, Reader);
 					continue;
 				}
 			}

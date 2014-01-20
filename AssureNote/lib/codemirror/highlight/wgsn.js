@@ -4,7 +4,6 @@ CodeMirror.defineMode("wgsn", function(cmCfg, modeCfg) {
     }
     var mode = {};
     mode.token = function(stream, state) {
-    console.log(stream);
     if (stream.sol() && stream.eatWhile("*")) {
         return 'highlight-asterisks';
     }

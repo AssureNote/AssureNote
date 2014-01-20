@@ -680,7 +680,7 @@ var GSNNode = (function () {
     };
 
     // SubNode
-    GSNNode.prototype.FormatSubNode = function (GoalLevel, Writer) {
+    GSNNode.prototype.FormatSubNode = function (GoalLevel, Writer, IsRecursive) {
         Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
         Writer.print(" ");
         if (this.LabelName != null) {
@@ -698,18 +698,20 @@ var GSNNode = (function () {
             Writer.print(this.NodeDoc);
             Writer.newline();
         }
+        if (!IsRecursive)
+            return;
         Writer.newline();
         if (this.NonNullSubNodeList() != null) {
             for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                 var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
                 if (Node.IsContext()) {
-                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer);
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
                 }
             }
             for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
                 var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
                 if (!Node.IsContext()) {
-                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer);
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
                 }
             }
         }
@@ -734,7 +736,7 @@ var GSNNode = (function () {
     GSNNode.prototype.ReplaceSubNodeAsText = function (DocText) {
         var Reader = new StringReader(DocText);
         var Parser = new ParserContext(null);
-        var NewNode = Parser.ParseNode(Reader, null);
+        var NewNode = Parser.ParseNode(Reader);
         if (NewNode != null) {
             NewNode = this.ReplaceSubNode(NewNode);
         }
@@ -1072,7 +1074,7 @@ var GSNRecord = (function () {
         while (Reader.HasNext()) {
             var Doc = new GSNDoc(this);
             var Parser = new ParserContext(Doc);
-            Doc.TopNode = Parser.ParseNode(Reader, RefMap);
+            Doc.TopNode = Parser.ParseNode(Reader);
             Doc.RenumberAll();
         }
     };
@@ -1281,18 +1283,13 @@ var ParserContext = (function () {
         return false;
     };
 
-    ParserContext.prototype.CreateNewNode = function (LabelLine, RefMap, Reader) {
+    ParserContext.prototype.CreateNewNode = function (LabelLine, Reader) {
         var NodeType = WikiSyntax.ParseNodeType(LabelLine);
         var LabelName = WikiSyntax.ParseLabelName(LabelLine);
         var LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
         var UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
         var RevisionHistory = WikiSyntax.ParseRevisionHistory(LabelLine);
-        var RefNode = null;
         var NewNode = null;
-        if (RefMap != null && LabelNumber != null && RevisionHistory != null) {
-            var RefKey = WikiSyntax.FormatRefKey(NodeType, RevisionHistory);
-            RefNode = RefMap.get(RefKey);
-        }
         var ParentNode = null;
         var HistoryTriple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
         var Level = WikiSyntax.ParseGoalLevel(LabelLine);
@@ -1309,16 +1306,6 @@ var ParserContext = (function () {
         if (this.NullableDoc != null) {
             this.NullableDoc.AddNode(NewNode);
         }
-        if (RefMap != null && HistoryTriple != null) {
-            var RefKey = WikiSyntax.FormatRefKey(NodeType, NewNode.GetHistoryTriple());
-            RefMap.put(RefKey, NewNode);
-        }
-        if (RefNode != null) {
-            NewNode.HasTag = RefNode.HasTag;
-            NewNode.NodeDoc = RefNode.NodeDoc;
-            NewNode.Digest = RefNode.Digest;
-            return null;
-        }
         return NewNode;
     };
 
@@ -1328,7 +1315,7 @@ var ParserContext = (function () {
         }
     };
 
-    ParserContext.prototype.ParseNode = function (Reader, RefMap) {
+    ParserContext.prototype.ParseNode = function (Reader) {
         while (Reader.HasNext()) {
             var Line = Reader.ReadLine();
             if (Lib.String_startsWith(Line, "*")) {
@@ -1356,7 +1343,7 @@ var ParserContext = (function () {
                 }
                 if (this.IsValidSection(Line, Reader)) {
                     this.UpdateContent(LastNode, LineList);
-                    LastNode = this.CreateNewNode(Line, RefMap, Reader);
+                    LastNode = this.CreateNewNode(Line, Reader);
                     continue;
                 }
             }
