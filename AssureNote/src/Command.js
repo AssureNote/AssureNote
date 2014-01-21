@@ -61,7 +61,7 @@ var AssureNote;
             }
             var Node = this.App.PictgramPanel.ViewMap[Label];
             if (CommandName == "" && Node == null) {
-                Label = this.App.PictgramPanel.FocusedLabel;
+                Label = this.App.PictgramPanel.GetFocusedLabel();
                 Node = this.App.PictgramPanel.ViewMap[Label];
             }
             if (Node != null) {

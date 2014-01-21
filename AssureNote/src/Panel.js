@@ -48,30 +48,18 @@ var AssureNote;
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 _this.AssureNoteApp.DebugP("click:" + Label);
+                _this.ChangeFocusedLabel(Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                 }
-                var NodeView = _this.ViewMap[Label];
-                if (NodeView != null) {
-                    var oldNodeView = _this.ViewMap[_this.FocusedLabel];
-                    if (oldNodeView != null) {
-                        oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
-                    }
-                    _this.FocusedLabel = Label;
-                    NodeView.ChangeColorStyle(AssureNote.ColorStyle.Highlight);
-                }
                 event.preventDefault();
             });
 
             this.EventMapLayer.addEventListener("pointerdown", function (event) {
-                var oldNodeView = _this.ViewMap[_this.FocusedLabel];
-                if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
-                }
-                _this.FocusedLabel = null;
+                _this.ChangeFocusedLabel(null);
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -84,7 +72,7 @@ var AssureNote;
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = _this.ViewMap[Label];
                 if (NodeView != null) {
-                    _this.FocusedLabel = Label;
+                    _this.ChangeFocusedLabel(Label);
                     if (Bar.IsEnable) {
                         Bar.Remove();
                     }
@@ -271,6 +259,33 @@ var AssureNote;
                     }
                 }
             });
+        };
+
+        /**
+        if label is null, there is no focused label.
+        */
+        PictgramPanel.prototype.ChangeFocusedLabel = function (Label) {
+            if (Label == null) {
+                var oldNodeView = this.ViewMap[this.FocusedLabel];
+                if (oldNodeView != null) {
+                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                }
+                this.FocusedLabel = null;
+                return;
+            }
+            var NodeView = this.ViewMap[Label];
+            if (NodeView != null) {
+                var oldNodeView = this.ViewMap[this.FocusedLabel];
+                if (oldNodeView != null) {
+                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                }
+                this.FocusedLabel = Label;
+                NodeView.ChangeColorStyle(AssureNote.ColorStyle.Highlight);
+            }
+        };
+
+        PictgramPanel.prototype.GetFocusedLabel = function () {
+            return this.FocusedLabel;
         };
 
         PictgramPanel.prototype.InitializeView = function (NodeView) {

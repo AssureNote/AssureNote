@@ -47,7 +47,7 @@ module AssureNote {
         Search: Search;
 
         CurrentDoc: GSNDoc;// Convert to caseview
-        FocusedLabel: string;// A label pointed out or clicked.
+        private FocusedLabel: string;// A label pointed out or clicked.
         FocusedWx: number;
         FocusedWy: number;
 
@@ -64,30 +64,18 @@ module AssureNote {
             this.ContentLayer.addEventListener("click", (event: MouseEvent) => {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 this.AssureNoteApp.DebugP("click:" + Label);
+                this.ChangeFocusedLabel(Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                 }
-                var NodeView = this.ViewMap[Label];
-                if (NodeView != null) {
-                    var oldNodeView = this.ViewMap[this.FocusedLabel];
-                    if (oldNodeView != null) {
-                        oldNodeView.ChangeColorStyle(ColorStyle.Default);
-                    }
-                    this.FocusedLabel = Label;
-                    NodeView.ChangeColorStyle(ColorStyle.Highlight);
-                }
                 event.preventDefault();
             });
 
             this.EventMapLayer.addEventListener("pointerdown", (event: MouseEvent) => {
-                var oldNodeView = this.ViewMap[this.FocusedLabel];
-                if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
-                }
-                this.FocusedLabel = null;
+                this.ChangeFocusedLabel(null);
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -100,7 +88,7 @@ module AssureNote {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null) {
-                    this.FocusedLabel = Label;
+                    this.ChangeFocusedLabel(Label);
                     if (Bar.IsEnable) {
                         Bar.Remove();
                     }
@@ -293,6 +281,33 @@ module AssureNote {
                     }
                 }
             });
+        }
+
+        /**
+           if label is null, there is no focused label.
+        */
+        ChangeFocusedLabel(Label: string): void {
+            if (Label == null) {
+                var oldNodeView = this.ViewMap[this.FocusedLabel];
+                if (oldNodeView != null) {
+                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                }
+                this.FocusedLabel = null;
+                return;
+            }
+            var NodeView = this.ViewMap[Label];
+            if (NodeView != null) {
+                var oldNodeView = this.ViewMap[this.FocusedLabel];
+                if (oldNodeView != null) {
+                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                }
+                this.FocusedLabel = Label;
+                NodeView.ChangeColorStyle(ColorStyle.Highlight);
+            }
+        }
+
+        GetFocusedLabel(): string {
+            return this.FocusedLabel;
         }
 
         InitializeView(NodeView: NodeView): void {
