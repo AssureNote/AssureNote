@@ -76,6 +76,12 @@ module AssureNote {
             });
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
+
+        RenderSVG (ShapeGroup: SVGGElement, NodeView: NodeView): void {
+            if () {
+
+            }
+        }
     }
 
     export class ConnectServerPlugin extends Plugin {

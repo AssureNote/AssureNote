@@ -72,11 +72,10 @@ var AssureNote;
                 return;
             }
 
-            if (method == 'startedit' && !this.IsEditable(params.UID)) {
-                $.notify("Warning:Other user edits this Node!", "warn");
-                return;
-            }
-
+            //            if (method == 'startedit' && !this.IsEditable(params.UID)) {
+            //                (<any>$).notify("Warning:Other user edits this Node!", "warn");
+            //                return;
+            //            }
             this.socket.emit(method, params);
         };
 
@@ -99,12 +98,14 @@ var AssureNote;
             });
             this.socket.on('startedit', function (data) {
                 console.log('edit');
-                self.EditingNodesID.push(data.UID);
+                self.EditingNodesID.push(data);
+                self.SetColor(data);
                 console.log('here is ID array = ' + self.EditingNodesID);
             });
             this.socket.on('finishedit', function (data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
+                self.SetDefaultColor(data.UID);
                 console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
@@ -139,7 +140,7 @@ var AssureNote;
 
         SocketManager.prototype.DeleteID = function (UID) {
             for (var i = 0; i < this.EditingNodesID.length; i++) {
-                if (this.EditingNodesID[i] == UID) {
+                if (this.EditingNodesID[i]["UID"] == UID) {
                     this.EditingNodesID.splice(i, 1);
                     return;
                 }
@@ -148,19 +149,31 @@ var AssureNote;
 
         SocketManager.prototype.IsEditable = function (UID) {
             var index = 0;
-            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID);
+            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID).Parent;
 
             if (this.EditingNodesID.length == 0)
                 return true;
+            for (var i = 0; i < this.EditingNodesID.length; i++) {
+                if (this.EditingNodesID[i]["UID"] == UID) {
+                    return false;
+                }
+            }
+
             while (CurrentView != null) {
                 for (var i = 0; i < this.EditingNodesID.length; i++) {
-                    if (this.EditingNodesID[i] == CurrentView.Model.UID) {
+                    if (this.EditingNodesID[i]["EditorFlag"] && this.EditingNodesID[i]["UID"] == CurrentView.Model.UID) {
                         return false;
                     }
                 }
                 CurrentView = CurrentView.Parent;
             }
             return true;
+        };
+
+        SocketManager.prototype.SetColor = function (data) {
+        };
+
+        SocketManager.prototype.SetDefaultColor = function (UID) {
         };
 
         SocketManager.prototype.StartEdit = function (data) {

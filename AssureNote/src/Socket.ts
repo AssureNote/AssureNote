@@ -73,10 +73,10 @@ module AssureNote {
                 return;
             }
 
-            if (method == 'startedit' && !this.IsEditable(params.UID)) {
-                (<any>$).notify("Warning:Other user edits this Node!", "warn");
-                return;
-            }
+//            if (method == 'startedit' && !this.IsEditable(params.UID)) {
+//                (<any>$).notify("Warning:Other user edits this Node!", "warn");
+//                return;
+//            }
 
             this.socket.emit(method, params);
         }
@@ -100,12 +100,14 @@ module AssureNote {
             });
             this.socket.on('startedit', function(data) {
                 console.log('edit');
-                self.EditingNodesID.push(data.UID);
+                self.EditingNodesID.push(data);
+//                self.SetColor(data);
                 console.log('here is ID array = ' + self.EditingNodesID);
             });
             this.socket.on('finishedit', function(data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
+//                self.SetDefaultColor(data.UID);
                 console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
@@ -140,8 +142,8 @@ module AssureNote {
 
         DeleteID(UID:number) {
             for (var i:number = 0; i < this.EditingNodesID.length; i++) {
-                if (this.EditingNodesID[i] == UID) {
-                    this.EditingNodesID.splice(i, 1); 
+                if (this.EditingNodesID[i]["UID"] == UID) {
+                    this.EditingNodesID.splice(i, 1);
                     return;
                 }
             }
@@ -149,12 +151,18 @@ module AssureNote {
 
         IsEditable(UID: number) {
             var index: number = 0;
-            var CurrentView: NodeView  = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID);
+            var CurrentView: NodeView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID).Parent;
 
             if (this.EditingNodesID.length == 0) return true;
+            for (var i:number = 0; i < this.EditingNodesID.length; i++) {
+                if (this.EditingNodesID[i]["UID"] == UID) {
+                    return false;
+                }
+            }
+
             while (CurrentView != null) {
                 for (var i:number = 0; i < this.EditingNodesID.length; i++) {
-                    if (this.EditingNodesID[i] == CurrentView.Model.UID) {
+                    if (this.EditingNodesID[i]["EditorFlag"] && this.EditingNodesID[i]["UID"] == CurrentView.Model.UID) {
                         return false;
                     }
                 }
@@ -162,6 +170,23 @@ module AssureNote {
             }
             return true;
         }
+
+        SetColor(data: {Label: string; UID: number; Flag: boolean;}) {
+            var CurrentView: NodeView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+            CurrentView.ChangeColorStyle(ColorStyle.Editing);
+            if (!Flag) {
+                return;
+            }
+            for (var i: number = 0; i < CurrentView.Children.length; i++) {
+                Current.ChangeColorStyle(ColorStyle.Editing);
+                ChangeColor(CurrentNodeView, ColorStyle);
+            }
+        }
+
+        SetDefaultColor(UID: number) {
+
+        }
+
 
         StartEdit(data: {Label: string; UID: number}) {
             this.Emit('startedit' ,data);

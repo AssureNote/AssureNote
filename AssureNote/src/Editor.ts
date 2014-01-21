@@ -53,7 +53,7 @@ module AssureNote {
             this.Timeout = null;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
-            this.AssureNoteApp.SocketManager.StartEdit({Label: Model.GetLabel(), UID: Model.UID});
+            this.AssureNoteApp.SocketManager.StartEdit({"Label": Model.GetLabel(), "UID": Model.UID, "EditorFlag": IsRecursive});
 
             var Callback = (event: MouseEvent) => {
                 this.Element.blur();
@@ -105,7 +105,7 @@ module AssureNote {
                 /* TODO resolve conflict */
                 this.AssureNoteApp.SocketManager.UpdateWGSN();
             }
-            this.AssureNoteApp.SocketManager.Emit('finishedit', {Label: OldNodeView.Model.GetLabel(), UID: OldNodeView.Model.UID});
+            this.AssureNoteApp.SocketManager.Emit('finishedit', {"Label": OldNodeView.Model.GetLabel(), "UID": OldNodeView.Model.UID});
             this.AssureNoteApp.MasterRecord.CloseEditor();
             $(this.Selector).addClass("animated fadeOutUp");
 

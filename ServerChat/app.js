@@ -32,10 +32,11 @@ var AssureNoteServer = (function () {
             socket.broadcast.emit('update', data);
         });
         socket.on('startedit', function (data) {
-            data['socketId'] = socket.id;
             self.EditingNodes.push(data);
+            console.log("this is the data we receive" + data);
             console.log("this is editing list" + this.EditingNodes);
             socket.broadcast.emit('startedit', data);
+            data['socketId'] = socket.id;
         });
         socket.on('finishedit', function (data) {
             socket.broadcast.emit('finishedit', data);

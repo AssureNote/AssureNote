@@ -183,6 +183,7 @@ module AssureNote {
         static Searched: string = "assurenote-search";
         static SearchHighlight: string = "assurenote-search-highlight";
         static Danger: string = "assurenote-danger";
+        static Editing: string = "assurenote-editing";
     }
 
     export class Rect {
