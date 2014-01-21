@@ -70,12 +70,15 @@ module AssureNote {
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                 }
+                var NodeView = this.ViewMap[Label];
+                if (NodeView != null) {
+                    this.FocusedLabel = Label;
+                }
                 event.preventDefault();
             });
 
-            //FIXME
             this.EventMapLayer.addEventListener("pointerdown", (event: MouseEvent) => {
-                //this.FocusedLabel = null;
+                this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -107,7 +110,7 @@ module AssureNote {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = this.ViewMap[Label];
                 this.AssureNoteApp.DebugP("double click:" + Label);
-                if (Bar.IsEnable) { //TODO cancel click event
+                if (Bar.IsEnable) {
                     Bar.Remove();
                 }
                 if (Tooltip.IsEnable) {
@@ -199,14 +202,15 @@ module AssureNote {
                 }
             });
 
+            var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", (event: MouseEvent) => {
                 if (!this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
                 var Label = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = this.ViewMap[Label];
-                if (NodeView != null && this.FocusedLabel != Label) {
-                    this.FocusedLabel = Label;
+                if (NodeView != null && ToolTipFocusedLabel != Label) {
+                    ToolTipFocusedLabel = Label;
                     var Tooltips = this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
                     Tooltip.Create(NodeView, this.ControlLayer, Tooltips);
                 }
@@ -219,13 +223,10 @@ module AssureNote {
                 if (!this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
-                var Label = this.FocusedLabel;
-                var NodeView = this.ViewMap[Label];
-                if (NodeView != null && Label == this.FocusedLabel) {
-                    this.FocusedLabel = null;
-                }
+
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
+                    ToolTipFocusedLabel = null;
                 }
             });
 

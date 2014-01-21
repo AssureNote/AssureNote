@@ -54,12 +54,15 @@ var AssureNote;
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                 }
+                var NodeView = _this.ViewMap[Label];
+                if (NodeView != null) {
+                    _this.FocusedLabel = Label;
+                }
                 event.preventDefault();
             });
 
-            //FIXME
             this.EventMapLayer.addEventListener("pointerdown", function (event) {
-                //this.FocusedLabel = null;
+                _this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -182,14 +185,15 @@ var AssureNote;
                 }
             });
 
+            var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = _this.ViewMap[Label];
-                if (NodeView != null && _this.FocusedLabel != Label) {
-                    _this.FocusedLabel = Label;
+                if (NodeView != null && ToolTipFocusedLabel != Label) {
+                    ToolTipFocusedLabel = Label;
                     var Tooltips = _this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
                     Tooltip.Create(NodeView, _this.ControlLayer, Tooltips);
                 }
@@ -202,13 +206,10 @@ var AssureNote;
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
                 }
-                var Label = _this.FocusedLabel;
-                var NodeView = _this.ViewMap[Label];
-                if (NodeView != null && Label == _this.FocusedLabel) {
-                    _this.FocusedLabel = null;
-                }
+
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
+                    ToolTipFocusedLabel = null;
                 }
             });
 
