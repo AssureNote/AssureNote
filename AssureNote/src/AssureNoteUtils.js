@@ -145,6 +145,7 @@ var AssureNote;
         ColorStyle.Searched = "assurenote-search";
         ColorStyle.SearchHighlight = "assurenote-search-highlight";
         ColorStyle.Danger = "assurenote-danger";
+        ColorStyle.Editing = "assurenote-editing";
         return ColorStyle;
     })();
     AssureNote.ColorStyle = ColorStyle;

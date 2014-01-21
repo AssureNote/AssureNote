@@ -99,13 +99,19 @@ var AssureNote;
             this.socket.on('startedit', function (data) {
                 console.log('edit');
                 self.EditingNodesID.push(data);
-                this.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+                var NewNodeView = new AssureNote.NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
+                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
+                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
+                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
                 console.log('here is ID array = ' + self.EditingNodesID);
             });
             this.socket.on('finishedit', function (data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
-                this.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+                var NewNodeView = new AssureNote.NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
+                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
+                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
+                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
                 console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
@@ -168,18 +174,6 @@ var AssureNote;
                 CurrentView = CurrentView.Parent;
             }
             return true;
-        };
-
-        SocketManager.prototype.SetColor = function (data) {
-            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
-            CurrentView.ChangeColorStyle(AssureNote.ColorStyle.Editing);
-            if (!Flag) {
-                return;
-            }
-            for (var i = 0; i < CurrentView.Children.length; i++) {
-                Current.ChangeColorStyle(AssureNote.ColorStyle.Editing);
-                ChangeColor(CurrentNodeView, AssureNote.ColorStyle);
-            }
         };
 
         SocketManager.prototype.SetDefaultColor = function (UID) {

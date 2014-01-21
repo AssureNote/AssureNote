@@ -101,13 +101,19 @@ module AssureNote {
             this.socket.on('startedit', function(data) {
                 console.log('edit');
                 self.EditingNodesID.push(data);
-                this.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+                var NewNodeView: NodeView = new NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
+                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
+                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
+                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
                 console.log('here is ID array = ' + self.EditingNodesID);
             });
             this.socket.on('finishedit', function(data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
-                this.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+                var NewNodeView: NodeView = new NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
+                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
+                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
+                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
                 console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
@@ -169,18 +175,6 @@ module AssureNote {
                 CurrentView = CurrentView.Parent;
             }
             return true;
-        }
-
-        SetColor(data: {Label: string; UID: number; Flag: boolean;}) {
-            var CurrentView: NodeView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
-            CurrentView.ChangeColorStyle(ColorStyle.Editing);
-            if (!Flag) {
-                return;
-            }
-            for (var i: number = 0; i < CurrentView.Children.length; i++) {
-                Current.ChangeColorStyle(ColorStyle.Editing);
-                ChangeColor(CurrentNodeView, ColorStyle);
-            }
         }
 
         SetDefaultColor(UID: number) {
