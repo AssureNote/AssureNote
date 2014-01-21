@@ -103,6 +103,8 @@ var AssureNote;
 
             this.CmdLine = new AssureNote.CommandLine();
             this.Search = new AssureNote.Search(AssureNoteApp);
+
+            // Following event handler is a little dirty. We need refactoring.
             document.addEventListener("keydown", function (event) {
                 if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
                     return;
@@ -145,14 +147,28 @@ var AssureNote;
                             _this.CmdLine.Clear();
                         }
                         break;
+                    case 37:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.Viewport.Move(-100, 0, _this.Viewport.GetCameraScale(), 50);
+                        }
+                        break;
                     case 38:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowPrevHistory();
+                        } else {
+                            _this.Viewport.Move(0, -100, _this.Viewport.GetCameraScale(), 50);
+                        }
+                        break;
+                    case 39:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.Viewport.Move(100, 0, _this.Viewport.GetCameraScale(), 50);
                         }
                         break;
                     case 40:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowNextHistory();
+                        } else {
+                            _this.Viewport.Move(0, 100, _this.Viewport.GetCameraScale(), 50);
                         }
                         break;
                     case 8:

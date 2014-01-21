@@ -49,5 +49,12 @@ $(() => {
         }, 100);
     }
 
+    Debug.ShowFocusedLabel = () => {
+        setInterval(() => {
+            var p = Debug.AssureNote.PictgramPanel;
+            document.title = p.FocusedLabel || "(not selected)"
+        }, 100);
+    }
+
     App.LoadDefaultWGSN();
 });
