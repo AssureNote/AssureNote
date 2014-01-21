@@ -40,13 +40,15 @@ var AssureNote;
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
+            this.RegistCommand(new AssureNote.SaveSVGCommand(this));
+            this.RegistCommand(new AssureNote.SaveWGSNCommand(this));
+            this.RegistCommand(new AssureNote.SaveDCaseCommand(this));
             this.RegistCommand(new AssureNote.OpenCommand(this));
             this.RegistCommand(new AssureNote.NewCommand(this));
             this.RegistCommand(new AssureNote.UnfoldAllCommand(this));
             this.RegistCommand(new AssureNote.SetColorCommand(this));
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
             this.RegistCommand(new AssureNote.HelpCommand(this));
-            this.RegistCommand(new AssureNote.SaveSVGCommand(this));
             this.RegistCommand(new AssureNote.UploadCommand(this));
 
             this.PluginManager.LoadPlugin();

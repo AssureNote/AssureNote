@@ -90,29 +90,67 @@ var AssureNote;
         SaveCommand.prototype.Invoke = function (CommandName, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             var Extention = Filename.split(".").pop();
-            var StringToWrite = "";
-            switch (Extention) {
-                case "dcase_model":
-                    StringToWrite = this.ConvertToDCaseXML(this.App.MasterRecord.GetLatestDoc().TopNode);
-                    break;
-                default:
-                    if (Extention != "wgsn") {
-                        Extention = "wgsn";
-                        Filename += ".wgsn";
-                    }
-                    var Writer = new AssureNote.StringWriter();
-                    this.App.MasterRecord.FormatRecord(Writer);
-                    StringToWrite = Writer.toString();
-                    break;
+            var SaveCommand = this.App.FindCommandByCommandLineName("save-as-" + Extention);
+            if (SaveCommand) {
+                SaveCommand.Invoke(CommandName, Params);
+                return;
             }
-            AssureNote.AssureNoteUtils.SaveAs(StringToWrite, Filename);
+            var Writer = new AssureNote.StringWriter();
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Filename);
         };
 
         SaveCommand.prototype.GetHelpHTML = function () {
-            return "<code>save [name]</code><br>Save editing GSN.<dl><dt>[name]</dt><dd>File name to save.</dd></dl>";
+            return "<code>save [name]</code><br>Save editing GSN.";
+        };
+        return SaveCommand;
+    })(Command);
+    AssureNote.SaveCommand = SaveCommand;
+
+    var SaveWGSNCommand = (function (_super) {
+        __extends(SaveWGSNCommand, _super);
+        function SaveWGSNCommand(App) {
+            _super.call(this, App);
+            this.App = App;
+        }
+        SaveWGSNCommand.prototype.GetCommandLineNames = function () {
+            return ["save-as-wgsn", "SaveAsWgsn"];
         };
 
-        SaveCommand.prototype.ConvertToDCaseXML = function (root) {
+        SaveWGSNCommand.prototype.GetHelpHTML = function () {
+            return "<code>" + this.GetCommandLineNames()[0] + " [name]</code><br>Save editing GSN as WGSN file.";
+        };
+
+        SaveWGSNCommand.prototype.Invoke = function (CommandName, Params) {
+            var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
+            var Writer = new AssureNote.StringWriter();
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Filename);
+        };
+        return SaveWGSNCommand;
+    })(Command);
+    AssureNote.SaveWGSNCommand = SaveWGSNCommand;
+
+    var SaveDCaseCommand = (function (_super) {
+        __extends(SaveDCaseCommand, _super);
+        function SaveDCaseCommand(App) {
+            _super.call(this, App);
+            this.App = App;
+        }
+        SaveDCaseCommand.prototype.GetCommandLineNames = function () {
+            return ["save-as-dcase_model", "SaveAsDCaseModel"];
+        };
+
+        SaveDCaseCommand.prototype.Invoke = function (CommandName, Params) {
+            var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".dcase_model");
+            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToDCaseXML(this.App.MasterRecord.GetLatestDoc().TopNode), Filename);
+        };
+
+        SaveDCaseCommand.prototype.GetHelpHTML = function () {
+            return "<code>" + this.GetCommandLineNames()[0] + " [name]</code><br>Save editing GSN as dcase_model file.";
+        };
+
+        SaveDCaseCommand.prototype.ConvertToDCaseXML = function (root) {
             var dcaseNS = "http://www.dependable-os.net/2013/11/dcase_model/";
             var xsiNS = "http://www.w3.org/2001/XMLSchema-instance";
 
@@ -183,9 +221,9 @@ var AssureNote;
             DummyNode.appendChild(DCaseArgumentXML);
             return '<?xml version="1.0" encoding="UTF-8"?>\n' + DummyNode.innerHTML.replace(/>/g, ">\n").replace(/&amp;#x/g, "&#x");
         };
-        return SaveCommand;
+        return SaveDCaseCommand;
     })(Command);
-    AssureNote.SaveCommand = SaveCommand;
+    AssureNote.SaveDCaseCommand = SaveDCaseCommand;
 
     var SaveSVGCommand = (function (_super) {
         __extends(SaveSVGCommand, _super);

@@ -57,13 +57,15 @@ module AssureNote {
 
             this.DefaultCommand = new CommandMissingCommand(this);
             this.RegistCommand(new SaveCommand(this));
+            this.RegistCommand(new SaveSVGCommand(this));
+            this.RegistCommand(new SaveWGSNCommand(this));
+            this.RegistCommand(new SaveDCaseCommand(this));
             this.RegistCommand(new OpenCommand(this));
             this.RegistCommand(new NewCommand(this));
             this.RegistCommand(new UnfoldAllCommand(this));
             this.RegistCommand(new SetColorCommand(this));
             this.RegistCommand(new SetScaleCommand(this));
             this.RegistCommand(new HelpCommand(this));
-            this.RegistCommand(new SaveSVGCommand(this));
             this.RegistCommand(new UploadCommand(this));
 
             this.PluginManager.LoadPlugin();

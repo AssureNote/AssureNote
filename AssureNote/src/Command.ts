@@ -81,26 +81,59 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]) {
             var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             var Extention = Filename.split(".").pop();
-            var StringToWrite: string = "";
-            switch (Extention) {
-                case "dcase_model":
-                    StringToWrite = this.ConvertToDCaseXML(this.App.MasterRecord.GetLatestDoc().TopNode);
-                    break;
-                default:
-                    if (Extention != "wgsn") {
-                        Extention = "wgsn";
-                        Filename += ".wgsn";
-                    }
-                    var Writer = new StringWriter();
-                    this.App.MasterRecord.FormatRecord(Writer);
-                    StringToWrite = Writer.toString()
-                    break;
+            var SaveCommand = this.App.FindCommandByCommandLineName("save-as-" + Extention);
+            if (SaveCommand) {
+                SaveCommand.Invoke(CommandName, Params);
+                return;
             }
-            AssureNote.AssureNoteUtils.SaveAs(StringToWrite, Filename);
+            var Writer = new StringWriter();
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Filename);
         }
 
         public GetHelpHTML(): string {
-            return "<code>save [name]</code><br>Save editing GSN.<dl><dt>[name]</dt><dd>File name to save.</dd></dl>"
+            return "<code>save [name]</code><br>Save editing GSN."
+        }
+
+    }
+
+    export class SaveWGSNCommand extends Command {
+        constructor(public App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["save-as-wgsn", "SaveAsWgsn"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>" + this.GetCommandLineNames()[0] + " [name]</code><br>Save editing GSN as WGSN file.";
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
+            var Writer = new StringWriter();
+            this.App.MasterRecord.FormatRecord(Writer);
+            AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Filename);
+        }
+    }
+
+    export class SaveDCaseCommand extends Command {
+        constructor(public App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["save-as-dcase_model", "SaveAsDCaseModel"];
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".dcase_model");
+            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToDCaseXML(this.App.MasterRecord.GetLatestDoc().TopNode), Filename);
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>" + this.GetCommandLineNames()[0] + " [name]</code><br>Save editing GSN as dcase_model file.";
         }
 
         ConvertToDCaseXML(root: GSNNode): string {
@@ -174,7 +207,6 @@ module AssureNote {
             DummyNode.appendChild(DCaseArgumentXML);
             return '<?xml version="1.0" encoding="UTF-8"?>\n' + DummyNode.innerHTML.replace(/>/g, ">\n").replace(/&amp;#x/g, "&#x");
         }
-
     }
 
     export class SaveSVGCommand extends Command {
