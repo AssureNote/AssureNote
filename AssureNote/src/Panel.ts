@@ -72,12 +72,21 @@ module AssureNote {
                 }
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null) {
+                    var oldNodeView = this.ViewMap[this.FocusedLabel];
+                    if (oldNodeView != null) {
+                        oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                    }
                     this.FocusedLabel = Label;
+                    NodeView.ChangeColorStyle(ColorStyle.Highlight);
                 }
                 event.preventDefault();
             });
 
             this.EventMapLayer.addEventListener("pointerdown", (event: MouseEvent) => {
+                var oldNodeView = this.ViewMap[this.FocusedLabel];
+                if (oldNodeView != null) {
+                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                }
                 this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();

@@ -178,6 +178,7 @@ module AssureNote {
 
     export class ColorStyle {
         static Default: string = "assurenote-default";
+        static Highlight: string = "assurenote-default-highlight";
         static ToDo: string = "assurenote-todo";
         static Searched: string = "assurenote-search";
         static SearchHighlight: string = "assurenote-search-highlight";

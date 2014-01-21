@@ -140,6 +140,7 @@ var AssureNote;
         function ColorStyle() {
         }
         ColorStyle.Default = "assurenote-default";
+        ColorStyle.Highlight = "assurenote-default-highlight";
         ColorStyle.ToDo = "assurenote-todo";
         ColorStyle.Searched = "assurenote-search";
         ColorStyle.SearchHighlight = "assurenote-search-highlight";

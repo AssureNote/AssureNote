@@ -56,12 +56,21 @@ var AssureNote;
                 }
                 var NodeView = _this.ViewMap[Label];
                 if (NodeView != null) {
+                    var oldNodeView = _this.ViewMap[_this.FocusedLabel];
+                    if (oldNodeView != null) {
+                        oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                    }
                     _this.FocusedLabel = Label;
+                    NodeView.ChangeColorStyle(AssureNote.ColorStyle.Highlight);
                 }
                 event.preventDefault();
             });
 
             this.EventMapLayer.addEventListener("pointerdown", function (event) {
+                var oldNodeView = _this.ViewMap[_this.FocusedLabel];
+                if (oldNodeView != null) {
+                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                }
                 _this.FocusedLabel = null;
                 if (Bar.IsEnable) {
                     Bar.Remove();
