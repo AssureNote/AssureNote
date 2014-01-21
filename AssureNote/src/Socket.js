@@ -99,17 +99,13 @@ var AssureNote;
             this.socket.on('startedit', function (data) {
                 console.log('edit');
                 self.EditingNodesID.push(data);
-
-                //                self.SetColor(data);
-                /* TODO Re-render */
+                this.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
                 console.log('here is ID array = ' + self.EditingNodesID);
             });
             this.socket.on('finishedit', function (data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
-
-                //                self.SetDefaultColor(data.UID);
-                /* TODO Re-Render */
+                this.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
                 console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
