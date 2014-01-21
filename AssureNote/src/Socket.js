@@ -99,13 +99,17 @@ var AssureNote;
             this.socket.on('startedit', function (data) {
                 console.log('edit');
                 self.EditingNodesID.push(data);
-                self.SetColor(data);
+
+                //                self.SetColor(data);
+                /* TODO Re-render */
                 console.log('here is ID array = ' + self.EditingNodesID);
             });
             this.socket.on('finishedit', function (data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
-                self.SetDefaultColor(data.UID);
+
+                //                self.SetDefaultColor(data.UID);
+                /* TODO Re-Render */
                 console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
@@ -171,6 +175,15 @@ var AssureNote;
         };
 
         SocketManager.prototype.SetColor = function (data) {
+            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+            CurrentView.ChangeColorStyle(AssureNote.ColorStyle.Editing);
+            if (!Flag) {
+                return;
+            }
+            for (var i = 0; i < CurrentView.Children.length; i++) {
+                Current.ChangeColorStyle(AssureNote.ColorStyle.Editing);
+                ChangeColor(CurrentNodeView, AssureNote.ColorStyle);
+            }
         };
 
         SocketManager.prototype.SetDefaultColor = function (UID) {

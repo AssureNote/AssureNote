@@ -102,12 +102,14 @@ module AssureNote {
                 console.log('edit');
                 self.EditingNodesID.push(data);
 //                self.SetColor(data);
+                /* TODO Re-render */
                 console.log('here is ID array = ' + self.EditingNodesID);
             });
             this.socket.on('finishedit', function(data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
 //                self.SetDefaultColor(data.UID);
+                /* TODO Re-Render */
                 console.log('here is ID array after delete = ' + self.EditingNodesID);
             });
 
