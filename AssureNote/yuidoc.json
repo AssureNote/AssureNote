@@ -1,0 +1,13 @@
+{
+    "name": "AssureNote",
+    "description": "AssureNote auto-generated document",
+    "version": "0.0.1",
+    "url": "https://github.com/AssureNote/AssureNote",
+    "options": {
+        "linkNatives": "true",        
+        "attributesEmit": "true",
+        "selleck": "true",
+        "paths": "./src",
+        "outdir": "./doc"
+    }
+}

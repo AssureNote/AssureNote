@@ -34,6 +34,10 @@
 ///<reference path='../plugin/SingleNodeEditor/SingleNodeEditor.ts'/>
 
 module AssureNote {
+    /**
+        @class AssureNote.PictgramPanel
+    */
+
     export class PictgramPanel {
         LayoutEngine: LayoutEngine;
         SVGLayer: SVGGElement;
@@ -165,26 +169,26 @@ module AssureNote {
                         }
                         break;
                     case 37: /*left*/
-                        if (!this.CmdLine.IsVisible) {
+                        if (!this.CmdLine.IsVisible && !this.AssureNoteApp.PluginPanel.IsVisible) {
                             this.Viewport.Move(-100, 0, this.Viewport.GetCameraScale(), 50);
                         }
                         break;
                     case 38: /*up*/
                         if (this.CmdLine.IsVisible) {
                             this.CmdLine.ShowPrevHistory();
-                        } else {
+                        } else if (!this.AssureNoteApp.PluginPanel.IsVisible) {
                             this.Viewport.Move(0, -100, this.Viewport.GetCameraScale(), 50);
                         }
                         break;
                     case 39: /*right*/
-                        if (!this.CmdLine.IsVisible) {
+                        if (!this.CmdLine.IsVisible && !this.AssureNoteApp.PluginPanel.IsVisible) {
                             this.Viewport.Move(100, 0, this.Viewport.GetCameraScale(), 50);
                         }
                         break;
                     case 40: /*down*/
                         if (this.CmdLine.IsVisible) {
                             this.CmdLine.ShowNextHistory();
-                        } else {
+                        } else if (!this.AssureNoteApp.PluginPanel.IsVisible) {
                             this.Viewport.Move(0, 100, this.Viewport.GetCameraScale(), 50);
                         }
                         break;
@@ -284,7 +288,8 @@ module AssureNote {
         }
 
         /**
-           if label is null, there is no focused label.
+           @method ChangeFocusedLabel
+           @param {string} Label If label is null, there is no focused label.
         */
         ChangeFocusedLabel(Label: string): void {
             if (Label == null) {
