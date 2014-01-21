@@ -25,6 +25,7 @@
     "mocha": "1.10.0",
     "node-inspector": "0.2.0beta4",
     "expect.js": "0.2.0",
-    "supertest": "0.6.0"
+    "supertest": "0.6.0",
+    "yuidocjs": "*"
   }
 }
