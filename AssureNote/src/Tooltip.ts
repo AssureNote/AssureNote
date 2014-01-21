@@ -37,6 +37,10 @@ module AssureNote {
         Enable() {
         }
 
+        /**
+        * Remove Tooltip from Content layer.
+        * @param none
+        */
         Remove() {
             this.Tooltip.remove();
             this.Tooltip = null;
