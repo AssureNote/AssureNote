@@ -118,9 +118,8 @@ h4 {
 	stroke-dasharray: 5px, 5px;
 }
 .assurenote-editing {
-	fill: #008B8B;
-	stroke: #FFFFFF;
-	stroke-dasharray: 5px, 5px;
+	fill: #FFFFFF;
+	stroke: #5858FA;
 }
 
 .assurenote-todo-highlight {
