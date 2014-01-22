@@ -152,41 +152,62 @@ var AssureNote;
                         break;
                     case 37:
                         if (!_this.CmdLine.IsVisible) {
-                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 0 /* Left */);
-                            if (NextNode != null) {
-                                _this.ChangeFocusedLabel(NextNode.Label);
-                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
-                            }
+                            _this.MoveToNearestNode(0 /* Left */);
                         }
                         break;
                     case 38:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowPrevHistory();
                         } else {
-                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 1 /* Top */);
-                            if (NextNode != null) {
-                                _this.ChangeFocusedLabel(NextNode.Label);
-                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
-                            }
+                            _this.MoveToNearestNode(1 /* Top */);
                         }
                         break;
                     case 39:
                         if (!_this.CmdLine.IsVisible) {
-                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 2 /* Right */);
-                            if (NextNode != null) {
-                                _this.ChangeFocusedLabel(NextNode.Label);
-                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
-                            }
+                            _this.MoveToNearestNode(2 /* Right */);
                         }
                         break;
                     case 40:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowNextHistory();
                         } else {
-                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 3 /* Bottom */);
-                            if (NextNode != null) {
-                                _this.ChangeFocusedLabel(NextNode.Label);
-                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
+                            _this.MoveToNearestNode(3 /* Bottom */);
+                        }
+                        break;
+                    case 72:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(0 /* Left */);
+                        }
+                        break;
+                    case 74:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(3 /* Bottom */);
+                        }
+                        break;
+                    case 75:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(1 /* Top */);
+                        }
+                        break;
+                    case 76:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(2 /* Right */);
+                        }
+                        break;
+                    case 70:
+                        if (!_this.CmdLine.IsVisible) {
+                            var FoldCommand = _this.AssureNoteApp.FindCommandByCommandLineName("fold");
+                            if (FoldCommand && _this.FocusedLabel) {
+                                FoldCommand.Invoke(null, [_this.FocusedLabel]);
+                            }
+                        }
+                        break;
+                    case 65:
+                    case 73:
+                        if (!_this.CmdLine.IsVisible) {
+                            var FoldCommand = _this.AssureNoteApp.FindCommandByCommandLineName("edit");
+                            if (FoldCommand && _this.FocusedLabel) {
+                                FoldCommand.Invoke(null, [_this.FocusedLabel]);
                             }
                         }
                         break;
@@ -268,6 +289,18 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
+        /**
+        @method MoveToNearestNode
+        @param {AssureNote.Direction} Dir
+        */
+        PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
+            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
+            if (NextNode != null) {
+                this.ChangeFocusedLabel(NextNode.Label);
+                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+            }
+        };
+
         /**
         @method FindNearestNode
         @param {AssureNote.NodeView} CenterNode
