@@ -84,16 +84,16 @@ module AssureNote {
 
         IsValid(): boolean {
             if(this.Location && this.Type && this.Condition) {
-                return true;    
+                return true;
             }
-            return false;    
+            return false;
         }
 
         IsDead(): boolean {
             if(this.GetView() == null) {
                 return true;
             }
-            return false;    
+            return false;
         }
 
         UpdateModel(): void {
@@ -118,28 +118,29 @@ module AssureNote {
                 NodeDoc += this.Type+"::"+Value;
             }
             Model.NodeDoc = NodeDoc;
+            Model.LastModified = Model.BaseDoc.DocHistory;
         }
 
         Update(Rec: RecApi, ErrorCallback: (Request, Status, Error) => void): void {
             // Get latest data from REC
             var LatestLog = Rec.GetLatestData(this.Location, this.Type, ErrorCallback);
             if(LatestLog == null) {
-                return;   // ajax error
+                return;   // Ajax error
             }
 
-            // update past logs
+            // Update past logs
             if(!(this.PastLogs.length < 20)) {
                 this.PastLogs.pop();
             }
             this.PastLogs.unshift(LatestLog);
 
-            // update status
+            // Update status
             this.Data = LatestLog.data;
             var script = "var "+this.Type+"="+this.Data+";";
             script += this.Condition+";";
-            this.Status = eval(script);   // TODO Don't use eval()
+            this.Status = eval(script);   // FIXME Don't use eval()
 
-            // update model
+            // Update model
             this.UpdateModel();
         }
 
@@ -152,13 +153,13 @@ module AssureNote {
         IsRunning: boolean;
         Timer: number;
         Rec: RecApi;
-        RedNodeMap: { [key: string]: boolean };   // value doesn't make sense
+        RedNodeMap: { [key: string]: boolean };   // Value doesn't make sense
 
         constructor(public App: AssureNote.AssureNoteApp) {
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // FIXME make it configurable
+            this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // FIXME Make it configurable
             this.RedNodeMap = {};
         }
 
@@ -225,6 +226,9 @@ module AssureNote {
                 // Initialize red node map
                 self.RedNodeMap = {};
 
+                // Update monitor nodes
+                var Doc = self.App.MasterRecord.GetLatestDoc();
+                var IsFirst = true;
                 for(var Label in self.MonitorNodeMap) {
                     var MNode = self.MonitorNodeMap[Label];
                     if(MNode.IsDead()) {
@@ -236,13 +240,22 @@ module AssureNote {
                         continue;
                     }
 
-                    // Check red nodes
+                    // Update monitoring data
                     MNode.Update(self.Rec, function(Request, Status, Error) {
                         self.StopMonitoring();
-                    } /* error handler */);
-
+                    } /* Error handler */);
                     if(!self.IsRunning) break;
 
+                    // Update history if last modifier wasn't 'Monitor'
+                    if(IsFirst) {
+                        if(Doc.DocHistory.Author != "Monitor") {
+                            self.App.MasterRecord.OpenEditor("Monitor", "todo", null, "test");
+                            Doc = self.App.MasterRecord.EditingDoc;
+                        }
+                        IsFirst = false;
+                    }
+
+                    // Change node color recursively if node's status is 'false'
                     if(MNode.Status == false) {
                         var View = MNode.GetView();
                         while(View != null) {
@@ -253,9 +266,11 @@ module AssureNote {
                 }
 
                 // Update view
-                var Doc = self.App.MasterRecord.GetLatestDoc();
                 self.InitializeView(Doc);
                 self.UpdateView(Doc);
+                if(self.App.MasterRecord.EditingDoc != null) {
+                    self.App.MasterRecord.CloseEditor();
+                }
             }, Interval);
         }
 

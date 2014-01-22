@@ -114,6 +114,7 @@ var AssureNote;
                 NodeDoc += this.Type + "::" + Value;
             }
             Model.NodeDoc = NodeDoc;
+            Model.LastModified = Model.BaseDoc.DocHistory;
         };
 
         MonitorNode.prototype.Update = function (Rec, ErrorCallback) {
@@ -123,19 +124,19 @@ var AssureNote;
                 return;
             }
 
-            // update past logs
+            // Update past logs
             if (!(this.PastLogs.length < 20)) {
                 this.PastLogs.pop();
             }
             this.PastLogs.unshift(LatestLog);
 
-            // update status
+            // Update status
             this.Data = LatestLog.data;
             var script = "var " + this.Type + "=" + this.Data + ";";
             script += this.Condition + ";";
-            this.Status = eval(script); // TODO Don't use eval()
+            this.Status = eval(script); // FIXME Don't use eval()
 
-            // update model
+            // Update model
             this.UpdateModel();
         };
         return MonitorNode;
@@ -148,7 +149,7 @@ var AssureNote;
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/"); // FIXME make it configurable
+            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/"); // FIXME Make it configurable
             this.RedNodeMap = {};
         }
         MonitorNodeManager.prototype.SetMonitorNode = function (MNode) {
@@ -214,6 +215,9 @@ var AssureNote;
                 // Initialize red node map
                 self.RedNodeMap = {};
 
+                // Update monitor nodes
+                var Doc = self.App.MasterRecord.GetLatestDoc();
+                var IsFirst = true;
                 for (var Label in self.MonitorNodeMap) {
                     var MNode = self.MonitorNodeMap[Label];
                     if (MNode.IsDead()) {
@@ -225,14 +229,23 @@ var AssureNote;
                         continue;
                     }
 
-                    // Check red nodes
+                    // Update monitoring data
                     MNode.Update(self.Rec, function (Request, Status, Error) {
                         self.StopMonitoring();
-                    } /* error handler */ );
-
+                    } /* Error handler */ );
                     if (!self.IsRunning)
                         break;
 
+                    // Update history if last modifier wasn't 'Monitor'
+                    if (IsFirst) {
+                        if (Doc.DocHistory.Author != "Monitor") {
+                            self.App.MasterRecord.OpenEditor("Monitor", "todo", null, "test");
+                            Doc = self.App.MasterRecord.EditingDoc;
+                        }
+                        IsFirst = false;
+                    }
+
+                    // Change node color recursively if node's status is 'false'
                     if (MNode.Status == false) {
                         var View = MNode.GetView();
                         while (View != null) {
@@ -243,9 +256,11 @@ var AssureNote;
                 }
 
                 // Update view
-                var Doc = self.App.MasterRecord.GetLatestDoc();
                 self.InitializeView(Doc);
                 self.UpdateView(Doc);
+                if (self.App.MasterRecord.EditingDoc != null) {
+                    self.App.MasterRecord.CloseEditor();
+                }
             }, Interval);
         };
 
