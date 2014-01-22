@@ -6,6 +6,11 @@ var __extends = this.__extends || function (d, b) {
 };
 var events = require('events');
 
+/**
+@class DAO
+@constructor
+@param {db.Database} con
+*/
 var DAO = (function (_super) {
     __extends(DAO, _super);
     function DAO(con) {

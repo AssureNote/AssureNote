@@ -1,9 +1,6 @@
 ///<reference path='../DefinitelyTyped/express/express.d.ts'/>
 /**
-* JSON-RPC2実装
-*
-* usage:
-*
+* @class GLOBAL
 */
 var express = require("express");
 var error = require("./error");
@@ -36,7 +33,11 @@ function isAuthRequired(methodName) {
 }
 
 /**
-* handle method call
+* @method httpHandler
+* @static
+* @param {Object} req
+* @param {Object} res
+* @return {void}
 */
 function httpHandler(req, res) {
     var auth = new util_auth.Auth(req, res);

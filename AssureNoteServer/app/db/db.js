@@ -9,12 +9,27 @@ var mysql = require('mysql');
 var events = require('events');
 var CONFIG = require('config');
 
+/**
+@class Database
+@constructor
+@extends events.EventEmitter
+*/
 var Database = (function (_super) {
     __extends(Database, _super);
     function Database() {
         _super.call(this);
         this.con = Database.getConnection();
     }
+    /**
+    @property con
+    @type mysql.Connection
+    @public
+    */
+    /**
+    @method getConnection
+    @static
+    @return {mysql.Connection} con
+    */
     Database.getConnection = function () {
         return mysql.createConnection({
             host: CONFIG.mysql.host,
@@ -25,7 +40,13 @@ var Database = (function (_super) {
     };
 
     Database.prototype.query = function (sql, values, callback) {
-        // console.log('QUERY: ' + sql);
+        /**
+        @method query
+        @param {String} sql
+        @param {Array} values
+        @param {mysql.QueryCallback} callback
+        @return {void} void
+        */
         if (callback === undefined && typeof values === 'function') {
             callback = values;
         }
@@ -39,6 +60,11 @@ var Database = (function (_super) {
         }
     };
 
+    /**
+    @method begin
+    @param {mysql.QueryCallback} callback
+    @return {void}
+    */
     Database.prototype.begin = function (callback) {
         var _this = this;
         this.query('SET autocommit=0', function (err, result) {
@@ -52,12 +78,22 @@ var Database = (function (_super) {
         });
     };
 
+    /**
+    @method commit
+    @param {mysql.QueryCallback} callback
+    @return {void}
+    */
     Database.prototype.commit = function (callback) {
         this.query('COMMIT', function (err, result) {
             callback(err, result);
         });
     };
 
+    /**
+    @method rollback
+    @param {mysql.QueryCallback} [callback]
+    @return {void}
+    */
     Database.prototype.rollback = function (callback) {
         callback = callback || this._defaultCallback;
         if (this.con) {
@@ -79,12 +115,22 @@ var Database = (function (_super) {
         }
     };
 
+    /**
+    @method endTransaction
+    @param {mysql.QueryCallback} callback
+    @return {void}
+    */
     Database.prototype.endTransaction = function (callback) {
         this.query('SET autocommit=1', function (err, query) {
             callback(err, query);
         });
     };
 
+    /**
+    @method close
+    @param {mysql.QueryCallback} [callback]
+    @return {void}
+    */
     Database.prototype.close = function (callback) {
         callback = callback || this._defaultCallback;
         if (this.con) {

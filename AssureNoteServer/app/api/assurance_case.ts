@@ -1,5 +1,8 @@
 ///<reference path='../DefinitelyTyped/async/async.d.ts'/>
 
+/**
+  * @class GLOBAL
+  */
 var db                   = require('../db/db');
 import type                 = require('./type');
 var constant             = require('../constant');
@@ -9,6 +12,14 @@ var error                = require('./error');
 var async                = require('async');
 var _                    = require('underscore');
 
+/**
+  * @method upload
+  * @static
+  * @param {Object} params
+  * @param {String} userIdKey
+  * @param {type.Callback} callback
+  * @return {void}
+  */
 export function upload(params:any, userIdKey: string, callback: type.Callback) {
     function validate(params:any) {
         var checks = [];
@@ -51,6 +62,14 @@ export function upload(params:any, userIdKey: string, callback: type.Callback) {
     );
 }
 
+/**
+  * @method download
+  * @static
+  * @param {Object} params
+  * @param {String} userIdKey
+  * @param {type.Callback} callback
+  * @return {void}
+  */
 export function download(params:any, userIdKey: string, callback: type.Callback) {
     function validate(params:any) {
         var checks = [];

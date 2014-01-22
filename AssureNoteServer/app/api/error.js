@@ -4,6 +4,10 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+/**
+* @class RPCError
+* @constructor
+*/
 var RPCError = (function () {
     function RPCError(rpcHttpStatus, code, message, data) {
         this.rpcHttpStatus = rpcHttpStatus;
@@ -11,6 +15,10 @@ var RPCError = (function () {
         this.message = message;
         this.data = data;
     }
+    /**
+    * @method toStrictRPCError
+    * @return {IRPCError}
+    */
     RPCError.prototype.toStrictRPCError = function () {
         return {
             code: this.code,
@@ -21,6 +29,13 @@ var RPCError = (function () {
 })();
 exports.RPCError = RPCError;
 
+/**
+* @class ParseError
+* @constructor
+* @extends RPCError
+* @param {String} msg
+* @param {Any} data
+*/
 var ParseError = (function (_super) {
     __extends(ParseError, _super);
     function ParseError(msg, data) {
@@ -30,6 +45,13 @@ var ParseError = (function (_super) {
 })(RPCError);
 exports.ParseError = ParseError;
 
+/**
+* @class InvalidRequestError
+* @constructor
+* @extends RPCError
+* @param {String} msg
+* @param {Any} data
+*/
 var InvalidRequestError = (function (_super) {
     __extends(InvalidRequestError, _super);
     function InvalidRequestError(msg, data) {
@@ -38,6 +60,14 @@ var InvalidRequestError = (function (_super) {
     return InvalidRequestError;
 })(RPCError);
 exports.InvalidRequestError = InvalidRequestError;
+
+/**
+* @class MethodNotFoundError
+* @constructor
+* @extends RPCError
+* @param {String} msg
+* @param {Any} data
+*/
 var MethodNotFoundError = (function (_super) {
     __extends(MethodNotFoundError, _super);
     function MethodNotFoundError(msg, data) {
@@ -46,6 +76,14 @@ var MethodNotFoundError = (function (_super) {
     return MethodNotFoundError;
 })(RPCError);
 exports.MethodNotFoundError = MethodNotFoundError;
+
+/**
+* @class InvalidParamsError
+* @constructor
+* @extends RPCError
+* @param {Array<String>} msg
+* @param {Any} data
+*/
 var InvalidParamsError = (function (_super) {
     __extends(InvalidParamsError, _super);
     function InvalidParamsError(msg, data) {
@@ -57,6 +95,14 @@ var InvalidParamsError = (function (_super) {
     return InvalidParamsError;
 })(RPCError);
 exports.InvalidParamsError = InvalidParamsError;
+
+/**
+* @class InternalError
+* @constructor
+* @extends RPCError
+* @param {String} msg
+* @param {Any} data
+*/
 var InternalError = (function (_super) {
     __extends(InternalError, _super);
     function InternalError(msg, data) {
@@ -66,6 +112,13 @@ var InternalError = (function (_super) {
 })(RPCError);
 exports.InternalError = InternalError;
 
+/**
+* @class ApplicationError
+* @constructor
+* @extends IRPCOverHTTPError
+* @param {String} msg
+* @param {Any} data
+*/
 var ApplicationError = (function () {
     function ApplicationError(rpcHttpStatus, code, message, data) {
         this.rpcHttpStatus = rpcHttpStatus;
@@ -73,6 +126,10 @@ var ApplicationError = (function () {
         this.message = message;
         this.data = data;
     }
+    /**
+    * @method toStrictRPCError
+    * @return {IRPCError}
+    */
     ApplicationError.prototype.toStrictRPCError = function () {
         return {
             code: this.code,
@@ -83,6 +140,13 @@ var ApplicationError = (function () {
 })();
 exports.ApplicationError = ApplicationError;
 
+/**
+* @class ForbiddenError
+* @constructor
+* @extends ApplicationError
+* @param {String} msg
+* @param {Any} [data]
+*/
 var ForbiddenError = (function (_super) {
     __extends(ForbiddenError, _super);
     function ForbiddenError(msg, data) {
@@ -92,6 +156,13 @@ var ForbiddenError = (function (_super) {
 })(ApplicationError);
 exports.ForbiddenError = ForbiddenError;
 
+/**
+* @class NotFoundError
+* @constructor
+* @extends ApplicationError
+* @param {String} msg
+* @param {Any} [data]
+*/
 var NotFoundError = (function (_super) {
     __extends(NotFoundError, _super);
     function NotFoundError(msg, data) {
@@ -101,6 +172,13 @@ var NotFoundError = (function (_super) {
 })(ApplicationError);
 exports.NotFoundError = NotFoundError;
 
+/**
+* @class DuplicatedError
+* @constructor
+* @extends ApplicationError
+* @param {String} msg
+* @param {Any} [data]
+*/
 var DuplicatedError = (function (_super) {
     __extends(DuplicatedError, _super);
     function DuplicatedError(msg, data) {
@@ -110,6 +188,13 @@ var DuplicatedError = (function (_super) {
 })(ApplicationError);
 exports.DuplicatedError = DuplicatedError;
 
+/**
+* @class LoginError
+* @constructor
+* @extends ApplicationError
+* @param {String} msg
+* @param {Any} [data]
+*/
 var LoginError = (function (_super) {
     __extends(LoginError, _super);
     function LoginError(msg, data) {
@@ -119,6 +204,13 @@ var LoginError = (function (_super) {
 })(ApplicationError);
 exports.LoginError = LoginError;
 
+/**
+* @class UnauthorizedError
+* @constructor
+* @extends ApplicationError
+* @param {String} msg
+* @param {Any} [data]
+*/
 var UnauthorizedError = (function (_super) {
     __extends(UnauthorizedError, _super);
     function UnauthorizedError(msg, data) {
@@ -128,6 +220,13 @@ var UnauthorizedError = (function (_super) {
 })(ApplicationError);
 exports.UnauthorizedError = UnauthorizedError;
 
+/**
+* @class VersionConflictError
+* @constructor
+* @extends ApplicationError
+* @param {String} msg
+* @param {Any} [data]
+*/
 var VersionConflictError = (function (_super) {
     __extends(VersionConflictError, _super);
     function VersionConflictError(msg, data) {
@@ -137,6 +236,13 @@ var VersionConflictError = (function (_super) {
 })(ApplicationError);
 exports.VersionConflictError = VersionConflictError;
 
+/**
+* @class ExternalParameterError
+* @constructor
+* @extends ApplicationError
+* @param {String} msg
+* @param {Any} [data]
+*/
 var ExternalParameterError = (function (_super) {
     __extends(ExternalParameterError, _super);
     function ExternalParameterError(msg, data) {
