@@ -124,8 +124,13 @@ var AssureNote;
                 return;
             }
 
+            // Don't update if latest log is same as past log
+            if (JSON.stringify(LatestLog) == JSON.stringify(this.PastLogs[0])) {
+                return;
+            }
+
             // Update past logs
-            if (!(this.PastLogs.length < 20)) {
+            if (this.PastLogs.length > 20) {
                 this.PastLogs.pop();
             }
             this.PastLogs.unshift(LatestLog);
@@ -410,6 +415,41 @@ var AssureNote;
             if (NodeView.Label in MNodeManager.RedNodeMap) {
                 NodeView.ChangeColorStyle(AssureNote.ColorStyle.Danger);
             }
+        };
+
+        MonitorNodePlugin.prototype.CreateTooltipContents = function (NodeView) {
+            if (!(NodeView.Label in MNodeManager.MonitorNodeMap)) {
+                return null;
+            }
+
+            var MNode = MNodeManager.MonitorNodeMap[NodeView.Label];
+
+            var ReturnValue = [];
+            var li = document.createElement('li');
+            var table = document.createElement('table');
+            table.setAttribute('border', '4');
+            table.setAttribute('width', '250');
+            table.setAttribute('align', 'center');
+
+            var TableInnerHTML = '';
+            TableInnerHTML += '<caption>REC Logs</caption>';
+            TableInnerHTML += '<tr bgcolor="#cccccc">';
+            TableInnerHTML += '<th>Timestamp</th>';
+            TableInnerHTML += '<th>Data</th>';
+            TableInnerHTML += '</tr>';
+
+            for (var i = 0; i < MNode.PastLogs.length; i++) {
+                var Log = MNode.PastLogs[i];
+                TableInnerHTML += '<tr align="center">';
+                TableInnerHTML += '<td>' + Log.timestamp + '</td>';
+                TableInnerHTML += '<td>' + Log.data + '</td>';
+                TableInnerHTML += '</tr>';
+            }
+
+            table.innerHTML = TableInnerHTML;
+            li.innerHTML = table.outerHTML;
+            ReturnValue.push(li);
+            return ReturnValue;
         };
         return MonitorNodePlugin;
     })(AssureNote.Plugin);
