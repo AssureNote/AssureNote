@@ -41,6 +41,10 @@ var AssureNote;
         Tooltip.prototype.Enable = function () {
         };
 
+        /**
+        * Remove Tooltip from Content layer.
+        * @param none
+        */
         Tooltip.prototype.Remove = function () {
             this.Tooltip.remove();
             this.Tooltip = null;

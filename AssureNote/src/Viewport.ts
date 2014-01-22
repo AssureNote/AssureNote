@@ -27,7 +27,11 @@
 
 /* VIEW (MVC) */
 module AssureNote {
-
+    /**
+        Controll scroll by mouse, touch and pen and zoom by wheel.
+        @class AssureNote.ScrollManager
+        @for AssureNote.ViewportManager
+    */
     export class ScrollManager {
         private CurrentX: number = 0;
         private CurrentY: number = 0;
@@ -160,6 +164,9 @@ module AssureNote {
         }
     }
 
+    /**
+        @class AssureNote.ViewportManager
+    */
     export class ViewportManager {
         ScrollManager: ScrollManager = new ScrollManager(this);
         private CameraGX: number = 0;
@@ -200,6 +207,10 @@ module AssureNote {
             $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { this.ScrollManager.OnMouseWheel(e, this); });
         }
 
+        /**
+            @method GetCameraScale
+            @return {number} Scale of camera. 1.0 for 100%.
+        */
         GetCameraScale(): number {
             return this.Scale;
         }
@@ -208,6 +219,10 @@ module AssureNote {
             return Math.max(0.02, Math.min(20.0, Scale));
         }
 
+        /**
+            @method SetCameraScale
+            @param {number} Scale Scale of camera. 1.0 for 100%.
+        */
         SetCameraScale(Scale: number): void {
             this.Scale = ViewportManager.LimitScale(Scale);
             this.UpdateAttr();
@@ -233,18 +248,38 @@ module AssureNote {
             this.UpdateAttr();
         }
 
+        /**
+            @method GetCameraGX
+            @return {number} Scale-independent camera X position in GSN. 0 for leftside of topgoal.
+        */
         GetCameraGX(): number {
             return this.CameraGX;
         }
 
+        /**
+            @method GetCameraGY
+            @return {number} Scale-independent camera Y position in GSN. 0 for top of topgoal.
+        */
         GetCameraGY(): number {
             return this.CameraGY;
         }
 
+        /**
+            @method SetCameraPosition
+            @param {number} GX Scale-independent camera X position in GSN. 0 for leftside of topgoal.
+            @param {number} GY Scale-independent camera Y position in GSN. 0 for top of topgoal.
+        */
         SetCameraPosition(GX: number, GY: number): void {
             this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
         }
 
+        /**
+            Set camera's position and scale one time.
+            @method SetCamera
+            @param {number} GX Scale-independent camera X position in GSN. 0 for leftside of topgoal.
+            @param {number} GY Scale-independent camera Y position in GSN. 0 for top of topgoal.
+            @param {number} Scale Scale of camera. 1.0 for 100%.
+        */
         SetCamera(GX: number, GY: number, Scale: number): void {
             this.Scale = Scale;
             this.SetOffset(this.CameraCenterPageX - GX * this.Scale, this.CameraCenterPageY - GY * this.Scale);
@@ -257,31 +292,69 @@ module AssureNote {
             this.UpdateAttr();
         }
 
+        /**
+            @method GetCameraPageCenterX
+            @return {number} X of camera's vanishing point in web page.
+        */
         GetCameraPageCenterX(): number {
             return this.CameraCenterPageX;
         }
 
+        /**
+            @method GetCameraPageCenterY
+            @return {number} Y of camera's vanishing point in web page.
+        */
         GetCameraPageCenterY(): number {
             return this.CameraCenterPageY;
         }
 
+        /**
+            Set camera's vanishing point in web page.
+            @method SetCameraPageCenter
+            @param {number} PageX X of camera's vanishing point in web page.
+            @param {number} PageY Y of camera's vanishing point in web page.
+        */
         SetCameraPageCenter(PageX: number, PageY: number): void {
             this.CameraCenterPageX = PageX;
             this.CameraCenterPageY = PageY;
         }
 
+        /**
+            Calcurate PageX from GX 
+            @method PageXFromGX
+            @param {number} GX Scale-independent X position in GSN.
+            @return {number} PageX for given GX. It is depend on camera's position, scale and vanishing point.
+        */
         PageXFromGX(GX: number): number {
             return this.CameraCenterPageX + (GX - this.CameraGX) * this.Scale;
         }
 
+        /**
+            Calcurate PageY from GY 
+            @method PageYFromGY
+            @param {number} GY Scale-independent Y position in GSN.
+            @return {number} PageY for given GY. It is depend on camera's position, scale and vanishing point.
+        */
         PageYFromGY(GY: number): number {
             return this.CameraCenterPageY + (GY - this.CameraGY) * this.Scale;
         }
 
+        /**
+            Calcurate GX from PageX 
+            @method GXFromPageX
+            @param {number} PageX X position in web page.
+            @return {number} GX for given PageX. It is depend on camera's position, scale and vanishing point.
+        */
         GXFromPageX(PageX: number): number {
             return (PageX - this.CameraCenterPageX) / this.Scale + this.CameraGX;
         }
 
+        /**
+            Calcurate GY from PageY 
+            @method GYFromPageY
+            @param {number} PageY Y position in web page.
+            @return {number} GY for given PageY. It is depend on camera's position, scale and vanishing point.
+        */
         GYFromPageY(PageY: number): number {
             return (PageY - this.CameraCenterPageY) / this.Scale + this.CameraGY;
         }
@@ -312,10 +385,28 @@ module AssureNote {
 
         private AnimationFrameTimerHandle: number = 0;
 
+        /**
+            Move camera position relatively and change scale.
+            @method Move
+            @param {number} GX Scale-independent camera relative X difference.
+            @param {number} GY Scale-independent camera relative Y difference.
+            @param {number} Scale Scale of camera. 1.0 for 100%.
+            @param {number} Duration Time for moving in millisecond.
+            @async
+        */
         Move(GX: number, GY: number, Scale: number, Duration: number): void {
             this.MoveTo(this.GetCameraGX() + GX, this.GetCameraGY() + GY, Scale, Duration);
         }
 
+        /**
+            Move camera position and scale one time.
+            @method MoveTo
+            @param {number} GX Scale-independent camera X position in GSN. 0 for leftside of topgoal.
+            @param {number} GY Scale-independent camera Y position in GSN. 0 for top of topgoal.
+            @param {number} Scale Scale of camera. 1.0 for 100%.
+            @param {number} Duration Time for moving in millisecond.
+            @async
+        */
         MoveTo(GX: number, GY: number, Scale: number, Duration: number): void {
             Scale = ViewportManager.LimitScale(Scale);
             if (Duration <= 0) {

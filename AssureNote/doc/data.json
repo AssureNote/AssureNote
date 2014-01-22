@@ -1,0 +1,380 @@
+{
+    "project": {
+        "name": "AssureNote",
+        "description": "AssureNote auto-generated document",
+        "version": "0.0.1",
+        "url": "https://github.com/AssureNote/AssureNote"
+    },
+    "files": {
+        "src\\Panel.js": {
+            "name": "src\\Panel.js",
+            "modules": {},
+            "classes": {
+                "AssureNote.PictgramPanel": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\Tooltip.js": {
+            "name": "src\\Tooltip.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\Viewport.js": {
+            "name": "src\\Viewport.js",
+            "modules": {},
+            "classes": {
+                "AssureNote.ScrollManager": 1,
+                "AssureNote.ViewportManager": 1
+            },
+            "fors": {
+                "AssureNote.ViewportManager": 1
+            },
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {
+        "AssureNote.PictgramPanel": {
+            "name": "AssureNote.PictgramPanel",
+            "shortname": "AssureNote.PictgramPanel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\Panel.js",
+            "line": 35
+        },
+        "AssureNote.ScrollManager": {
+            "name": "AssureNote.ScrollManager",
+            "shortname": "AssureNote.ScrollManager",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\Viewport.js",
+            "line": 29,
+            "description": "Controll scroll by mouse, touch and pen and zoom by wheel."
+        },
+        "AssureNote.ViewportManager": {
+            "name": "AssureNote.ViewportManager",
+            "shortname": "AssureNote.ViewportManager",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "src\\Viewport.js",
+            "line": 163
+        }
+    },
+    "classitems": [
+        {
+            "file": "src\\Panel.js",
+            "line": 267,
+            "itemtype": "method",
+            "name": "ChangeFocusedLabel",
+            "params": [
+                {
+                    "name": "Label",
+                    "description": "If label is null, there is no focused label.",
+                    "type": "String"
+                }
+            ],
+            "class": "AssureNote.PictgramPanel"
+        },
+        {
+            "file": "src\\Tooltip.js",
+            "line": 44,
+            "description": "Remove Tooltip from Content layer.",
+            "params": [
+                {
+                    "name": "none",
+                    "description": ""
+                }
+            ],
+            "class": "AssureNote.ScrollManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 216,
+            "itemtype": "method",
+            "name": "GetCameraScale",
+            "return": {
+                "description": "Scale of camera. 1.0 for 100%.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 228,
+            "itemtype": "method",
+            "name": "SetCameraScale",
+            "params": [
+                {
+                    "name": "Scale",
+                    "description": "Scale of camera. 1.0 for 100%.",
+                    "type": "Number"
+                }
+            ],
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 257,
+            "itemtype": "method",
+            "name": "GetCameraGX",
+            "return": {
+                "description": "Scale-independent camera X position in GSN. 0 for leftside of topgoal.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 265,
+            "itemtype": "method",
+            "name": "GetCameraGY",
+            "return": {
+                "description": "Scale-independent camera Y position in GSN. 0 for top of topgoal.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 273,
+            "itemtype": "method",
+            "name": "SetCameraPosition",
+            "params": [
+                {
+                    "name": "GX",
+                    "description": "Scale-independent camera X position in GSN. 0 for leftside of topgoal.",
+                    "type": "Number"
+                },
+                {
+                    "name": "GY",
+                    "description": "Scale-independent camera Y position in GSN. 0 for top of topgoal.",
+                    "type": "Number"
+                }
+            ],
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 282,
+            "description": "Set camera's position and scale one time.",
+            "itemtype": "method",
+            "name": "SetCamera",
+            "params": [
+                {
+                    "name": "GX",
+                    "description": "Scale-independent camera X position in GSN. 0 for leftside of topgoal.",
+                    "type": "Number"
+                },
+                {
+                    "name": "GY",
+                    "description": "Scale-independent camera Y position in GSN. 0 for top of topgoal.",
+                    "type": "Number"
+                },
+                {
+                    "name": "Scale",
+                    "description": "Scale of camera. 1.0 for 100%.",
+                    "type": "Number"
+                }
+            ],
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 301,
+            "itemtype": "method",
+            "name": "GetCameraPageCenterX",
+            "return": {
+                "description": "X of camera's vanishing point in web page.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 309,
+            "itemtype": "method",
+            "name": "GetCameraPageCenterY",
+            "return": {
+                "description": "Y of camera's vanishing point in web page.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 317,
+            "description": "Set camera's vanishing point in web page.",
+            "itemtype": "method",
+            "name": "SetCameraPageCenter",
+            "params": [
+                {
+                    "name": "PageX",
+                    "description": "X of camera's vanishing point in web page.",
+                    "type": "Number"
+                },
+                {
+                    "name": "PageY",
+                    "description": "Y of camera's vanishing point in web page.",
+                    "type": "Number"
+                }
+            ],
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 328,
+            "description": "Calcurate PageX from GX",
+            "itemtype": "method",
+            "name": "PageXFromGX",
+            "params": [
+                {
+                    "name": "GX",
+                    "description": "Scale-independent X position in GSN.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "PageX for given GX. It is depend on camera's position, scale and vanishing point.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 338,
+            "description": "Calcurate PageY from GY",
+            "itemtype": "method",
+            "name": "PageYFromGY",
+            "params": [
+                {
+                    "name": "GY",
+                    "description": "Scale-independent Y position in GSN.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "PageY for given GY. It is depend on camera's position, scale and vanishing point.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 348,
+            "description": "Calcurate GX from PageX",
+            "itemtype": "method",
+            "name": "GXFromPageX",
+            "params": [
+                {
+                    "name": "PageX",
+                    "description": "X position in web page.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "GX for given PageX. It is depend on camera's position, scale and vanishing point.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 358,
+            "description": "Calcurate GY from PageY",
+            "itemtype": "method",
+            "name": "GYFromPageY",
+            "params": [
+                {
+                    "name": "PageY",
+                    "description": "Y position in web page.",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "GY for given PageY. It is depend on camera's position, scale and vanishing point.",
+                "type": "Number"
+            },
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 392,
+            "description": "Move camera position relatively and change scale.",
+            "itemtype": "method",
+            "name": "Move",
+            "params": [
+                {
+                    "name": "GX",
+                    "description": "Scale-independent camera relative X difference.",
+                    "type": "Number"
+                },
+                {
+                    "name": "GY",
+                    "description": "Scale-independent camera relative Y difference.",
+                    "type": "Number"
+                },
+                {
+                    "name": "Scale",
+                    "description": "Scale of camera. 1.0 for 100%.",
+                    "type": "Number"
+                },
+                {
+                    "name": "Duration",
+                    "description": "Time for moving in millisecond.",
+                    "type": "Number"
+                }
+            ],
+            "async": 1,
+            "class": "AssureNote.ViewportManager"
+        },
+        {
+            "file": "src\\Viewport.js",
+            "line": 405,
+            "description": "Move camera position and scale one time.",
+            "itemtype": "method",
+            "name": "MoveTo",
+            "params": [
+                {
+                    "name": "GX",
+                    "description": "Scale-independent camera X position in GSN. 0 for leftside of topgoal.",
+                    "type": "Number"
+                },
+                {
+                    "name": "GY",
+                    "description": "Scale-independent camera Y position in GSN. 0 for top of topgoal.",
+                    "type": "Number"
+                },
+                {
+                    "name": "Scale",
+                    "description": "Scale of camera. 1.0 for 100%.",
+                    "type": "Number"
+                },
+                {
+                    "name": "Duration",
+                    "description": "Time for moving in millisecond.",
+                    "type": "Number"
+                }
+            ],
+            "async": 1,
+            "class": "AssureNote.ViewportManager"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nRemove Tooltip from Content layer.",
+            "line": " src\\Tooltip.js:44"
+        }
+    ]
+}
