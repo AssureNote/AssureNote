@@ -151,27 +151,43 @@ var AssureNote;
                         }
                         break;
                     case 37:
-                        if (!_this.CmdLine.IsVisible && !_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(-100, 0, _this.Viewport.GetCameraScale(), 50);
+                        if (!_this.CmdLine.IsVisible) {
+                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 0 /* Left */);
+                            if (NextNode != null) {
+                                _this.ChangeFocusedLabel(NextNode.Label);
+                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 38:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowPrevHistory();
-                        } else if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(0, -100, _this.Viewport.GetCameraScale(), 50);
+                        } else {
+                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 1 /* Top */);
+                            if (NextNode != null) {
+                                _this.ChangeFocusedLabel(NextNode.Label);
+                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 39:
-                        if (!_this.CmdLine.IsVisible && !_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(100, 0, _this.Viewport.GetCameraScale(), 50);
+                        if (!_this.CmdLine.IsVisible) {
+                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 2 /* Right */);
+                            if (NextNode != null) {
+                                _this.ChangeFocusedLabel(NextNode.Label);
+                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 40:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowNextHistory();
-                        } else if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(0, 100, _this.Viewport.GetCameraScale(), 50);
+                        } else {
+                            var NextNode = _this.FindNearestNode(_this.ViewMap[_this.FocusedLabel], 3 /* Bottom */);
+                            if (NextNode != null) {
+                                _this.ChangeFocusedLabel(NextNode.Label);
+                                _this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), _this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 8:
@@ -252,6 +268,59 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
+        /**
+        @method FindNearestNode
+        @param {AssureNote.NodeView} CenterNode
+        @param {AssureNote.Direction} Dir
+        @return {AssureNote.NodeView} Found node. If no node is found, null is retured.
+        */
+        PictgramPanel.prototype.FindNearestNode = function (CenterNode, Dir) {
+            if (!CenterNode) {
+                return null;
+            }
+            var RightLimitVectorX = 1;
+            var RightLimitVectorY = 1;
+            var LeftLimitVectorX = 1;
+            var LeftLimitVectorY = 1;
+
+            switch (Dir) {
+                case 2 /* Right */:
+                    LeftLimitVectorY = -1;
+                    break;
+                case 0 /* Left */:
+                    RightLimitVectorX = -1;
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    break;
+                case 1 /* Top */:
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    LeftLimitVectorY = -1;
+                    break;
+                case 3 /* Bottom */:
+                    RightLimitVectorX = -1;
+                    break;
+            }
+            var NearestNode = null;
+            var CurrentMinimumDistanceSquere = Infinity;
+            this.MasterView.TraverseVisibleNode(function (Node) {
+                if (Node.IsVisible) {
+                    var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
+                    var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                    var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
+                    var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
+                    if (DDotR > 0 && DDotL > 0) {
+                        var DistanceSquere = DX * DX + DY * DY;
+                        if (DistanceSquere < CurrentMinimumDistanceSquere) {
+                            CurrentMinimumDistanceSquere = DistanceSquere;
+                            NearestNode = Node;
+                        }
+                    }
+                }
+            });
+            return NearestNode;
+        };
+
         PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
             var _this = this;
             NodeView.ForEachVisibleChildren(function (SubNode) {

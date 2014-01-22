@@ -169,27 +169,43 @@ module AssureNote {
                         }
                         break;
                     case 37: /*left*/
-                        if (!this.CmdLine.IsVisible && !this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(-100, 0, this.Viewport.GetCameraScale(), 50);
+                        if (!this.CmdLine.IsVisible) {
+                            var NextNode = this.FindNearestNode(this.ViewMap[this.FocusedLabel], Direction.Left);
+                            if (NextNode != null) {
+                                this.ChangeFocusedLabel(NextNode.Label);
+                                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 38: /*up*/
                         if (this.CmdLine.IsVisible) {
                             this.CmdLine.ShowPrevHistory();
-                        } else if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(0, -100, this.Viewport.GetCameraScale(), 50);
+                        } else  {
+                            var NextNode = this.FindNearestNode(this.ViewMap[this.FocusedLabel], Direction.Top);
+                            if (NextNode != null) {
+                                this.ChangeFocusedLabel(NextNode.Label);
+                                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 39: /*right*/
-                        if (!this.CmdLine.IsVisible && !this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(100, 0, this.Viewport.GetCameraScale(), 50);
+                        if (!this.CmdLine.IsVisible) {
+                            var NextNode = this.FindNearestNode(this.ViewMap[this.FocusedLabel], Direction.Right);
+                            if (NextNode != null) {
+                                this.ChangeFocusedLabel(NextNode.Label);
+                                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 40: /*down*/
                         if (this.CmdLine.IsVisible) {
                             this.CmdLine.ShowNextHistory();
-                        } else if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(0, 100, this.Viewport.GetCameraScale(), 50);
+                        } else {
+                            var NextNode = this.FindNearestNode(this.ViewMap[this.FocusedLabel], Direction.Bottom);
+                            if (NextNode != null) {
+                                this.ChangeFocusedLabel(NextNode.Label);
+                                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+                            }
                         }
                         break;
                     case 8: /*BackSpace*/
@@ -274,6 +290,60 @@ module AssureNote {
                 $("#auto-expand-area").hide(100);
             };
 
+        }
+
+
+        /**
+            @method FindNearestNode
+            @param {AssureNote.NodeView} CenterNode
+            @param {AssureNote.Direction} Dir 
+            @return {AssureNote.NodeView} Found node. If no node is found, null is retured.
+        */
+        FindNearestNode(CenterNode: NodeView, Dir: Direction): NodeView {
+            if (!CenterNode) {
+                return null;
+            }
+            var RightLimitVectorX: number = 1;
+            var RightLimitVectorY: number = 1;
+            var LeftLimitVectorX: number = 1;
+            var LeftLimitVectorY: number = 1;
+
+            switch (Dir) {
+                case Direction.Right:
+                    LeftLimitVectorY = -1;
+                    break;
+                case Direction.Left:
+                    RightLimitVectorX = -1;
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    break;
+                case Direction.Top:
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    LeftLimitVectorY = -1;
+                    break;
+                case Direction.Bottom:
+                    RightLimitVectorX = -1;
+                    break;
+            }
+            var NearestNode: NodeView = null;
+            var CurrentMinimumDistanceSquere = Infinity;
+            this.MasterView.TraverseVisibleNode((Node: NodeView) => {
+                if (Node.IsVisible) {
+                    var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
+                    var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                    var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
+                    var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
+                    if (DDotR > 0 && DDotL > 0) {
+                        var DistanceSquere = DX * DX + DY * DY;
+                        if (DistanceSquere < CurrentMinimumDistanceSquere) {
+                            CurrentMinimumDistanceSquere = DistanceSquere;
+                            NearestNode = Node;
+                        }
+                    }
+                }
+            });
+            return NearestNode;
         }
 
         SetFoldedAllGoalNode(NodeView: NodeView): void {
