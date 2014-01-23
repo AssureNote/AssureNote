@@ -397,7 +397,7 @@ module AssureNote {
             if (Label == null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(ColorStyle.Highlight);
                 }
                 this.FocusedLabel = null;
                 return;
@@ -406,10 +406,10 @@ module AssureNote {
             if (NodeView != null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(ColorStyle.Highlight);
                 }
                 this.FocusedLabel = Label;
-                NodeView.ChangeColorStyle(ColorStyle.Highlight);
+                NodeView.AddColorStyle(ColorStyle.Highlight);
             }
         }
 

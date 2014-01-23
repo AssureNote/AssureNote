@@ -101,26 +101,17 @@ h4 {
 }
 
 .assurenote-default {
-	fill: rgba(255, 255, 255, 1.0);
-	/*filli: #b4d8df;*/
+	fill: rgba(255,255,255,1.0);
 	stroke: black;
 	stroke-width: 2;
 }
 
 .assurenote-default-highlight {
-	/*fill: #b4d8df;*/
 	stroke: orange;
 }
 
 .assurenote-todo {
-	fill: #FFFFFF;
-	stroke: #000000;
 	stroke-dasharray: 5px, 5px;
-}
-
-.assurenote-todo-highlight {
-	fill: #FFFFFF;
-	stroke: orange
 }
 
 .assurenote-search{

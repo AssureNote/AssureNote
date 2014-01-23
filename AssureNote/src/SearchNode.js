@@ -57,21 +57,22 @@ var AssureNote;
             this.CreateHitNodeView(ViewMap);
 
             this.SetDestination(this.HitNodes[0]);
-            this.SetAllNodesColor(ViewMap, AssureNote.ColorStyle.Searched);
-            ViewMap[this.HitNodes[0].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.SearchHighlight);
+            this.AddAllHitNodesColor(ViewMap, AssureNote.ColorStyle.Searched);
+            ViewMap[this.HitNodes[0].GetLabel()].Shape.AddColorStyle(AssureNote.ColorStyle.SearchHighlight);
             this.MoveToNext(ViewPort, function () {
                 _this.IsMoving = false;
             });
         };
 
-        Search.prototype.SearchNext = function (TargetView, IsTurn) {
+        Search.prototype.SearchNext = function (TargetView, IsReversed) {
             var _this = this;
             var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
             var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
             if (this.HitNodes.length == 1) {
                 return;
             }
-            if (!IsTurn) {
+            var OldIndex = this.NodeIndex;
+            if (!IsReversed) {
                 this.NodeIndex++;
                 if (this.NodeIndex >= this.HitNodes.length) {
                     this.NodeIndex = 0;
@@ -86,14 +87,8 @@ var AssureNote;
             this.IsMoving = true;
             this.SetDestination(this.HitNodes[this.NodeIndex]);
             this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, function () {
-                ViewMap[_this.HitNodes[_this.NodeIndex].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.SearchHighlight);
-                var index = 0;
-                if (!IsTurn) {
-                    index = (_this.NodeIndex == 0) ? _this.HitNodes.length - 1 : _this.NodeIndex - 1;
-                } else {
-                    index = (_this.NodeIndex == _this.HitNodes.length - 1) ? 0 : _this.NodeIndex + 1;
-                }
-                ViewMap[_this.HitNodes[index].GetLabel()].Shape.ChangeColorStyle(AssureNote.ColorStyle.Searched); //Disable Highlight
+                ViewMap[_this.HitNodes[OldIndex].GetLabel()].Shape.RemoveColorStyle(AssureNote.ColorStyle.SearchHighlight);
+                ViewMap[_this.HitNodes[_this.NodeIndex].GetLabel()].Shape.AddColorStyle(AssureNote.ColorStyle.SearchHighlight);
                 _this.IsMoving = false;
             });
         };
@@ -114,19 +109,30 @@ var AssureNote;
         };
 
         Search.prototype.ResetParam = function () {
-            this.SetAllNodesColor(this.AssureNoteApp.PictgramPanel.ViewMap, AssureNote.ColorStyle.Default);
+            this.RemoveAllHitNodesColor(this.AssureNoteApp.PictgramPanel.ViewMap, AssureNote.ColorStyle.Searched);
+            this.AssureNoteApp.PictgramPanel.ViewMap[this.HitNodes[this.NodeIndex].GetLabel()].Shape.RemoveColorStyle(AssureNote.ColorStyle.SearchHighlight);
             this.HitNodes = [];
             this.NodeIndex = 0;
             this.SearchWord = "";
             this.Searching = false;
         };
 
-        Search.prototype.SetAllNodesColor = function (ViewMap, ColorCode) {
+        Search.prototype.AddAllHitNodesColor = function (ViewMap, ColorCode) {
             for (var i = 0; i < this.HitNodes.length; i++) {
                 var Label = this.HitNodes[i].GetLabel();
                 var Node = ViewMap[Label];
                 if (Node != null) {
-                    Node.GetShape().ChangeColorStyle(ColorCode);
+                    Node.GetShape().AddColorStyle(ColorCode);
+                }
+            }
+        };
+
+        Search.prototype.RemoveAllHitNodesColor = function (ViewMap, ColorCode) {
+            for (var i = 0; i < this.HitNodes.length; i++) {
+                var Label = this.HitNodes[i].GetLabel();
+                var Node = ViewMap[Label];
+                if (Node != null) {
+                    Node.GetShape().RemoveColorStyle(ColorCode);
                 }
             }
         };

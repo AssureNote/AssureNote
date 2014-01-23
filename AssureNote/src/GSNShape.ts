@@ -432,8 +432,44 @@ module AssureNote {
             }
         }
 
+        /**
+            Deprecated. please use AddColorStyle / RemoveColorStyle
+            @method ChangeColorStyle
+        */
         ChangeColorStyle(ColorStyleCode: string): void {
             this.ColorStyle = (ColorStyleCode != ColorStyle.Default) ? ColorStyleCode : "";
+            if (this.ShapeGroup != null) {
+                this.ShapeGroup.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
+            }
+        }
+
+        AddColorStyle(ColorStyleCode: string): void {
+            if (ColorStyleCode) {
+                var Styles: string[] = this.ColorStyle.split(" ");
+                if (Styles.indexOf(ColorStyleCode) < 0) {
+                    Styles.push(ColorStyleCode);
+                }
+                if (Styles.indexOf(ColorStyle.Default) < 0) {
+                    Styles.unshift(ColorStyle.Default);
+                }
+                this.ColorStyle = Styles.join(" ");
+                this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            }
+        }
+
+        RemoveColorStyle(ColorStyleCode: string): void {
+            if (ColorStyleCode) {
+                var Styles: string[] = this.ColorStyle.split(" ");
+                var Index = Styles.indexOf(ColorStyleCode);
+                if (Index > 0) {
+                    Styles.splice(Index, 1);
+                }
+                if (Styles.indexOf(ColorStyle.Default) < 0) {
+                    Styles.unshift(ColorStyle.Default);
+                }
+                this.ColorStyle = Styles.join(" ");
+                this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            }
         }
     }
 
@@ -477,13 +513,6 @@ module AssureNote {
         UpdateHtmlClass() {
             this.Content.className = "node node-goal";
         }
-
-        ChangeColorStyle(ColorStyleCode: string): void {
-            super.ChangeColorStyle(ColorStyleCode);
-            if (this.ShapeGroup != null) {
-                this.ShapeGroup.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
-            }
-        }
     }
 
     export class GSNContextShape extends GSNShape {
@@ -507,14 +536,6 @@ module AssureNote {
         UpdateHtmlClass() {
             this.Content.className = "node node-context";
         }
-
-        ChangeColorStyle(ColorStyleCode: string): void {
-            super.ChangeColorStyle(ColorStyleCode);
-            if (this.BodyRect != null) {
-                this.BodyRect.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
-            }
-        }
-
     }
 
     export class GSNStrategyShape extends GSNShape {
@@ -550,14 +571,6 @@ module AssureNote {
                     return new Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
             }
         }
-
-        ChangeColorStyle(ColorStyleCode: string): void {
-            super.ChangeColorStyle(ColorStyleCode);
-            if (this.BodyPolygon != null) {
-                this.BodyPolygon.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
-            }
-        }
-
     }
 
     export class GSNEvidenceShape extends GSNShape {
@@ -580,13 +593,6 @@ module AssureNote {
 
         UpdateHtmlClass() {
             this.Content.className = "node node-evidence";
-        }
-
-        ChangeColorStyle(ColorStyleCode: string): void {
-            super.ChangeColorStyle(ColorStyleCode);
-            if (this.BodyEllipse != null) {
-                this.BodyEllipse.setAttribute("class", ColorStyle.Default + " " + this.ColorStyle);
-            }
         }
     }
 }
