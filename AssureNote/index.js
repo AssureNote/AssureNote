@@ -64,5 +64,14 @@ $(function () {
     };
 
     App.LoadDefaultWGSN();
+    if (location.hash != null) {
+        console.log(location.hash);
+        var label = location.hash.substring(1);
+        var NodeView = App.PictgramPanel.ViewMap[label];
+        if (NodeView) {
+            App.PictgramPanel.ChangeFocusedLabel(label);
+            App.PictgramPanel.Viewport.SetCamera(NodeView.GetGX(), NodeView.GetGY(), 1);
+        }
+    }
 });
 //# sourceMappingURL=index.js.map

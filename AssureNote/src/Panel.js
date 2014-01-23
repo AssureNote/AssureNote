@@ -373,6 +373,7 @@ var AssureNote;
         @param {string} Label If label is null, there is no focused label.
         */
         PictgramPanel.prototype.ChangeFocusedLabel = function (Label) {
+            AssureNote.AssureNoteUtils.UpdateHash(Label);
             if (Label == null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {

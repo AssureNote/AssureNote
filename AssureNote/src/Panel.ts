@@ -396,6 +396,7 @@ module AssureNote {
            @param {string} Label If label is null, there is no focused label.
         */
         ChangeFocusedLabel(Label: string): void {
+            AssureNoteUtils.UpdateHash(Label);
             if (Label == null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {

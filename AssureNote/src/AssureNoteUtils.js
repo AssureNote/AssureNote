@@ -133,6 +133,15 @@ var AssureNote;
             return GenerateUID().toString(36);
         }
         AssureNoteUtils.GenerateRandomString = GenerateRandomString;
+
+        function UpdateHash(hash) {
+            if (!hash)
+                hash = '';
+            var scr = document.body.scrollTop;
+            window.location.hash = hash;
+            document.body.scrollTop = scr;
+        }
+        AssureNoteUtils.UpdateHash = UpdateHash;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

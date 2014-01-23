@@ -174,6 +174,13 @@ module AssureNote {
         export function GenerateRandomString(): string {
             return GenerateUID().toString(36);
         }
+
+        export function UpdateHash(hash: string) {
+            if (!hash) hash = '';
+            var scr = document.body.scrollTop;
+            window.location.hash = hash;
+            document.body.scrollTop = scr;
+        }
     }
 
     export class ColorStyle {
