@@ -356,10 +356,14 @@ var AssureNote;
             return NearestNode;
         };
 
-        PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
+        /**
+        @method FoldDeepSubGoals
+        @param {NodeView} NodeView
+        */
+        PictgramPanel.prototype.FoldDeepSubGoals = function (NodeView) {
             var _this = this;
             NodeView.ForEachVisibleChildren(function (SubNode) {
-                _this.SetFoldedAllGoalNode(SubNode);
+                _this.FoldDeepSubGoals(SubNode);
                 if (SubNode.GetNodeType() == 0 /* Goal */ && SubNode.Children != null) {
                     if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != 3 /* Evidence */) {
                         SubNode.IsFolded = true;

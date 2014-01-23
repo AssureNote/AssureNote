@@ -380,9 +380,13 @@ module AssureNote {
             return NearestNode;
         }
 
-        SetFoldedAllGoalNode(NodeView: NodeView): void {
+        /**
+           @method FoldDeepSubGoals
+           @param {NodeView} NodeView
+        */
+        FoldDeepSubGoals(NodeView: NodeView): void {
             NodeView.ForEachVisibleChildren((SubNode: NodeView) => {
-                this.SetFoldedAllGoalNode(SubNode);
+                this.FoldDeepSubGoals(SubNode);
                 if (SubNode.GetNodeType() == GSNType.Goal && SubNode.Children != null) {
                     if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != GSNType.Evidence) {
                         SubNode.IsFolded = true;
