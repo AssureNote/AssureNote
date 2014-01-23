@@ -235,10 +235,10 @@ var AssureNote;
             return "cloud-upload";
         };
         UploadMenuItem.prototype.GetDisplayName = function () {
-            return "Upload";
+            return "Share";
         };
         UploadMenuItem.prototype.Invoke = function (App) {
-            var Command = App.FindCommandByCommandLineName("upload");
+            var Command = App.FindCommandByCommandLineName("share");
             Command.Invoke(null, []);
         };
         return UploadMenuItem;
