@@ -1,10 +1,9 @@
 ///<reference path='../DefinitelyTyped/express/express.d.ts'/>
+
 /**
- * JSON-RPC2実装
- *
- * usage:
- * 
+ * @class GLOBAL
  */
+
 import express   = require("express");
 import error     = require("./error");
 import type      = require('./type');
@@ -30,9 +29,14 @@ export function requireAuth(newAuthMethods:string[]) {
 function isAuthRequired(methodName:string) {
     return _.contains(authMethods, methodName);
 }
+
 /**
- * handle method call
- */
+  * @method httpHandler
+  * @static
+  * @param {Object} req
+  * @param {Object} res
+  * @return {void}
+  */
 export function httpHandler(req: any, res: any) {
     var auth = new util_auth.Auth(req, res);
 

@@ -30,35 +30,43 @@ module AssureNote {
 
     export class MonitorNode {
 
-        Label: string;
         Location: string;
         Type: string;
         Condition: string;
+        Data: number;
         Status: boolean;
         PastLogs: any[];
 
-        constructor(public View: NodeView) {
-            this.Label = View.Label;
+        constructor(public App: AssureNoteApp, public Label: string) {
+            this.Data = null;
             this.Status = true;
             this.PastLogs = [];
 
-            var ThisNode = View.Model;
-            var GoalNode = ThisNode.GetCloseGoal();
-            var ContextNode = null;
-            for(var i: number = 0; i < GoalNode.SubNodeList.length; i++) {
-                var BroutherNode = GoalNode.SubNodeList[i];
-                if(BroutherNode.IsContext()) {
-                    ContextNode = BroutherNode;
+            var ThisModel = this.GetModel();
+            var GoalModel = ThisModel.GetCloseGoal();
+            var ContextModel = null;
+            for(var i: number = 0; i < GoalModel.SubNodeList.length; i++) {
+                var BroutherModel = GoalModel.SubNodeList[i];
+                if(BroutherModel.IsContext()) {
+                    ContextModel = BroutherModel;
                     break;
                 }
             }
-            if(ContextNode == null) {
+            if(ContextModel == null) {
                 return;
             }
-            var TagMap = ContextNode.GetTagMap();
+            var TagMap = ContextModel.GetTagMap();
             this.Location = TagMap.get("Location");
             this.Condition = TagMap.get("Condition");
             this.ExtractTypeFromCondition();
+        }
+
+        GetView(): NodeView {
+            return this.App.PictgramPanel.ViewMap[this.Label];
+        }
+
+        GetModel(): GSNNode {
+            return this.GetView().Model;
         }
 
         ExtractTypeFromCondition(): void {
@@ -74,38 +82,71 @@ module AssureNote {
             }
         }
 
-        Validate(): boolean {
+        IsValid(): boolean {
             if(this.Location && this.Type && this.Condition) {
-                return true;    
-            }
-            return false;    
-        }
-
-        IsDead(App: AssureNote.AssureNoteApp): boolean {
-            var View = App.PictgramPanel.ViewMap[this.Label];
-            if(View == null) {
                 return true;
             }
-            return false;    
+            return false;
+        }
+
+        IsDead(): boolean {
+            if(this.GetView() == null) {
+                return true;
+            }
+            return false;
+        }
+
+        UpdateModel(): void {
+            var Model = this.GetModel();
+            if(Model.TagMap == null) {
+               Model.TagMap = new HashMap<string, string>();
+            }
+            var Value = this.Data ? this.Data+"" : "";
+            Model.TagMap.put(this.Type, Value);
+            Model.HasTag = true;
+
+            var NodeDoc = Model.NodeDoc+Lib.LineFeed;;
+            var Regex = new RegExp(this.Type+"\\s*::.*\\n", "g");
+            if(NodeDoc.match(Regex)) {
+                NodeDoc = NodeDoc.replace(Regex, this.Type+"::"+Value+Lib.LineFeed);
+                NodeDoc = NodeDoc.slice(0, -1);
+            }
+            else {
+                if(NodeDoc == Lib.LineFeed) {
+                    NodeDoc = "";
+                }
+                NodeDoc += this.Type+"::"+Value;
+            }
+            Model.NodeDoc = NodeDoc;
+            Model.LastModified = Model.BaseDoc.DocHistory;
         }
 
         Update(Rec: RecApi, ErrorCallback: (Request, Status, Error) => void): void {
             // Get latest data from REC
             var LatestLog = Rec.GetLatestData(this.Location, this.Type, ErrorCallback);
             if(LatestLog == null) {
-                return;   // ajax error
+                return;   // Ajax error
+            }
+
+            // Don't update if latest log is same as past log
+            if(JSON.stringify(LatestLog) == JSON.stringify(this.PastLogs[0])) {
+                return;
             }
 
             // Update past logs
-            if(!(this.PastLogs.length < 20)) {
+            if(this.PastLogs.length > 20) {
                 this.PastLogs.pop();
             }
             this.PastLogs.unshift(LatestLog);
 
             // Update status
-            var script = "var "+this.Type+"="+LatestLog.data+";";
+            this.Data = LatestLog.data;
+            var script = "var "+this.Type+"="+this.Data+";";
             script += this.Condition+";";
-            this.Status = eval(script);   // TODO Don't use eval()
+            this.Status = eval(script);   // FIXME Don't use eval()
+
+            // Update model
+            this.UpdateModel();
         }
 
     }
@@ -117,12 +158,14 @@ module AssureNote {
         IsRunning: boolean;
         Timer: number;
         Rec: RecApi;
+        RedNodeMap: { [key: string]: boolean };   // Value doesn't make sense
 
         constructor(public App: AssureNote.AssureNoteApp) {
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // FIXME make it configurable
+            this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // FIXME Make it configurable
+            this.RedNodeMap = {};
         }
 
         SetMonitorNode(MNode: MonitorNode): void {
@@ -130,6 +173,8 @@ module AssureNote {
                 this.NodeCount += 1;
             }
             this.MonitorNodeMap[MNode.Label] = MNode;
+
+            MNode.UpdateModel();
         }
 
         DeleteMonitorNode(Label: string): void {
@@ -142,7 +187,7 @@ module AssureNote {
         DeleteDeadMonitorNodes(): void {
             for(var Label in this.MonitorNodeMap) {
                 var MNode = this.MonitorNodeMap[Label];
-                if(MNode.IsDead(this.App)) {
+                if(MNode.IsDead()) {
                     this.DeleteMonitorNode(Label);
                     if(this.NodeCount < 1 && this.IsRunning) {
                         this.StopMonitoring();
@@ -163,6 +208,18 @@ module AssureNote {
             }
         }
 
+        InitializeView(Doc: GSNDoc): void {
+            var Panel = this.App.PictgramPanel;
+            Doc.RenumberAll();
+            var NewView = new NodeView(Doc.TopNode, true);
+            NewView.SaveFoldedFlag(Panel.ViewMap);
+            Panel.InitializeView(NewView);
+        }
+
+        UpdateView(Doc: GSNDoc): void {
+            this.App.PictgramPanel.Draw(Doc.TopNode.GetLabel());
+        }
+
         StartMonitoring(Interval: number): void {
             this.IsRunning = true;
             console.log("Start monitoring...");
@@ -172,11 +229,14 @@ module AssureNote {
                 console.log("Monitoring...")
 
                 // Initialize red node map
-                var RedNodeMap: { [key: string]: boolean } = {};   // value doesn't make sense
+                self.RedNodeMap = {};
 
+                // Update monitor nodes
+                var Doc = self.App.MasterRecord.GetLatestDoc();
+                var IsFirst = true;
                 for(var Label in self.MonitorNodeMap) {
                     var MNode = self.MonitorNodeMap[Label];
-                    if(MNode.IsDead(self.App)) {
+                    if(MNode.IsDead()) {
                         self.DeleteMonitorNode(Label);
                         if(self.NodeCount < 1 && self.IsRunning) {
                             self.StopMonitoring();
@@ -185,25 +245,36 @@ module AssureNote {
                         continue;
                     }
 
-                    // Check red nodes
+                    // Update monitoring data
                     MNode.Update(self.Rec, function(Request, Status, Error) {
                         self.StopMonitoring();
-                    } /* error handler */);
-
+                    } /* Error handler */);
                     if(!self.IsRunning) break;
 
+                    // Update history if last modifier wasn't 'Monitor'
+                    if(IsFirst) {
+                        if(Doc.DocHistory.Author != "Monitor") {
+                            self.App.MasterRecord.OpenEditor("Monitor", "todo", null, "test");
+                            Doc = self.App.MasterRecord.EditingDoc;
+                        }
+                        IsFirst = false;
+                    }
+
+                    // Change node color recursively if node's status is 'false'
                     if(MNode.Status == false) {
-                        var View = MNode.View;
+                        var View = MNode.GetView();
                         while(View != null) {
-                            RedNodeMap[View.Label] = true;
+                            self.RedNodeMap[View.Label] = true;
                             View = View.Parent;
                         }
                     }
                 }
 
                 // Update view
-                for(var Label in RedNodeMap) {
-                    self.App.PictgramPanel.ViewMap[Label].ChangeColorStyle(ColorStyle.Danger);
+                self.InitializeView(Doc);
+                self.UpdateView(Doc);
+                if(self.App.MasterRecord.EditingDoc != null) {
+                    self.App.MasterRecord.CloseEditor();
                 }
             }, Interval);
         }
@@ -238,19 +309,26 @@ module AssureNote {
 
             if(Params.length == 1) {
                 var Param = Params[0];
+                // check params
                 if(Param == "all") {
                     // Start all monitors
+                    var IsFirst = true;
                     for(var Label in this.App.PictgramPanel.ViewMap) {
                         var View = this.App.PictgramPanel.ViewMap[Label];
                         if(!View.Model.IsEvidence()) {
                             continue;
                         }
 
-                        var MNode = new MonitorNode(View);
-                        if(!MNode.Validate()) {
+                        var MNode = new MonitorNode(this.App, Label);
+                        if(!MNode.IsValid()) {
                             continue;
                         }
 
+                        if(IsFirst) {
+                            this.App.MasterRecord.OpenEditor("Monitor", "todo", null, "test");
+                            MNodeManager.InitializeView(this.App.MasterRecord.EditingDoc);
+                            IsFirst = false;
+                        }
                         MNodeManager.SetMonitorNode(MNode);
                     }
                 }
@@ -262,14 +340,19 @@ module AssureNote {
                         return;
                     }
 
-                    var MNode = new MonitorNode(View);
-                    if(!MNode.Validate()) {
+                    var MNode = new MonitorNode(this.App, Label);
+                    if(!MNode.IsValid()) {
                         this.App.DebugP("This node is not monitor");
                         return;
                     }
 
+                    this.App.MasterRecord.OpenEditor("Monitor", "todo", null, "test");
+                    MNodeManager.InitializeView(this.App.MasterRecord.EditingDoc);
                     MNodeManager.SetMonitorNode(MNode);
                 }
+
+                MNodeManager.UpdateView(this.App.MasterRecord.EditingDoc);
+                this.App.MasterRecord.CloseEditor();
 
                 if(MNodeManager.NodeCount > 0 && !MNodeManager.IsRunning) {
                     MNodeManager.StartMonitoring(5000);
@@ -340,6 +423,47 @@ module AssureNote {
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
             this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
+        }
+
+        RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
+            if(NodeView.Label in MNodeManager.RedNodeMap) {
+                NodeView.ChangeColorStyle(ColorStyle.Danger);
+            }
+        }
+
+        CreateTooltipContents(NodeView: NodeView): HTMLLIElement[]{
+            if(!(NodeView.Label in MNodeManager.MonitorNodeMap)) {
+                return null;
+            }
+
+            var MNode = MNodeManager.MonitorNodeMap[NodeView.Label];
+
+            var ReturnValue: HTMLLIElement[] = [];
+            var li = document.createElement('li');
+            var table = document.createElement('table');
+            table.setAttribute('border', '4');
+            table.setAttribute('width', '250');
+            table.setAttribute('align', 'center');
+
+            var TableInnerHTML = '';
+            TableInnerHTML += '<caption>REC Logs</caption>';
+            TableInnerHTML += '<tr bgcolor="#cccccc">'
+            TableInnerHTML += '<th>Timestamp</th>'
+            TableInnerHTML += '<th>Data</th>'
+            TableInnerHTML += '</tr>'
+
+            for(var i: number = 0; i < MNode.PastLogs.length; i++) {
+                var Log = MNode.PastLogs[i];
+                TableInnerHTML += '<tr align="center">'
+                TableInnerHTML += '<td>'+Log.timestamp+'</td>';
+                TableInnerHTML += '<td>'+Log.data+'</td>';
+                TableInnerHTML += '</tr>'
+            }
+
+            table.innerHTML = TableInnerHTML;
+            li.innerHTML = table.outerHTML;
+            ReturnValue.push(li);
+            return ReturnValue;
         }
 
     }

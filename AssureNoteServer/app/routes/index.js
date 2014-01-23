@@ -26,32 +26,7 @@ var getBasicParam = function (req, res) {
     return params;
 };
 
-var index_DummyUser = function (req, res, params) {
-    if (CONFIG && CONFIG.debugt_user && CONFIG.debug_user.loginName) {
-        req.user = { displayName: CONFIG.debug_user.loginName };
-    } else {
-        req.user = { displayName: 'tsunade' };
-    }
-
-    //var con = new db.Database();
-    //var userDAO = new model_user.UserDAO(con);
-    //userDAO.login(req.user.displayName, (err:any, result: model_user.User) => {
-    //    if (err) {
-    //        console.error(err);
-    //        res.redirect(CONFIG.ads.basepath+'/');
-    //        return;
-    //    }
-    //    var auth = new util_auth.Auth(req, res);
-    //    auth.set(result.id, result.loginName);
-    res.render('index', params);
-    //});
-};
-
 exports.index = function (req, res) {
     var params = getBasicParam(req, res);
-    if (process.argv.length > 2 && process.argv[2] == '--debug') {
-        index_DummyUser(req, res, params);
-    } else {
-        res.render('index', params);
-    }
+    res.render('index', params);
 };

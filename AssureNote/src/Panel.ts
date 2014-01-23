@@ -173,27 +173,64 @@ module AssureNote {
                         }
                         break;
                     case 37: /*left*/
-                        if (!this.CmdLine.IsVisible && !this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(-100, 0, this.Viewport.GetCameraScale(), 50);
+                        if (!this.CmdLine.IsVisible) {
+                            this.MoveToNearestNode(Direction.Left);
                         }
                         break;
                     case 38: /*up*/
                         if (this.CmdLine.IsVisible) {
                             this.CmdLine.ShowPrevHistory();
-                        } else if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(0, -100, this.Viewport.GetCameraScale(), 50);
+                        } else {
+                            this.MoveToNearestNode(Direction.Top);
                         }
                         break;
                     case 39: /*right*/
-                        if (!this.CmdLine.IsVisible && !this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(100, 0, this.Viewport.GetCameraScale(), 50);
+                        if (!this.CmdLine.IsVisible) {
+                            this.MoveToNearestNode(Direction.Right);
                         }
                         break;
                     case 40: /*down*/
                         if (this.CmdLine.IsVisible) {
                             this.CmdLine.ShowNextHistory();
-                        } else if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-                            this.Viewport.Move(0, 100, this.Viewport.GetCameraScale(), 50);
+                        } else {
+                            this.MoveToNearestNode(Direction.Bottom);
+                        }
+                        break;
+                    case 72: /*h*/
+                        if (!this.CmdLine.IsVisible) {
+                            this.MoveToNearestNode(Direction.Left);
+                        }
+                        break;
+                    case 74: /*j*/
+                        if (!this.CmdLine.IsVisible) {
+                            this.MoveToNearestNode(Direction.Bottom);
+                        }
+                        break;
+                    case 75: /*k*/
+                        if (!this.CmdLine.IsVisible) {
+                            this.MoveToNearestNode(Direction.Top);
+                        }
+                        break;
+                    case 76: /*l*/
+                        if (!this.CmdLine.IsVisible) {
+                            this.MoveToNearestNode(Direction.Right);
+                        }
+                        break;
+                    case 70: /*f*/
+                        if (!this.CmdLine.IsVisible) {
+                            var FoldCommand = this.AssureNoteApp.FindCommandByCommandLineName("fold");
+                            if (FoldCommand && this.FocusedLabel) {
+                                FoldCommand.Invoke(null, [this.FocusedLabel]);
+                            }
+                        }
+                        break;
+                    case 65: /*a*/
+                    case 73: /*i*/
+                        if (!this.CmdLine.IsVisible) {
+                            var FoldCommand = this.AssureNoteApp.FindCommandByCommandLineName("edit");
+                            if (FoldCommand && this.FocusedLabel) {
+                                FoldCommand.Invoke(null, [this.FocusedLabel]);
+                            }
                         }
                         break;
                     case 8: /*BackSpace*/
@@ -280,6 +317,71 @@ module AssureNote {
 
         }
 
+        /**
+            @method MoveToNearestNode
+            @param {AssureNote.Direction} Dir 
+        */
+        MoveToNearestNode(Dir: Direction): void {
+            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
+            if (NextNode != null) {
+                this.ChangeFocusedLabel(NextNode.Label);
+                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+            }
+        }
+
+        /**
+            @method FindNearestNode
+            @param {AssureNote.NodeView} CenterNode
+            @param {AssureNote.Direction} Dir 
+            @return {AssureNote.NodeView} Found node. If no node is found, null is retured.
+        */
+        FindNearestNode(CenterNode: NodeView, Dir: Direction): NodeView {
+            if (!CenterNode) {
+                return null;
+            }
+            var RightLimitVectorX: number = 1;
+            var RightLimitVectorY: number = 1;
+            var LeftLimitVectorX: number = 1;
+            var LeftLimitVectorY: number = 1;
+
+            switch (Dir) {
+                case Direction.Right:
+                    LeftLimitVectorY = -1;
+                    break;
+                case Direction.Left:
+                    RightLimitVectorX = -1;
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    break;
+                case Direction.Top:
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    LeftLimitVectorY = -1;
+                    break;
+                case Direction.Bottom:
+                    RightLimitVectorX = -1;
+                    break;
+            }
+            var NearestNode: NodeView = null;
+            var CurrentMinimumDistanceSquere = Infinity;
+            this.MasterView.TraverseVisibleNode((Node: NodeView) => {
+                if (Node.IsVisible) {
+                    var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
+                    var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                    var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
+                    var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
+                    if (DDotR > 0 && DDotL > 0) {
+                        var DistanceSquere = DX * DX + DY * DY;
+                        if (DistanceSquere < CurrentMinimumDistanceSquere) {
+                            CurrentMinimumDistanceSquere = DistanceSquere;
+                            NearestNode = Node;
+                        }
+                    }
+                }
+            });
+            return NearestNode;
+        }
+
         SetFoldedAllGoalNode(NodeView: NodeView): void {
             NodeView.ForEachVisibleChildren((SubNode: NodeView) => {
                 this.SetFoldedAllGoalNode(SubNode);
@@ -299,7 +401,7 @@ module AssureNote {
             if (Label == null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(ColorStyle.Highlight);
                 }
                 this.FocusedLabel = null;
                 return;
@@ -308,10 +410,10 @@ module AssureNote {
             if (NodeView != null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(ColorStyle.Highlight);
                 }
                 this.FocusedLabel = Label;
-                NodeView.ChangeColorStyle(ColorStyle.Highlight);
+                NodeView.AddColorStyle(ColorStyle.Highlight);
             }
         }
 

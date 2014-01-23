@@ -7,12 +7,25 @@ var __extends = this.__extends || function (d, b) {
 var model = require('./model');
 var error = require('../api/error');
 
+/**
+* @class User
+* @constructor
+* @param {String} key
+* @param {String} displayName
+* @param {String} authId
+*/
 var User = (function () {
     function User(key, displayName, authId) {
         this.key = key;
         this.displayName = displayName;
         this.authId = authId;
     }
+    /**
+    * @method tableToObject
+    * @static
+    * @param {Any} row
+    * @return {User}
+    */
     User.tableToObject = function (row) {
         return new User(row.id_key, row.display_name, row.auth_id);
     };
@@ -20,12 +33,25 @@ var User = (function () {
 })();
 exports.User = User;
 
+/**
+* @class UserDAO
+* @constructor
+* @extends DAO
+*/
 var UserDAO = (function (_super) {
     __extends(UserDAO, _super);
     function UserDAO() {
         _super.apply(this, arguments);
     }
-    UserDAO.prototype.login = function (key, displayName, auth_id, callback) {
+    /**
+    * @method login
+    * @param {String} key
+    * @param {String} displayName
+    * @param {String} auth_id
+    * @param {Function} callback
+    * @return {void}
+    */
+    UserDAO.prototype.login = function (key, displayName, authId, callback) {
         var _this = this;
         function validate(key) {
             var checks = [];
@@ -44,7 +70,7 @@ var UserDAO = (function (_super) {
 
         this.select(key, function (err, resultSelect) {
             if (err) {
-                _this.insert(key, displayName, auth_id, function (error, resultInsert) {
+                _this.insert(key, displayName, authId, function (error, resultInsert) {
                     if (error) {
                         callback(error, null);
                         return;
@@ -61,6 +87,14 @@ var UserDAO = (function (_super) {
         });
     };
 
+    /**
+    * @method register
+    * @param {String} key
+    * @param {String} displayName
+    * @param {String} authId
+    * @param {Function} callback
+    * @return {void}
+    */
     UserDAO.prototype.register = function (key, displayName, authId, callback) {
         function validate(key, name) {
             var checks = [];
@@ -107,10 +141,18 @@ var UserDAO = (function (_super) {
         });
     };
 
-    UserDAO.prototype.insert = function (key, name, auth_id, callback) {
-        if (!auth_id)
-            auth_id = '';
-        this.con.query('INSERT INTO user(id_key, display_name, auth_id) VALUES(?, ?, ?) ', [key, name, auth_id], function (err, result) {
+    /**
+    * @method insert
+    * @param {String} key
+    * @param {String} displayName
+    * @param {String} authId
+    * @param {Function} callback
+    * @return {void}
+    */
+    UserDAO.prototype.insert = function (key, displayName, authId, callback) {
+        if (!authId)
+            authId = '';
+        this.con.query('INSERT INTO user(id_key, display_name, auth_id) VALUES(?, ?, ?) ', [key, displayName, authId], function (err, result) {
             if (err) {
                 if (err.code == 'ER_DUP_ENTRY') {
                     err = new error.DuplicatedError('The login name is already exist.');
@@ -118,7 +160,7 @@ var UserDAO = (function (_super) {
                 callback(err, null);
                 return;
             }
-            callback(err, new User(key, name, auth_id));
+            callback(err, new User(key, displayName, authId));
         });
     };
     return UserDAO;

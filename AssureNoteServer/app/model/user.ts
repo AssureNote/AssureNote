@@ -1,17 +1,43 @@
 import model    = require('./model')
 import error    = require('../api/error')
 
+/**
+  * @class User
+  * @constructor
+  * @param {String} key
+  * @param {String} displayName
+  * @param {String} authId
+  */
 export class User {
     constructor(public key: string, public displayName: string, public authId: string) {
     }
 
+    /**
+      * @method tableToObject
+      * @static
+      * @param {Any} row
+      * @return {User}
+      */
     static tableToObject(row:any) {
         return new User(row.id_key, row.display_name, row.auth_id);
     }
 }
 
+/**
+  * @class UserDAO
+  * @constructor
+  * @extends DAO
+  */
 export class UserDAO extends model.DAO {
-    login(key: string, displayName: string, auth_id: string, callback: (err:any, user: User) => void) {
+    /**
+      * @method login
+      * @param {String} key
+      * @param {String} displayName
+      * @param {String} auth_id
+      * @param {Function} callback
+      * @return {void}
+      */
+    login(key: string, displayName: string, authId: string, callback: (err:any, user: User) => void) {
         function validate(key: string) {
             var checks = [];
             if (key.length == 0) checks.push('User key is required.');
@@ -26,7 +52,7 @@ export class UserDAO extends model.DAO {
 
         this.select(key, (err, resultSelect) => {
             if (err) {
-                this.insert(key, displayName, auth_id, (error, resultInsert) => {
+                this.insert(key, displayName, authId, (error, resultInsert) => {
                     if (error) {
                         callback(error, null);
                         return;
@@ -44,6 +70,14 @@ export class UserDAO extends model.DAO {
         });
     }
 
+    /**
+      * @method register
+      * @param {String} key
+      * @param {String} displayName
+      * @param {String} authId
+      * @param {Function} callback
+      * @return {void}
+      */
     register(key: string, displayName: string, authId: string, callback: (err: any, user: User) => void) {
         function validate(key: string, name: string) {
             var checks = [];
@@ -86,10 +120,18 @@ export class UserDAO extends model.DAO {
         });
     }
 
-    insert(key: string, name: string, auth_id: string, callback: (err:any, user:User) => void) {
+    /**
+      * @method insert
+      * @param {String} key
+      * @param {String} displayName
+      * @param {String} authId
+      * @param {Function} callback
+      * @return {void}
+      */
+    insert(key: string, displayName: string, authId: string, callback: (err:any, user:User) => void) {
 
-        if (!auth_id) auth_id = '';
-        this.con.query('INSERT INTO user(id_key, display_name, auth_id) VALUES(?, ?, ?) ', [key, name, auth_id], (err, result) => {
+        if (!authId) authId = '';
+        this.con.query('INSERT INTO user(id_key, display_name, auth_id) VALUES(?, ?, ?) ', [key, displayName, authId], (err, result) => {
             if (err) {
                 if (err.code == 'ER_DUP_ENTRY') {
                     err = new error.DuplicatedError('The login name is already exist.');
@@ -97,7 +139,7 @@ export class UserDAO extends model.DAO {
                 callback(err, null);
                 return;
             }
-            callback(err, new User(key, name, auth_id));
+            callback(err, new User(key, displayName, authId));
         });
     }
 }

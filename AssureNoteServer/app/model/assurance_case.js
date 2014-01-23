@@ -12,6 +12,13 @@ var async = require('async');
 var _ = require('underscore');
 var crypto = require('crypto');
 
+/**
+* @class GLOBAL
+*/
+/**
+* @method getMd5String
+* @return {String}
+*/
 function getMd5String() {
     var d = new Date();
     var md5 = crypto.createHash('md5');
@@ -21,6 +28,14 @@ function getMd5String() {
 }
 exports.getMd5String = getMd5String;
 
+/**
+* @class AssuranceCase
+* @constructor
+* @param {String} hashKey
+* @param {String} userKey
+* @param {String} data
+* @param {String} [meta_data]
+*/
 var AssuranceCase = (function () {
     function AssuranceCase(hashKey, userKey, data, meta_data) {
         this.hashKey = hashKey;
@@ -28,6 +43,12 @@ var AssuranceCase = (function () {
         this.data = data;
         this.meta_data = meta_data;
     }
+    /**
+    * @method tableToObject
+    * @static
+    * @param {Any} table
+    * @return {AssuranceCase}
+    */
     AssuranceCase.tableToObject = function (table) {
         return new AssuranceCase(table.hash_key, table.user_key, table.data, table.meta_data);
     };
@@ -35,11 +56,22 @@ var AssuranceCase = (function () {
 })();
 exports.AssuranceCase = AssuranceCase;
 
+/**
+* @class AssuranceCaseDAO
+* @constructor
+* @extends DAO
+*/
 var AssuranceCaseDAO = (function (_super) {
     __extends(AssuranceCaseDAO, _super);
     function AssuranceCaseDAO() {
         _super.apply(this, arguments);
     }
+    /**
+    * @method get
+    * @param {String} hashKey
+    * @param {Function} callback
+    * @return {void}
+    */
     AssuranceCaseDAO.prototype.get = function (hashKey, callback) {
         var _this = this;
         async.waterfall([
@@ -60,6 +92,14 @@ var AssuranceCaseDAO = (function (_super) {
         });
     };
 
+    /**
+    * @method insert
+    * @param {String} userKey
+    * @param {String} data
+    * @param {String} meta_data
+    * @param {Function} callback
+    * @return {void}
+    */
     AssuranceCaseDAO.prototype.insert = function (userKey, data, meta_data, callback) {
         if (!meta_data) {
             meta_data = '';
