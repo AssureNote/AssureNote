@@ -283,23 +283,7 @@ class GSNHistory {
 	/*field*/GSNDoc Doc;
 
 	GSNHistory/*constructor*/(int Rev, String Author, String Role, String DateString, String Process, GSNDoc Doc) {
-		this.Rev = Rev;
-		this.Author = Author;
-		this.Role = Role;
-		this.Date = DateString;
-		/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-		if (DateString == null) {
-			/*local*/Date d = new Date();
-			this.Date = Format.format(d);
-		} else {
-			try {
-				this.Date = Format.format(Format.parse(DateString));
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
-		this.Process = Process;
-		this.Doc = Doc;
+		this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
 	}
 
 	public String toString() {
@@ -313,7 +297,15 @@ class GSNHistory {
 	public int CompareDate(GSNHistory aHistory) {
 		return (Lib.String_compareTo(this.Date, aHistory.Date));
 	}
-
+	
+	public void UpdateHistory(int Rev, String Author, String Role, String DateString, String Process, GSNDoc Doc) {
+		this.Rev = Rev;
+		this.Author = Author;
+		this.Role = Role;
+		this.Process = Process;
+		this.Doc = Doc;
+		this.Date = WikiSyntax.FormatDateString(DateString);
+	}
 }
 
 class WikiSyntax {	
@@ -480,6 +472,20 @@ class WikiSyntax {
 			Writer.newline();
 		}
 		return Writer.toString();
+	}
+	
+	
+	public static String FormatDateString(String DateString) {
+		/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		 if (DateString != null){
+			try {
+				return Format.format(Format.parse(DateString));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		/*local*/Date d = new Date();
+		return Format.format(d);
 	}
 }
 
@@ -1223,7 +1229,11 @@ class GSNRecord {
 		if(Rev >= 0) {
 			/*local*/GSNHistory History = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
 			while (!(Rev < Lib.Array_size(this.HistoryList))) {
-				Lib.Array_add(this.HistoryList, null);
+				Lib.Array_add(this.HistoryList, new GSNHistory(Rev, Author, Role, Date, Process, Doc));
+			}
+			if (0 <= Rev && Rev < Lib.Array_size(this.HistoryList)) {
+				/*local*/GSNHistory OldHistory = Lib.Array_get(this.HistoryList,  Rev);
+				OldHistory.UpdateHistory(Rev, Author, Role, Date, Process, Doc);
 			}
 			Lib.Array_set(this.HistoryList, Rev, History);
 			if (Doc != null) {

@@ -139,23 +139,7 @@ export class GSNHistory {
 	Doc: GSNDoc;
 
 	constructor(Rev: number, Author: string, Role: string, DateString: string, Process: string, Doc: GSNDoc) {
-		this.Rev = Rev;
-		this.Author = Author;
-		this.Role = Role;
-		this.Date = DateString;
-		var Format: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd84HH:mm:ssZ");
-		if (DateString == null) {
-			var d: Date = new Date();
-			this.Date = Format.format(d);
-		} else {
-			try {
-				this.Date = Format.format(Format.parse(DateString));
-			} catch(e) {
-				e.printStackTrace();
-			}
-		}
-		this.Process = Process;
-		this.Doc = Doc;
+		this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
 	}
 
 	public toString(): string {
@@ -169,7 +153,15 @@ export class GSNHistory {
 	public CompareDate(aHistory: GSNHistory): number {
 		return (Lib.String_compareTo(this.Date, aHistory.Date));
 	}
-
+	
+	public UpdateHistory(Rev: number, Author: string, Role: string, DateString: string, Process: string, Doc: GSNDoc): void {
+		this.Rev = Rev;
+		this.Author = Author;
+		this.Role = Role;
+		this.Process = Process;
+		this.Doc = Doc;
+		this.Date = WikiSyntax.FormatDateString(DateString);
+	}
 }
 
 export class WikiSyntax {	
@@ -302,15 +294,15 @@ export class WikiSyntax {
 			var Loc: number = LabelLine.indexOf("#");
 			try {
 				if (Loc != -1) {
-					var HistoryTriple: GSNHistory[] = new Array<GSNHistory>(2);
+					var HistoryTaple: GSNHistory[] = new Array<GSNHistory>(2);
 					var RevText: string = LabelLine.substring(Loc + 1).trim();
 					var RevSet: string[] = RevText.split(":");
-					HistoryTriple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1)); // Created
-					HistoryTriple[1] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[1], -1)); // Branched
-					if (HistoryTriple[0] == null || HistoryTriple[1] == null) {
+					HistoryTaple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1)); // Created
+					HistoryTaple[1] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[1], -1)); // Branched
+					if (HistoryTaple[0] == null || HistoryTaple[1] == null) {
 						return null;
 					}
-					return HistoryTriple;
+					return HistoryTaple;
 				}
 			}
 			catch(e) {
@@ -318,8 +310,8 @@ export class WikiSyntax {
 		}
 		return null;
 	}
-	public static FormatRefKey(NodeType: GSNType, HistoryTriple: string): string {
-		return WikiSyntax.FormatNodeType(NodeType) + HistoryTriple;
+	public static FormatRefKey(NodeType: GSNType, HistoryTaple: string): string {
+		return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
 	}
 	
 	public static CommentOutSubNode(DocText: string): string {
@@ -336,6 +328,20 @@ export class WikiSyntax {
 			Writer.newline();
 		}
 		return Writer.toString();
+	}
+	
+	
+	public static FormatDateString(DateString: string): string {
+		var Format: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd84HH:mm:ssZ");
+		 if (DateString != null){
+			try {
+				return Format.format(Format.parse(DateString));
+			} catch(e) {
+				e.printStackTrace();
+			}
+		}
+		var d: Date = new Date();
+		return Format.format(d);
 	}
 }
 
@@ -403,7 +409,7 @@ export class GSNNode {
 	
 	UID: number; /* Unique ID */
 
-	constructor(BaseDoc: GSNDoc, ParentNode: GSNNode, NodeType: GSNType,LabelName: string, UID: number, HistoryTriple: GSNHistory[]) {
+	constructor(BaseDoc: GSNDoc, ParentNode: GSNNode, NodeType: GSNType,LabelName: string, UID: number, HistoryTaple: GSNHistory[]) {
 		this.BaseDoc     = BaseDoc;
 		this.ParentNode  = ParentNode;
 		this.NodeType    = NodeType;	
@@ -412,9 +418,9 @@ export class GSNNode {
 		this.UID = UID;
 		this.SectionCount = 0;
 		this.SubNodeList = null;
-		if (HistoryTriple != null) {
-			this.Created = HistoryTriple[0];
-			this.LastModified = HistoryTriple[1];
+		if (HistoryTaple != null) {
+			this.Created = HistoryTaple[0];
+			this.LastModified = HistoryTaple[1];
 		} else {
 			if(BaseDoc != null) {
 				this.Created = BaseDoc.DocHistory;
@@ -490,7 +496,7 @@ export class GSNNode {
 		return WikiSyntax.FormatNodeType(this.NodeType) + this.GetLabelNumber();
 	}
 	
-	GetHistoryTriple(): string {
+	GetHistoryTaple(): string {
 		return "#" + this.Created.Rev + ":" + this.LastModified.Rev;
 	}
 	
@@ -677,8 +683,8 @@ export class GSNNode {
 		// Stream.append(" ");
 		// MD5.FormatDigest(this.Digest, Stream);
 		if (this.Created != null) {
-			var HistoryTriple: string = this.GetHistoryTriple();
-			Writer.print(" " + HistoryTriple);
+			var HistoryTaple: string = this.GetHistoryTaple();
+			Writer.print(" " + HistoryTaple);
 		}
 		Writer.newline();
 		if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
@@ -1074,7 +1080,11 @@ export class GSNRecord {
 		if(Rev >= 0) {
 			var History: GSNHistory = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
 			while (!(Rev < Lib.Array_size(this.HistoryList))) {
-				Lib.Array_add(this.HistoryList, null);
+				Lib.Array_add(this.HistoryList, new GSNHistory(Rev, Author, Role, Date, Process, Doc));
+			}
+			if (0 <= Rev && Rev < Lib.Array_size(this.HistoryList)) {
+				var OldHistory: GSNHistory = Lib.Array_get(this.HistoryList,  Rev);
+				OldHistory.UpdateHistory(Rev, Author, Role, Date, Process, Doc);
 			}
 			Lib.Array_set(this.HistoryList, Rev, History);
 			if (Doc != null) {
@@ -1321,17 +1331,16 @@ export class ParserContext {
 		var LabelName: string = WikiSyntax.ParseLabelName(LabelLine);
 		var LabelNumber: string = WikiSyntax.ParseLabelNumber(LabelLine); /* NOTE: LabelNumber WILL BE NEVER USED */
 		var UID: number = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
-		var RevisionHistory: string = WikiSyntax.ParseRevisionHistory(LabelLine);
 		var NewNode: GSNNode = null;
 		var ParentNode: GSNNode = null;
-		var HistoryTriple: GSNHistory[] = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
+		var HistoryTaple: GSNHistory[] = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
 		var Level: number = WikiSyntax.ParseGoalLevel(LabelLine);
 		if (NodeType == GSNType.Goal) {
 			ParentNode = this.GetStrategyOfGoal(Level);
 		} else {
 			ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
 		}
-		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTriple);
+		NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTaple);
 		if(this.FirstNode == null) {
 			this.FirstNode = NewNode;
 		}
