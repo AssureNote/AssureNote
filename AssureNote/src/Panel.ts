@@ -52,8 +52,7 @@ module AssureNote {
 
         CurrentDoc: GSNDoc;// Convert to caseview
         private FocusedLabel: string;// A label pointed out or clicked.
-        FocusedWx: number;
-        FocusedWy: number;
+        // We do not use FocusedView but FocusedLabel to make it modular.
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));

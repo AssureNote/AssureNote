@@ -36,6 +36,7 @@ var AssureNote;
     @class AssureNote.PictgramPanel
     */
     var PictgramPanel = (function () {
+        // We do not use FocusedView but FocusedLabel to make it modular.
         function PictgramPanel(AssureNoteApp) {
             var _this = this;
             this.AssureNoteApp = AssureNoteApp;
