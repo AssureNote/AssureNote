@@ -202,6 +202,7 @@ var AssureNote;
         };
 
         NodeView.prototype.UpdateDocumentPosition = function (Duration) {
+            Duration = Duration || 0;
             if (!this.IsVisible) {
                 return;
             }

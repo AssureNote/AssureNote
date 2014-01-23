@@ -214,6 +214,7 @@ module AssureNote {
         }
 
         UpdateDocumentPosition(Duration?: number): void {
+            Duration = Duration || 0;
             if (!this.IsVisible) {
                 return
             }
