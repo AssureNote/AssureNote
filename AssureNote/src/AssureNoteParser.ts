@@ -359,12 +359,10 @@ export class TagUtils {
 		}
 	}
 
-	static FormatHistoryTag(HistoryList: Array<GSNHistory>, Writer: StringWriter): void {
-		for (var i: number = 0; i < Lib.Array_size(HistoryList); i++) {
-			var History: GSNHistory = Lib.Array_get(HistoryList, i);
-			if (History != null) {
-				Writer.println("#" + i + "::" + History);
-			}
+	static FormatHistoryTag(HistoryList: Array<GSNHistory>, i: number, Writer: StringWriter): void {
+		var History: GSNHistory = Lib.Array_get(HistoryList, i);
+		if (History != null) {
+			Writer.println("#" + i + "::" + History);
 		}
 	}
 
@@ -1100,7 +1098,6 @@ export class GSNRecord {
 	}
 
 	Parse(TextDoc: string): void {
-		var RefMap: HashMap<string, GSNNode> = new HashMap<string, GSNNode>();
 		var Reader: StringReader = new StringReader(TextDoc);
 		while (Reader.HasNext()) {
 			var Doc: GSNDoc = new GSNDoc(this);
@@ -1213,13 +1210,13 @@ export class GSNRecord {
 
 	public FormatRecord(Writer: StringWriter): void {
 		var DocCount: number = 0;
-		TagUtils.FormatHistoryTag(this.HistoryList, Writer);
 		for (var i: number = 0; i < Lib.Array_size(this.HistoryList); i++) {
 			var Doc: GSNDoc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				if(DocCount > 0) {
 					Writer.println(Lib.VersionDelim);
 				}
+				TagUtils.FormatHistoryTag(this.HistoryList, i, Writer);
 				Doc.FormatDoc(Writer);
 				DocCount += 1;
 			}
