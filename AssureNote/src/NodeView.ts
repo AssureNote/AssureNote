@@ -324,5 +324,13 @@ module AssureNote {
         ChangeColorStyle(ColorStyle: string): void {
             this.Shape.ChangeColorStyle(ColorStyle);
         }
+
+        AddColorStyle(ColorStyle: string): void {
+            this.Shape.AddColorStyle(ColorStyle);
+        }
+
+        RemoveColorStyle(ColorStyle: string): void {
+            this.Shape.RemoveColorStyle(ColorStyle);
+        }
     }
 }

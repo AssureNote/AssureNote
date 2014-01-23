@@ -424,8 +424,44 @@ var AssureNote;
             }
         };
 
+        /**
+        Deprecated. please use AddColorStyle / RemoveColorStyle
+        @method ChangeColorStyle
+        */
         GSNShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
             this.ColorStyle = (ColorStyleCode != AssureNote.ColorStyle.Default) ? ColorStyleCode : "";
+            if (this.ShapeGroup != null) {
+                this.ShapeGroup.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
+            }
+        };
+
+        GSNShape.prototype.AddColorStyle = function (ColorStyleCode) {
+            if (ColorStyleCode) {
+                var Styles = this.ColorStyle.split(" ");
+                if (Styles.indexOf(ColorStyleCode) < 0) {
+                    Styles.push(ColorStyleCode);
+                }
+                if (Styles.indexOf(AssureNote.ColorStyle.Default) < 0) {
+                    Styles.unshift(AssureNote.ColorStyle.Default);
+                }
+                this.ColorStyle = Styles.join(" ");
+                this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            }
+        };
+
+        GSNShape.prototype.RemoveColorStyle = function (ColorStyleCode) {
+            if (ColorStyleCode) {
+                var Styles = this.ColorStyle.split(" ");
+                var Index = Styles.indexOf(ColorStyleCode);
+                if (Index > 0) {
+                    Styles.splice(Index, 1);
+                }
+                if (Styles.indexOf(AssureNote.ColorStyle.Default) < 0) {
+                    Styles.unshift(AssureNote.ColorStyle.Default);
+                }
+                this.ColorStyle = Styles.join(" ");
+                this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            }
         };
         GSNShape.ArrowPathMaster = null;
         return GSNShape;
@@ -474,13 +510,6 @@ var AssureNote;
         GSNGoalShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-goal";
         };
-
-        GSNGoalShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
-            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            if (this.ShapeGroup != null) {
-                this.ShapeGroup.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
-            }
-        };
         return GSNGoalShape;
     })(GSNShape);
     AssureNote.GSNGoalShape = GSNGoalShape;
@@ -507,13 +536,6 @@ var AssureNote;
 
         GSNContextShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-context";
-        };
-
-        GSNContextShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
-            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            if (this.BodyRect != null) {
-                this.BodyRect.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
-            }
         };
         return GSNContextShape;
     })(GSNShape);
@@ -554,13 +576,6 @@ var AssureNote;
                     return new AssureNote.Point(this.GetNodeWidth() / 2, this.GetNodeHeight());
             }
         };
-
-        GSNStrategyShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
-            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            if (this.BodyPolygon != null) {
-                this.BodyPolygon.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
-            }
-        };
         return GSNStrategyShape;
     })(GSNShape);
     AssureNote.GSNStrategyShape = GSNStrategyShape;
@@ -586,13 +601,6 @@ var AssureNote;
 
         GSNEvidenceShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-evidence";
-        };
-
-        GSNEvidenceShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
-            _super.prototype.ChangeColorStyle.call(this, ColorStyleCode);
-            if (this.BodyEllipse != null) {
-                this.BodyEllipse.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
-            }
         };
         return GSNEvidenceShape;
     })(GSNShape);

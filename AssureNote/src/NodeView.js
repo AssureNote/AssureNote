@@ -315,6 +315,14 @@ var AssureNote;
         NodeView.prototype.ChangeColorStyle = function (ColorStyle) {
             this.Shape.ChangeColorStyle(ColorStyle);
         };
+
+        NodeView.prototype.AddColorStyle = function (ColorStyle) {
+            this.Shape.AddColorStyle(ColorStyle);
+        };
+
+        NodeView.prototype.RemoveColorStyle = function (ColorStyle) {
+            this.Shape.RemoveColorStyle(ColorStyle);
+        };
         NodeView.GlobalPositionCache = null;
         return NodeView;
     })();

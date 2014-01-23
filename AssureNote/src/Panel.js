@@ -374,7 +374,7 @@ var AssureNote;
             if (Label == null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(AssureNote.ColorStyle.Highlight);
                 }
                 this.FocusedLabel = null;
                 return;
@@ -383,10 +383,10 @@ var AssureNote;
             if (NodeView != null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(AssureNote.ColorStyle.Highlight);
                 }
                 this.FocusedLabel = Label;
-                NodeView.ChangeColorStyle(AssureNote.ColorStyle.Highlight);
+                NodeView.AddColorStyle(AssureNote.ColorStyle.Highlight);
             }
         };
 
