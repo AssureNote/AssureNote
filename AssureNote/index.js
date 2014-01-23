@@ -35,6 +35,15 @@
 var Debug = {};
 
 $(function () {
+    //safari does not support window.performance
+    if (window.performance == null) {
+        window.performance = {};
+        if (window.performance.now == null) {
+            window.performance.now = function () {
+                return Date.now();
+            };
+        }
+    }
     var App = new AssureNote.AssureNoteApp();
     Debug.AssureNote = App;
     Debug.ShowCameraInfo = function () {
