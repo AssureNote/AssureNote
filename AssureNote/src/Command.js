@@ -315,7 +315,7 @@ var AssureNote;
         NewCommand.prototype.Invoke = function (CommandName, Params) {
             var History = new AssureNote.GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
             var Writer = new AssureNote.StringWriter();
-            AssureNote.TagUtils.FormatHistoryTag([History], Writer);
+            AssureNote.TagUtils.FormatHistoryTag([History], 0, Writer);
             console.log(Writer.toString());
             var WGSN = Writer.toString() + 'Revision:: 0\n*G';
             if (Params.length > 0) {

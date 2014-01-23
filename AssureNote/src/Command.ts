@@ -301,7 +301,7 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]) {
             var History: GSNHistory = new GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
             var Writer: StringWriter = new StringWriter();
-            TagUtils.FormatHistoryTag([History], Writer);
+            TagUtils.FormatHistoryTag([History], 0, Writer);
             console.log(Writer.toString());
             var WGSN = Writer.toString() + 'Revision:: 0\n*G';
             if (Params.length > 0) {
