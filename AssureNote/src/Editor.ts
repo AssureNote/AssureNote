@@ -53,7 +53,7 @@ module AssureNote {
             this.Timeout = null;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
-            this.AssureNoteApp.SocketManager.StartEdit({Label: Model.GetLabel(), UID: Model.UID});
+            this.AssureNoteApp.SocketManager.StartEdit({"Label": Model.GetLabel(), "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.AssureNoteApp.GetUserName()});
 
             var Callback = (event: MouseEvent) => {
                 this.Element.blur();
@@ -96,16 +96,17 @@ module AssureNote {
             if (NewNode) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();
                 var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
+
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
                 NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-                this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+                this.AssureNoteApp.PictgramPanel.Draw(null);
 
                 this.AssureNoteApp.PluginPanel.IsVisible = true;
                 /* TODO resolve conflict */
                 this.AssureNoteApp.SocketManager.UpdateWGSN();
             }
-            this.AssureNoteApp.SocketManager.Emit('finishedit', {Label: OldNodeView.Model.GetLabel(), UID: OldNodeView.Model.UID});
+            this.AssureNoteApp.SocketManager.Emit('finishedit', {"Label": OldNodeView.Model.GetLabel(), "UID": OldNodeView.Model.UID});
             this.AssureNoteApp.MasterRecord.CloseEditor();
             $(this.Selector).addClass("animated fadeOutUp");
 

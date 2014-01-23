@@ -25,24 +25,6 @@
 
 var AssureNote;
 (function (AssureNote) {
-    //export class JsonRPCRequest {
-    //    jsonrpc: string;
-    //    method: string;
-    //    id: number;
-    //    params: any;
-    //    constructor(method: string, params: any) {
-    //        this.method = method;
-    //        this.params = params;
-    //        this.jsonrpc = '2.0';
-    //        this.id = null;
-    //    }
-    //}
-    //export class JsonRPCResponse {
-    //    jsonrpc: string;
-    //    id: number;
-    //    result: any;
-    //    error: any;
-    //}
     var WGSNSocket = (function () {
         function WGSNSocket(name, WGSN) {
             this.name = name;
@@ -55,7 +37,7 @@ var AssureNote;
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
-            this.EditingNodesID = [];
+            this.EditingNodes = [];
             if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found');
             }
@@ -71,12 +53,6 @@ var AssureNote;
                 this.AssureNoteApp.DebugP('Socket not enable.');
                 return;
             }
-
-            if (method == 'startedit' && !this.IsEditable(params.UID)) {
-                $.notify("Warning:Other user edits this Node!", "warn");
-                return;
-            }
-
             this.socket.emit(method, params);
         };
 
@@ -99,13 +75,24 @@ var AssureNote;
             });
             this.socket.on('startedit', function (data) {
                 console.log('edit');
-                self.EditingNodesID.push(data.UID);
-                console.log('here is ID array = ' + self.EditingNodesID);
+                self.EditingNodes.push(data);
+                var NewNodeView = new AssureNote.NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
+                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
+                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
+                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+
+                var CurrentNodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                self.AddUserNameOn(CurrentNodeView, { User: data.UserName, IsRecursive: data.IsRecursive });
+                console.log('here is ID array = ' + self.EditingNodes);
             });
             this.socket.on('finishedit', function (data) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
-                console.log('here is ID array after delete = ' + self.EditingNodesID);
+                var NewNodeView = new AssureNote.NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
+                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
+                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
+                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+                console.log('here is ID array after delete = ' + self.EditingNodes);
             });
 
             for (var key in this.handler) {
@@ -138,9 +125,9 @@ var AssureNote;
         };
 
         SocketManager.prototype.DeleteID = function (UID) {
-            for (var i = 0; i < this.EditingNodesID.length; i++) {
-                if (this.EditingNodesID[i] == UID) {
-                    this.EditingNodesID.splice(i, 1);
+            for (var i = 0; i < this.EditingNodes.length; i++) {
+                if (this.EditingNodes[i]["UID"] == UID) {
+                    this.EditingNodes.splice(i, 1);
                     return;
                 }
             }
@@ -148,19 +135,63 @@ var AssureNote;
 
         SocketManager.prototype.IsEditable = function (UID) {
             var index = 0;
-            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID);
+            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID).Parent;
 
-            if (this.EditingNodesID.length == 0)
+            if (this.EditingNodes.length == 0)
                 return true;
+            for (var i = 0; i < this.EditingNodes.length; i++) {
+                if (this.EditingNodes[i]["UID"] == UID) {
+                    this.CurrentUserName = this.EditingNodes[i]["UserName"];
+                    return false;
+                }
+            }
+
             while (CurrentView != null) {
-                for (var i = 0; i < this.EditingNodesID.length; i++) {
-                    if (this.EditingNodesID[i] == CurrentView.Model.UID) {
+                for (var i = 0; i < this.EditingNodes.length; i++) {
+                    if (this.EditingNodes[i]["IsRecursive"] && this.EditingNodes[i]["UID"] == CurrentView.Model.UID) {
+                        this.CurrentUserName = this.EditingNodes[i]["UserName"];
                         return false;
                     }
                 }
                 CurrentView = CurrentView.Parent;
             }
             return true;
+        };
+
+        SocketManager.prototype.AddUserNameOn = function (NodeView, Data) {
+            var Label = NodeView.Label.replace(/\./g, "\\.");
+            var topdist;
+            var rightdist;
+            switch (NodeView.Model.NodeType) {
+                case 0 /* Goal */:
+                case 1 /* Context */:
+                    topdist = "5px";
+                    rightdist = "5px";
+                    break;
+                case 2 /* Strategy */:
+                    topdist = "5px";
+                    rightdist = "10px";
+                    break;
+                case 3 /* Evidence */:
+                    topdist = "19px";
+                    rightdist = "40px";
+                    break;
+            }
+            $("<div class=\"user_" + Data.User + "\">" + Data.User + "</div>").appendTo($('#' + Label)).css({ position: "absolute", top: topdist, right: rightdist, "font-size": "12px", "text-decoration": "underline" });
+
+            if (NodeView.Right != null && Data.IsRecursive) {
+                this.AddUserNameOn(NodeView.Right[0], Data);
+            }
+            if (NodeView.Children == null || !Data.IsRecursive)
+                return;
+
+            for (var i = 0; i < NodeView.Children.length; i++) {
+                this.AddUserNameOn(NodeView.Children[i], Data);
+            }
+        };
+
+        SocketManager.prototype.GetCurrentUserName = function () {
+            return this.GetCurrentUserName();
         };
 
         SocketManager.prototype.StartEdit = function (data) {

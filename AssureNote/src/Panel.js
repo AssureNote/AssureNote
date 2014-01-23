@@ -82,8 +82,12 @@ var AssureNote;
                     if (Tooltip.IsEnable) {
                         Tooltip.Remove();
                     }
-                    var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
-                    Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
+                    if (_this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
+                        var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
+                        Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
+                    } else {
+                        $.notify("Warning:Other user edits this node!", "warn");
+                    }
                 } else {
                     _this.FocusedLabel = null;
                 }
