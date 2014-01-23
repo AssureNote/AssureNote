@@ -1210,7 +1210,7 @@ export class GSNRecord {
 
 	public FormatRecord(Writer: StringWriter): void {
 		var DocCount: number = 0;
-		for (var i: number = 0; i < Lib.Array_size(this.HistoryList); i++) {
+		for (var i: number = Lib.Array_size(this.HistoryList)- 1 ; i >= 0; i--) {
 			var Doc: GSNDoc = this.GetHistoryDoc(i);
 			if(Doc != null) {
 				if(DocCount > 0) {

@@ -1204,7 +1204,7 @@ var GSNRecord = (function () {
 
     GSNRecord.prototype.FormatRecord = function (Writer) {
         var DocCount = 0;
-        for (var i = 0; i < Lib.Array_size(this.HistoryList); i++) {
+        for (var i = Lib.Array_size(this.HistoryList) - 1; i >= 0; i--) {
             var Doc = this.GetHistoryDoc(i);
             if (Doc != null) {
                 if (DocCount > 0) {
