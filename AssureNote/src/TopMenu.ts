@@ -195,10 +195,10 @@ module AssureNote {
             return "cloud-upload";
         }
         GetDisplayName(): string {
-            return "Upload";
+            return "Share";
         }
         Invoke(App: AssureNoteApp): void {
-            var Command = App.FindCommandByCommandLineName("upload");
+            var Command = App.FindCommandByCommandLineName("share");
             Command.Invoke(null, []);
         }
     }
