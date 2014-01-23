@@ -7,6 +7,7 @@ var AssureNoteServer = (function () {
     function AssureNoteServer() {
         this.room = 'room';
         this.EditingNodes = [];
+        this.MasterWGSN = '';
         var self = this;
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {

@@ -53,7 +53,7 @@ module AssureNote {
             this.Timeout = null;
             var Model = NodeView.Model;
             this.AssureNoteApp.PluginPanel.IsVisible = false;
-            this.AssureNoteApp.SocketManager.StartEdit({"Label": Model.GetLabel(), "UID": Model.UID, "EditorFlag": IsRecursive});
+            this.AssureNoteApp.SocketManager.StartEdit({"Label": Model.GetLabel(), "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.AssureNoteApp.GetUserName()});
 
             var Callback = (event: MouseEvent) => {
                 this.Element.blur();

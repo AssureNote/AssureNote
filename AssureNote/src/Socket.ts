@@ -26,26 +26,6 @@
 declare var io: any;
 
 module AssureNote {
-    //export class JsonRPCRequest {
-    //    jsonrpc: string;
-    //    method: string;
-    //    id: number;
-    //    params: any;
-    //    constructor(method: string, params: any) {
-    //        this.method = method;
-    //        this.params = params;
-    //        this.jsonrpc = '2.0';
-    //        this.id = null;
-    //    }
-    //}
-
-    //export class JsonRPCResponse {
-    //    jsonrpc: string;
-    //    id: number;
-    //    result: any;
-    //    error: any;
-    //}
-
     export class WGSNSocket {
         constructor(public name: string, public WGSN: string) { }
     }
@@ -53,7 +33,8 @@ module AssureNote {
     export class SocketManager {
         private socket: any;
         private handler: { [key: string]: (any) => void };
-        EditingNodesID: number[] = [];
+        EditingNodes: any[] = [];
+        CurrentUserName: string;
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             if (!this.IsOperational()) {
@@ -72,12 +53,6 @@ module AssureNote {
                 this.AssureNoteApp.DebugP('Socket not enable.');
                 return;
             }
-
-//            if (method == 'startedit' && !this.IsEditable(params.UID)) {
-//                (<any>$).notify("Warning:Other user edits this Node!", "warn");
-//                return;
-//            }
-
             this.socket.emit(method, params);
         }
 
@@ -100,12 +75,15 @@ module AssureNote {
             });
             this.socket.on('startedit', function(data) {
                 console.log('edit');
-                self.EditingNodesID.push(data);
+                self.EditingNodes.push(data);
                 var NewNodeView: NodeView = new NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
                 NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
                 self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
                 self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
-                console.log('here is ID array = ' + self.EditingNodesID);
+
+                var CurrentNodeView: NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                self.AddUserNameOn(CurrentNodeView, {User:data.UserName, IsRecursive:data.IsRecursive});
+                console.log('here is ID array = ' + self.EditingNodes);
             });
             this.socket.on('finishedit', function(data) {
                 console.log('finishedit');
@@ -114,7 +92,7 @@ module AssureNote {
                 NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
                 self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
                 self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
-                console.log('here is ID array after delete = ' + self.EditingNodesID);
+                console.log('here is ID array after delete = ' + self.EditingNodes);
             });
 
             for (var key in this.handler) {
@@ -147,9 +125,9 @@ module AssureNote {
         }
 
         DeleteID(UID:number) {
-            for (var i:number = 0; i < this.EditingNodesID.length; i++) {
-                if (this.EditingNodesID[i]["UID"] == UID) {
-                    this.EditingNodesID.splice(i, 1);
+            for (var i:number = 0; i < this.EditingNodes.length; i++) {
+                if (this.EditingNodes[i]["UID"] == UID) {
+                    this.EditingNodes.splice(i, 1);
                     return;
                 }
             }
@@ -159,16 +137,18 @@ module AssureNote {
             var index: number = 0;
             var CurrentView: NodeView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID).Parent;
 
-            if (this.EditingNodesID.length == 0) return true;
-            for (var i:number = 0; i < this.EditingNodesID.length; i++) {
-                if (this.EditingNodesID[i]["UID"] == UID) {
+            if (this.EditingNodes.length == 0) return true;
+            for (var i:number = 0; i < this.EditingNodes.length; i++) {
+                if (this.EditingNodes[i]["UID"] == UID) {
+                    this.CurrentUserName = this.EditingNodes[i]["UserName"];
                     return false;
                 }
             }
 
             while (CurrentView != null) {
-                for (var i:number = 0; i < this.EditingNodesID.length; i++) {
-                    if (this.EditingNodesID[i]["EditorFlag"] && this.EditingNodesID[i]["UID"] == CurrentView.Model.UID) {
+                for (var i:number = 0; i < this.EditingNodes.length; i++) {
+                    if (this.EditingNodes[i]["IsRecursive"] && this.EditingNodes[i]["UID"] == CurrentView.Model.UID) {
+                        this.CurrentUserName = this.EditingNodes[i]["UserName"];
                         return false;
                     }
                 }
@@ -177,10 +157,38 @@ module AssureNote {
             return true;
         }
 
-        SetDefaultColor(UID: number) {
+        AddUserNameOn(NodeView: NodeView, Data: {User: string; IsRecursive: boolean}) : void {
+            var Label: string = NodeView.Label.replace(/\./g, "\\.");
+            var topdist: string;
+            var rightdist: string;
 
+            switch (NodeView.Model.NodeType) {
+                case 0:
+                case 1:
+                    topdist = "5px"; rightdist = "5px";
+                    break;
+                case 2:
+                    topdist = "5px"; rightdist = "10px";
+                    break;
+                case 3:
+                    topdist = "19px"; rightdist = "40px";
+                    break;
+            }
+            $("<div class=\"user_" + Data.User + "\">" + Data.User + "</div>").appendTo($('#' + Label)).css({position: "absolute", top: topdist, right: rightdist, "font-size": "12px", "text-decoration": "underline"});
+
+            if (NodeView.Right != null && Data.IsRecursive) {
+                this.AddUserNameOn(NodeView.Right[0], Data);
+            }
+            if (NodeView.Children == null || !Data.IsRecursive) return;
+
+            for (var i: number = 0; i < NodeView.Children.length; i++) {
+                this.AddUserNameOn(NodeView.Children[i], Data);
+            }
         }
 
+        GetCurrentUserName() : string {
+            return this.GetCurrentUserName();
+        }
 
         StartEdit(data: {Label: string; UID: number}) {
             this.Emit('startedit' ,data);

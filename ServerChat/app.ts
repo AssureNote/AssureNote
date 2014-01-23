@@ -36,7 +36,7 @@ class AssureNoteServer {
         socket.on('update', function(data: {name: string; WGSN: string}) {
             socket.broadcast.emit('update', data);
         });
-        socket.on('startedit', function(data: {Label: string; UID: number}) {
+        socket.on('startedit', function(data: {Label: string; UID: number; IsRecursive: boolean; UserName: string}) {
             self.EditingNodes.push(data);
             console.log("this is the data we receive" + data);
             console.log("this is editing list" + this.EditingNodes);
