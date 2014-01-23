@@ -95,7 +95,7 @@ var AssureNote;
         }
         MessageChatPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
             if (!this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
-                NodeView.ChangeColorStyle(AssureNote.ColorStyle.Editing);
+                NodeView.AddColorStyle(AssureNote.ColorStyle.Editing);
             }
         };
         return MessageChatPlugin;

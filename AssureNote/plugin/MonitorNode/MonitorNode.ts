@@ -427,7 +427,7 @@ module AssureNote {
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
             if(NodeView.Label in MNodeManager.RedNodeMap) {
-                NodeView.ChangeColorStyle(ColorStyle.Danger);
+                NodeView.AddColorStyle(ColorStyle.Danger);
             }
         }
 

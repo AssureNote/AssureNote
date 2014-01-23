@@ -43,12 +43,12 @@ var AssureNote;
             if (!TagMap)
                 return;
             if (TagMap.get('TODO') || TagMap.get('TODO') == '') {
-                NodeView.ChangeColorStyle(AssureNote.ColorStyle.ToDo);
+                NodeView.AddColorStyle(AssureNote.ColorStyle.ToDo);
             }
             var KeySet = TagMap.keySet();
             for (var key in KeySet) {
                 if (TagMap.get(KeySet[key]) == '') {
-                    NodeView.ChangeColorStyle(AssureNote.ColorStyle.ToDo);
+                    NodeView.AddColorStyle(AssureNote.ColorStyle.ToDo);
                 }
             }
         };

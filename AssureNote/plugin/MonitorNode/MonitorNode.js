@@ -413,7 +413,7 @@ var AssureNote;
         }
         MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
             if (NodeView.Label in MNodeManager.RedNodeMap) {
-                NodeView.ChangeColorStyle(AssureNote.ColorStyle.Danger);
+                NodeView.AddColorStyle(AssureNote.ColorStyle.Danger);
             }
         };
 

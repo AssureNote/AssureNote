@@ -36,12 +36,12 @@ module AssureNote {
             var TagMap: HashMap<string, string> = NodeView.Model.GetTagMap();
             if (!TagMap) return;
             if (TagMap.get('TODO') || TagMap.get('TODO') == '') {
-                NodeView.ChangeColorStyle(ColorStyle.ToDo);
+                NodeView.AddColorStyle(ColorStyle.ToDo);
             }
             var KeySet: string[] = TagMap.keySet();
             for (var key in KeySet) {
                 if (TagMap.get(KeySet[key]) == '') {
-                    NodeView.ChangeColorStyle(ColorStyle.ToDo);
+                    NodeView.AddColorStyle(ColorStyle.ToDo);
                 }
             }
         }

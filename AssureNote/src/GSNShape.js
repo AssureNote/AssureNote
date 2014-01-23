@@ -289,6 +289,7 @@ var AssureNote;
         GSNShape.prototype.PrerenderSVGContent = function (manager) {
             this.ShapeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
+            this.ShapeGroup.setAttribute("class", this.ColorStyle);
             this.ArrowPath = GSNShape.CreateArrowPath();
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         };
@@ -424,17 +425,6 @@ var AssureNote;
             }
         };
 
-        /**
-        Deprecated. please use AddColorStyle / RemoveColorStyle
-        @method ChangeColorStyle
-        */
-        GSNShape.prototype.ChangeColorStyle = function (ColorStyleCode) {
-            this.ColorStyle = (ColorStyleCode != AssureNote.ColorStyle.Default) ? ColorStyleCode : "";
-            if (this.ShapeGroup != null) {
-                this.ShapeGroup.setAttribute("class", AssureNote.ColorStyle.Default + " " + this.ColorStyle);
-            }
-        };
-
         GSNShape.prototype.AddColorStyle = function (ColorStyleCode) {
             if (ColorStyleCode) {
                 var Styles = this.ColorStyle.split(" ");
@@ -463,6 +453,11 @@ var AssureNote;
                 this.ShapeGroup.setAttribute("class", this.ColorStyle);
             }
         };
+
+        GSNShape.prototype.ClearColorStyle = function () {
+            this.ColorStyle = AssureNote.ColorStyle.Default;
+            this.ShapeGroup.setAttribute("class", this.ColorStyle);
+        };
         GSNShape.ArrowPathMaster = null;
         return GSNShape;
     })();
@@ -479,8 +474,6 @@ var AssureNote;
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
                 this.ModuleRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-
-                //this.ModuleRect.setAttribute("class", ColorStyle.Default);
                 this.ModuleRect.setAttribute("width", "80px");
                 this.ModuleRect.setAttribute("height", "13px");
                 this.ModuleRect.setAttribute("y", "-13px");
@@ -489,11 +482,8 @@ var AssureNote;
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
                 this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
                 this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
-
-                //this.UndevelopedSymbol.setAttribute("class", ColorStyle.Default);
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
-            this.ChangeColorStyle(this.ColorStyle);
         };
 
         GSNGoalShape.prototype.FitSizeToContent = function () {
@@ -522,7 +512,6 @@ var AssureNote;
         GSNContextShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-            this.ChangeColorStyle(this.ColorStyle);
             this.ArrowPath.setAttribute("marker-end", "url(#Triangle-white)");
             this.BodyRect.setAttribute("rx", "10");
             this.BodyRect.setAttribute("ry", "10");
@@ -550,7 +539,6 @@ var AssureNote;
         GSNStrategyShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyPolygon = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
-            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyPolygon);
         };
 
@@ -588,7 +576,6 @@ var AssureNote;
         GSNEvidenceShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
-            this.ChangeColorStyle(this.ColorStyle);
             this.ShapeGroup.appendChild(this.BodyEllipse);
         };
 

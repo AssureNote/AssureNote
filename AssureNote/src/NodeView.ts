@@ -322,10 +322,6 @@ module AssureNote {
             return (this.Left != null && this.Left.length > 0) || (this.Right != null && this.Right.length > 0)
         }
 
-        ChangeColorStyle(ColorStyle: string): void {
-            this.Shape.ChangeColorStyle(ColorStyle);
-        }
-
         AddColorStyle(ColorStyle: string): void {
             this.Shape.AddColorStyle(ColorStyle);
         }
