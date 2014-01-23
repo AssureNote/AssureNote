@@ -368,12 +368,10 @@ var TagUtils = (function () {
         }
     };
 
-    TagUtils.FormatHistoryTag = function (HistoryList, Writer) {
-        for (var i = 0; i < Lib.Array_size(HistoryList); i++) {
-            var History = Lib.Array_get(HistoryList, i);
-            if (History != null) {
-                Writer.println("#" + i + "::" + History);
-            }
+    TagUtils.FormatHistoryTag = function (HistoryList, i, Writer) {
+        var History = Lib.Array_get(HistoryList, i);
+        if (History != null) {
+            Writer.println("#" + i + "::" + History);
         }
     };
 
@@ -1092,7 +1090,6 @@ var GSNRecord = (function () {
     };
 
     GSNRecord.prototype.Parse = function (TextDoc) {
-        var RefMap = new HashMap();
         var Reader = new StringReader(TextDoc);
         while (Reader.HasNext()) {
             var Doc = new GSNDoc(this);
@@ -1207,13 +1204,13 @@ var GSNRecord = (function () {
 
     GSNRecord.prototype.FormatRecord = function (Writer) {
         var DocCount = 0;
-        TagUtils.FormatHistoryTag(this.HistoryList, Writer);
         for (var i = 0; i < Lib.Array_size(this.HistoryList); i++) {
             var Doc = this.GetHistoryDoc(i);
             if (Doc != null) {
                 if (DocCount > 0) {
                     Writer.println(Lib.VersionDelim);
                 }
+                TagUtils.FormatHistoryTag(this.HistoryList, i, Writer);
                 Doc.FormatDoc(Writer);
                 DocCount += 1;
             }
