@@ -28,7 +28,7 @@ var AssureNote;
         function CommandParser() {
         }
         CommandParser.prototype.Parse = function (line) {
-            var s = line.split(" ");
+            var s = line.split(/\s+/);
             if (s.length > 0) {
                 if (s[0][0] == null) {
                     this.Method = "";

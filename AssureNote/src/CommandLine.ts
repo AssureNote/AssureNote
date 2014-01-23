@@ -35,7 +35,7 @@ module AssureNote {
         }
 
         Parse(line: string): void {
-            var s = line.split(" ");
+            var s = line.split(/\s+/);
             if (s.length > 0) {
                 if (s[0][0] == null) {
                     this.Method = "";
