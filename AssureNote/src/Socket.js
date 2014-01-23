@@ -162,18 +162,17 @@ var AssureNote;
             var Label = NodeView.Label.replace(/\./g, "\\.");
             var topdist;
             var rightdist;
-
             switch (NodeView.Model.NodeType) {
-                case 0:
-                case 1:
+                case 0 /* Goal */:
+                case 1 /* Context */:
                     topdist = "5px";
                     rightdist = "5px";
                     break;
-                case 2:
+                case 2 /* Strategy */:
                     topdist = "5px";
                     rightdist = "10px";
                     break;
-                case 3:
+                case 3 /* Evidence */:
                     topdist = "19px";
                     rightdist = "40px";
                     break;

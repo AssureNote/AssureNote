@@ -161,16 +161,15 @@ module AssureNote {
             var Label: string = NodeView.Label.replace(/\./g, "\\.");
             var topdist: string;
             var rightdist: string;
-
             switch (NodeView.Model.NodeType) {
-                case 0:
-                case 1:
+                case GSNType.Goal:
+                case GSNType.Context:
                     topdist = "5px"; rightdist = "5px";
                     break;
-                case 2:
+                case GSNType.Strategy:
                     topdist = "5px"; rightdist = "10px";
                     break;
-                case 3:
+                case GSNType.Evidence:
                     topdist = "19px"; rightdist = "40px";
                     break;
             }

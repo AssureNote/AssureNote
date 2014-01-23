@@ -329,7 +329,7 @@ module AssureNote {
             this.Shape.AddColorStyle(ColorStyle);
         }
 
-        RemoveColorStyle(ColorStyle: string): void {
+        RemoveColorStyle(ColorStyle: string): void {    
             this.Shape.RemoveColorStyle(ColorStyle);
         }
     }
