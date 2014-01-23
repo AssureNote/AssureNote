@@ -337,17 +337,15 @@ var AssureNote;
             var NearestNode = null;
             var CurrentMinimumDistanceSquere = Infinity;
             this.MasterView.TraverseVisibleNode(function (Node) {
-                if (Node.IsVisible) {
-                    var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
-                    var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
-                    var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
-                    var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
-                    if (DDotR > 0 && DDotL > 0) {
-                        var DistanceSquere = DX * DX + DY * DY;
-                        if (DistanceSquere < CurrentMinimumDistanceSquere) {
-                            CurrentMinimumDistanceSquere = DistanceSquere;
-                            NearestNode = Node;
-                        }
+                var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
+                var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
+                var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
+                if (DDotR > 0 && DDotL > 0) {
+                    var DistanceSquere = DX * DX + DY * DY;
+                    if (DistanceSquere < CurrentMinimumDistanceSquere) {
+                        CurrentMinimumDistanceSquere = DistanceSquere;
+                        NearestNode = Node;
                     }
                 }
             });
