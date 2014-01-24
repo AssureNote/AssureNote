@@ -164,8 +164,12 @@ module AssureNote {
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // FIXME Make it configurable
+            this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // Default REC
             this.RedNodeMap = {};
+        }
+
+        SetRecUrl(Url: string): void {
+            this.Rec = new RecApi(Url);
         }
 
         SetMonitorNode(MNode: MonitorNode): void {
@@ -300,7 +304,7 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>monitor-start</code><br>Start monitoring."
+            return "<code>monitor-start</code><br>Start monitoring.";
         }
 
         public Invoke(CommandName: string, Params: any[]): void {
@@ -379,7 +383,7 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>monitor-stop</code><br>Stop monitoring."
+            return "<code>monitor-stop</code><br>Stop monitoring.";
         }
 
         public Invoke(CommandName: string, Params: any[]): void {
@@ -416,6 +420,34 @@ module AssureNote {
 
     }
 
+    export class UseRecAtCommand extends Command {
+
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["use-rec-at"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>use-rec-at</code><br>Use specified REC.";
+        }
+
+        public Invoke(CommandName: string, Params: any[]): void {
+            if(Params.length == 1) {
+                MNodeManager.SetRecUrl(Params[0]);
+            }
+            else if(Params.length > 1) {
+                console.log("Too many parameter");
+            }
+            else {
+                console.log("Need parameter");
+            }
+        }
+
+    }
+
     export class MonitorNodePlugin extends Plugin {
 
         constructor(public AssureNoteApp: AssureNoteApp) {
@@ -423,6 +455,7 @@ module AssureNote {
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
             this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
         }
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {

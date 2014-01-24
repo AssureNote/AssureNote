@@ -154,9 +154,13 @@ var AssureNote;
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/"); // FIXME Make it configurable
+            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/"); // Default REC
             this.RedNodeMap = {};
         }
+        MonitorNodeManager.prototype.SetRecUrl = function (Url) {
+            this.Rec = new AssureNote.RecApi(Url);
+        };
+
         MonitorNodeManager.prototype.SetMonitorNode = function (MNode) {
             if (!(MNode.Label in this.MonitorNodeMap)) {
                 this.NodeCount += 1;
@@ -402,6 +406,32 @@ var AssureNote;
     })(AssureNote.Command);
     AssureNote.MonitorStopCommand = MonitorStopCommand;
 
+    var UseRecAtCommand = (function (_super) {
+        __extends(UseRecAtCommand, _super);
+        function UseRecAtCommand(App) {
+            _super.call(this, App);
+        }
+        UseRecAtCommand.prototype.GetCommandLineNames = function () {
+            return ["use-rec-at"];
+        };
+
+        UseRecAtCommand.prototype.GetHelpHTML = function () {
+            return "<code>use-rec-at</code><br>Use specified REC.";
+        };
+
+        UseRecAtCommand.prototype.Invoke = function (CommandName, Params) {
+            if (Params.length == 1) {
+                MNodeManager.SetRecUrl(Params[0]);
+            } else if (Params.length > 1) {
+                console.log("Too many parameter");
+            } else {
+                console.log("Need parameter");
+            }
+        };
+        return UseRecAtCommand;
+    })(AssureNote.Command);
+    AssureNote.UseRecAtCommand = UseRecAtCommand;
+
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
@@ -410,6 +440,7 @@ var AssureNote;
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
             this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
         }
         MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
             if (NodeView.Label in MNodeManager.RedNodeMap) {
