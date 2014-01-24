@@ -314,6 +314,18 @@ export class WikiSyntax {
 		return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
 	}
 	
+	public static CommentOutAll(DocText: string): string {
+		var Reader: StringReader = new StringReader(DocText);
+		var Writer: StringWriter = new StringWriter();
+		while (Reader.HasNext()) {
+			var line: string = Reader.ReadLine();
+				line = "#" + line;
+			Writer.print(line);
+			Writer.newline();
+		}
+		return Writer.toString();
+	}
+	
 	public static CommentOutSubNode(DocText: string): string {
 		var Reader: StringReader = new StringReader(DocText);
 		var Writer: StringWriter = new StringWriter();
@@ -768,6 +780,12 @@ export class GSNNode {
 		var Reader: StringReader = new StringReader(DocText);
 		var Parser: ParserContext = new ParserContext(null);
 		var NewNode: GSNNode = Parser.ParseNode(Reader);
+		if (NewNode.NodeType != this.NodeType) {
+			var Writer: StringWriter = new StringWriter();
+			NewNode.FormatNode(Writer);
+			this.NodeDoc = WikiSyntax.CommentOutAll(Writer.toString());
+			NewNode = this;
+		}
 		if(NewNode != null) {
 			NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
 		}

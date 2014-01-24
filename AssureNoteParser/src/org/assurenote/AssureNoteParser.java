@@ -458,6 +458,18 @@ class WikiSyntax {
 		return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
 	}
 	
+	public static String CommentOutAll(String DocText) {
+		/*local*/StringReader Reader = new StringReader(DocText);
+		/*local*/StringWriter Writer = new StringWriter();
+		while (Reader.HasNext()) {
+			/*local*/String line = Reader.ReadLine();
+				line = "#" + line;
+			Writer.print(line);
+			Writer.newline();
+		}
+		return Writer.toString();
+	}
+	
 	public static String CommentOutSubNode(String DocText) {
 		/*local*/StringReader Reader = new StringReader(DocText);
 		/*local*/StringWriter Writer = new StringWriter();
@@ -914,6 +926,12 @@ class GSNNode {
 		/*local*/StringReader Reader = new StringReader(DocText);
 		/*local*/ParserContext Parser = new ParserContext(null);
 		/*local*/GSNNode NewNode = Parser.ParseNode(Reader);
+		if (NewNode.NodeType != this.NodeType) {
+			/*local*/StringWriter Writer = new StringWriter();
+			NewNode.FormatNode(Writer);
+			this.NodeDoc = WikiSyntax.CommentOutAll(Writer.toString());
+			NewNode = this;
+		}
 		if(NewNode != null) {
 			NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
 		}

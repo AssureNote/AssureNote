@@ -319,6 +319,18 @@ var WikiSyntax = (function () {
         return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
     };
 
+    WikiSyntax.CommentOutAll = function (DocText) {
+        var Reader = new StringReader(DocText);
+        var Writer = new StringWriter();
+        while (Reader.HasNext()) {
+            var line = Reader.ReadLine();
+            line = "#" + line;
+            Writer.print(line);
+            Writer.newline();
+        }
+        return Writer.toString();
+    };
+
     WikiSyntax.CommentOutSubNode = function (DocText) {
         var Reader = new StringReader(DocText);
         var Writer = new StringWriter();
@@ -764,6 +776,12 @@ var GSNNode = (function () {
         var Reader = new StringReader(DocText);
         var Parser = new ParserContext(null);
         var NewNode = Parser.ParseNode(Reader);
+        if (NewNode.NodeType != this.NodeType) {
+            var Writer = new StringWriter();
+            NewNode.FormatNode(Writer);
+            this.NodeDoc = WikiSyntax.CommentOutAll(Writer.toString());
+            NewNode = this;
+        }
         if (NewNode != null) {
             NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
         }
