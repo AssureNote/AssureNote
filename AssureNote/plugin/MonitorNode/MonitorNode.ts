@@ -224,6 +224,19 @@ module AssureNote {
             this.App.PictgramPanel.Draw(Doc.TopNode.GetLabel());
         }
 
+        UpdateRedNodeMap(): void {
+            this.RedNodeMap = {};
+            for(var MNode in this.MonitorNodeMap) {
+                if(MNode.Status == false) {
+                    var View = MNode.GetView();
+                    while(View != null) {
+                        this.RedNodeMap[View.Label] = true;
+                        View = View.Parent;
+                    }
+                }
+            }
+        }
+
         StartMonitoring(Interval: number): void {
             this.IsRunning = true;
             console.log("Start monitoring...");
@@ -409,6 +422,10 @@ module AssureNote {
                         MNodeManager.StopMonitoring();
                     }
                 }
+                MNodeManager.UpdateRedNodeMap();
+                var Doc = this.App.MasterRecord.GetLatestDoc();
+                MNodeManager.InitializeView(Doc);
+                MNodeManager.UpdateView(Doc);
             }
             else if(Params.length > 1) {
                 console.log("Too many parameter");

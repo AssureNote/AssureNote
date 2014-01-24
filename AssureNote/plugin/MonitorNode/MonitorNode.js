@@ -213,6 +213,19 @@ var AssureNote;
             this.App.PictgramPanel.Draw(Doc.TopNode.GetLabel());
         };
 
+        MonitorNodeManager.prototype.UpdateRedNodeMap = function () {
+            this.RedNodeMap = {};
+            for (var MNode in this.MonitorNodeMap) {
+                if (MNode.Status == false) {
+                    var View = MNode.GetView();
+                    while (View != null) {
+                        this.RedNodeMap[View.Label] = true;
+                        View = View.Parent;
+                    }
+                }
+            }
+        };
+
         MonitorNodeManager.prototype.StartMonitoring = function (Interval) {
             this.IsRunning = true;
             console.log("Start monitoring...");
@@ -396,6 +409,10 @@ var AssureNote;
                         MNodeManager.StopMonitoring();
                     }
                 }
+                MNodeManager.UpdateRedNodeMap();
+                var Doc = this.App.MasterRecord.GetLatestDoc();
+                MNodeManager.InitializeView(Doc);
+                MNodeManager.UpdateView(Doc);
             } else if (Params.length > 1) {
                 console.log("Too many parameter");
             } else {
