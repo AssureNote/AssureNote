@@ -50,11 +50,6 @@ module AssureNote {
             var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                var TargetType = TargetView.GetNodeType();
-                if (TargetType != GSNType.Goal && TargetType != GSNType.Strategy) {
-                    this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
-                    return;
-                }
                 this.Fold(TargetView);
             } else {
                 this.App.DebugP(Label + " not found.");
@@ -74,6 +69,9 @@ module AssureNote {
                         }
                     }
                 }
+            } else if (TargetView.GetNodeType() != GSNType.Goal) {
+                this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
+                return;
             } else {
                 TargetView.IsFolded = TargetView.IsFolded != true;
             }
