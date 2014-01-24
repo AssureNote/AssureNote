@@ -73,6 +73,10 @@ var AssureNote;
                 console.log('update');
                 self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
             });
+            this.socket.on('sync', function (data) {
+                console.log('sync');
+                self.AssureNoteApp.PictgramPanel.Viewport.MoveTo(data.PosX, data.PosY, 1.0, 100);
+            });
             this.socket.on('startedit', function (data) {
                 console.log('edit');
                 self.EditingNodes.push(data);
@@ -196,6 +200,10 @@ var AssureNote;
 
         SocketManager.prototype.StartEdit = function (data) {
             this.Emit('startedit', data);
+        };
+
+        SocketManager.prototype.SyncScreenFocus = function (PosData) {
+            this.Emit('sync', PosData);
         };
 
         SocketManager.prototype.UpdateWGSN = function () {

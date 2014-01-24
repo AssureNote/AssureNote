@@ -69,11 +69,15 @@ module AssureNote {
                 console.log('init');
                 console.log(data);
             });
-            this.socket.on('update', function (data) {
+            this.socket.on('update', function (data: {name: string; WGSN: string}) {
                 console.log('update');
                 self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
             });
-            this.socket.on('startedit', function(data) {
+            this.socket.on('sync', function (data: {PosX: number; PosY: number}) {
+                console.log('sync');
+                self.AssureNoteApp.PictgramPanel.Viewport.MoveTo(data.PosX, data.PosY, 1.0, 100);
+            });
+            this.socket.on('startedit', function(data: {Label: string; UID: number; IsRecursive: boolean; UserName: string}) {
                 console.log('edit');
                 self.EditingNodes.push(data);
                 var NewNodeView: NodeView = new NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
@@ -85,7 +89,7 @@ module AssureNote {
                 self.AddUserNameOn(CurrentNodeView, {User:data.UserName, IsRecursive:data.IsRecursive});
                 console.log('here is ID array = ' + self.EditingNodes);
             });
-            this.socket.on('finishedit', function(data) {
+            this.socket.on('finishedit', function(data: {Label: string; UID: number}) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
                 var NewNodeView: NodeView = new NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
@@ -191,6 +195,10 @@ module AssureNote {
 
         StartEdit(data: {Label: string; UID: number}) {
             this.Emit('startedit' ,data);
+        }
+
+        SyncScreenFocus (PosData: {PosX: number; PosY: number})  {
+            this.Emit('sync', PosData);
         }
 
         UpdateWGSN() {

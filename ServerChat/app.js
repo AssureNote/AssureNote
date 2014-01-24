@@ -32,6 +32,9 @@ var AssureNoteServer = (function () {
         socket.on('update', function (data) {
             socket.broadcast.emit('update', data);
         });
+        socket.on('sync', function (data) {
+            socket.broadcast.emit('sync', data);
+        });
         socket.on('startedit', function (data) {
             self.EditingNodes.push(data);
             console.log("this is the data we receive" + data);
