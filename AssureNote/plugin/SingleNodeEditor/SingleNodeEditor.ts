@@ -27,7 +27,53 @@
 ///<reference path="../../src/Editor.ts" />
 
 module AssureNote {
+    export class SingleNodeEditorCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp, public EditorUtil: EditorUtil) {
+            super(App);
+        }
 
+        public GetCommandLineNames(): string[] {
+            return ["singleedit"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>singleedit [label]</code><br>Open single node editor."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var Label: string;
+            if (Params.length < 1) {
+                Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
+            } else {
+                Label = Params[0].toUpperCase();
+            }
+            var event = document.createEvent("UIEvents");
+            var TargetView = this.App.PictgramPanel.ViewMap[Label];
+            if (TargetView != null) {
+                //if (TargetView.GetNodeType() == GSNType.Strategy) {
+                //    this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
+                //    return;
+                //}
+                var Writer = new StringWriter();
+                TargetView.Model.FormatSubNode(1, Writer, false);
+                var Top = this.App.PictgramPanel.Viewport.PageYFromGY(TargetView.GetGY());
+                var Left = this.App.PictgramPanel.Viewport.PageXFromGX(TargetView.GetGX());
+                var Width = TargetView.GetShape().GetNodeWidth();
+                var Height = Math.max(100, TargetView.GetShape().GetNodeHeight());
+                this.EditorUtil.UpdateCSS({
+                    position: "fixed",
+                    top: Top,
+                    left: Left,
+                    width: Width,
+                    height: Height,
+                    background: "rgba(255, 255, 255, 1.00)",
+                });
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+            } else {
+                this.App.DebugP(Label + " not found.");
+            }
+        }
+    }
     export class SingleNodeEditorPlugin extends Plugin {
         public EditorUtil: EditorUtil;
         constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
@@ -36,11 +82,9 @@ module AssureNote {
             this.SetEditor(true);
             this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
                 position: "absolute",
-                //top: "5%",
-                //left: "5%",
-                //width: "90%",
-                //height: "90%"
             });
+
+            this.AssureNoteApp.RegistCommand(new SingleNodeEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
@@ -48,20 +92,8 @@ module AssureNote {
                 (event: Event, TargetView: NodeView) => {
                     var Writer = new StringWriter();
                     TargetView.Model.FormatSubNode(1, Writer, false);
-                    //var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
-                    //var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3) / 4;
-                    //this.Tooltip.css({
-                    //    //width: '250px',
-                    //    //height: '150px',
-                    //    position: 'absolute',
-                    //    top: Top,
-                    //    left: Left,
-                    //    display: 'block',
-                    //    opacity: 100
-                    //});
                     var Top = this.AssureNoteApp.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
                     var Left = this.AssureNoteApp.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
-                    console.log(Top, Left);
                     var Width = NodeView.GetShape().GetNodeWidth();
                     var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
                     this.EditorUtil.UpdateCSS({

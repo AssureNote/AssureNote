@@ -32,6 +32,56 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path="../../src/Editor.ts" />
 var AssureNote;
 (function (AssureNote) {
+    var SingleNodeEditorCommand = (function (_super) {
+        __extends(SingleNodeEditorCommand, _super);
+        function SingleNodeEditorCommand(App, EditorUtil) {
+            _super.call(this, App);
+            this.EditorUtil = EditorUtil;
+        }
+        SingleNodeEditorCommand.prototype.GetCommandLineNames = function () {
+            return ["singleedit"];
+        };
+
+        SingleNodeEditorCommand.prototype.GetHelpHTML = function () {
+            return "<code>singleedit [label]</code><br>Open single node editor.";
+        };
+
+        SingleNodeEditorCommand.prototype.Invoke = function (CommandName, Params) {
+            var Label;
+            if (Params.length < 1) {
+                Label = this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel();
+            } else {
+                Label = Params[0].toUpperCase();
+            }
+            var event = document.createEvent("UIEvents");
+            var TargetView = this.App.PictgramPanel.ViewMap[Label];
+            if (TargetView != null) {
+                //if (TargetView.GetNodeType() == GSNType.Strategy) {
+                //    this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
+                //    return;
+                //}
+                var Writer = new AssureNote.StringWriter();
+                TargetView.Model.FormatSubNode(1, Writer, false);
+                var Top = this.App.PictgramPanel.Viewport.PageYFromGY(TargetView.GetGY());
+                var Left = this.App.PictgramPanel.Viewport.PageXFromGX(TargetView.GetGX());
+                var Width = TargetView.GetShape().GetNodeWidth();
+                var Height = Math.max(100, TargetView.GetShape().GetNodeHeight());
+                this.EditorUtil.UpdateCSS({
+                    position: "fixed",
+                    top: Top,
+                    left: Left,
+                    width: Width,
+                    height: Height,
+                    background: "rgba(255, 255, 255, 1.00)"
+                });
+                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+            } else {
+                this.App.DebugP(Label + " not found.");
+            }
+        };
+        return SingleNodeEditorCommand;
+    })(AssureNote.Command);
+    AssureNote.SingleNodeEditorCommand = SingleNodeEditorCommand;
     var SingleNodeEditorPlugin = (function (_super) {
         __extends(SingleNodeEditorPlugin, _super);
         function SingleNodeEditorPlugin(AssureNoteApp, textarea, selector) {
@@ -44,27 +94,16 @@ var AssureNote;
             this.EditorUtil = new AssureNote.EditorUtil(AssureNoteApp, textarea, selector, {
                 position: "absolute"
             });
+
+            this.AssureNoteApp.RegistCommand(new SingleNodeEditorCommand(this.AssureNoteApp, this.EditorUtil));
         }
         SingleNodeEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
             return new AssureNote.NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor", function (event, TargetView) {
                 var Writer = new AssureNote.StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, false);
-
-                //var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
-                //var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3) / 4;
-                //this.Tooltip.css({
-                //    //width: '250px',
-                //    //height: '150px',
-                //    position: 'absolute',
-                //    top: Top,
-                //    left: Left,
-                //    display: 'block',
-                //    opacity: 100
-                //});
                 var Top = _this.AssureNoteApp.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
                 var Left = _this.AssureNoteApp.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
-                console.log(Top, Left);
                 var Width = NodeView.GetShape().GetNodeWidth();
                 var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
                 _this.EditorUtil.UpdateCSS({
