@@ -30,6 +30,7 @@ var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
+            this.Mode = 0 /* Edit */;
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -178,6 +179,14 @@ var AssureNote;
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
+        };
+
+        AssureNoteApp.prototype.GetMode = function () {
+            return this.Mode;
+        };
+
+        AssureNoteApp.prototype.SetMode = function (Mode) {
+            this.Mode = Mode;
         };
         return AssureNoteApp;
     })();

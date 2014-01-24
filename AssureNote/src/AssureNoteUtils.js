@@ -203,5 +203,11 @@ var AssureNote;
         return (Dir + 2) & 3;
     }
     AssureNote.ReverseDirection = ReverseDirection;
+
+    (function (AssureNoteMode) {
+        AssureNoteMode[AssureNoteMode["Edit"] = 0] = "Edit";
+        AssureNoteMode[AssureNoteMode["View"] = 1] = "View";
+    })(AssureNote.AssureNoteMode || (AssureNote.AssureNoteMode = {}));
+    var AssureNoteMode = AssureNote.AssureNoteMode;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=AssureNoteUtils.js.map

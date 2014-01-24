@@ -40,6 +40,7 @@ module AssureNote {
         WGSNName: string;
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
+        private Mode: AssureNoteMode;
         DefaultCommand: AssureNote.CommandMissingCommand;
 
         TopMenu: TopMenuItem;
@@ -47,6 +48,7 @@ module AssureNote {
         private UserName: string;
 
         constructor() {
+            this.Mode = AssureNoteMode.Edit;
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -194,6 +196,14 @@ module AssureNote {
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
+        }
+
+        GetMode(): AssureNoteMode {
+            return this.Mode;
+        }
+
+        SetMode(Mode: AssureNoteMode): void {
+            this.Mode = Mode;
         }
     }
 

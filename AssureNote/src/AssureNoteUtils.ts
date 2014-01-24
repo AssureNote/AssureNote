@@ -221,4 +221,8 @@ module AssureNote {
     export function ReverseDirection(Dir: Direction): Direction {
         return (Dir + 2) & 3;
     }
+
+    export enum AssureNoteMode {
+        Edit, View
+    }
 }
