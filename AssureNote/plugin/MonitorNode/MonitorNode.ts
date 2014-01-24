@@ -134,7 +134,7 @@ module AssureNote {
             }
 
             // Update past logs
-            if(this.PastLogs.length > 20) {
+            if(this.PastLogs.length > 10) {
                 this.PastLogs.pop();
             }
             this.PastLogs.unshift(LatestLog);
