@@ -155,7 +155,6 @@ module AssureNote {
                     var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     var HMargin = SimpleLayoutEngine.ChildrenHorizontalMargin;
-                    var ShiftY = 0;
 
                     var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
                     var IsFoldedLike = (SubNode.IsFolded || IsUndeveloped) && ChildHeadHeight <= FormarUnfoldedChildHeight;
@@ -197,20 +196,10 @@ module AssureNote {
                         FormarUnfoldedChildHeight = ChildHeadHeight;
                         SubNode.RelativeX += -SubNode.Shape.GetTreeLeftLocalX();
                     }
-                    if (!SubNode.HasSideNode()) {
-                        var SubNodeHeight = SubNode.Shape.GetNodeHeight();
-                        var ThisHeight = ThisNode.Shape.GetNodeHeight();
-                        var VMargin = SimpleLayoutEngine.ChildrenVerticalMargin;
-                        if (!SubNode.HasChildren() || ThisHeight + VMargin * 2 + SubNodeHeight > TreeHeight) {
-                            ShiftY = TreeHeight - (ThisHeight + VMargin);
-                        } else {
-                            ShiftY = SubNodeHeight + VMargin;
-                        }
-                    }
-                    SubNode.RelativeY = TreeHeight - ShiftY;
+                    SubNode.RelativeY = TreeHeight;
 
                     IsPreviousChildFolded = IsFoldedLike;
-                    ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight - ShiftY);
+                    ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
                     //console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
                 });
 
@@ -220,6 +209,19 @@ module AssureNote {
                 if (VisibleChildrenCount == 1) {
                     ThisNode.ForEachVisibleChildren((SubNode: NodeView) => {
                         ShiftX = -SubNode.Shape.GetTreeLeftLocalX();
+                        if (!SubNode.HasSideNode() || SubNode.IsFolded) {
+                            var ShiftY = 0;
+                            var SubNodeHeight = SubNode.Shape.GetNodeHeight();
+                            var ThisHeight = ThisNode.Shape.GetNodeHeight();
+                            var VMargin = SimpleLayoutEngine.ChildrenVerticalMargin;
+                            if (!SubNode.HasChildren() || ThisHeight + VMargin * 2 + SubNodeHeight > TreeHeight) {
+                                ShiftY = TreeHeight - (ThisHeight + VMargin);
+                            } else {
+                                ShiftY = SubNodeHeight + VMargin;
+                            }
+                            SubNode.RelativeY -= ShiftY;
+                            ChildrenHeight -= ShiftY;
+                        }
                     });
                 }
                 TreeLeftX = Math.min(TreeLeftX, -ShiftX);
