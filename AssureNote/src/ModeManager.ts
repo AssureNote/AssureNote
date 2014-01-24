@@ -30,13 +30,21 @@ module AssureNote {
         private WrapperElement: JQuery;
         constructor(public App: AssureNoteApp, Mode: AssureNoteMode) {
             this.Mode = Mode;
-            this.WrapperElement = $('#edit-mode');
-            console.log(this.WrapperElement);
+            this.WrapperElement = $('.edit-mode');
             var input = document.createElement('input');
+            input.id = 'mode-switch';
             input.setAttribute('type', 'checkbox');
             input.setAttribute('checked', '');
+            input.setAttribute('data-on-label', 'Edit');
+            input.setAttribute('data-off-label', 'View');
+
             //$(input).appendTo(this.WrapperElement);
-            //$(input).bootstrapSwitch('setSizeClass', '');
+            $('#mode-switch').bootstrapSwitch();
+            $('#mode-switch').bootstrapSwitch('setSizeClass', '')
+                .on('switch-change', (e, ...data) => {
+                    var value = data[0].value;
+                    this.SetMode((value) ? AssureNoteMode.Edit : AssureNoteMode.View);
+                });
         }
 
         GetMode(): AssureNoteMode {
