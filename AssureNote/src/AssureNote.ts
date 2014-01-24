@@ -33,6 +33,7 @@ module AssureNote {
     export class AssureNoteApp {
         PluginManager: PluginManager;
         SocketManager: SocketManager;
+        ModeManager: ModeManager;
         PictgramPanel: PictgramPanel;
         PluginPanel: PluginPanel;
         IsDebugMode: boolean;
@@ -40,7 +41,6 @@ module AssureNote {
         WGSNName: string;
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
-        private Mode: AssureNoteMode;
         DefaultCommand: AssureNote.CommandMissingCommand;
 
         TopMenu: TopMenuItem;
@@ -48,7 +48,6 @@ module AssureNote {
         private UserName: string;
 
         constructor() {
-            this.Mode = AssureNoteMode.Edit;
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -56,6 +55,7 @@ module AssureNote {
             this.SocketManager = new SocketManager(this);
             this.PictgramPanel = new PictgramPanel(this);
             this.PluginPanel = new PluginPanel(this);
+            this.ModeManager = new ModeManager(this, AssureNoteMode.Edit);
 
             this.DefaultCommand = new CommandMissingCommand(this);
             this.RegistCommand(new SaveCommand(this));
@@ -91,6 +91,8 @@ module AssureNote {
                 ])
             ]);
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
+
+
         }
 
         public RegistCommand(Command: Command) {
@@ -196,14 +198,6 @@ module AssureNote {
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
-        }
-
-        GetMode(): AssureNoteMode {
-            return this.Mode;
-        }
-
-        SetMode(Mode: AssureNoteMode): void {
-            this.Mode = Mode;
         }
     }
 

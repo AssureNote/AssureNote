@@ -8,6 +8,7 @@ src/CommandLine.ts
 src/Editor.ts
 src/GSNShape.ts
 src/LayoutEngine.ts
+src/ModeManager.ts
 src/NodeMenu.ts
 src/NodeView.ts
 src/Panel.ts

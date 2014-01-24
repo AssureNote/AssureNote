@@ -30,7 +30,6 @@ var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
-            this.Mode = 0 /* Edit */;
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -38,6 +37,7 @@ var AssureNote;
             this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.PluginPanel = new AssureNote.PluginPanel(this);
+            this.ModeManager = new AssureNote.ModeManager(this, 0 /* Edit */);
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
@@ -179,14 +179,6 @@ var AssureNote;
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
-        };
-
-        AssureNoteApp.prototype.GetMode = function () {
-            return this.Mode;
-        };
-
-        AssureNoteApp.prototype.SetMode = function (Mode) {
-            this.Mode = Mode;
         };
         return AssureNoteApp;
     })();
