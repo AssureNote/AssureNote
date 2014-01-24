@@ -26,6 +26,20 @@
 /* VIEW (MVC) */
 var AssureNote;
 (function (AssureNote) {
+    var Pointer = (function () {
+        function Pointer(X, Y, ID) {
+            this.X = X;
+            this.Y = Y;
+            this.ID = ID;
+        }
+        Pointer.prototype.SetPosition = function (X, Y) {
+            this.X = X;
+            this.Y = Y;
+        };
+        return Pointer;
+    })();
+    AssureNote.Pointer = Pointer;
+
     /**
     Controll scroll by mouse, touch and pen and zoom by wheel.
     @class AssureNote.ScrollManager
@@ -72,13 +86,7 @@ var AssureNote;
         };
 
         ScrollManager.prototype.GetMainPointer = function () {
-            for (var i = 0; i < this.Pointers.length; ++i) {
-                if (this.Pointers[i].identifier === this.MainPointerID) {
-                    return this.Pointers[i];
-                }
-            }
-            ;
-            return null;
+            return this.Pointers[this.MainPointerID];
         };
 
         ScrollManager.prototype.IsDragging = function () {
@@ -104,23 +112,42 @@ var AssureNote;
 
         ScrollManager.prototype.OnPointerEvent = function (e, Screen) {
             var _this = this;
-            this.Pointers = e.getPointerList();
-            var IsTherePointer = this.Pointers.length > 0;
+            switch (e.type) {
+                case "pointerdown":
+                    this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                    break;
+                case "pointerup":
+                    if (!this.Pointers[e.pointerId]) {
+                        return;
+                    }
+                    delete this.Pointers[e.pointerId];
+                    break;
+                case "pointermove":
+                    if (!this.Pointers[e.pointerId]) {
+                        return;
+                    }
+                    this.Pointers[e.pointerId].SetPosition(e.clientX, e.clientY);
+                    break;
+                default:
+                    return;
+            }
+
+            var IsTherePointer = Object.keys(this.Pointers).length > 0;
             var HasDragJustStarted = IsTherePointer && !this.IsDragging();
-            var HasDragJustEnded = !IsTherePointer && this.IsDragging();
+            var HasDragJustEnded = !this.GetMainPointer() && this.IsDragging();
 
             if (IsTherePointer) {
                 if (HasDragJustStarted) {
                     this.StopAnimation();
                     this.timer = null;
-                    var mainPointer = this.Pointers[0];
-                    this.MainPointerID = mainPointer.identifier;
+                    var mainPointer = this.Pointers[Object.keys(this.Pointers)[0]];
+                    this.MainPointerID = mainPointer.ID;
                     this.Viewport.SetEventMapLayerPosition(true);
-                    this.StartDrag(mainPointer.pageX, mainPointer.pageY);
+                    this.StartDrag(mainPointer.X, mainPointer.Y);
                 } else {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
-                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
+                        this.UpdateDrag(mainPointer.X, mainPointer.Y);
                         Screen.AddOffset(this.Dx, this.Dy);
                     } else {
                         this.EndDrag();
@@ -465,11 +492,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {
-            if (IsUpper && !this.IsEventMapUpper) {
-                $(this.ControlLayer).after(this.EventMapLayer);
-            } else if (!IsUpper && this.IsEventMapUpper) {
-                $(this.ContentLayer).before(this.EventMapLayer);
-            }
+            //if (IsUpper && !this.IsEventMapUpper) {
+            //    $(this.ControlLayer).after(this.EventMapLayer);
+            //} else if (!IsUpper && this.IsEventMapUpper) {
+            //    $(this.ContentLayer).before(this.EventMapLayer);
+            //}
             this.IsEventMapUpper = IsUpper;
         };
 

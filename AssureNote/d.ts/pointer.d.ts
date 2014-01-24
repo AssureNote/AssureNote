@@ -1,21 +1,20 @@
 
-interface Pointer {
-	clientX: number;
-	clientY: number;
-	screenX: number;
-	screenY: number;
-	pageX: number;
-	pageY: number;
-	tiltX: number;
-	tiltY: number;
-	pressure: number;
-	hwTimestamp: number;
-	pointerType: string;
-	identifier: number;
+interface PointerEvent extends MouseEvent {
+    pointerId: number;
+    width: number;
+    height: number;
+    pressure: number;
+    tiltX: number;
+    tiltY: number;
+    pointerType: string;
+    isPrimary: boolean;
 }
 
-interface PointerEvent extends Event {
-	getPointerList(): Pointer[];
+interface Element {
+    ongotpointercapture: any;
+    onlostpointercapture: any;
+    setPointerCapture(pointerId: number): void;
+    releasePointerCapture(pointerId: number): void;
 }
 
 interface GestureScaleEvent extends Event {

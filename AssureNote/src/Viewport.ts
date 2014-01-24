@@ -27,6 +27,14 @@
 
 /* VIEW (MVC) */
 module AssureNote {
+    export class Pointer {
+        constructor(public X: number, public Y: number, public ID: number) { }
+        SetPosition(X: number, Y: number) {
+            this.X = X;
+            this.Y = Y;
+        }
+    }
+
     /**
         Controll scroll by mouse, touch and pen and zoom by wheel.
         @class AssureNote.ScrollManager
@@ -76,12 +84,7 @@ module AssureNote {
         }
 
         private GetMainPointer(): Pointer {
-            for (var i = 0; i < this.Pointers.length; ++i) {
-                if (this.Pointers[i].identifier === this.MainPointerID) {
-                    return this.Pointers[i]
-                }
-            };
-            return null;
+            return this.Pointers[this.MainPointerID];
         }
 
         private IsDragging(): boolean {
@@ -110,23 +113,42 @@ module AssureNote {
         OnEndDrag: (Viewport: ViewportManager) => void;
 
         OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
-            this.Pointers = e.getPointerList();
-            var IsTherePointer: boolean = this.Pointers.length > 0;
+            switch (e.type) {
+                case "pointerdown":
+                    this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                    break;
+                case "pointerup":
+                    if (!this.Pointers[e.pointerId]) {
+                        return
+                    }
+                    delete this.Pointers[e.pointerId];
+                    break;
+                case "pointermove":
+                    if (!this.Pointers[e.pointerId]) {
+                        return
+                    }
+                    this.Pointers[e.pointerId].SetPosition(e.clientX, e.clientY);
+                    break;
+                default:
+                    return;
+            }
+
+            var IsTherePointer: boolean = Object.keys(this.Pointers).length > 0;
             var HasDragJustStarted: boolean = IsTherePointer && !this.IsDragging();
-            var HasDragJustEnded: boolean = !IsTherePointer && this.IsDragging();
+            var HasDragJustEnded: boolean = !this.GetMainPointer() && this.IsDragging();
 
             if (IsTherePointer) {
                 if (HasDragJustStarted) {
                     this.StopAnimation();
                     this.timer = null;
-                    var mainPointer = this.Pointers[0];
-                    this.MainPointerID = mainPointer.identifier;
+                    var mainPointer: Pointer = this.Pointers[Object.keys(this.Pointers)[0]];
+                    this.MainPointerID = mainPointer.ID;
                     this.Viewport.SetEventMapLayerPosition(true);
-                    this.StartDrag(mainPointer.pageX, mainPointer.pageY);
+                    this.StartDrag(mainPointer.X, mainPointer.Y);
                 } else {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
-                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
+                        this.UpdateDrag(mainPointer.X, mainPointer.Y);
                         Screen.AddOffset(this.Dx, this.Dy);
                     } else {
                         this.EndDrag();
@@ -459,11 +481,11 @@ module AssureNote {
 
         private IsEventMapUpper: boolean = false;
         public SetEventMapLayerPosition(IsUpper: boolean) {
-            if (IsUpper && !this.IsEventMapUpper) {
-                $(this.ControlLayer).after(this.EventMapLayer);
-            } else if (!IsUpper && this.IsEventMapUpper) {
-                $(this.ContentLayer).before(this.EventMapLayer);
-            }
+            //if (IsUpper && !this.IsEventMapUpper) {
+            //    $(this.ControlLayer).after(this.EventMapLayer);
+            //} else if (!IsUpper && this.IsEventMapUpper) {
+            //    $(this.ContentLayer).before(this.EventMapLayer);
+            //}
             this.IsEventMapUpper = IsUpper;
         }
 

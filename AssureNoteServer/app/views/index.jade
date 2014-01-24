@@ -22,7 +22,7 @@ html
       #auto-expand-area
       svg#svglayer-box(xmlns='http://www.w3.org/2000/svg', version='1.1', style='top: 0px; left: 0px; width: 100%; height: 100%;')
         g#svg-layer(transform='translate(0,0)')
-      #eventmap-layer(style='top: 0px; left: 0px; width: 100%; height: 100%;position: absolute;')
+      #eventmap-layer(style='top: 0px; left: 0px; width: 100%; height: 100%;position: absolute;', touch-action='none')
       #content-layer(style='top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;')
       #control-layer(style='top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;')
       #fixed-control-layer(style='top: 0px; left: 0px; width: 100%; height: 0px; position: absolute;')
@@ -78,7 +78,7 @@ html
     +js('/lib/jquery.jqdock.min.js')
     +js('/lib/jquery.cookie.js')
     +js('/lib/jquery.mousewheel.js')
-    +js('/lib/pointer.min.js')
+    +js('/lib/pointerevents.min.js')
     +js('/lib/codemirror/codemirror.js')
     +js('/lib/codemirror/highlight/wgsn.js')
     +js('/lib/FileSaver.js')
