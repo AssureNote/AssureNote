@@ -46,3 +46,7 @@ interface JQueryTmplItem
     key:number;
     parent:JQueryTmplItem;
 }
+
+interface JQuery {
+    bootstrapSwitch(type: string, value: string): JQuery;
+}

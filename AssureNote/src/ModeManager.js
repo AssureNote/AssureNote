@@ -21,12 +21,20 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+///<reference path='../d.ts/jquery_plugins.d.ts'/>
 var AssureNote;
 (function (AssureNote) {
     var ModeManager = (function () {
         function ModeManager(App, Mode) {
             this.App = App;
             this.Mode = Mode;
+            this.WrapperElement = $('#edit-mode');
+            console.log(this.WrapperElement);
+            var input = document.createElement('input');
+            input.setAttribute('type', 'checkbox');
+            input.setAttribute('checked', '');
+            //$(input).appendTo(this.WrapperElement);
+            //$(input).bootstrapSwitch('setSizeClass', '');
         }
         ModeManager.prototype.GetMode = function () {
             return this.Mode;

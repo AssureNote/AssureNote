@@ -22,11 +22,21 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
 
+///<reference path='../d.ts/jquery_plugins.d.ts'/>
+
 module AssureNote {
     export class ModeManager {
         private Mode: AssureNoteMode;
+        private WrapperElement: JQuery;
         constructor(public App: AssureNoteApp, Mode: AssureNoteMode) {
             this.Mode = Mode;
+            this.WrapperElement = $('#edit-mode');
+            console.log(this.WrapperElement);
+            var input = document.createElement('input');
+            input.setAttribute('type', 'checkbox');
+            input.setAttribute('checked', '');
+            //$(input).appendTo(this.WrapperElement);
+            //$(input).bootstrapSwitch('setSizeClass', '');
         }
 
         GetMode(): AssureNoteMode {
