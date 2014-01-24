@@ -293,18 +293,18 @@ module AssureNote {
 
     var MNodeManager: MonitorNodeManager = null;
 
-    export class MonitorStartCommand extends Command {
+    export class SetMonitorCommand extends Command {
 
         constructor(App: AssureNote.AssureNoteApp) {
             super(App);
         }
 
         public GetCommandLineNames(): string[] {
-            return ["monitor-start"];
+            return ["set-monitor"];
         }
 
         public GetHelpHTML(): string {
-            return "<code>monitor-start</code><br>Start monitoring.";
+            return "<code>set-monitor</code><br>Set node as monitor.";
         }
 
         public Invoke(CommandName: string, Params: any[]): void {
@@ -315,7 +315,7 @@ module AssureNote {
                 var Param = Params[0];
                 // check params
                 if(Param == "all") {
-                    // Start all monitors
+                    // Set all monitors
                     var IsFirst = true;
                     for(var Label in this.App.PictgramPanel.ViewMap) {
                         var View = this.App.PictgramPanel.ViewMap[Label];
@@ -372,18 +372,18 @@ module AssureNote {
 
     }
 
-    export class MonitorStopCommand extends Command {
+    export class UnsetMonitorCommand extends Command {
 
         constructor(App: AssureNote.AssureNoteApp) {
             super(App);
         }
 
         public GetCommandLineNames(): string[] {
-            return ["monitor-stop"];
+            return ["unset-monitor"];
         }
 
         public GetHelpHTML(): string {
-            return "<code>monitor-stop</code><br>Stop monitoring.";
+            return "<code>unset-monitor</code><br>Unset node as monitor.";
         }
 
         public Invoke(CommandName: string, Params: any[]): void {
@@ -393,7 +393,7 @@ module AssureNote {
             if(Params.length == 1) {
                 var Param = Params[0];
                 if(Param == "all") {
-                    // Stop all monitors
+                    // Unset all monitors
                     MNodeManager.DeleteAllMonitorNodes();
                 }
                 else {
@@ -453,8 +453,8 @@ module AssureNote {
         constructor(public AssureNoteApp: AssureNoteApp) {
             super();
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
-            this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
-            this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
         }
 

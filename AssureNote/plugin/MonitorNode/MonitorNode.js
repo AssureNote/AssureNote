@@ -284,20 +284,20 @@ var AssureNote;
 
     var MNodeManager = null;
 
-    var MonitorStartCommand = (function (_super) {
-        __extends(MonitorStartCommand, _super);
-        function MonitorStartCommand(App) {
+    var SetMonitorCommand = (function (_super) {
+        __extends(SetMonitorCommand, _super);
+        function SetMonitorCommand(App) {
             _super.call(this, App);
         }
-        MonitorStartCommand.prototype.GetCommandLineNames = function () {
-            return ["monitor-start"];
+        SetMonitorCommand.prototype.GetCommandLineNames = function () {
+            return ["set-monitor"];
         };
 
-        MonitorStartCommand.prototype.GetHelpHTML = function () {
-            return "<code>monitor-start</code><br>Start monitoring.";
+        SetMonitorCommand.prototype.GetHelpHTML = function () {
+            return "<code>set-monitor</code><br>Set node as monitor.";
         };
 
-        MonitorStartCommand.prototype.Invoke = function (CommandName, Params) {
+        SetMonitorCommand.prototype.Invoke = function (CommandName, Params) {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
 
@@ -306,7 +306,7 @@ var AssureNote;
 
                 // check params
                 if (Param == "all") {
-                    // Start all monitors
+                    // Set all monitors
                     var IsFirst = true;
                     for (var Label in this.App.PictgramPanel.ViewMap) {
                         var View = this.App.PictgramPanel.ViewMap[Label];
@@ -357,31 +357,31 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
-        return MonitorStartCommand;
+        return SetMonitorCommand;
     })(AssureNote.Command);
-    AssureNote.MonitorStartCommand = MonitorStartCommand;
+    AssureNote.SetMonitorCommand = SetMonitorCommand;
 
-    var MonitorStopCommand = (function (_super) {
-        __extends(MonitorStopCommand, _super);
-        function MonitorStopCommand(App) {
+    var UnsetMonitorCommand = (function (_super) {
+        __extends(UnsetMonitorCommand, _super);
+        function UnsetMonitorCommand(App) {
             _super.call(this, App);
         }
-        MonitorStopCommand.prototype.GetCommandLineNames = function () {
-            return ["monitor-stop"];
+        UnsetMonitorCommand.prototype.GetCommandLineNames = function () {
+            return ["unset-monitor"];
         };
 
-        MonitorStopCommand.prototype.GetHelpHTML = function () {
-            return "<code>monitor-stop</code><br>Stop monitoring.";
+        UnsetMonitorCommand.prototype.GetHelpHTML = function () {
+            return "<code>unset-monitor</code><br>Unset node as monitor.";
         };
 
-        MonitorStopCommand.prototype.Invoke = function (CommandName, Params) {
+        UnsetMonitorCommand.prototype.Invoke = function (CommandName, Params) {
             // Delete dead monitors before below process
             MNodeManager.DeleteDeadMonitorNodes();
 
             if (Params.length == 1) {
                 var Param = Params[0];
                 if (Param == "all") {
-                    // Stop all monitors
+                    // Unset all monitors
                     MNodeManager.DeleteAllMonitorNodes();
                 } else {
                     var Label = Param;
@@ -402,9 +402,9 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
-        return MonitorStopCommand;
+        return UnsetMonitorCommand;
     })(AssureNote.Command);
-    AssureNote.MonitorStopCommand = MonitorStopCommand;
+    AssureNote.UnsetMonitorCommand = UnsetMonitorCommand;
 
     var UseRecAtCommand = (function (_super) {
         __extends(UseRecAtCommand, _super);
@@ -438,8 +438,8 @@ var AssureNote;
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
-            this.AssureNoteApp.RegistCommand(new MonitorStartCommand(this.AssureNoteApp));
-            this.AssureNoteApp.RegistCommand(new MonitorStopCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
         }
         MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
