@@ -147,6 +147,7 @@ var AssureNote;
             var VisibleChildrenCount = 0;
             if (ThisNode.Children != null && ThisNode.Children.length > 0) {
                 var IsPreviousChildFolded = false;
+
                 ThisNode.ForEachVisibleChildren(function (SubNode) {
                     VisibleChildrenCount++;
                     _this.Layout(SubNode);
@@ -155,22 +156,23 @@ var AssureNote;
                     var ChildHeadLeftSideMargin = SubNode.Shape.GetHeadLeftLocalX() - SubNode.Shape.GetTreeLeftLocalX();
                     var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
-                    var Margin = SimpleLayoutEngine.ChildrenHorizontalMargin;
+                    var HMargin = SimpleLayoutEngine.ChildrenHorizontalMargin;
+                    var ShiftY = 0;
 
                     var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
                     var IsFoldedLike = SubNode.IsFolded || IsUndeveloped;
 
                     if (IsFoldedLike) {
                         SubNode.RelativeX = ChildrenTopWidth;
-                        ChildrenTopWidth = ChildrenTopWidth + ChildHeadWidth + Margin;
+                        ChildrenTopWidth = ChildrenTopWidth + ChildHeadWidth + HMargin;
                         FoldedNodeRun.push(SubNode);
                     } else {
                         if (IsPreviousChildFolded) {
                             var WidthDiff = ChildrenTopWidth - ChildrenBottomWidth;
                             if (WidthDiff < ChildHeadLeftSideMargin) {
                                 SubNode.RelativeX = ChildrenBottomWidth;
-                                ChildrenTopWidth = ChildrenBottomWidth + ChildHeadRightX + Margin;
-                                ChildrenBottomWidth = ChildrenBottomWidth + ChildTreeWidth + Margin;
+                                ChildrenTopWidth = ChildrenBottomWidth + ChildHeadRightX + HMargin;
+                                ChildrenBottomWidth = ChildrenBottomWidth + ChildTreeWidth + HMargin;
                                 if (SubNode.RelativeX == 0) {
                                     for (var i = 0; i < FoldedNodeRun.length; i++) {
                                         FoldedNodeRun[i].RelativeX += ChildHeadLeftSideMargin - WidthDiff;
@@ -183,40 +185,46 @@ var AssureNote;
                                 }
                             } else {
                                 SubNode.RelativeX = ChildrenTopWidth - ChildHeadLeftSideMargin;
-                                ChildrenBottomWidth = ChildrenTopWidth + ChildTreeWidth - ChildHeadLeftSideMargin + Margin;
-                                ChildrenTopWidth = ChildrenTopWidth + ChildHeadWidth + Margin;
+                                ChildrenBottomWidth = ChildrenTopWidth + ChildTreeWidth - ChildHeadLeftSideMargin + HMargin;
+                                ChildrenTopWidth = ChildrenTopWidth + ChildHeadWidth + HMargin;
                             }
                         } else {
                             var ChildrenWidth = Math.max(ChildrenTopWidth, ChildrenBottomWidth);
                             SubNode.RelativeX = ChildrenWidth;
-                            ChildrenTopWidth = ChildrenWidth + ChildHeadRightX + Margin;
-                            ChildrenBottomWidth = ChildrenWidth + ChildTreeWidth + Margin;
+                            ChildrenTopWidth = ChildrenWidth + ChildHeadRightX + HMargin;
+                            ChildrenBottomWidth = ChildrenWidth + ChildTreeWidth + HMargin;
                         }
                         FoldedNodeRun = [];
                         SubNode.RelativeX += -SubNode.Shape.GetTreeLeftLocalX();
                     }
-                    SubNode.RelativeY = TreeHeight;
+                    if (!SubNode.HasSideNode()) {
+                        var SubNodeHeight = SubNode.Shape.GetNodeHeight();
+                        var ThisHeight = ThisNode.Shape.GetNodeHeight();
+                        var VMargin = SimpleLayoutEngine.ChildrenVerticalMargin;
+                        if (!SubNode.HasChildren() || ThisHeight + VMargin * 2 + SubNodeHeight > TreeHeight) {
+                            ShiftY = TreeHeight - (ThisHeight + VMargin);
+                        } else {
+                            ShiftY = SubNodeHeight + VMargin;
+                        }
+                    }
+                    SubNode.RelativeY = TreeHeight - ShiftY;
 
                     IsPreviousChildFolded = IsFoldedLike;
-                    ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
+                    ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight - ShiftY);
                     //console.log("T" + ChildrenTopWidth + ", B" + ChildrenBottomWidth);
                 });
 
                 var ChildrenWidth = Math.max(ChildrenTopWidth, ChildrenBottomWidth) - SimpleLayoutEngine.ChildrenHorizontalMargin;
                 var ShiftX = (ChildrenWidth - ThisNodeWidth) / 2;
-                var ShiftY = 0;
+
                 if (VisibleChildrenCount == 1) {
                     ThisNode.ForEachVisibleChildren(function (SubNode) {
                         ShiftX = -SubNode.Shape.GetTreeLeftLocalX();
-                        if (!SubNode.HasSideNode()) {
-                            ShiftY = ThisNode.Shape.GetNodeHeight() + SimpleLayoutEngine.ChildrenVerticalMargin - TreeHeight;
-                        }
                     });
                 }
                 TreeLeftX = Math.min(TreeLeftX, -ShiftX);
                 ThisNode.ForEachVisibleChildren(function (SubNode) {
                     SubNode.RelativeX -= ShiftX;
-                    SubNode.RelativeY += ShiftY;
                 });
 
                 TreeHeight += ChildrenHeight;

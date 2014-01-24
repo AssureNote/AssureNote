@@ -313,6 +313,10 @@ var AssureNote;
             return (this.Left != null && this.Left.length > 0) || (this.Right != null && this.Right.length > 0);
         };
 
+        NodeView.prototype.HasChildren = function () {
+            return (this.Children != null && this.Children.length > 0);
+        };
+
         NodeView.prototype.AddColorStyle = function (ColorStyle) {
             this.Shape.AddColorStyle(ColorStyle);
         };
