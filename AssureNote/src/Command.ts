@@ -443,11 +443,11 @@ module AssureNote {
         }
 
         public GetCommandLineNames(): string[] {
-            return ["upload"];
+            return ["share"];
         }
 
         public GetHelpHTML(): string {
-            return "<code>upload</code><br>Upload editing GSN to the server(online version only)."
+            return "<code>share</code><br>Upload editing GSN to the server(online version only)."
         }
 
         public Invoke(CommandName: string, Params: any[]) {

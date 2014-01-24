@@ -472,11 +472,11 @@ var AssureNote;
             _super.call(this, App);
         }
         UploadCommand.prototype.GetCommandLineNames = function () {
-            return ["upload"];
+            return ["share"];
         };
 
         UploadCommand.prototype.GetHelpHTML = function () {
-            return "<code>upload</code><br>Upload editing GSN to the server(online version only).";
+            return "<code>share</code><br>Upload editing GSN to the server(online version only).";
         };
 
         UploadCommand.prototype.Invoke = function (CommandName, Params) {
