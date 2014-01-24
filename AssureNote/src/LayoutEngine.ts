@@ -158,7 +158,7 @@ module AssureNote {
                     var ShiftY = 0;
 
                     var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
-                    var IsFoldedLike = (SubNode.IsFolded || IsUndeveloped) && ChildHeadHeight < FormarUnfoldedChildHeight;
+                    var IsFoldedLike = (SubNode.IsFolded || IsUndeveloped) && ChildHeadHeight <= FormarUnfoldedChildHeight;
 
                     if (IsFoldedLike) {
                         SubNode.RelativeX = ChildrenTopWidth;
