@@ -143,6 +143,7 @@ var AssureNote;
             var ChildrenTopWidth = 0;
             var ChildrenBottomWidth = 0;
             var ChildrenHeight = 0;
+            var FormarUnfoldedChildHeight = Infinity;
             var FoldedNodeRun = [];
             var VisibleChildrenCount = 0;
             if (ThisNode.Children != null && ThisNode.Children.length > 0) {
@@ -153,6 +154,7 @@ var AssureNote;
                     _this.Layout(SubNode);
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
                     var ChildHeadWidth = SubNode.IsFolded ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
+                    var ChildHeadHeight = SubNode.IsFolded ? SubNode.Shape.GetNodeHeight() : SubNode.Shape.GetHeadHeight();
                     var ChildHeadLeftSideMargin = SubNode.Shape.GetHeadLeftLocalX() - SubNode.Shape.GetTreeLeftLocalX();
                     var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
@@ -160,7 +162,7 @@ var AssureNote;
                     var ShiftY = 0;
 
                     var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
-                    var IsFoldedLike = SubNode.IsFolded || IsUndeveloped;
+                    var IsFoldedLike = (SubNode.IsFolded || IsUndeveloped) && ChildHeadHeight < FormarUnfoldedChildHeight;
 
                     if (IsFoldedLike) {
                         SubNode.RelativeX = ChildrenTopWidth;
@@ -168,6 +170,7 @@ var AssureNote;
                         FoldedNodeRun.push(SubNode);
                     } else {
                         if (IsPreviousChildFolded) {
+                            // Arrange the folded nodes between open nodes to equal distance
                             var WidthDiff = ChildrenTopWidth - ChildrenBottomWidth;
                             if (WidthDiff < ChildHeadLeftSideMargin) {
                                 SubNode.RelativeX = ChildrenBottomWidth;
@@ -195,6 +198,7 @@ var AssureNote;
                             ChildrenBottomWidth = ChildrenWidth + ChildTreeWidth + HMargin;
                         }
                         FoldedNodeRun = [];
+                        FormarUnfoldedChildHeight = ChildHeadHeight;
                         SubNode.RelativeX += -SubNode.Shape.GetTreeLeftLocalX();
                     }
                     if (!SubNode.HasSideNode()) {
