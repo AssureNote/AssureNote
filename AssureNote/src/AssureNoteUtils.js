@@ -142,6 +142,99 @@ var AssureNote;
             document.body.scrollTop = scr;
         }
         AssureNoteUtils.UpdateHash = UpdateHash;
+
+        var UserAgant = (function () {
+            function UserAgant() {
+            }
+            UserAgant.IsLessThanIE6 = function () {
+                return !!UserAgant.ua.ltIE6;
+            };
+            UserAgant.IsLessThanIE7 = function () {
+                return !!UserAgant.ua.ltIE7;
+            };
+            UserAgant.IsLessThanIE8 = function () {
+                return !!UserAgant.ua.ltIE8;
+            };
+            UserAgant.IsLessThanIE9 = function () {
+                return !!UserAgant.ua.ltIE9;
+            };
+            UserAgant.IsGreaterThanIE10 = function () {
+                return !!UserAgant.ua.gtIE10;
+            };
+            UserAgant.IsTrident = function () {
+                return !!UserAgant.ua.Trident;
+            };
+            UserAgant.IsGecko = function () {
+                return !!UserAgant.ua.Gecko;
+            };
+            UserAgant.IsPresto = function () {
+                return !!UserAgant.ua.Presto;
+            };
+            UserAgant.IsBlink = function () {
+                return !!UserAgant.ua.Blink;
+            };
+            UserAgant.IsWebkit = function () {
+                return !!UserAgant.ua.Webkit;
+            };
+            UserAgant.IsTouchEnabled = function () {
+                return !!UserAgant.ua.Touch;
+            };
+            UserAgant.IsPointerEnabled = function () {
+                return !!UserAgant.ua.Pointer;
+            };
+            UserAgant.IsMSPoniterEnabled = function () {
+                return !!UserAgant.ua.MSPoniter;
+            };
+            UserAgant.IsPerformanceEnabled = function () {
+                return !!UserAgant.ua.Performance;
+            };
+            UserAgant.IsAnimationFrameEnabled = function () {
+                return !!UserAgant.ua.AnimationFrame;
+            };
+            UserAgant.ua = (function () {
+                return {
+                    ltIE6: typeof window.addEventListener == "undefined" && typeof document.documentElement.style.maxHeight == "undefined",
+                    ltIE7: typeof window.addEventListener == "undefined" && typeof document.querySelectorAll == "undefined",
+                    ltIE8: typeof window.addEventListener == "undefined" && typeof document.getElementsByClassName == "undefined",
+                    ltIE9: document.uniqueID && !window.matchMedia,
+                    gtIE10: document.uniqueID && document.documentMode >= 10,
+                    Trident: document.uniqueID,
+                    Gecko: 'MozAppearance' in document.documentElement.style,
+                    Presto: window.opera,
+                    Blink: window.chrome,
+                    Webkit: !window.chrome && 'WebkitAppearance' in document.documentElement.style,
+                    Touch: typeof document.ontouchstart != "undefined",
+                    Mobile: typeof document.orientation != "undefined",
+                    Pointer: (typeof document.navigator != "undefined") && !!document.navigator.pointerEnabled,
+                    MSPoniter: (typeof document.navigator != "undefined") && !!document.navigator.msPointerEnabled,
+                    Performance: typeof window.performance != "undefined",
+                    AnimationFrame: typeof window.requestAnimationFrame != "undefined"
+                };
+            })();
+            return UserAgant;
+        })();
+        AssureNoteUtils.UserAgant = UserAgant;
+
+        function RequestAnimationFrame(Callback) {
+            if (UserAgant.IsAnimationFrameEnabled()) {
+                return window.requestAnimationFrame(Callback);
+            }
+            return window.setTimeout(Callback, 16.7);
+        }
+        AssureNoteUtils.RequestAnimationFrame = RequestAnimationFrame;
+
+        function CancelAnimationFrame(Handle) {
+            if (UserAgant.IsAnimationFrameEnabled()) {
+                return window.cancelAnimationFrame(Handle);
+            }
+            return window.clearTimeout(Handle);
+        }
+        AssureNoteUtils.CancelAnimationFrame = CancelAnimationFrame;
+
+        function GetTime() {
+            return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
+        }
+        AssureNoteUtils.GetTime = GetTime;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

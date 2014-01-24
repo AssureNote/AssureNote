@@ -181,6 +181,92 @@ module AssureNote {
             window.location.hash = hash;
             document.body.scrollTop = scr;
         }
+
+        export class UserAgant {
+            private static ua: any = (() => {
+                return {
+                    ltIE6: typeof window.addEventListener == "undefined" && typeof document.documentElement.style.maxHeight == "undefined",
+                    ltIE7: typeof window.addEventListener == "undefined" && typeof document.querySelectorAll == "undefined",
+                    ltIE8: typeof window.addEventListener == "undefined" && typeof document.getElementsByClassName == "undefined",
+                    ltIE9: document.uniqueID && !window.matchMedia,
+                    gtIE10: document.uniqueID && document.documentMode >= 10,
+                    Trident: document.uniqueID,
+                    Gecko: 'MozAppearance' in document.documentElement.style,
+                    Presto: (<any>window).opera,
+                    Blink: (<any>window).chrome,
+                    Webkit: !(<any>window).chrome && 'WebkitAppearance' in document.documentElement.style,
+                    Touch: typeof (<any>document).ontouchstart != "undefined",
+                    Mobile: typeof (<any>document).orientation != "undefined",
+                    Pointer: (typeof (<any>document).navigator != "undefined") && !!(<any>document).navigator.pointerEnabled,
+                    MSPoniter: (typeof (<any>document).navigator != "undefined") && !!(<any>document).navigator.msPointerEnabled,
+                    Performance: typeof window.performance != "undefined",
+                    AnimationFrame: typeof window.requestAnimationFrame != "undefined"
+                };
+            })();
+            static IsLessThanIE6(): boolean {
+                return !!UserAgant.ua.ltIE6;
+            }
+            static IsLessThanIE7(): boolean {
+                return !!UserAgant.ua.ltIE7;
+            }
+            static IsLessThanIE8(): boolean {
+                return !!UserAgant.ua.ltIE8;
+            }
+            static IsLessThanIE9(): boolean {
+                return !!UserAgant.ua.ltIE9;
+            }
+            static IsGreaterThanIE10(): boolean {
+                return !!UserAgant.ua.gtIE10;
+            }
+            static IsTrident(): boolean {
+                return !!UserAgant.ua.Trident;
+            }
+            static IsGecko(): boolean {
+                return !!UserAgant.ua.Gecko;
+            }
+            static IsPresto(): boolean {
+                return !!UserAgant.ua.Presto;
+            }
+            static IsBlink(): boolean {
+                return !!UserAgant.ua.Blink;
+            }
+            static IsWebkit(): boolean {
+                return !!UserAgant.ua.Webkit;
+            }
+            static IsTouchEnabled(): boolean {
+                return !!UserAgant.ua.Touch;
+            }
+            static IsPointerEnabled(): boolean {
+                return !!UserAgant.ua.Pointer;
+            }
+            static IsMSPoniterEnabled(): boolean {
+                return !!UserAgant.ua.MSPoniter;
+            }
+            static IsPerformanceEnabled(): boolean {
+                return !!UserAgant.ua.Performance;
+            }
+            static IsAnimationFrameEnabled(): boolean {
+                return !!UserAgant.ua.AnimationFrame;
+            }
+        }
+
+        export function RequestAnimationFrame(Callback: Function): number {
+            if (UserAgant.IsAnimationFrameEnabled()) {
+                return window.requestAnimationFrame(<any>Callback);
+            }
+            return window.setTimeout(Callback, 16.7);
+        }
+
+        export function CancelAnimationFrame(Handle: number): void {
+            if (UserAgant.IsAnimationFrameEnabled()) {
+                return window.cancelAnimationFrame(Handle);
+            }
+            return window.clearTimeout(Handle);
+        }
+
+        export function GetTime(): number {
+            return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
+        }
     }
 
     export class ColorStyle {
