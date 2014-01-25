@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -64,8 +64,11 @@ $(function () {
     };
 
     App.LoadDefaultWGSN();
+    document.documentElement.scrollTop = 0;
+    window.addEventListener('hashchange', function (ev) {
+        document.documentElement.scrollTop = 0;
+    });
     if (location.hash != null) {
-        console.log(location.hash);
         var label = location.hash.substring(1);
         var NodeView = App.PictgramPanel.ViewMap[label];
         if (NodeView) {
