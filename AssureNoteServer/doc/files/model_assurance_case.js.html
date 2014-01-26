@@ -210,7 +210,7 @@ var AssuranceCaseDAO = (function (_super) {
             },
             function (result, next) {
                 if (result.length == 0) {
-                    next(new error.NotFoundError(&#x27;Assurance Case is not found.&#x27;, { fileId: hashKey }));
+                    next(new error.NotFoundError(&#x27;Assurance Case not found.&#x27;, { fileId: hashKey }));
                     return;
                 }
                 next(null, AssuranceCase.tableToObject(result[0]));
