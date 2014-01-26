@@ -64,7 +64,7 @@ export class AssuranceCaseDAO extends model.DAO {
             },
             (result:any, next) => {
                 if (result.length == 0) {
-                    next(new error.NotFoundError('AssuranceCase is not found.', {fileId: hashKey}));
+                    next(new error.NotFoundError('Assurance Case is not found.', {fileId: hashKey}));
                     return;
                 }
                 next(null, AssuranceCase.tableToObject(result[0]));

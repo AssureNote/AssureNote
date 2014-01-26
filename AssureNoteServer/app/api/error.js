@@ -166,7 +166,7 @@ exports.ForbiddenError = ForbiddenError;
 var NotFoundError = (function (_super) {
     __extends(NotFoundError, _super);
     function NotFoundError(msg, data) {
-        _super.call(this, 200 /* OK */, 24001 /* DATA_NOT_FOUND */, msg, data);
+        _super.call(this, 404 /* NOT_FOUND */, 24001 /* DATA_NOT_FOUND */, msg, data);
     }
     return NotFoundError;
 })(ApplicationError);
