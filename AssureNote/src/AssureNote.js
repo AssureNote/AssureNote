@@ -158,8 +158,17 @@ var AssureNote;
 
             this.PictgramPanel.Draw();
 
-            var TopGoal = this.PictgramPanel.MasterView;
-            this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
+            if (location.hash != null) {
+                var label = location.hash.substring(1);
+                var NodeView = this.PictgramPanel.ViewMap[label];
+                if (NodeView) {
+                    this.PictgramPanel.ChangeFocusedLabel(label);
+                    this.PictgramPanel.Viewport.SetCamera(NodeView.GetGX(), NodeView.GetGY(), 1);
+                }
+            } else {
+                var TopGoal = this.PictgramPanel.MasterView;
+                this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
+            }
 
             $("title").text("AssureNote");
         };

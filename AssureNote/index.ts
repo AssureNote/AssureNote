@@ -68,12 +68,4 @@ $(() => {
     window.addEventListener('hashchange', (ev: Event) => {
         document.documentElement.scrollTop = 0;
     });
-    if (location.hash != null) {
-        var label = location.hash.substring(1);
-        var NodeView: AssureNote.NodeView = App.PictgramPanel.ViewMap[label];
-        if (NodeView) {
-            App.PictgramPanel.ChangeFocusedLabel(label);
-            App.PictgramPanel.Viewport.SetCamera(NodeView.GetGX(), NodeView.GetGY(), 1);
-        }
-    }
 });
