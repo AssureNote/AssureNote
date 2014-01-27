@@ -86,7 +86,7 @@ module AssureNote {
                     ]),
                     new DividerMenuItem(),
                     new HelpMenuItem(),
-                    new CommandListMenuItem(),
+                    //new CommandListMenuItem(),
                     new AboutMenuItem()
                 ])
             ]);
