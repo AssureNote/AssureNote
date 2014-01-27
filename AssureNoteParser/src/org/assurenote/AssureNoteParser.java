@@ -1798,6 +1798,15 @@ class GSNRecord {
 	}
 
 	/**
+	 * @method DiscardEditor
+	 */
+	public void DiscardEditor() {
+		this.EditingDoc = null;
+		Lib.Array_remove(this.HistoryList, Lib.Array_size(this.HistoryList) - 1);
+		
+	}
+	
+	/**
 	 * @method Merge
 	 * @param {GSNRecord} NewRecord
 	 */

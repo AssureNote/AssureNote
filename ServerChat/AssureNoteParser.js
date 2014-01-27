@@ -246,13 +246,13 @@ exports.GSNHistory = GSNHistory;
 var WikiSyntax = (function () {
     function WikiSyntax() {
     }
-    WikiSyntax.ParseInt = /**
+    /**
     * @method ParseInt
     * @param {String} NumText
     * @param {Number} DefVal
     * @return {Number}
     */
-    function (NumText, DefVal) {
+    WikiSyntax.ParseInt = function (NumText, DefVal) {
         try  {
             return Lib.parseInt(NumText);
         } catch (e) {
@@ -260,12 +260,12 @@ var WikiSyntax = (function () {
         return DefVal;
     };
 
-    WikiSyntax.ParseGoalLevel = /**
+    /**
     * @method ParseGoalLevel
     * @param {String} LabelLine
     * @return {Number}
     */
-    function (LabelLine) {
+    WikiSyntax.ParseGoalLevel = function (LabelLine) {
         var GoalLevel = 0;
         for (var i = 0; i < LabelLine.length; i++) {
             if (LabelLine.charCodeAt(i) != 42)
@@ -275,12 +275,12 @@ var WikiSyntax = (function () {
         return GoalLevel;
     };
 
-    WikiSyntax.FormatGoalLevel = /**
+    /**
     * @method FormatGoalLevel
     * @param {Number} GoalLevel
     * @return {String}
     */
-    function (GoalLevel) {
+    WikiSyntax.FormatGoalLevel = function (GoalLevel) {
         var sb = new StringBuilder();
         for (var i = 0; i < GoalLevel; i++) {
             sb.append("*");
@@ -288,13 +288,13 @@ var WikiSyntax = (function () {
         return sb.toString();
     };
 
-    WikiSyntax.GetLabelPos = /**
+    /**
     * @method GetLabelPos
     * @static
     * @param {String} LabelLine
     * @return {Number}
     */
-    function (LabelLine) {
+    WikiSyntax.GetLabelPos = function (LabelLine) {
         /* Returns the row of the abel (e.g., 71). */
         var i;
         for (i = 0; i < LabelLine.length; i++) {
@@ -308,40 +308,40 @@ var WikiSyntax = (function () {
         return i;
     };
 
-    WikiSyntax.ParseNodeType = /**
+    /**
     * @method ParseNodeType
     * @param {String} LabelLine
     * @return {GSNType}
     */
-    function (LabelLine) {
+    WikiSyntax.ParseNodeType = function (LabelLine) {
         var i = WikiSyntax.GetLabelPos(LabelLine);
         if (i < LabelLine.length) {
             var ch = LabelLine.charCodeAt(i);
             if (ch == 71) {
-                return GSNType.Goal;
+                return 0 /* Goal */;
             }
             if (ch == 83) {
-                return GSNType.Strategy;
+                return 2 /* Strategy */;
             }
             if (ch == 69 || ch == 77 || ch == 65) {
-                return GSNType.Evidence;
+                return 3 /* Evidence */;
             }
             if (ch == 67 || ch == 74 || ch == 82) {
-                return GSNType.Context;
+                return 1 /* Context */;
             }
         }
-        return GSNType.Undefined;
+        return 4 /* Undefined */;
     };
 
-    WikiSyntax.ParseLabelName = /**
+    /**
     * @method ParseLabelName
     * @param {String} LabelLine
     * @return {String}
     */
-    function (LabelLine) {
+    WikiSyntax.ParseLabelName = function (LabelLine) {
         var i = WikiSyntax.GetLabelPos(LabelLine);
         var sb = new StringBuilder();
-        i = i + 1;
+        i = i + 1; // eat label
 
         if (i >= LabelLine.length || LabelLine.charCodeAt(i) != 58)
             return null;
@@ -354,32 +354,32 @@ var WikiSyntax = (function () {
         return sb.toString();
     };
 
-    WikiSyntax.FormatNodeType = /**
+    /**
     * @method FormatNodeType
     * @param {GSNType} NodeType
     * @return {String}
     */
-    function (NodeType) {
+    WikiSyntax.FormatNodeType = function (NodeType) {
         switch (NodeType) {
-            case GSNType.Goal:
+            case 0 /* Goal */:
                 return "G";
-            case GSNType.Context:
+            case 1 /* Context */:
                 return "C";
-            case GSNType.Strategy:
+            case 2 /* Strategy */:
                 return "S";
-            case GSNType.Evidence:
+            case 3 /* Evidence */:
                 return "E";
-            case GSNType.Undefined:
+            case 4 /* Undefined */:
         }
         return "U";
     };
 
-    WikiSyntax.ParseLabelNumber = /**
+    /**
     * @method ParseLabelNumber
     * @param {String} LabelLine
     * @return {String}
     */
-    function (LabelLine) {
+    WikiSyntax.ParseLabelNumber = function (LabelLine) {
         var StartIdx = WikiSyntax.GetLabelPos(LabelLine) + 1;
         if (StartIdx >= LabelLine.length || LabelLine.charCodeAt(StartIdx) == 58)
             return null;
@@ -404,12 +404,12 @@ var WikiSyntax = (function () {
         return null;
     };
 
-    WikiSyntax.ParseUID = /**
+    /**
     * @method ParseUID
     * @param {String} LabelLine
     * @return {String}
     */
-    function (LabelLine) {
+    WikiSyntax.ParseUID = function (LabelLine) {
         var StartIdx = LabelLine.indexOf("&") + 1;
         if (StartIdx == 0)
             return null;
@@ -420,13 +420,13 @@ var WikiSyntax = (function () {
         return UID;
     };
 
-    WikiSyntax.ParseRevisionHistory = /**
+    /**
     * @method ParseRevisionHistory
     * @static
     * @param {LabelLine} LabelLine
     * @return {String}
     */
-    function (LabelLine) {
+    WikiSyntax.ParseRevisionHistory = function (LabelLine) {
         var Loc = LabelLine.indexOf("#");
         if (Loc != -1) {
             return LabelLine.substring(Loc).trim();
@@ -434,13 +434,13 @@ var WikiSyntax = (function () {
         return null;
     };
 
-    WikiSyntax.ParseHistory = /**
+    /**
     * @method ParseHistory
     * @param {String} LabelLine
     * @param {GSNDoc} BaseDoc
     * @return {String}
     */
-    function (LabelLine, BaseDoc) {
+    WikiSyntax.ParseHistory = function (LabelLine, BaseDoc) {
         if (BaseDoc != null) {
             var Loc = LabelLine.indexOf("#");
             try  {
@@ -448,8 +448,8 @@ var WikiSyntax = (function () {
                     var HistoryTaple = new Array(2);
                     var RevText = LabelLine.substring(Loc + 1).trim();
                     var RevSet = RevText.split(":");
-                    HistoryTaple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1));
-                    HistoryTaple[1] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[1], -1));
+                    HistoryTaple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1)); // Created
+                    HistoryTaple[1] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[1], -1)); // Branched
                     if (HistoryTaple[0] == null || HistoryTaple[1] == null) {
                         return null;
                     }
@@ -461,23 +461,23 @@ var WikiSyntax = (function () {
         return null;
     };
 
-    WikiSyntax.FormatRefKey = /**
+    /**
     * @method FormatRefKey
     * @static
     * @param {GSNType} NodeType
     * @param {String} HistoryTaple
     * @return {String}
     */
-    function (NodeType, HistoryTaple) {
+    WikiSyntax.FormatRefKey = function (NodeType, HistoryTaple) {
         return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
     };
 
-    WikiSyntax.CommentOutAll = /**
+    /**
     * @method CommentOutAll
     * @param {String} DocText
     * @return {String}
     */
-    function (DocText) {
+    WikiSyntax.CommentOutAll = function (DocText) {
         var Reader = new StringReader(DocText);
         var Writer = new StringWriter();
         while (Reader.HasNext()) {
@@ -489,13 +489,13 @@ var WikiSyntax = (function () {
         return Writer.toString();
     };
 
-    WikiSyntax.CommentOutSubNode = /**
+    /**
     * @method CommentOutSubNode
     * @static
     * @param {String} DocText
     * @return {String}
     */
-    function (DocText) {
+    WikiSyntax.CommentOutSubNode = function (DocText) {
         var Reader = new StringReader(DocText);
         var Writer = new StringWriter();
         var NodeCount = 0;
@@ -512,13 +512,13 @@ var WikiSyntax = (function () {
         return Writer.toString();
     };
 
-    WikiSyntax.FormatDateString = /**
+    /**
     * @method FormatDateString
     * @static
     * @param {String} DateString
     * @return {String}
     */
-    function (DateString) {
+    WikiSyntax.FormatDateString = function (DateString) {
         var Format = new SimpleDateFormat("yyyy-MM-dd84HH:mm:ssZ");
         if (DateString != null) {
             try  {
@@ -542,13 +542,13 @@ exports.WikiSyntax = WikiSyntax;
 var TagUtils = (function () {
     function TagUtils() {
     }
-    TagUtils.ParseTag = /**
+    /**
     * @method ParseTag
     * @static
     * @param {Object} TagMap
     * @param {String} Line
     */
-    function (TagMap, Line) {
+    TagUtils.ParseTag = function (TagMap, Line) {
         var loc = Line.indexOf("::");
         if (loc != -1) {
             var Key = Line.substring(0, loc).trim();
@@ -557,13 +557,13 @@ var TagUtils = (function () {
         }
     };
 
-    TagUtils.FormatTag = /**
+    /**
     * @method FormatTag
     * @static
     * @param {Object} TagMap
     * @param {StringWriter} Writer
     */
-    function (TagMap, Writer) {
+    TagUtils.FormatTag = function (TagMap, Writer) {
         if (TagMap != null) {
             var keyArray = TagMap.keySet();
             for (var i = 0; i < keyArray.length; i++) {
@@ -573,27 +573,27 @@ var TagUtils = (function () {
         }
     };
 
-    TagUtils.FormatHistoryTag = /**
+    /**
     * @method FormatHistoryTag
     * @param {Array<GSNHistory>} HistoryList
     * @param {Number} i
     * @param {StringWriter} Writer
     */
-    function (HistoryList, i, Writer) {
+    TagUtils.FormatHistoryTag = function (HistoryList, i, Writer) {
         var History = Lib.Array_get(HistoryList, i);
         if (History != null) {
             Writer.println("#" + i + "::" + History);
         }
     };
 
-    TagUtils.GetString = /**
+    /**
     * @method GetString
     * @param {Object} TagMap
     * @param {String} Key
     * @param {String} DefValue
     * @return {String}
     */
-    function (TagMap, Key, DefValue) {
+    TagUtils.GetString = function (TagMap, Key, DefValue) {
         if (TagMap != null) {
             var Value = TagMap.get(Key);
             if (Value != null) {
@@ -603,14 +603,14 @@ var TagUtils = (function () {
         return DefValue;
     };
 
-    TagUtils.GetInteger = /**
+    /**
     * @method GetInteger
     * @param {Object} TagMap
     * @param {String} Key
     * @param {Number} DefValue
     * @return
     */
-    function (TagMap, Key, DefValue) {
+    TagUtils.GetInteger = function (TagMap, Key, DefValue) {
         if (TagMap != null) {
             return WikiSyntax.ParseInt(TagMap.get(Key), DefValue);
         }
@@ -635,7 +635,7 @@ var GSNNode = (function () {
         this.BaseDoc = BaseDoc;
         this.ParentNode = ParentNode;
         this.NodeType = NodeType;
-        this.LabelName = LabelName;
+        this.LabelName = LabelName; // G:TopGoal
         this.AssignedLabelNumber = "";
         this.UID = UID;
         this.SectionCount = 0;
@@ -680,7 +680,7 @@ var GSNNode = (function () {
     * @return {Boolean}
     */
     GSNNode.prototype.IsGoal = function () {
-        return (this.NodeType == GSNType.Goal);
+        return (this.NodeType == 0 /* Goal */);
     };
 
     /**
@@ -688,7 +688,7 @@ var GSNNode = (function () {
     * @return {Boolean}
     */
     GSNNode.prototype.IsStrategy = function () {
-        return (this.NodeType == GSNType.Strategy);
+        return (this.NodeType == 2 /* Strategy */);
     };
 
     /**
@@ -696,7 +696,7 @@ var GSNNode = (function () {
     * @return {Boolean}
     */
     GSNNode.prototype.IsContext = function () {
-        return (this.NodeType == GSNType.Context);
+        return (this.NodeType == 1 /* Context */);
     };
 
     /**
@@ -704,7 +704,7 @@ var GSNNode = (function () {
     * @return {Boolean}
     */
     GSNNode.prototype.IsEvidence = function () {
-        return (this.NodeType == GSNType.Evidence);
+        return (this.NodeType == 3 /* Evidence */);
     };
 
     /**
@@ -896,7 +896,7 @@ var GSNNode = (function () {
     */
     GSNNode.prototype.GetCloseGoal = function () {
         var Node = this;
-        while (Node.NodeType != GSNType.Goal) {
+        while (Node.NodeType != 0 /* Goal */) {
             Node = Node.ParentNode;
         }
         return Node;
@@ -982,8 +982,8 @@ var GSNNode = (function () {
                 }
             }
         }
-        if (NodeType == GSNType.Strategy && Creation) {
-            return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.UID, null);
+        if (NodeType == 2 /* Strategy */ && Creation) {
+            return new GSNNode(this.BaseDoc, this, 2 /* Strategy */, this.LabelName, this.UID, null);
         }
         return null;
     };
@@ -1003,6 +1003,8 @@ var GSNNode = (function () {
         Writer.print(" &");
         Writer.print(Lib.DecToHex(this.UID));
 
+        // Stream.append(" ");
+        // MD5.FormatDigest(this.Digest, Stream);
         if (this.Created != null) {
             var HistoryTaple = this.GetHistoryTaple();
             Writer.print(" " + HistoryTaple);
@@ -1144,7 +1146,7 @@ var GSNNode = (function () {
     */
     GSNNode.prototype.MergeSubNode = function (NewNode) {
         (this.BaseDoc != null);
-        NewNode.LastModified = null;
+        NewNode.LastModified = null; // this.BaseDoc has Last
         var UID = NewNode.UID;
         var OldNode = this.BaseDoc.GetNode(UID);
         if (OldNode != null && this.HasSubNodeUID(UID)) {
@@ -1401,7 +1403,7 @@ var GSNDoc = (function () {
             }
         }
         this.NodeMap.put(Key, Node);
-        if (Node.NodeType == GSNType.Goal) {
+        if (Node.NodeType == 0 /* Goal */) {
             if (Node.GetGoalLevel() == 1) {
                 this.TopNode = Node;
             }
@@ -1642,6 +1644,14 @@ var GSNRecord = (function () {
     };
 
     /**
+    * @method DiscardEditor
+    */
+    GSNRecord.prototype.DiscardEditor = function () {
+        this.EditingDoc = null;
+        Lib.Array_remove(this.HistoryList, Lib.Array_size(this.HistoryList) - 1);
+    };
+
+    /**
     * @method Merge
     * @param {GSNRecord} NewRecord
     */
@@ -1773,8 +1783,8 @@ exports.GSNRecord = GSNRecord;
 */
 var ParserContext = (function () {
     function ParserContext(NullableDoc) {
-        var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, -1, null);
-        this.NullableDoc = NullableDoc;
+        var ParentNode = new GSNNode(NullableDoc, null, 0 /* Goal */, null, -1, null);
+        this.NullableDoc = NullableDoc; // nullabel
         this.FirstNode = null;
         this.LastGoalNode = null;
         this.LastNonContextNode = null;
@@ -1805,7 +1815,7 @@ var ParserContext = (function () {
         if (Level - 1 < Lib.Array_size(this.GoalStack)) {
             var ParentGoal = this.GetGoalStackAt(Level - 1);
             if (ParentGoal != null) {
-                return ParentGoal.GetLastNode(GSNType.Strategy, true);
+                return ParentGoal.GetLastNode(2 /* Strategy */, true);
             }
         }
         return null;
@@ -1845,7 +1855,7 @@ var ParserContext = (function () {
     ParserContext.prototype.IsValidSection = function (Line, Reader) {
         var NodeType = WikiSyntax.ParseNodeType(Line);
         var Level = WikiSyntax.ParseGoalLevel(Line);
-        if (NodeType == GSNType.Goal) {
+        if (NodeType == 0 /* Goal */) {
             var ParentNode = this.GetStrategyOfGoal(Level);
             if (ParentNode != null) {
                 return true;
@@ -1857,18 +1867,18 @@ var ParserContext = (function () {
             Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
             return false;
         }
-        if (NodeType == GSNType.Context) {
+        if (NodeType == 1 /* Context */) {
             return true;
         }
-        if (NodeType == GSNType.Evidence) {
-            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Strategy)) {
+        if (NodeType == 3 /* Evidence */) {
+            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(2 /* Strategy */)) {
                 Reader.LogError("Evidence is only linked to Goal", Line);
                 return false;
             }
             return true;
         }
-        if (NodeType == GSNType.Strategy) {
-            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Evidence)) {
+        if (NodeType == 2 /* Strategy */) {
+            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(3 /* Evidence */)) {
                 Reader.LogError("Strategy is only linked to Goal", Line);
                 return false;
             }
@@ -1893,10 +1903,10 @@ var ParserContext = (function () {
         var ParentNode = null;
         var HistoryTaple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
         var Level = WikiSyntax.ParseGoalLevel(LabelLine);
-        if (NodeType == GSNType.Goal) {
+        if (NodeType == 0 /* Goal */) {
             ParentNode = this.GetStrategyOfGoal(Level);
         } else {
-            ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
+            ParentNode = (NodeType == 1 /* Context */) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
         }
         NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTaple);
         if (this.FirstNode == null) {
@@ -1984,13 +1994,13 @@ exports.ParserContext = ParserContext;
 var AssureNoteParser = (function () {
     function AssureNoteParser() {
     }
-    AssureNoteParser.merge = /**
+    /**
     * @method merge
     * @static
     * @param {String} MasterFile
     * @param {String} BranchFile
     */
-    function (MasterFile, BranchFile) {
+    AssureNoteParser.merge = function (MasterFile, BranchFile) {
         var MasterRecord = new GSNRecord();
         MasterRecord.Parse(Lib.ReadFile(MasterFile));
         if (BranchFile != null) {
@@ -2005,11 +2015,11 @@ var AssureNoteParser = (function () {
         console.log(Writer.toString());
     };
 
-    AssureNoteParser.ts_merge = /**
+    /**
     * @method ts_merge
     * @static
     */
-    function () {
+    AssureNoteParser.ts_merge = function () {
         var MasterFile = (Lib.Input.length > 0) ? Lib.Input[0] : null;
         var BranchFile = (Lib.Input.length > 1) ? Lib.Input[1] : null;
         var MasterRecord = new GSNRecord();
@@ -2026,11 +2036,11 @@ var AssureNoteParser = (function () {
         console.log(Writer.toString());
     };
 
-    AssureNoteParser.main = /**
+    /**
     * @method main
     * @param {Array<String>}argv
     */
-    function (argv) {
+    AssureNoteParser.main = function (argv) {
         if (argv.length == 2) {
             //AssureNoteParser.merge(argv[0], argv[1]);
             var MasterRecord = new GSNRecord();
@@ -2050,6 +2060,7 @@ var AssureNoteParser = (function () {
     return AssureNoteParser;
 })();
 exports.AssureNoteParser = AssureNoteParser;
+
 
 /* FIXME this class is never used */
 var PdfConverter = (function () {
@@ -2236,8 +2247,8 @@ exports.MessageDigest = MessageDigest;
 var Lib = (function () {
     function Lib() {
     }
-    Lib.GetMD5 = /* Methods */
-    function () {
+    /* Methods */
+    Lib.GetMD5 = function () {
         return new MessageDigest();
     };
 
@@ -2336,7 +2347,7 @@ var Lib = (function () {
     };
 
     Lib.Object_InstanceOf = function (self, klass) {
-        return (self).constructor == klass;
+        return self.constructor == klass;
     };
     Lib.Input = [];
     Lib.EmptyNodeList = new Array();
@@ -2448,7 +2459,7 @@ Object.defineProperty(Object.prototype, "equals", {
 Object.defineProperty(Object.prototype, "InstanceOf", {
     enumerable: false,
     value: function (klass) {
-        return (this).constructor == klass;
+        return this.constructor == klass;
     }
 });
 
@@ -2522,7 +2533,7 @@ Object.defineProperty(String.prototype, "matches", {
 */
 /*jslint bitwise: true */
 /*global unescape, define */
-((function ($) {
+(function ($) {
     'use strict';
 
     /*
@@ -2752,5 +2763,4 @@ Object.defineProperty(String.prototype, "matches", {
     }
 
     $.md5 = md5;
-})(Lib));
-
+}(Lib));

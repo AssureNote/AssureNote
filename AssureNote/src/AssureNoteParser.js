@@ -1646,6 +1646,14 @@ var AssureNote;
         };
 
         /**
+        * @method DiscardEditor
+        */
+        GSNRecord.prototype.DiscardEditor = function () {
+            this.EditingDoc = null;
+            Lib.Array_remove(this.HistoryList, Lib.Array_size(this.HistoryList) - 1);
+        };
+
+        /**
         * @method Merge
         * @param {GSNRecord} NewRecord
         */
