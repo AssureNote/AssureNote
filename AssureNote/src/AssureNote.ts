@@ -179,13 +179,18 @@ module AssureNote {
 
             this.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoalNode, true));
             this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.MasterView);
-
             this.PictgramPanel.Draw();
 
             if (location.hash != null) {
                 var label = location.hash.substring(1);
                 var NodeView: AssureNote.NodeView = this.PictgramPanel.ViewMap[label];
                 if (NodeView) {
+                    var ParentView: AssureNote.NodeView = NodeView.Parent;
+                    while (ParentView) {
+                        ParentView.IsFolded = false;
+                        ParentView = ParentView.Parent;
+                    }
+                    this.PictgramPanel.Draw();
                     this.PictgramPanel.ChangeFocusedLabel(label);
                     this.PictgramPanel.Viewport.SetCamera(NodeView.GetGX(), NodeView.GetGY(), 1);
                 }
@@ -193,7 +198,6 @@ module AssureNote {
                 var TopGoal = this.PictgramPanel.MasterView;
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
-
             $("title").text("AssureNote");
         }
 
