@@ -3,7 +3,17 @@ YUI.add("yuidoc-meta", function(Y) {
     "classes": [
         "AssureNote.PictgramPanel",
         "AssureNote.ScrollManager",
-        "AssureNote.ViewportManager"
+        "AssureNote.ViewportManager",
+        "AssureNoteParsr",
+        "GSNDoc",
+        "GSNHistory",
+        "GSNNode",
+        "GSNRecord",
+        "ParserContext",
+        "StringReader",
+        "StringWriter",
+        "TagUtils",
+        "WikiSyntax"
     ],
     "modules": [],
     "allModules": []

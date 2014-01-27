@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\Viewport.js - AssureNote</title>
+    <title>src/Viewport.js - AssureNote</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -47,6 +47,26 @@
             
                 <li><a href="../classes/AssureNote.ViewportManager.html">AssureNote.ViewportManager</a></li>
             
+                <li><a href="../classes/AssureNoteParsr.html">AssureNoteParsr</a></li>
+            
+                <li><a href="../classes/GSNDoc.html">GSNDoc</a></li>
+            
+                <li><a href="../classes/GSNHistory.html">GSNHistory</a></li>
+            
+                <li><a href="../classes/GSNNode.html">GSNNode</a></li>
+            
+                <li><a href="../classes/GSNRecord.html">GSNRecord</a></li>
+            
+                <li><a href="../classes/ParserContext.html">ParserContext</a></li>
+            
+                <li><a href="../classes/StringReader.html">StringReader</a></li>
+            
+                <li><a href="../classes/StringWriter.html">StringWriter</a></li>
+            
+                <li><a href="../classes/TagUtils.html">TagUtils</a></li>
+            
+                <li><a href="../classes/WikiSyntax.html">WikiSyntax</a></li>
+            
             </ul>
 
             <ul id="api-modules" class="apis modules">
@@ -86,7 +106,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\Viewport.js</h1>
+                        <h1 class="file-heading">File: src/Viewport.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -118,6 +138,20 @@
 /* VIEW (MVC) */
 var AssureNote;
 (function (AssureNote) {
+    var Pointer = (function () {
+        function Pointer(X, Y, ID) {
+            this.X = X;
+            this.Y = Y;
+            this.ID = ID;
+        }
+        Pointer.prototype.SetPosition = function (X, Y) {
+            this.X = X;
+            this.Y = Y;
+        };
+        return Pointer;
+    })();
+    AssureNote.Pointer = Pointer;
+
     /**
     Controll scroll by mouse, touch and pen and zoom by wheel.
     @class AssureNote.ScrollManager
@@ -164,13 +198,7 @@ var AssureNote;
         };
 
         ScrollManager.prototype.GetMainPointer = function () {
-            for (var i = 0; i &lt; this.Pointers.length; ++i) {
-                if (this.Pointers[i].identifier === this.MainPointerID) {
-                    return this.Pointers[i];
-                }
-            }
-            ;
-            return null;
+            return this.Pointers[this.MainPointerID];
         };
 
         ScrollManager.prototype.IsDragging = function () {
@@ -196,23 +224,42 @@ var AssureNote;
 
         ScrollManager.prototype.OnPointerEvent = function (e, Screen) {
             var _this = this;
-            this.Pointers = e.getPointerList();
-            var IsTherePointer = this.Pointers.length &gt; 0;
+            switch (e.type) {
+                case &quot;pointerdown&quot;:
+                    this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                    break;
+                case &quot;pointerup&quot;:
+                    if (!this.Pointers[e.pointerId]) {
+                        return;
+                    }
+                    delete this.Pointers[e.pointerId];
+                    break;
+                case &quot;pointermove&quot;:
+                    if (!this.Pointers[e.pointerId]) {
+                        return;
+                    }
+                    this.Pointers[e.pointerId].SetPosition(e.clientX, e.clientY);
+                    break;
+                default:
+                    return;
+            }
+
+            var IsTherePointer = Object.keys(this.Pointers).length &gt; 0;
             var HasDragJustStarted = IsTherePointer &amp;&amp; !this.IsDragging();
-            var HasDragJustEnded = !IsTherePointer &amp;&amp; this.IsDragging();
+            var HasDragJustEnded = !this.GetMainPointer() &amp;&amp; this.IsDragging();
 
             if (IsTherePointer) {
                 if (HasDragJustStarted) {
                     this.StopAnimation();
                     this.timer = null;
-                    var mainPointer = this.Pointers[0];
-                    this.MainPointerID = mainPointer.identifier;
+                    var mainPointer = this.Pointers[Object.keys(this.Pointers)[0]];
+                    this.MainPointerID = mainPointer.ID;
                     this.Viewport.SetEventMapLayerPosition(true);
-                    this.StartDrag(mainPointer.pageX, mainPointer.pageY);
+                    this.StartDrag(mainPointer.X, mainPointer.Y);
                 } else {
                     var mainPointer = this.GetMainPointer();
                     if (mainPointer) {
-                        this.UpdateDrag(mainPointer.pageX, mainPointer.pageY);
+                        this.UpdateDrag(mainPointer.X, mainPointer.Y);
                         Screen.AddOffset(this.Dx, this.Dy);
                     } else {
                         this.EndDrag();
@@ -557,11 +604,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {
-            if (IsUpper &amp;&amp; !this.IsEventMapUpper) {
-                $(this.ControlLayer).after(this.EventMapLayer);
-            } else if (!IsUpper &amp;&amp; this.IsEventMapUpper) {
-                $(this.ContentLayer).before(this.EventMapLayer);
-            }
+            //if (IsUpper &amp;&amp; !this.IsEventMapUpper) {
+            //    $(this.ControlLayer).after(this.EventMapLayer);
+            //} else if (!IsUpper &amp;&amp; this.IsEventMapUpper) {
+            //    $(this.ContentLayer).before(this.EventMapLayer);
+            //}
             this.IsEventMapUpper = IsUpper;
         };
 

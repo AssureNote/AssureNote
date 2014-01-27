@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>AssureNote.PictgramPanel - AssureNote</title>
+    <title>TagUtils - AssureNote</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -106,7 +106,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>AssureNote.PictgramPanel Class</h1>
+                        <h1>TagUtils Class</h1>
 <div class="box meta">
     
 
@@ -114,7 +114,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_Panel.js.html#l35"><code>src&#x2F;Panel.js:35</code></a>
+            Defined in: <a href="../files/src_AssureNoteParser.js.html#l539"><code>src&#x2F;AssureNoteParser.js:539</code></a>
         </div>
     
 
@@ -154,29 +154,40 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_ChangeFocusedLabel">ChangeFocusedLabel</a>
+                                <a href="#method_FormatHistoryTag">FormatHistoryTag</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_FindNearestNode">FindNearestNode</a>
+                                <a href="#method_FormatTag">FormatTag</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_GetInteger">GetInteger</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_FoldDeepSubGoals">FoldDeepSubGoals</a>
+                                <a href="#method_GetString">GetString</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_MoveToNearestNode">MoveToNearestNode</a>
+                                <a href="#method_ParseTag">ParseTag</a>
 
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -197,8 +208,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_ChangeFocusedLabel" class="method item">
-    <h3 class="name"><code>ChangeFocusedLabel</code></h3>
+                    <div id="method_FormatHistoryTag" class="method item">
+    <h3 class="name"><code>FormatHistoryTag</code></h3>
 
     
         <div class="args">
@@ -206,7 +217,19 @@
             
                 <li class="arg">
                     
-                        <code>Label</code>
+                        <code>HistoryList</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>i</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>Writer</code>
                     
                 </li>
             
@@ -239,7 +262,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l376"><code>src&#x2F;Panel.js:376</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l578"><code>src&#x2F;AssureNoteParser.js:578</code></a>
         
         </p>
 
@@ -261,15 +284,44 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Label</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                        <code class="param-name">HistoryList</code>
+                        <span class="type">Array<GSNHistory></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>If label is null, there is no focused label.</p>
+                         
+                    </div>
 
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">i</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">Writer</code>
+                        <span class="type"><a href="../classes/StringWriter.html" class="crosslink">StringWriter</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
                     </div>
 
                     
@@ -285,8 +337,8 @@
 </div>
 
                 
-                    <div id="method_FindNearestNode" class="method item">
-    <h3 class="name"><code>FindNearestNode</code></h3>
+                    <div id="method_FormatTag" class="method item">
+    <h3 class="name"><code>FormatTag</code></h3>
 
     
         <div class="args">
@@ -294,13 +346,129 @@
             
                 <li class="arg">
                     
-                        <code>CenterNode</code>
+                        <code>TagMap</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>Dir</code>
+                        <code>Writer</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_AssureNoteParser.js.html#l562"><code>src&#x2F;AssureNoteParser.js:562</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">TagMap</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">Writer</code>
+                        <span class="type"><a href="../classes/StringWriter.html" class="crosslink">StringWriter</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_GetInteger" class="method item">
+    <h3 class="name"><code>GetInteger</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>TagMap</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>Key</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>DefValue</code>
                     
                 </li>
             
@@ -310,7 +478,7 @@
 
     
         <span class="returns-inline">
-            <span class="type">AssureNote.NodeView</span>
+            <span class="type"></span>
         </span>
     
 
@@ -337,7 +505,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l309"><code>src&#x2F;Panel.js:309</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l608"><code>src&#x2F;AssureNoteParser.js:608</code></a>
         
         </p>
 
@@ -359,8 +527,8 @@
             
                 <li class="param">
                     
-                        <code class="param-name">CenterNode</code>
-                        <span class="type">AssureNote.NodeView</span>
+                        <code class="param-name">TagMap</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
                     
 
                     
@@ -374,8 +542,23 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Dir</code>
-                        <span class="type">AssureNote.Direction</span>
+                        <code class="param-name">Key</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">DefValue</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
                     
 
                     
@@ -398,10 +581,6 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">AssureNote.NodeView</span>:
-                    
-                    <p>Found node. If no node is found, null is retured.</p>
-
                 
             </div>
         </div>
@@ -411,8 +590,8 @@
 </div>
 
                 
-                    <div id="method_FoldDeepSubGoals" class="method item">
-    <h3 class="name"><code>FoldDeepSubGoals</code></h3>
+                    <div id="method_GetString" class="method item">
+    <h3 class="name"><code>GetString</code></h3>
 
     
         <div class="args">
@@ -420,7 +599,19 @@
             
                 <li class="arg">
                     
-                        <code>NodeView</code>
+                        <code>TagMap</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>Key</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>DefValue</code>
                     
                 </li>
             
@@ -428,6 +619,10 @@
         </div>
     
 
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+        </span>
     
 
     
@@ -453,7 +648,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l360"><code>src&#x2F;Panel.js:360</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l591"><code>src&#x2F;AssureNoteParser.js:591</code></a>
         
         </p>
 
@@ -475,8 +670,38 @@
             
                 <li class="param">
                     
-                        <code class="param-name">NodeView</code>
-                        <span class="type">NodeView</span>
+                        <code class="param-name">TagMap</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">Key</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">DefValue</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
                     
 
                     
@@ -493,13 +718,25 @@
     
 
     
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>:
+                    
+                
+            </div>
+        </div>
+    
 
     
 </div>
 
                 
-                    <div id="method_MoveToNearestNode" class="method item">
-    <h3 class="name"><code>MoveToNearestNode</code></h3>
+                    <div id="method_ParseTag" class="method item">
+    <h3 class="name"><code>ParseTag</code></h3>
 
     
         <div class="args">
@@ -507,7 +744,13 @@
             
                 <li class="arg">
                     
-                        <code>Dir</code>
+                        <code>TagMap</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>Line</code>
                     
                 </li>
             
@@ -523,6 +766,8 @@
 
     
 
+    
+        <span class="flag static">static</span>
     
 
     
@@ -540,7 +785,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l297"><code>src&#x2F;Panel.js:297</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l547"><code>src&#x2F;AssureNoteParser.js:547</code></a>
         
         </p>
 
@@ -562,8 +807,23 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Dir</code>
-                        <span class="type">AssureNote.Direction</span>
+                        <code class="param-name">TagMap</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">Line</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
                     
 
                     

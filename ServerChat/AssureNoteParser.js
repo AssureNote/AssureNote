@@ -27,6 +27,12 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+/**
+*
+* @class StringReader
+* @constructor
+* @param {String} text
+*/
 var StringReader = (function () {
     function StringReader(Text) {
         this.Text = Text;
@@ -34,10 +40,18 @@ var StringReader = (function () {
         this.PreviousPos = 0;
         this.Linenum = 0;
     }
+    /**
+    * @method HasNext
+    * @return {Boolean}
+    */
     StringReader.prototype.HasNext = function () {
         return this.CurrentPos < this.Text.length;
     };
 
+    /**
+    * @method ReadLine
+    * @return {String}
+    */
     StringReader.prototype.ReadLine = function () {
         var StartPos = this.CurrentPos;
         var i;
@@ -68,11 +82,19 @@ var StringReader = (function () {
         return this.Text.substring(StartPos, this.CurrentPos).trim();
     };
 
+    /**
+    * @method RoollbackLineFeed
+    */
     StringReader.prototype.RollbackLineFeed = function () {
         this.CurrentPos = this.PreviousPos;
         this.Linenum -= 1;
     };
 
+    /**
+    * @method ReadLineList
+    * @param {Array<String>} LineList
+    * @param {Boolean} UntilSection
+    */
     StringReader.prototype.ReadLineList = function (LineList, UntilSection) {
         while (this.HasNext()) {
             var Line = this.ReadLine();
@@ -84,16 +106,31 @@ var StringReader = (function () {
         }
     };
 
+    /**
+    * @method GetLineList
+    * @param {Boolean} UntilSection
+    * @return {Array<String>}
+    */
     StringReader.prototype.GetLineList = function (UntilSection) {
         var LineList = new Array();
         this.ReadLineList(LineList, UntilSection);
         return LineList;
     };
 
+    /**
+    * @method LogError
+    * @param {String} Message
+    * @param {String} Line
+    */
     StringReader.prototype.LogError = function (Message, Line) {
         console.log("(error:" + this.Linenum + ") " + Message + ": " + Line);
     };
 
+    /**
+    * @method LogWarning
+    * @param {String} Message
+    * @param {String} Line
+    */
     StringReader.prototype.LogWarning = function (Message, Line) {
         console.log("(warning:" + this.Linenum + ") " + Message + ": " + Line);
     };
@@ -101,6 +138,10 @@ var StringReader = (function () {
 })();
 exports.StringReader = StringReader;
 
+/**
+* @class StringWriter
+* @constructor
+*/
 var StringWriter = (function () {
     function StringWriter() {
         this.sb = new StringBuilder();
@@ -115,6 +156,11 @@ var StringWriter = (function () {
     StringWriter.prototype.newline = function () {
         this.sb.append(Lib.LineFeed);
     };
+
+    /**
+    * @method toString
+    * @return {String}
+    */
     StringWriter.prototype.toString = function () {
         return this.sb.toString();
     };
@@ -131,22 +177,56 @@ exports.StringWriter = StringWriter;
 })(exports.GSNType || (exports.GSNType = {}));
 var GSNType = exports.GSNType;
 
+/**
+* @class GSNHistory
+* @constructor
+* @param {Number} Rev
+* @param {String} Author
+* @param {String} Role
+* @param {String} DateString
+* @param {String} Process
+* @param {GSNDoc} Doc
+*
+*/
 var GSNHistory = (function () {
     function GSNHistory(Rev, Author, Role, DateString, Process, Doc) {
         this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
     }
+    /**
+    * @method toString
+    * @return {String}
+    */
     GSNHistory.prototype.toString = function () {
         return this.Date + ";" + this.Author + ";" + this.Role + ";" + this.Process;
     };
 
+    /**
+    * @method EqualsHistory
+    * @param {GSNHistory} aHistory
+    * @return {Boolean}
+    */
     GSNHistory.prototype.EqualsHistory = function (aHistory) {
         return (Lib.Object_equals(this.Date, aHistory.Date) && Lib.Object_equals(this.Author, aHistory.Author));
     };
 
+    /**
+    * @method CompareDate
+    * @param {GSNHistory} aHistory
+    * @return {Number}
+    */
     GSNHistory.prototype.CompareDate = function (aHistory) {
         return (Lib.String_compareTo(this.Date, aHistory.Date));
     };
 
+    /**
+    * @method UpdateHistory
+    * @param {Number} Rev
+    * @param {String} Author
+    * @param {String} Role
+    * @param {String} DateString
+    * @param {String} Process
+    * @param {GSNDoc} Doc
+    */
     GSNHistory.prototype.UpdateHistory = function (Rev, Author, Role, DateString, Process, Doc) {
         this.Rev = Rev;
         this.Author = Author;
@@ -159,17 +239,33 @@ var GSNHistory = (function () {
 })();
 exports.GSNHistory = GSNHistory;
 
+/**
+* @class WikiSyntax
+* @constructor
+*/
 var WikiSyntax = (function () {
     function WikiSyntax() {
     }
-    WikiSyntax.ParseInt = function (NumText, DefVal) {
+    WikiSyntax.ParseInt = /**
+    * @method ParseInt
+    * @param {String} NumText
+    * @param {Number} DefVal
+    * @return {Number}
+    */
+    function (NumText, DefVal) {
         try  {
             return Lib.parseInt(NumText);
         } catch (e) {
         }
         return DefVal;
     };
-    WikiSyntax.ParseGoalLevel = function (LabelLine) {
+
+    WikiSyntax.ParseGoalLevel = /**
+    * @method ParseGoalLevel
+    * @param {String} LabelLine
+    * @return {Number}
+    */
+    function (LabelLine) {
         var GoalLevel = 0;
         for (var i = 0; i < LabelLine.length; i++) {
             if (LabelLine.charCodeAt(i) != 42)
@@ -178,7 +274,13 @@ var WikiSyntax = (function () {
         }
         return GoalLevel;
     };
-    WikiSyntax.FormatGoalLevel = function (GoalLevel) {
+
+    WikiSyntax.FormatGoalLevel = /**
+    * @method FormatGoalLevel
+    * @param {Number} GoalLevel
+    * @return {String}
+    */
+    function (GoalLevel) {
         var sb = new StringBuilder();
         for (var i = 0; i < GoalLevel; i++) {
             sb.append("*");
@@ -186,7 +288,13 @@ var WikiSyntax = (function () {
         return sb.toString();
     };
 
-    WikiSyntax.GetLabelPos = function (LabelLine) {
+    WikiSyntax.GetLabelPos = /**
+    * @method GetLabelPos
+    * @static
+    * @param {String} LabelLine
+    * @return {Number}
+    */
+    function (LabelLine) {
         /* Returns the row of the abel (e.g., 71). */
         var i;
         for (i = 0; i < LabelLine.length; i++) {
@@ -200,30 +308,40 @@ var WikiSyntax = (function () {
         return i;
     };
 
-    WikiSyntax.ParseNodeType = function (LabelLine) {
+    WikiSyntax.ParseNodeType = /**
+    * @method ParseNodeType
+    * @param {String} LabelLine
+    * @return {GSNType}
+    */
+    function (LabelLine) {
         var i = WikiSyntax.GetLabelPos(LabelLine);
         if (i < LabelLine.length) {
             var ch = LabelLine.charCodeAt(i);
             if (ch == 71) {
-                return 0 /* Goal */;
+                return GSNType.Goal;
             }
             if (ch == 83) {
-                return 2 /* Strategy */;
+                return GSNType.Strategy;
             }
             if (ch == 69 || ch == 77 || ch == 65) {
-                return 3 /* Evidence */;
+                return GSNType.Evidence;
             }
             if (ch == 67 || ch == 74 || ch == 82) {
-                return 1 /* Context */;
+                return GSNType.Context;
             }
         }
-        return 4 /* Undefined */;
+        return GSNType.Undefined;
     };
 
-    WikiSyntax.ParseLabelName = function (LabelLine) {
+    WikiSyntax.ParseLabelName = /**
+    * @method ParseLabelName
+    * @param {String} LabelLine
+    * @return {String}
+    */
+    function (LabelLine) {
         var i = WikiSyntax.GetLabelPos(LabelLine);
         var sb = new StringBuilder();
-        i = i + 1; // eat label
+        i = i + 1;
 
         if (i >= LabelLine.length || LabelLine.charCodeAt(i) != 58)
             return null;
@@ -236,22 +354,32 @@ var WikiSyntax = (function () {
         return sb.toString();
     };
 
-    WikiSyntax.FormatNodeType = function (NodeType) {
+    WikiSyntax.FormatNodeType = /**
+    * @method FormatNodeType
+    * @param {GSNType} NodeType
+    * @return {String}
+    */
+    function (NodeType) {
         switch (NodeType) {
-            case 0 /* Goal */:
+            case GSNType.Goal:
                 return "G";
-            case 1 /* Context */:
+            case GSNType.Context:
                 return "C";
-            case 2 /* Strategy */:
+            case GSNType.Strategy:
                 return "S";
-            case 3 /* Evidence */:
+            case GSNType.Evidence:
                 return "E";
-            case 4 /* Undefined */:
+            case GSNType.Undefined:
         }
         return "U";
     };
 
-    WikiSyntax.ParseLabelNumber = function (LabelLine) {
+    WikiSyntax.ParseLabelNumber = /**
+    * @method ParseLabelNumber
+    * @param {String} LabelLine
+    * @return {String}
+    */
+    function (LabelLine) {
         var StartIdx = WikiSyntax.GetLabelPos(LabelLine) + 1;
         if (StartIdx >= LabelLine.length || LabelLine.charCodeAt(StartIdx) == 58)
             return null;
@@ -276,7 +404,12 @@ var WikiSyntax = (function () {
         return null;
     };
 
-    WikiSyntax.ParseUID = function (LabelLine) {
+    WikiSyntax.ParseUID = /**
+    * @method ParseUID
+    * @param {String} LabelLine
+    * @return {String}
+    */
+    function (LabelLine) {
         var StartIdx = LabelLine.indexOf("&") + 1;
         if (StartIdx == 0)
             return null;
@@ -287,7 +420,13 @@ var WikiSyntax = (function () {
         return UID;
     };
 
-    WikiSyntax.ParseRevisionHistory = function (LabelLine) {
+    WikiSyntax.ParseRevisionHistory = /**
+    * @method ParseRevisionHistory
+    * @static
+    * @param {LabelLine} LabelLine
+    * @return {String}
+    */
+    function (LabelLine) {
         var Loc = LabelLine.indexOf("#");
         if (Loc != -1) {
             return LabelLine.substring(Loc).trim();
@@ -295,7 +434,13 @@ var WikiSyntax = (function () {
         return null;
     };
 
-    WikiSyntax.ParseHistory = function (LabelLine, BaseDoc) {
+    WikiSyntax.ParseHistory = /**
+    * @method ParseHistory
+    * @param {String} LabelLine
+    * @param {GSNDoc} BaseDoc
+    * @return {String}
+    */
+    function (LabelLine, BaseDoc) {
         if (BaseDoc != null) {
             var Loc = LabelLine.indexOf("#");
             try  {
@@ -303,8 +448,8 @@ var WikiSyntax = (function () {
                     var HistoryTaple = new Array(2);
                     var RevText = LabelLine.substring(Loc + 1).trim();
                     var RevSet = RevText.split(":");
-                    HistoryTaple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1)); // Created
-                    HistoryTaple[1] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[1], -1)); // Branched
+                    HistoryTaple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1));
+                    HistoryTaple[1] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[1], -1));
                     if (HistoryTaple[0] == null || HistoryTaple[1] == null) {
                         return null;
                     }
@@ -315,11 +460,24 @@ var WikiSyntax = (function () {
         }
         return null;
     };
-    WikiSyntax.FormatRefKey = function (NodeType, HistoryTaple) {
+
+    WikiSyntax.FormatRefKey = /**
+    * @method FormatRefKey
+    * @static
+    * @param {GSNType} NodeType
+    * @param {String} HistoryTaple
+    * @return {String}
+    */
+    function (NodeType, HistoryTaple) {
         return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
     };
 
-    WikiSyntax.CommentOutAll = function (DocText) {
+    WikiSyntax.CommentOutAll = /**
+    * @method CommentOutAll
+    * @param {String} DocText
+    * @return {String}
+    */
+    function (DocText) {
         var Reader = new StringReader(DocText);
         var Writer = new StringWriter();
         while (Reader.HasNext()) {
@@ -331,7 +489,13 @@ var WikiSyntax = (function () {
         return Writer.toString();
     };
 
-    WikiSyntax.CommentOutSubNode = function (DocText) {
+    WikiSyntax.CommentOutSubNode = /**
+    * @method CommentOutSubNode
+    * @static
+    * @param {String} DocText
+    * @return {String}
+    */
+    function (DocText) {
         var Reader = new StringReader(DocText);
         var Writer = new StringWriter();
         var NodeCount = 0;
@@ -348,7 +512,13 @@ var WikiSyntax = (function () {
         return Writer.toString();
     };
 
-    WikiSyntax.FormatDateString = function (DateString) {
+    WikiSyntax.FormatDateString = /**
+    * @method FormatDateString
+    * @static
+    * @param {String} DateString
+    * @return {String}
+    */
+    function (DateString) {
         var Format = new SimpleDateFormat("yyyy-MM-dd84HH:mm:ssZ");
         if (DateString != null) {
             try  {
@@ -364,10 +534,21 @@ var WikiSyntax = (function () {
 })();
 exports.WikiSyntax = WikiSyntax;
 
+/**
+* @class TagUtils
+* @static
+*
+*/
 var TagUtils = (function () {
     function TagUtils() {
     }
-    TagUtils.ParseTag = function (TagMap, Line) {
+    TagUtils.ParseTag = /**
+    * @method ParseTag
+    * @static
+    * @param {Object} TagMap
+    * @param {String} Line
+    */
+    function (TagMap, Line) {
         var loc = Line.indexOf("::");
         if (loc != -1) {
             var Key = Line.substring(0, loc).trim();
@@ -376,7 +557,13 @@ var TagUtils = (function () {
         }
     };
 
-    TagUtils.FormatTag = function (TagMap, Writer) {
+    TagUtils.FormatTag = /**
+    * @method FormatTag
+    * @static
+    * @param {Object} TagMap
+    * @param {StringWriter} Writer
+    */
+    function (TagMap, Writer) {
         if (TagMap != null) {
             var keyArray = TagMap.keySet();
             for (var i = 0; i < keyArray.length; i++) {
@@ -386,14 +573,27 @@ var TagUtils = (function () {
         }
     };
 
-    TagUtils.FormatHistoryTag = function (HistoryList, i, Writer) {
+    TagUtils.FormatHistoryTag = /**
+    * @method FormatHistoryTag
+    * @param {Array<GSNHistory>} HistoryList
+    * @param {Number} i
+    * @param {StringWriter} Writer
+    */
+    function (HistoryList, i, Writer) {
         var History = Lib.Array_get(HistoryList, i);
         if (History != null) {
             Writer.println("#" + i + "::" + History);
         }
     };
 
-    TagUtils.GetString = function (TagMap, Key, DefValue) {
+    TagUtils.GetString = /**
+    * @method GetString
+    * @param {Object} TagMap
+    * @param {String} Key
+    * @param {String} DefValue
+    * @return {String}
+    */
+    function (TagMap, Key, DefValue) {
         if (TagMap != null) {
             var Value = TagMap.get(Key);
             if (Value != null) {
@@ -403,7 +603,14 @@ var TagUtils = (function () {
         return DefValue;
     };
 
-    TagUtils.GetInteger = function (TagMap, Key, DefValue) {
+    TagUtils.GetInteger = /**
+    * @method GetInteger
+    * @param {Object} TagMap
+    * @param {String} Key
+    * @param {Number} DefValue
+    * @return
+    */
+    function (TagMap, Key, DefValue) {
         if (TagMap != null) {
             return WikiSyntax.ParseInt(TagMap.get(Key), DefValue);
         }
@@ -413,12 +620,22 @@ var TagUtils = (function () {
 })();
 exports.TagUtils = TagUtils;
 
+/**
+* @class GSNNode
+* @constructor
+* @param {GSNDoc} BaseDoc
+* @param {GSNNode} ParentNode
+* @param {GSNType} NodeType
+* @param {String} LabelName
+* @param {Number} UID
+* @param {Array<GSNHistory>} HistoryTaple
+*/
 var GSNNode = (function () {
     function GSNNode(BaseDoc, ParentNode, NodeType, LabelName, UID, HistoryTaple) {
         this.BaseDoc = BaseDoc;
         this.ParentNode = ParentNode;
         this.NodeType = NodeType;
-        this.LabelName = LabelName; // G:TopGoal
+        this.LabelName = LabelName;
         this.AssignedLabelNumber = "";
         this.UID = UID;
         this.SectionCount = 0;
@@ -458,23 +675,50 @@ var GSNNode = (function () {
         return NewNode;
     };
 
+    /**
+    * @method IsGoal
+    * @return {Boolean}
+    */
     GSNNode.prototype.IsGoal = function () {
-        return (this.NodeType == 0 /* Goal */);
-    };
-    GSNNode.prototype.IsStrategy = function () {
-        return (this.NodeType == 2 /* Strategy */);
-    };
-    GSNNode.prototype.IsContext = function () {
-        return (this.NodeType == 1 /* Context */);
-    };
-    GSNNode.prototype.IsEvidence = function () {
-        return (this.NodeType == 3 /* Evidence */);
+        return (this.NodeType == GSNType.Goal);
     };
 
+    /**
+    * @method IsStrategy
+    * @return {Boolean}
+    */
+    GSNNode.prototype.IsStrategy = function () {
+        return (this.NodeType == GSNType.Strategy);
+    };
+
+    /**
+    * @method IsContext
+    * @return {Boolean}
+    */
+    GSNNode.prototype.IsContext = function () {
+        return (this.NodeType == GSNType.Context);
+    };
+
+    /**
+    * @method IsEvidence
+    * @return {Boolean}
+    */
+    GSNNode.prototype.IsEvidence = function () {
+        return (this.NodeType == GSNType.Evidence);
+    };
+
+    /**
+    * @method NonNullSubNodeList
+    * @return {Array<GSNNode>}
+    */
     GSNNode.prototype.NonNullSubNodeList = function () {
         return this.SubNodeList == null ? Lib.EmptyNodeList : this.SubNodeList;
     };
 
+    /**
+    * @method Remap
+    * @param {Object} NodeMap
+    */
     GSNNode.prototype.Remap = function (NodeMap) {
         NodeMap.put(this.UID, this);
         for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
@@ -483,6 +727,10 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method GetGoalLevel
+    * @return {Number}
+    */
     GSNNode.prototype.GetGoalLevel = function () {
         var GoalCount = this.IsGoal() ? 1 : 0;
         var Node = this.ParentNode;
@@ -495,22 +743,42 @@ var GSNNode = (function () {
         return GoalCount;
     };
 
+    /**
+    * @method GetLabel
+    * @return {String}
+    */
     GSNNode.prototype.GetLabel = function () {
         return WikiSyntax.FormatNodeType(this.NodeType) + this.GetLabelNumber();
     };
 
+    /**
+    * @method @GetHistoryTaple
+    * @return {String}
+    */
     GSNNode.prototype.GetHistoryTaple = function () {
         return "#" + this.Created.Rev + ":" + this.LastModified.Rev;
     };
 
+    /**
+    * @method GetLabelNumber
+    * @return
+    */
     GSNNode.prototype.GetLabelNumber = function () {
         return this.AssignedLabelNumber;
     };
 
+    /**
+    * @method IsModified
+    * @return {Boolean}
+    */
     GSNNode.prototype.IsModified = function () {
         return this.LastModified == this.BaseDoc.DocHistory;
     };
 
+    /**
+    * @method SetContent
+    * @param {Array<String>} LineList
+    */
     GSNNode.prototype.SetContent = function (LineList) {
         var OldDigest = this.Digest;
         var LineCount = 0;
@@ -538,10 +806,17 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method UpdateContent
+    * @param {String} TextDoc
+    */
     GSNNode.prototype.UpdateContent = function (TextDoc) {
         this.SetContent(new StringReader(TextDoc).GetLineList(true));
     };
 
+    /**
+    * @method GetHtmlContent
+    */
     GSNNode.prototype.GetHtmlContent = function () {
         if (this.Digest != null) {
             var Reader = new StringReader(this.NodeDoc);
@@ -563,6 +838,10 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * GetNodeHistoryList
+    * @return {Array<GSNNode>}
+    */
     GSNNode.prototype.GetNodeHistoryList = function () {
         var NodeList = new Array();
         var LastNode = null;
@@ -583,6 +862,11 @@ var GSNNode = (function () {
         return NodeList;
     };
 
+    /**
+    * @method AppendSubNode
+    * @private
+    * @param {GSNNode} Node
+    */
     GSNNode.prototype.AppendSubNode = function (Node) {
         (Node.BaseDoc == this.BaseDoc);
         if (this.SubNodeList == null) {
@@ -591,6 +875,11 @@ var GSNNode = (function () {
         Lib.Array_add(this.SubNodeList, Node);
     };
 
+    /**
+    * @method HasSubNode
+    * @param {GSNType} NodeType
+    * @return {Boolean}
+    */
     GSNNode.prototype.HasSubNode = function (NodeType) {
         for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
             var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
@@ -601,14 +890,22 @@ var GSNNode = (function () {
         return false;
     };
 
+    /**
+    * @method GetCloseGoal
+    * @return {GSNNode}
+    */
     GSNNode.prototype.GetCloseGoal = function () {
         var Node = this;
-        while (Node.NodeType != 0 /* Goal */) {
+        while (Node.NodeType != GSNType.Goal) {
             Node = Node.ParentNode;
         }
         return Node;
     };
 
+    /**
+    * @method GetTagMap
+    * @return {Object}
+    */
     GSNNode.prototype.GetTagMap = function () {
         if (this.TagMap == null && this.HasTag) {
             this.TagMap = new HashMap();
@@ -624,6 +921,12 @@ var GSNNode = (function () {
         return this.TagMap;
     };
 
+    /**
+    * @method MergeTagMap
+    * @param {Object} BaseMap
+    * @param {Object} NewMap
+    * @return {Object}
+    */
     GSNNode.prototype.MergeTagMap = function (BaseMap, NewMap) {
         if (BaseMap == null)
             return NewMap;
@@ -642,6 +945,10 @@ var GSNNode = (function () {
         return Result;
     };
 
+    /**
+    * @method  GetTagMapWithLexicalScope
+    * @return {Object}
+    */
     GSNNode.prototype.GetTagMapWithLexicalScope = function () {
         var Result = null;
         if (this.ParentNode != null) {
@@ -660,6 +967,12 @@ var GSNNode = (function () {
         return Result;
     };
 
+    /**
+    * @method GetLastNode
+    * @param {GSNType} NodeType
+    * @param {Boolean} Creation
+    * @return {GSNNode}
+    */
     GSNNode.prototype.GetLastNode = function (NodeType, Creation) {
         if (this.SubNodeList != null) {
             for (var i = Lib.Array_size(this.SubNodeList) - 1; i >= 0; i--) {
@@ -669,12 +982,16 @@ var GSNNode = (function () {
                 }
             }
         }
-        if (NodeType == 2 /* Strategy */ && Creation) {
-            return new GSNNode(this.BaseDoc, this, 2 /* Strategy */, this.LabelName, this.UID, null);
+        if (NodeType == GSNType.Strategy && Creation) {
+            return new GSNNode(this.BaseDoc, this, GSNType.Strategy, this.LabelName, this.UID, null);
         }
         return null;
     };
 
+    /**
+    * @method FormatNode
+    * @param {StringWriter} Writer
+    */
     GSNNode.prototype.FormatNode = function (Writer) {
         Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
         Writer.print(" ");
@@ -686,8 +1003,6 @@ var GSNNode = (function () {
         Writer.print(" &");
         Writer.print(Lib.DecToHex(this.UID));
 
-        // Stream.append(" ");
-        // MD5.FormatDigest(this.Digest, Stream);
         if (this.Created != null) {
             var HistoryTaple = this.GetHistoryTaple();
             Writer.print(" " + HistoryTaple);
@@ -712,6 +1027,12 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method FormatSubNode
+    * @param {Number} GoalLevel
+    * @param {StringWriter} Writer
+    * @param {Boolean} IsRecursive
+    */
     // SubNode
     GSNNode.prototype.FormatSubNode = function (GoalLevel, Writer, IsRecursive) {
         Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
@@ -750,6 +1071,12 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method ReplaceSubNode
+    * @param {GSNNode} NewNode
+    * @param {Boolean} IsRecursive
+    * @return {GSNNode}
+    */
     GSNNode.prototype.ReplaceSubNode = function (NewNode, IsRecursive) {
         this.MergeSubNode(NewNode);
         if (this.ParentNode != null) {
@@ -769,6 +1096,12 @@ var GSNNode = (function () {
         return NewNode;
     };
 
+    /**
+    * @method ReplaceSubNodeAsText
+    * @param {String} DocText
+    * @param {Boolean} IsRecursive
+    * @return {GSNNode}
+    */
     GSNNode.prototype.ReplaceSubNodeAsText = function (DocText, IsRecursive) {
         if (!IsRecursive) {
             DocText = WikiSyntax.CommentOutSubNode(DocText);
@@ -788,6 +1121,11 @@ var GSNNode = (function () {
         return NewNode;
     };
 
+    /**
+    * @method HasSubNodeUID
+    * @param {Number} UID
+    * @return {Boolean}
+    */
     GSNNode.prototype.HasSubNodeUID = function (UID) {
         if (UID == this.UID) {
             return true;
@@ -800,9 +1138,13 @@ var GSNNode = (function () {
         return false;
     };
 
+    /**
+    * @method MergeSubNode
+    * @param {GSNNode} NewNode
+    */
     GSNNode.prototype.MergeSubNode = function (NewNode) {
         (this.BaseDoc != null);
-        NewNode.LastModified = null; // this.BaseDoc has Last
+        NewNode.LastModified = null;
         var UID = NewNode.UID;
         var OldNode = this.BaseDoc.GetNode(UID);
         if (OldNode != null && this.HasSubNodeUID(UID)) {
@@ -824,6 +1166,11 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method IsNewerTree
+    * @param {Number} ModifiedRev
+    * @return {Boolean}
+    */
     // Merge
     GSNNode.prototype.IsNewerTree = function (ModifiedRev) {
         if (ModifiedRev <= this.LastModified.Rev) {
@@ -838,6 +1185,10 @@ var GSNNode = (function () {
         return false;
     };
 
+    /**
+    * @method ListSubGoalNode
+    * @param {Array<GSNNode>} BufferList
+    */
     GSNNode.prototype.ListSubGoalNode = function (BufferList) {
         for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
             var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
@@ -850,6 +1201,10 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method ListSectionNode
+    * @param {Array<GSNNode>} BufferList
+    */
     GSNNode.prototype.ListSectionNode = function (BufferList) {
         for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
             var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
@@ -862,6 +1217,12 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method RenumberGoalRecursive
+    * @param {Number} GoalCount
+    * @param {Number} NextGoalCount
+    * @param {Object} LabelMap
+    */
     GSNNode.prototype.RenumberGoalRecursive = function (GoalCount, NextGoalCount, LabelMap) {
         (this.IsGoal());
 
@@ -896,11 +1257,21 @@ var GSNNode = (function () {
         }
     };
 
+    /**
+    * @method RenumberGoal
+    * @param {Number} GoalCount
+    * @param {Number} NextGoalCount
+    */
     GSNNode.prototype.RenumberGoal = function (GoalCount, NextGoalCount) {
         var LabelMap = new HashMap();
         this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
     };
 
+    /**
+    * @method SearchNode
+    * @param {String} SearchWord
+    * @return {Array<GSNNode>}
+    */
     GSNNode.prototype.SearchNode = function (SearchWord) {
         var NodeList = new Array();
         if (Lib.String_matches(this.NodeDoc, SearchWord)) {
@@ -913,6 +1284,10 @@ var GSNNode = (function () {
         return NodeList;
     };
 
+    /**
+    * @method GetNodeCount
+    * @return {Number}
+    */
     GSNNode.prototype.GetNodeCount = function () {
         var res = 1;
         for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
@@ -924,6 +1299,11 @@ var GSNNode = (function () {
 })();
 exports.GSNNode = GSNNode;
 
+/**
+* @class GSNDoc
+* @constructor
+* @param {GSNRecord} Record
+*/
 var GSNDoc = (function () {
     function GSNDoc(Record) {
         this.Record = Record;
@@ -933,6 +1313,14 @@ var GSNDoc = (function () {
         this.DocHistory = null;
         this.GoalCount = 0;
     }
+    /**
+    * @method DeepCopy
+    * @param {String} Author
+    * @param {String} Role
+    * @param {String} Date
+    * @param {String} Process
+    * @return {GSNDoc}
+    */
     GSNDoc.prototype.DeepCopy = function (Author, Role, Date, Process) {
         var NewDoc = new GSNDoc(this.Record);
         NewDoc.GoalCount = this.GoalCount;
@@ -944,6 +1332,11 @@ var GSNDoc = (function () {
         return NewDoc;
     };
 
+    /**
+    * @method DuplicateTagMap
+    * @param {Object} TagMap
+    * @return {Object}
+    */
     GSNDoc.prototype.DuplicateTagMap = function (TagMap) {
         if (TagMap != null) {
             var NewMap = new HashMap();
@@ -957,6 +1350,10 @@ var GSNDoc = (function () {
         return null;
     };
 
+    /**
+    * @method UpdateDocHeader
+    * @param {StringReader} Reader
+    */
     GSNDoc.prototype.UpdateDocHeader = function (Reader) {
         var Revision = TagUtils.GetInteger(this.DocTagMap, "Revision", -1);
         if (Revision != -1) {
@@ -974,14 +1371,27 @@ var GSNDoc = (function () {
         }
     };
 
+    /**
+    * @method GetNode
+    * @param {Number} UID
+    * @return {GSNNode}
+    */
     GSNDoc.prototype.GetNode = function (UID) {
         return this.NodeMap.get(UID);
     };
 
+    /**
+    * @method UncheckAddNode
+    * @param {GSNNode} Node
+    */
     GSNDoc.prototype.UncheckAddNode = function (Node) {
         this.NodeMap.put(Node.UID, Node);
     };
 
+    /**
+    * @method AddNode
+    * @param {GSNNode} Node
+    */
     GSNDoc.prototype.AddNode = function (Node) {
         var Key = Node.UID;
         var OldNode = this.NodeMap.get(Key);
@@ -991,13 +1401,16 @@ var GSNDoc = (function () {
             }
         }
         this.NodeMap.put(Key, Node);
-        if (Node.NodeType == 0 /* Goal */) {
+        if (Node.NodeType == GSNType.Goal) {
             if (Node.GetGoalLevel() == 1) {
                 this.TopNode = Node;
             }
         }
     };
 
+    /**
+    * @method RemapNodeMap
+    */
     GSNDoc.prototype.RemapNodeMap = function () {
         var NodeMap = new HashMap();
         if (this.TopNode != null) {
@@ -1006,6 +1419,10 @@ var GSNDoc = (function () {
         this.NodeMap = NodeMap;
     };
 
+    /**
+    * @method RemoveNode
+    * @param Node
+    */
     GSNDoc.prototype.RemoveNode = function (Node) {
         (this == Node.BaseDoc);
         if (Node.ParentNode != null) {
@@ -1014,6 +1431,10 @@ var GSNDoc = (function () {
         this.RemapNodeMap();
     };
 
+    /**
+    * @method FormatDoc
+    * @param {StringWriter} Stream
+    */
     GSNDoc.prototype.FormatDoc = function (Stream) {
         if (this.TopNode != null) {
             Stream.println("Revision:: " + this.DocHistory.Rev);
@@ -1021,6 +1442,10 @@ var GSNDoc = (function () {
         }
     };
 
+    /**
+    * @method GetLabelMap
+    * @return {Object}
+    */
     GSNDoc.prototype.GetLabelMap = function () {
         var LabelMap = new HashMap();
         var CurrentNode;
@@ -1037,10 +1462,17 @@ var GSNDoc = (function () {
         return LabelMap;
     };
 
+    /**
+    * @method GetNodeCount
+    * @return {Number}
+    */
     GSNDoc.prototype.GetNodeCount = function () {
         return this.TopNode.GetNodeCount();
     };
 
+    /**
+    * @method RenumberAll
+    */
     GSNDoc.prototype.RenumberAll = function () {
         if (this.TopNode != null) {
             this.TopNode.RenumberGoal(1, 2);
@@ -1050,11 +1482,20 @@ var GSNDoc = (function () {
 })();
 exports.GSNDoc = GSNDoc;
 
+/**
+* @class GSNRecord
+* @constructor
+*
+*/
 var GSNRecord = (function () {
     function GSNRecord() {
         this.HistoryList = new Array();
         this.EditingDoc = null;
     }
+    /**
+    * @method DeepCopy
+    * @return GSNRecord
+    */
     GSNRecord.prototype.DeepCopy = function () {
         var NewRecord = new GSNRecord();
         for (var i = 0; i < Lib.Array_size(this.HistoryList); i++) {
@@ -1065,6 +1506,11 @@ var GSNRecord = (function () {
         return NewRecord;
     };
 
+    /**
+    * @method GetHistory
+    * @param {Number} Rev
+    * @return {GSNHistory}
+    */
     GSNRecord.prototype.GetHistory = function (Rev) {
         if (Rev < Lib.Array_size(this.HistoryList)) {
             return Lib.Array_get(this.HistoryList, Rev);
@@ -1072,6 +1518,11 @@ var GSNRecord = (function () {
         return null;
     };
 
+    /**
+    * @method GetHistoryDoc
+    * @param {Number} Rev
+    * @return {GSNDoc}
+    */
     GSNRecord.prototype.GetHistoryDoc = function (Rev) {
         var history = this.GetHistory(Rev);
         if (history != null) {
@@ -1080,12 +1531,30 @@ var GSNRecord = (function () {
         return null;
     };
 
+    /**
+    * @method NewHistory
+    * @param {String} Author
+    * @param {String} Role
+    * @param {String} Date
+    * @param {String} Process
+    * @param {GSNDoc} Doc
+    * @return {GSNHistory}
+    */
     GSNRecord.prototype.NewHistory = function (Author, Role, Date, Process, Doc) {
         var History = new GSNHistory(Lib.Array_size(this.HistoryList), Author, Role, Date, Process, Doc);
         Lib.Array_add(this.HistoryList, History);
         return History;
     };
 
+    /**
+    * @method AddHistory
+    * @param {Number} Rev
+    * @param {String} Author
+    * @param {String} Role
+    * @param {String} Date
+    * @param {String} Process
+    * @param {GSNDoc} Doc
+    */
     GSNRecord.prototype.AddHistory = function (Rev, Author, Role, Date, Process, Doc) {
         if (Rev >= 0) {
             var History = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
@@ -1103,6 +1572,11 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method ParseHistoryTag
+    * @param {String} Line
+    * @param {StringReader} Reader
+    */
     GSNRecord.prototype.ParseHistoryTag = function (Line, Reader) {
         var loc = Line.indexOf("::");
         if (loc != -1) {
@@ -1117,6 +1591,10 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method Parse
+    * @param {String} TextDoc
+    */
     GSNRecord.prototype.Parse = function (TextDoc) {
         var Reader = new StringReader(TextDoc);
         while (Reader.HasNext()) {
@@ -1127,6 +1605,9 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method RenumberAll
+    */
     GSNRecord.prototype.RenumberAll = function () {
         var LatestDoc = this.GetLatestDoc();
         if (LatestDoc != null && LatestDoc.TopNode != null) {
@@ -1134,6 +1615,13 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method OpenEditor
+    * @param {String} Author
+    * @param {String} Role
+    * @param {String} Date
+    * @param {String} Process
+    */
     GSNRecord.prototype.OpenEditor = function (Author, Role, Date, Process) {
         if (this.EditingDoc == null) {
             var Doc = this.GetLatestDoc();
@@ -1146,10 +1634,17 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method CloseEditor
+    */
     GSNRecord.prototype.CloseEditor = function () {
         this.EditingDoc = null;
     };
 
+    /**
+    * @method Merge
+    * @param {GSNRecord} NewRecord
+    */
     GSNRecord.prototype.Merge = function (NewRecord) {
         var CommonHistory = -1;
         for (var Rev = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
@@ -1168,6 +1663,10 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method MergeAsFastFoward
+    * @param {GSNRecord} NewRecord
+    */
     GSNRecord.prototype.MergeAsFastFoward = function (NewRecord) {
         for (var i = Lib.Array_size(this.HistoryList); i < Lib.Array_size(NewRecord.HistoryList); i++) {
             var BranchDoc = NewRecord.GetHistoryDoc(i);
@@ -1178,6 +1677,10 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method MergeAsReplaceTopGoal
+    * @param {GSNRecord} NewRecord
+    */
     GSNRecord.prototype.MergeAsReplaceTopGoal = function (NewRecord) {
         for (var i = 0; i < Lib.Array_size(NewRecord.HistoryList); i++) {
             var NewHistory = Lib.Array_get(NewRecord.HistoryList, i);
@@ -1190,6 +1693,13 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method MergeAsIncrementalAddition
+    * @param {Number} Rev1
+    * @param {GSNRecord} Record1
+    * @param {Number} Rev2
+    * @param {GSNRecord} Record2
+    */
     GSNRecord.prototype.MergeAsIncrementalAddition = function (Rev1, Record1, Rev2, Record2) {
         while (Rev1 < Lib.Array_size(Record1.HistoryList) && Rev2 < Lib.Array_size(Record2.HistoryList)) {
             var History1 = Record1.GetHistory(Rev1);
@@ -1220,6 +1730,10 @@ var GSNRecord = (function () {
         }
     };
 
+    /**
+    * @method GetLatestDoc
+    * @return {GSNDoc}
+    */
     GSNRecord.prototype.GetLatestDoc = function () {
         for (var i = Lib.Array_size(this.HistoryList) - 1; i >= 0; i++) {
             var Doc = this.GetHistoryDoc(i);
@@ -1230,6 +1744,10 @@ var GSNRecord = (function () {
         return null;
     };
 
+    /**
+    * @method FormatRecord
+    * @param {StringWriter} Writer
+    */
     GSNRecord.prototype.FormatRecord = function (Writer) {
         var DocCount = 0;
         for (var i = Lib.Array_size(this.HistoryList) - 1; i >= 0; i--) {
@@ -1248,10 +1766,15 @@ var GSNRecord = (function () {
 })();
 exports.GSNRecord = GSNRecord;
 
+/**
+* @class ParserContext
+* @constructor
+* @param {GSNDoc} NullableDoc
+*/
 var ParserContext = (function () {
     function ParserContext(NullableDoc) {
-        var ParentNode = new GSNNode(NullableDoc, null, 0 /* Goal */, null, -1, null);
-        this.NullableDoc = NullableDoc; // nullabel
+        var ParentNode = new GSNNode(NullableDoc, null, GSNType.Goal, null, -1, null);
+        this.NullableDoc = NullableDoc;
         this.FirstNode = null;
         this.LastGoalNode = null;
         this.LastNonContextNode = null;
@@ -1259,6 +1782,10 @@ var ParserContext = (function () {
         this.random = new Random(System.currentTimeMillis());
         this.SetGoalStackAt(ParentNode);
     }
+    /**
+    * @method SetLastNode
+    * @param {GSNNode} Node
+    */
     ParserContext.prototype.SetLastNode = function (Node) {
         if (Node.IsGoal()) {
             this.LastGoalNode = Node;
@@ -1269,16 +1796,26 @@ var ParserContext = (function () {
         }
     };
 
+    /**
+    * @method GetStrategyOfGoal
+    * @param {Number} Level
+    * @return {GSNNode}
+    */
     ParserContext.prototype.GetStrategyOfGoal = function (Level) {
         if (Level - 1 < Lib.Array_size(this.GoalStack)) {
             var ParentGoal = this.GetGoalStackAt(Level - 1);
             if (ParentGoal != null) {
-                return ParentGoal.GetLastNode(2 /* Strategy */, true);
+                return ParentGoal.GetLastNode(GSNType.Strategy, true);
             }
         }
         return null;
     };
 
+    /**
+    * @method GetGoalStackAt
+    * @param {Number} Level
+    * @return {GSNNode}
+    */
     ParserContext.prototype.GetGoalStackAt = function (Level) {
         if (Level >= 0 && Level < Lib.Array_size(this.GoalStack)) {
             return Lib.Array_get(this.GoalStack, Level);
@@ -1286,6 +1823,10 @@ var ParserContext = (function () {
         return null;
     };
 
+    /**
+    * @method SetGoalStackAt
+    * @param {GSNNode} Node
+    */
     ParserContext.prototype.SetGoalStackAt = function (Node) {
         var GoalLevel = Node.GetGoalLevel();
 
@@ -1295,10 +1836,16 @@ var ParserContext = (function () {
         Lib.Array_set(this.GoalStack, GoalLevel - 1, Node);
     };
 
+    /**
+    * @method IsValidSection
+    * @param {String} Line
+    * @param {StringReader} Reader
+    * @return {Boolean}
+    */
     ParserContext.prototype.IsValidSection = function (Line, Reader) {
         var NodeType = WikiSyntax.ParseNodeType(Line);
         var Level = WikiSyntax.ParseGoalLevel(Line);
-        if (NodeType == 0 /* Goal */) {
+        if (NodeType == GSNType.Goal) {
             var ParentNode = this.GetStrategyOfGoal(Level);
             if (ParentNode != null) {
                 return true;
@@ -1310,18 +1857,18 @@ var ParserContext = (function () {
             Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
             return false;
         }
-        if (NodeType == 1 /* Context */) {
+        if (NodeType == GSNType.Context) {
             return true;
         }
-        if (NodeType == 3 /* Evidence */) {
-            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(2 /* Strategy */)) {
+        if (NodeType == GSNType.Evidence) {
+            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Strategy)) {
                 Reader.LogError("Evidence is only linked to Goal", Line);
                 return false;
             }
             return true;
         }
-        if (NodeType == 2 /* Strategy */) {
-            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(3 /* Evidence */)) {
+        if (NodeType == GSNType.Strategy) {
+            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Evidence)) {
                 Reader.LogError("Strategy is only linked to Goal", Line);
                 return false;
             }
@@ -1331,6 +1878,12 @@ var ParserContext = (function () {
         return false;
     };
 
+    /**
+    * @method CreateNewNode
+    * @param {String} LabelLine
+    * @param {StringReader} Reader
+    * @return {GSNNode}
+    */
     ParserContext.prototype.CreateNewNode = function (LabelLine, Reader) {
         var NodeType = WikiSyntax.ParseNodeType(LabelLine);
         var LabelName = WikiSyntax.ParseLabelName(LabelLine);
@@ -1340,10 +1893,10 @@ var ParserContext = (function () {
         var ParentNode = null;
         var HistoryTaple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
         var Level = WikiSyntax.ParseGoalLevel(LabelLine);
-        if (NodeType == 0 /* Goal */) {
+        if (NodeType == GSNType.Goal) {
             ParentNode = this.GetStrategyOfGoal(Level);
         } else {
-            ParentNode = (NodeType == 1 /* Context */) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
+            ParentNode = (NodeType == GSNType.Context) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
         }
         NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTaple);
         if (this.FirstNode == null) {
@@ -1356,12 +1909,20 @@ var ParserContext = (function () {
         return NewNode;
     };
 
+    /**
+    * @method RemoveSentinel
+    */
     ParserContext.prototype.RemoveSentinel = function () {
         if (this.FirstNode != null && this.FirstNode.ParentNode != null) {
             this.FirstNode.ParentNode = null;
         }
     };
 
+    /**
+    * @method ParseNode
+    * @param {StringReader} Reader
+    * @return {GSNNode}
+    */
     ParserContext.prototype.ParseNode = function (Reader) {
         while (Reader.HasNext()) {
             var Line = Reader.ReadLine();
@@ -1401,6 +1962,11 @@ var ParserContext = (function () {
         return this.FirstNode;
     };
 
+    /**
+    * @method UpdateContent
+    * @param {GSNNode} LastNode
+    * @param {Array<String>} LineList
+    */
     ParserContext.prototype.UpdateContent = function (LastNode, LineList) {
         if (LastNode != null) {
             LastNode.SetContent(LineList);
@@ -1411,10 +1977,20 @@ var ParserContext = (function () {
 })();
 exports.ParserContext = ParserContext;
 
+/**
+* @class AssureNoteParsr
+* @constructor
+*/
 var AssureNoteParser = (function () {
     function AssureNoteParser() {
     }
-    AssureNoteParser.merge = function (MasterFile, BranchFile) {
+    AssureNoteParser.merge = /**
+    * @method merge
+    * @static
+    * @param {String} MasterFile
+    * @param {String} BranchFile
+    */
+    function (MasterFile, BranchFile) {
         var MasterRecord = new GSNRecord();
         MasterRecord.Parse(Lib.ReadFile(MasterFile));
         if (BranchFile != null) {
@@ -1429,7 +2005,11 @@ var AssureNoteParser = (function () {
         console.log(Writer.toString());
     };
 
-    AssureNoteParser.ts_merge = function () {
+    AssureNoteParser.ts_merge = /**
+    * @method ts_merge
+    * @static
+    */
+    function () {
         var MasterFile = (Lib.Input.length > 0) ? Lib.Input[0] : null;
         var BranchFile = (Lib.Input.length > 1) ? Lib.Input[1] : null;
         var MasterRecord = new GSNRecord();
@@ -1446,7 +2026,11 @@ var AssureNoteParser = (function () {
         console.log(Writer.toString());
     };
 
-    AssureNoteParser.main = function (argv) {
+    AssureNoteParser.main = /**
+    * @method main
+    * @param {Array<String>}argv
+    */
+    function (argv) {
         if (argv.length == 2) {
             //AssureNoteParser.merge(argv[0], argv[1]);
             var MasterRecord = new GSNRecord();
@@ -1466,7 +2050,6 @@ var AssureNoteParser = (function () {
     return AssureNoteParser;
 })();
 exports.AssureNoteParser = AssureNoteParser;
-
 
 /* FIXME this class is never used */
 var PdfConverter = (function () {
@@ -1653,8 +2236,8 @@ exports.MessageDigest = MessageDigest;
 var Lib = (function () {
     function Lib() {
     }
-    /* Methods */
-    Lib.GetMD5 = function () {
+    Lib.GetMD5 = /* Methods */
+    function () {
         return new MessageDigest();
     };
 
@@ -1753,7 +2336,7 @@ var Lib = (function () {
     };
 
     Lib.Object_InstanceOf = function (self, klass) {
-        return self.constructor == klass;
+        return (self).constructor == klass;
     };
     Lib.Input = [];
     Lib.EmptyNodeList = new Array();
@@ -1865,7 +2448,7 @@ Object.defineProperty(Object.prototype, "equals", {
 Object.defineProperty(Object.prototype, "InstanceOf", {
     enumerable: false,
     value: function (klass) {
-        return this.constructor == klass;
+        return (this).constructor == klass;
     }
 });
 
@@ -1939,7 +2522,7 @@ Object.defineProperty(String.prototype, "matches", {
 */
 /*jslint bitwise: true */
 /*global unescape, define */
-(function ($) {
+((function ($) {
     'use strict';
 
     /*
@@ -2169,4 +2752,5 @@ Object.defineProperty(String.prototype, "matches", {
     }
 
     $.md5 = md5;
-}(Lib));
+})(Lib));
+

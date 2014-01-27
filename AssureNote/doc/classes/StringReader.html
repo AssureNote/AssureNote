@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>AssureNote.PictgramPanel - AssureNote</title>
+    <title>StringReader - AssureNote</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -106,7 +106,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>AssureNote.PictgramPanel Class</h1>
+                        <h1>StringReader Class</h1>
 <div class="box meta">
     
 
@@ -114,7 +114,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_Panel.js.html#l35"><code>src&#x2F;Panel.js:35</code></a>
+            Defined in: <a href="../files/src_AssureNoteParser.js.html#l32"><code>src&#x2F;AssureNoteParser.js:32</code></a>
         </div>
     
 
@@ -130,75 +130,10 @@
 </div>
 
 
-
-<div id="classdocs" class="tabview">
-    <ul class="api-class-tabs">
-        <li class="api-class-tab index"><a href="#index">Index</a></li>
-
-        
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-        
-        
-        
-        
-    </ul>
-
-    <div>
-        <div id="index" class="api-class-tabpanel index">
-            <h2 class="off-left">Item Index</h2>
-
-            
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                        
-                            <li class="index-item method">
-                                <a href="#method_ChangeFocusedLabel">ChangeFocusedLabel</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_FindNearestNode">FindNearestNode</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_FoldDeepSubGoals">FoldDeepSubGoals</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_MoveToNearestNode">MoveToNearestNode</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
-            
-
-            
-
-            
-
-            
-        </div>
-
-        
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-                
-                    <div id="method_ChangeFocusedLabel" class="method item">
-    <h3 class="name"><code>ChangeFocusedLabel</code></h3>
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_StringReader" class="method item">
+    <h3 class="name"><code>StringReader</code></h3>
 
     
         <div class="args">
@@ -206,7 +141,7 @@
             
                 <li class="arg">
                     
-                        <code>Label</code>
+                        <code>text</code>
                     
                 </li>
             
@@ -239,7 +174,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l376"><code>src&#x2F;Panel.js:376</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l32"><code>src&#x2F;AssureNoteParser.js:32</code></a>
         
         </p>
 
@@ -261,15 +196,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Label</code>
+                        <code class="param-name">text</code>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>If label is null, there is no focused label.</p>
-
+                         
                     </div>
 
                     
@@ -284,9 +218,98 @@
     
 </div>
 
+    </div>
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+            
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_GetLineList">GetLineList</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_HasNext">HasNext</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_LogError">LogError</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_LogWarning">LogWarning</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_ReadLine">ReadLine</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_ReadLineList">ReadLineList</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_RoollbackLineFeed">RoollbackLineFeed</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+
+            
+
+            
+        </div>
+
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
                 
-                    <div id="method_FindNearestNode" class="method item">
-    <h3 class="name"><code>FindNearestNode</code></h3>
+                    <div id="method_GetLineList" class="method item">
+    <h3 class="name"><code>GetLineList</code></h3>
 
     
         <div class="args">
@@ -294,13 +317,7 @@
             
                 <li class="arg">
                     
-                        <code>CenterNode</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>Dir</code>
+                        <code>UntilSection</code>
                     
                 </li>
             
@@ -310,7 +327,7 @@
 
     
         <span class="returns-inline">
-            <span class="type">AssureNote.NodeView</span>
+            <span class="type">Array<String></span>
         </span>
     
 
@@ -337,7 +354,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l309"><code>src&#x2F;Panel.js:309</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l111"><code>src&#x2F;AssureNoteParser.js:111</code></a>
         
         </p>
 
@@ -359,23 +376,8 @@
             
                 <li class="param">
                     
-                        <code class="param-name">CenterNode</code>
-                        <span class="type">AssureNote.NodeView</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                         
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">Dir</code>
-                        <span class="type">AssureNote.Direction</span>
+                        <code class="param-name">UntilSection</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
                     
 
                     
@@ -398,10 +400,8 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">AssureNote.NodeView</span>:
+                        <span class="type">Array<String></span>:
                     
-                    <p>Found node. If no node is found, null is retured.</p>
-
                 
             </div>
         </div>
@@ -411,8 +411,78 @@
 </div>
 
                 
-                    <div id="method_FoldDeepSubGoals" class="method item">
-    <h3 class="name"><code>FoldDeepSubGoals</code></h3>
+                    <div id="method_HasNext" class="method item">
+    <h3 class="name"><code>HasNext</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_AssureNoteParser.js.html#l45"><code>src&#x2F;AssureNoteParser.js:45</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_LogError" class="method item">
+    <h3 class="name"><code>LogError</code></h3>
 
     
         <div class="args">
@@ -420,7 +490,13 @@
             
                 <li class="arg">
                     
-                        <code>NodeView</code>
+                        <code>Message</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>Line</code>
                     
                 </li>
             
@@ -453,7 +529,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l360"><code>src&#x2F;Panel.js:360</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l122"><code>src&#x2F;AssureNoteParser.js:122</code></a>
         
         </p>
 
@@ -475,8 +551,23 @@
             
                 <li class="param">
                     
-                        <code class="param-name">NodeView</code>
-                        <span class="type">NodeView</span>
+                        <code class="param-name">Message</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">Line</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
                     
 
                     
@@ -498,8 +589,8 @@
 </div>
 
                 
-                    <div id="method_MoveToNearestNode" class="method item">
-    <h3 class="name"><code>MoveToNearestNode</code></h3>
+                    <div id="method_LogWarning" class="method item">
+    <h3 class="name"><code>LogWarning</code></h3>
 
     
         <div class="args">
@@ -507,7 +598,13 @@
             
                 <li class="arg">
                     
-                        <code>Dir</code>
+                        <code>Message</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>Line</code>
                     
                 </li>
             
@@ -540,7 +637,7 @@
             
         
         
-        <a href="../files/src_Panel.js.html#l297"><code>src&#x2F;Panel.js:297</code></a>
+        <a href="../files/src_AssureNoteParser.js.html#l131"><code>src&#x2F;AssureNoteParser.js:131</code></a>
         
         </p>
 
@@ -562,8 +659,23 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Dir</code>
-                        <span class="type">AssureNote.Direction</span>
+                        <code class="param-name">Message</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">Line</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
                     
 
                     
@@ -577,6 +689,238 @@
             
             </ul>
         </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_ReadLine" class="method item">
+    <h3 class="name"><code>ReadLine</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_AssureNoteParser.js.html#l53"><code>src&#x2F;AssureNoteParser.js:53</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_ReadLineList" class="method item">
+    <h3 class="name"><code>ReadLineList</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>LineList</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>UntilSection</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_AssureNoteParser.js.html#l95"><code>src&#x2F;AssureNoteParser.js:95</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">LineList</code>
+                        <span class="type">Array<String></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">UntilSection</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_RoollbackLineFeed" class="method item">
+    <h3 class="name"><code>RoollbackLineFeed</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_AssureNoteParser.js.html#l87"><code>src&#x2F;AssureNoteParser.js:87</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
     
 
     

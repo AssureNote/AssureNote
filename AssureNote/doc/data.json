@@ -6,8 +6,54 @@
         "url": "https://github.com/AssureNote/AssureNote"
     },
     "files": {
-        "src\\Panel.js": {
-            "name": "src\\Panel.js",
+        "lib/bootstrap/js/bootstrap.min.js": {
+            "name": "lib/bootstrap/js/bootstrap.min.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib/jquery-ui.js": {
+            "name": "lib/jquery-ui.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib/notify.min.js": {
+            "name": "lib/notify.min.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib/socket.io.js": {
+            "name": "lib/socket.io.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/AssureNoteParser.js": {
+            "name": "src/AssureNoteParser.js",
+            "modules": {},
+            "classes": {
+                "StringReader": 1,
+                "StringWriter": 1,
+                "GSNHistory": 1,
+                "WikiSyntax": 1,
+                "TagUtils": 1,
+                "GSNNode": 1,
+                "GSNDoc": 1,
+                "GSNRecord": 1,
+                "ParserContext": 1,
+                "AssureNoteParsr": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/Panel.js": {
+            "name": "src/Panel.js",
             "modules": {},
             "classes": {
                 "AssureNote.PictgramPanel": 1
@@ -15,15 +61,15 @@
             "fors": {},
             "namespaces": {}
         },
-        "src\\Tooltip.js": {
-            "name": "src\\Tooltip.js",
+        "src/Tooltip.js": {
+            "name": "src/Tooltip.js",
             "modules": {},
             "classes": {},
             "fors": {},
             "namespaces": {}
         },
-        "src\\Viewport.js": {
-            "name": "src\\Viewport.js",
+        "src/Viewport.js": {
+            "name": "src/Viewport.js",
             "modules": {},
             "classes": {
                 "AssureNote.ScrollManager": 1,
@@ -37,6 +83,221 @@
     },
     "modules": {},
     "classes": {
+        "StringReader": {
+            "name": "StringReader",
+            "shortname": "StringReader",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 32,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "text",
+                    "description": "",
+                    "type": "String"
+                }
+            ]
+        },
+        "StringWriter": {
+            "name": "StringWriter",
+            "shortname": "StringWriter",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 143,
+            "is_constructor": 1
+        },
+        "GSNHistory": {
+            "name": "GSNHistory",
+            "shortname": "GSNHistory",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 182,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Rev",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "Author",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Role",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "DateString",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Process",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Doc",
+                    "description": "",
+                    "type": "GSNDoc"
+                }
+            ]
+        },
+        "WikiSyntax": {
+            "name": "WikiSyntax",
+            "shortname": "WikiSyntax",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 244,
+            "is_constructor": 1
+        },
+        "TagUtils": {
+            "name": "TagUtils",
+            "shortname": "TagUtils",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 539,
+            "static": 1
+        },
+        "GSNNode": {
+            "name": "GSNNode",
+            "shortname": "GSNNode",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 625,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "BaseDoc",
+                    "description": "",
+                    "type": "GSNDoc"
+                },
+                {
+                    "name": "ParentNode",
+                    "description": "",
+                    "type": "GSNNode"
+                },
+                {
+                    "name": "NodeType",
+                    "description": "",
+                    "type": "GSNType"
+                },
+                {
+                    "name": "LabelName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "UID",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "HistoryTaple",
+                    "description": "",
+                    "type": "Array<GSNHistory>"
+                }
+            ]
+        },
+        "GSNDoc": {
+            "name": "GSNDoc",
+            "shortname": "GSNDoc",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 1306,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Record",
+                    "description": "",
+                    "type": "GSNRecord"
+                }
+            ]
+        },
+        "GSNRecord": {
+            "name": "GSNRecord",
+            "shortname": "GSNRecord",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 1489,
+            "is_constructor": 1
+        },
+        "ParserContext": {
+            "name": "ParserContext",
+            "shortname": "ParserContext",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 1773,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "NullableDoc",
+                    "description": "",
+                    "type": "GSNDoc"
+                }
+            ]
+        },
+        "AssureNoteParsr": {
+            "name": "AssureNoteParsr",
+            "shortname": "AssureNoteParsr",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/AssureNoteParser.js",
+            "line": 1984,
+            "is_constructor": 1
+        },
         "AssureNote.PictgramPanel": {
             "name": "AssureNote.PictgramPanel",
             "shortname": "AssureNote.PictgramPanel",
@@ -45,7 +306,8 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "file": "src\\Panel.js",
+            "namespace": "",
+            "file": "src/Panel.js",
             "line": 35
         },
         "AssureNote.ScrollManager": {
@@ -56,8 +318,9 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "file": "src\\Viewport.js",
-            "line": 29,
+            "namespace": "",
+            "file": "src/Viewport.js",
+            "line": 43,
             "description": "Controll scroll by mouse, touch and pen and zoom by wheel."
         },
         "AssureNote.ViewportManager": {
@@ -68,14 +331,3673 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "file": "src\\Viewport.js",
-            "line": 163
+            "namespace": "",
+            "file": "src/Viewport.js",
+            "line": 190
         }
     },
     "classitems": [
         {
-            "file": "src\\Panel.js",
-            "line": 267,
+            "file": "lib/bootstrap/js/bootstrap.min.js",
+            "line": 1,
+            "description": "bootstrap.js v3.0.0 by @fat and @mdo\nCopyright 2013 Twitter Inc.\nhttp://www.apache.org/licenses/LICENSE-2.0",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 5478,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 5479,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 5480,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 5683,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 5684,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 5685,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 6030,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 6031,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/jquery-ui.js",
+            "line": 6032,
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/notify.min.js",
+            "line": 1,
+            "description": "http://notifyjs.com/\nCopyright (c) 2013 Jaime Pillora - MIT",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 11,
+            "description": "IO namespace.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 19,
+            "description": "Socket.IO version",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 27,
+            "description": "Protocol implemented.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 35,
+            "description": "Available transports, these will be populated with the available transports",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 43,
+            "description": "Keep track of jsonp callbacks.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 51,
+            "description": "Keep track of our io.Sockets",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 59,
+            "description": "Manages connections to hosts.",
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "force",
+                    "description": "creation of new socket (defaults to false)",
+                    "type": "Boolean"
+                }
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 105,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 113,
+            "description": "Utilities namespace.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 121,
+            "description": "Parses an URI",
+            "author": "Steven Levithan <stevenlevithan.com> (MIT license)",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 146,
+            "description": "Produces a unique url that identifies a Socket.IO connection.",
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 173,
+            "description": "Mergest 2 query strings in to once unique query string",
+            "params": [
+                {
+                    "name": "base",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "addition",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 195,
+            "description": "Transforms a querystring in to an object",
+            "params": [
+                {
+                    "name": "qs",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 219,
+            "description": "Executes the given function when the page is loaded.\n\n    io.util.load(function () { console.log('page loaded'); });",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 238,
+            "description": "Adds an event.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 252,
+            "description": "Generates the correct `XMLHttpRequest` for regular and cross domain requests.",
+            "params": [
+                {
+                    "name": "xdomain",
+                    "description": "Create a request that can be used cross domain.",
+                    "type": "Boolean",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "If we can create a XMLHttpRequest.",
+                "type": "XMLHttpRequest|false"
+            },
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 279,
+            "description": "XHR based transport constructor.",
+            "is_constructor": 1,
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 286,
+            "description": "Change the internal pageLoaded value.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 296,
+            "description": "Defers a function to ensure a spinner is not displayed by the browser",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 313,
+            "description": "Merges two objects.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 338,
+            "description": "Merges prototypes from objects",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 348,
+            "description": "Shortcut for prototypical and static inheritance.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 360,
+            "description": "Checks if the given object is an Array.\n\n    io.util.isArray([]); // true\n    io.util.isArray({}); // false",
+            "params": [
+                {
+                    "name": "Object",
+                    "description": "obj"
+                }
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 374,
+            "description": "Intersects values of two arrays into a third",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 393,
+            "description": "Array indexOf compatibility.",
+            "see": [
+                "bit.ly/a5Dxa2"
+            ],
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 408,
+            "description": "Converts enumerables to array.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 423,
+            "description": "UA / engines detection namespace.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 431,
+            "description": "Whether the UA supports CORS for XHR.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 447,
+            "description": "Detect webkit.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 458,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 466,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 472,
+            "description": "Event emitter constructor.",
+            "api": "public.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 480,
+            "description": "Adds a listener",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 504,
+            "description": "Adds a volatile listener.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 524,
+            "description": "Removes a listener.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 561,
+            "description": "Removes all listeners for an event.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 581,
+            "description": "Gets all listeners for a certain event.",
+            "api": "publci",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 603,
+            "description": "Emits an event.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 642,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 648,
+            "description": "Based on JSON2 (http://www.JSON.org/js.html).",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 964,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 972,
+            "description": "Parser namespace.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 980,
+            "description": "Packet types.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 996,
+            "description": "Errors reasons.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1006,
+            "description": "Errors advice.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1014,
+            "description": "Shortcuts.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1021,
+            "description": "Encodes a packet.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1089,
+            "description": "Encodes multiple messages (payload).",
+            "params": [
+                {
+                    "name": "messages",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1110,
+            "description": "Decodes a packet",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1193,
+            "description": "Decodes data payload. Detects multiple messages",
+            "return": {
+                "description": "messages",
+                "type": "Array"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1225,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1233,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1239,
+            "description": "This is the transport template for all supported transport methods.",
+            "is_constructor": 1,
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1251,
+            "description": "Apply EventEmitter mixin.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1257,
+            "description": "Handles the response from the server. When a new response is received\nit will automatically update the timeout, decode the message and\nforwards the response to the onMessage function for further processing.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "Response from the server.",
+                    "type": "String"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1290,
+            "description": "Handles packets.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1316,
+            "description": "Sets close timeout",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1332,
+            "description": "Called when transport disconnects.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1345,
+            "description": "Called when transport connects",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1356,
+            "description": "Clears close timeout",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1369,
+            "description": "Clear timeouts",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1383,
+            "description": "Sends a packet",
+            "params": [
+                {
+                    "name": "packet",
+                    "description": "object.",
+                    "type": "Object"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1394,
+            "description": "Send the received heartbeat message back to server. So the server\nknows we are still connected.",
+            "params": [
+                {
+                    "name": "heartbeat",
+                    "description": "Heartbeat response from the server.",
+                    "type": "String"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1406,
+            "description": "Called when the transport opens.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1418,
+            "description": "Notifies the base when the connection with the Socket.IO server\nhas been disconnected.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1438,
+            "description": "Generates a connection url based on the Socket.IO URL Protocol.\nSee <https://github.com/learnboost/socket.io-node/> for more details.",
+            "return": {
+                "description": "Connection url",
+                "type": "String"
+            },
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1455,
+            "description": "Checks if the transport is ready to start a connection.",
+            "params": [
+                {
+                    "name": "socket",
+                    "description": "The socket instance that needs a transport",
+                    "type": "Socket"
+                },
+                {
+                    "name": "fn",
+                    "description": "The callback",
+                    "type": "Function"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1470,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1478,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1484,
+            "description": "Create a new `Socket.IO client` which can establish a persistent\nconnection with a Socket.IO enabled server.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1534,
+            "description": "Apply EventEmitter mixin.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1540,
+            "description": "Returns a namespace listener/emitter for this socket",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1558,
+            "description": "Emits the given event to the Socket and all namespaces",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1577,
+            "description": "Performs the handshake",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1636,
+            "description": "Find an available transport based on the options supplied in the constructor.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1656,
+            "description": "Connects to the server.",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "Callback.",
+                    "type": "Function",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "io.Socket"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1733,
+            "description": "Clears and sets a new heartbeat timeout using the value given by the\nserver during the handshake.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1749,
+            "description": "Sends a message.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "packet.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "io.Socket"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1767,
+            "description": "Sets buffer state",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1782,
+            "description": "Disconnect the established connect.",
+            "return": {
+                "description": "",
+                "type": "io.Socket"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1802,
+            "description": "Disconnects the socket with a sync XHR.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1819,
+            "description": "Check if we need to use cross domain enabled transports. Cross domain would\nbe a different port or different domain name.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1836,
+            "description": "Called upon handshake.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1854,
+            "description": "Called when the transport opens",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1864,
+            "description": "Called when the transport closes.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1875,
+            "description": "Called when the transport first opens a connection",
+            "params": [
+                {
+                    "name": "text",
+                    "description": ""
+                }
+            ],
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1885,
+            "description": "Handles an error.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1904,
+            "description": "Called when the transport disconnects.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 1931,
+            "description": "Called upon reconnection.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2018,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2026,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2032,
+            "description": "Socket namespace constructor.",
+            "is_constructor": 1,
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2048,
+            "description": "Apply EventEmitter mixin.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2054,
+            "description": "Copies emit since we override it",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2062,
+            "description": "Creates a new namespace, by proxying the request to the socket. This\nallows us to use the synax as we do on the server.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2073,
+            "description": "Sends a packet.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2086,
+            "description": "Sends a message",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2107,
+            "description": "Emits an event",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2133,
+            "description": "Disconnects the namespace",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2150,
+            "description": "Handles a packet",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2223,
+            "description": "Flag interface.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2234,
+            "description": "Send a message",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2245,
+            "description": "Emit an event",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2261,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2269,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2275,
+            "description": "The WebSocket transport uses the HTML5 WebSocket API to establish an\npersistent connection with the Socket.IO server. This transport will also\nbe inherited by the FlashSocket fallback as it provides a API compatible\npolyfill for the WebSockets.",
+            "is_constructor": 1,
+            "extends": "{io.Transport}",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2290,
+            "description": "Inherits from Transport.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2296,
+            "description": "Transport name",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2304,
+            "description": "Initializes a new `WebSocket` connection with the Socket.IO server. We attach\nall the appropriate listeners to handle the responses from the server.",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2342,
+            "description": "Send a message to the Socket.IO server. The message will automatically be\nencoded in the correct message format.",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2355,
+            "description": "Payload",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2368,
+            "description": "Disconnect the established `WebSocket` connection.",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2380,
+            "description": "Handle the errors that `WebSocket` might be giving when we\nare attempting to connect or send messages.",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "The error.",
+                    "type": "Error"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2392,
+            "description": "Returns the appropriate scheme for the URI generation.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2401,
+            "description": "Checks if the browser has support for native `WebSockets` and that\nit's not the polyfill created for the FlashSocket transport.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2414,
+            "description": "Check if the `WebSocket` transport support cross domain communications.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2425,
+            "description": "Add the transport to your public io.transports array.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2439,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2447,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2453,
+            "description": "The FlashSocket transport. This is a API wrapper for the HTML5 WebSocket\nspecification. It uses a .swf file to communicate with the server. If you want\nto serve the .swf file from a other server than where the Socket.IO script is\ncoming from you need to use the insecure version of the .swf. More information\nabout this can be found on the github page.",
+            "is_constructor": 1,
+            "extends": "{io.Transport.websocket}",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2469,
+            "description": "Inherits from Transport.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2475,
+            "description": "Transport name",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2483,
+            "description": "Disconnect the established `FlashSocket` connection. This is done by adding a \nnew task to the FlashSocket. The rest will be handled off by the `WebSocket` \ntransport.",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2502,
+            "description": "Sends a message to the Socket.IO server. This is done by adding a new\ntask to the FlashSocket. The rest will be handled off by the `WebSocket` \ntransport.",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2519,
+            "description": "Disconnects the established `FlashSocket` connection.",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2532,
+            "description": "The WebSocket fall back needs to append the flash container to the body\nelement, so we need to make sure we have access to it. Or defer the call\nuntil we are sure there is a body element.",
+            "params": [
+                {
+                    "name": "socket",
+                    "description": "The socket instance that needs a transport",
+                    "type": "Socket"
+                },
+                {
+                    "name": "fn",
+                    "description": "The callback",
+                    "type": "Function"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2579,
+            "description": "Check if the FlashSocket transport is supported as it requires that the Adobe\nFlash Player plug-in version `10.0.0` or greater is installed. And also check if\nthe polyfill is correctly loaded.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2597,
+            "description": "Check if the FlashSocket transport can be used as cross domain / cross origin \ntransport. Because we can't see which type (secure or insecure) of .swf is used\nwe will just return true.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2610,
+            "description": "Disable AUTO_INITIALIZATION",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2618,
+            "description": "Add the transport to your public io.transports array.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2660,
+            "description": "This class represents a faux web socket.",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "protocols",
+                    "description": "",
+                    "type": "Array or string"
+                },
+                {
+                    "name": "proxyHost",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "proxyPort",
+                    "description": "",
+                    "type": "Int"
+                },
+                {
+                    "name": "headers",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2690,
+            "description": "Send data to the web socket.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The data to send to the socket.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "True for success, false for failure.",
+                "type": "Boolean"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2716,
+            "description": "Close this web socket gracefully.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2727,
+            "description": "Implementation of {@link <a href=\"http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration\">DOM 2 EventTarget Interface</a>}",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "listener",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "useCapture",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2742,
+            "description": "Implementation of {@link <a href=\"http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration\">DOM 2 EventTarget Interface</a>}",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "listener",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "useCapture",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2761,
+            "description": "Implementation of {@link <a href=\"http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration\">DOM 2 EventTarget Interface</a>}",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "",
+                    "type": "Event"
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2776,
+            "description": "Handles an event from Flash.",
+            "params": [
+                {
+                    "name": "flashEvent",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2825,
+            "description": "Define the WebSocket readyState enumeration.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2838,
+            "description": "Load a new flash security policy file.",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2848,
+            "description": "Loads WebSocketMain.swf and creates WebSocketMain object in Flash.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2900,
+            "description": "Called by Flash to notify JS that it's fully loaded and ready\nfor communication.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2918,
+            "description": "Called by Flash to notify WebSockets events are fired.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2956,
+            "description": "Test if the browser is running flash lite.",
+            "return": {
+                "description": "True if flash lite is running, false otherwise.",
+                "type": "Boolean"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2985,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 2993,
+            "description": "Expose constructor.",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3001,
+            "description": "XHR constructor",
+            "costructor": "",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3015,
+            "description": "Inherits from Transport.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3021,
+            "description": "Establish a connection",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3040,
+            "description": "Check if we need to send data to the Socket.IO server, if we have data in our\nbuffer we encode it and forward it to the `post` method.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3057,
+            "description": "Send data to the Socket.IO server.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The message"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3070,
+            "description": "Posts a encoded message to the Socket.IO server.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "A encoded message.",
+                    "type": "String"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3112,
+            "description": "Disconnects the established `XHR` connection.",
+            "return": {
+                "description": "",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3124,
+            "description": "Generates a configured XHR request",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "The url that needs to be requested.",
+                    "type": "String"
+                },
+                {
+                    "name": "method",
+                    "description": "The method the request should use.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "XMLHttpRequest"
+            },
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3153,
+            "description": "Returns the scheme to use for the transport URLs.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3163,
+            "description": "Check if the XHR transports are supported",
+            "params": [
+                {
+                    "name": "xdomain",
+                    "description": "Check if we support cross domain requests.",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3185,
+            "description": "Check if the XHR transport supports cross domain requests.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3201,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3209,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3215,
+            "description": "The HTMLFile transport creates a `forever iframe` based transport\nfor Internet Explorer. Regular forever iframe implementations will \ncontinuously trigger the browsers buzy indicators. If the forever iframe\nis created inside a `htmlfile` these indicators will not be trigged.",
+            "is_constructor": 1,
+            "extends": "{io.Transport.XHR}",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3230,
+            "description": "Inherits from XHR transport.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3236,
+            "description": "Transport name",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3244,
+            "description": "Creates a new Ac...eX `htmlfile` with a forever loading iframe\nthat can be used to listen to messages. Inside the generated\n`htmlfile` a reference will be made to the HTMLFile transport.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3277,
+            "description": "The Socket.IO server will write script tags inside the forever\niframe, this function will be used as callback for the incoming\ninformation.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The message",
+                    "type": "String"
+                },
+                {
+                    "name": "doc",
+                    "description": "Reference to the context",
+                    "type": "Document"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3295,
+            "description": "Destroy the established connection, iframe and `htmlfile`.\nAnd calls the `CollectGarbage` function of Internet Explorer\nto release the memory.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3317,
+            "description": "Disconnects the established connection.",
+            "return": {
+                "description": "Chaining.",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3329,
+            "description": "Checks if the browser supports this transport. The browser\nmust have an `Ac...eXObject` implementation.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3347,
+            "description": "Check if cross domain requests are supported.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3360,
+            "description": "Add the transport to your public io.transports array.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3373,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3381,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3387,
+            "description": "The XHR-polling transport uses long polling XHR requests to create a\n\"persistent\" connection with the server.",
+            "is_constructor": 1,
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3399,
+            "description": "Inherits from XHR transport.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3405,
+            "description": "Merge the properties from XHR transport",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3411,
+            "description": "Transport name",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3419,
+            "description": "Establish a connection, for iPhone and Android this will be done once the page\nis loaded.",
+            "return": {
+                "description": "Chaining.",
+                "type": "Transport"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3434,
+            "description": "Starts a XHR request to wait for incoming messages.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3483,
+            "description": "Handle the unclean close behavior.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3501,
+            "description": "Webkit based browsers show a infinit spinner when you start a XHR request\nbefore the browsers onload event is called so we need to defer opening of\nthe transport until the onload event is called. Wrapping the cb in our\ndefer method solve this.",
+            "params": [
+                {
+                    "name": "socket",
+                    "description": "The socket instance that needs a transport",
+                    "type": "Socket"
+                },
+                {
+                    "name": "fn",
+                    "description": "The callback",
+                    "type": "Function"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3520,
+            "description": "Add the transport to your public io.transports array.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3534,
+            "description": "socket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3541,
+            "description": "There is a way to hide the loading indicator in Firefox. If you create and\nremove a iframe it will stop showing the current loading indicator.\nUnfortunately we can't feature detect that and UA sniffing is evil.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3552,
+            "description": "Expose constructor.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3558,
+            "description": "The JSONP transport creates an persistent connection by dynamically\ninserting a script tag in the page. This script tag will receive the\ninformation of the Socket.IO server. When new information is received\nit creates a new script tag for the new data stream.",
+            "is_constructor": 1,
+            "extends": "{io.Transport.xhr-polling}",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3581,
+            "description": "Inherits from XHR polling transport.",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3587,
+            "description": "Transport name",
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3595,
+            "description": "Posts a encoded message to the Socket.IO server using an iframe.\nThe iframe is used because script tags can create POST based requests.\nThe iframe is positioned outside of the view so the user does not\nnotice it's existence.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "A encoded message.",
+                    "type": "String"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3683,
+            "description": "Creates a new JSONP poll that can be used to listen\nfor messages from the Socket.IO server.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3722,
+            "description": "Callback function for the incoming message stream from the Socket.IO server.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "The message",
+                    "type": "String"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3737,
+            "description": "The indicator hack only works after onload",
+            "params": [
+                {
+                    "name": "socket",
+                    "description": "The socket instance that needs a transport",
+                    "type": "Socket"
+                },
+                {
+                    "name": "fn",
+                    "description": "The callback",
+                    "type": "Function"
+                }
+            ],
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3754,
+            "description": "Checks if browser supports this transport.",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3765,
+            "description": "Check if cross domain requests are supported",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "api": "public",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/socket.io.js",
+            "line": 3776,
+            "description": "Add the transport to your public io.transports array.",
+            "api": "private",
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 45,
+            "itemtype": "method",
+            "name": "HasNext",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 53,
+            "itemtype": "method",
+            "name": "ReadLine",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 87,
+            "itemtype": "method",
+            "name": "RoollbackLineFeed",
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 95,
+            "itemtype": "method",
+            "name": "ReadLineList",
+            "params": [
+                {
+                    "name": "LineList",
+                    "description": "",
+                    "type": "Array<String>"
+                },
+                {
+                    "name": "UntilSection",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 111,
+            "itemtype": "method",
+            "name": "GetLineList",
+            "params": [
+                {
+                    "name": "UntilSection",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array<String>"
+            },
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 122,
+            "itemtype": "method",
+            "name": "LogError",
+            "params": [
+                {
+                    "name": "Message",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Line",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 131,
+            "itemtype": "method",
+            "name": "LogWarning",
+            "params": [
+                {
+                    "name": "Message",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Line",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "StringReader"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 162,
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "StringWriter"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 197,
+            "itemtype": "method",
+            "name": "toString",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "GSNHistory"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 205,
+            "itemtype": "method",
+            "name": "EqualsHistory",
+            "params": [
+                {
+                    "name": "aHistory",
+                    "description": "",
+                    "type": "GSNHistory"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNHistory"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 214,
+            "itemtype": "method",
+            "name": "CompareDate",
+            "params": [
+                {
+                    "name": "aHistory",
+                    "description": "",
+                    "type": "GSNHistory"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "GSNHistory"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 223,
+            "itemtype": "method",
+            "name": "UpdateHistory",
+            "params": [
+                {
+                    "name": "Rev",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "Author",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Role",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "DateString",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Process",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Doc",
+                    "description": "",
+                    "type": "GSNDoc"
+                }
+            ],
+            "class": "GSNHistory"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 251,
+            "itemtype": "method",
+            "name": "ParseInt",
+            "params": [
+                {
+                    "name": "NumText",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "DefVal",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 265,
+            "itemtype": "method",
+            "name": "ParseGoalLevel",
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 280,
+            "itemtype": "method",
+            "name": "FormatGoalLevel",
+            "params": [
+                {
+                    "name": "GoalLevel",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 293,
+            "itemtype": "method",
+            "name": "GetLabelPos",
+            "static": 1,
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 313,
+            "itemtype": "method",
+            "name": "ParseNodeType",
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNType"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 338,
+            "itemtype": "method",
+            "name": "ParseLabelName",
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 359,
+            "itemtype": "method",
+            "name": "FormatNodeType",
+            "params": [
+                {
+                    "name": "NodeType",
+                    "description": "",
+                    "type": "GSNType"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 379,
+            "itemtype": "method",
+            "name": "ParseLabelNumber",
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 409,
+            "itemtype": "method",
+            "name": "ParseUID",
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 425,
+            "itemtype": "method",
+            "name": "ParseRevisionHistory",
+            "static": 1,
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "LabelLine"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 439,
+            "itemtype": "method",
+            "name": "ParseHistory",
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "BaseDoc",
+                    "description": "",
+                    "type": "GSNDoc"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 466,
+            "itemtype": "method",
+            "name": "FormatRefKey",
+            "static": 1,
+            "params": [
+                {
+                    "name": "NodeType",
+                    "description": "",
+                    "type": "GSNType"
+                },
+                {
+                    "name": "HistoryTaple",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 477,
+            "itemtype": "method",
+            "name": "CommentOutAll",
+            "params": [
+                {
+                    "name": "DocText",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 494,
+            "itemtype": "method",
+            "name": "CommentOutSubNode",
+            "static": 1,
+            "params": [
+                {
+                    "name": "DocText",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 517,
+            "itemtype": "method",
+            "name": "FormatDateString",
+            "static": 1,
+            "params": [
+                {
+                    "name": "DateString",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "WikiSyntax"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 547,
+            "itemtype": "method",
+            "name": "ParseTag",
+            "static": 1,
+            "params": [
+                {
+                    "name": "TagMap",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "Line",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "TagUtils"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 562,
+            "itemtype": "method",
+            "name": "FormatTag",
+            "static": 1,
+            "params": [
+                {
+                    "name": "TagMap",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "Writer",
+                    "description": "",
+                    "type": "StringWriter"
+                }
+            ],
+            "class": "TagUtils"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 578,
+            "itemtype": "method",
+            "name": "FormatHistoryTag",
+            "params": [
+                {
+                    "name": "HistoryList",
+                    "description": "",
+                    "type": "Array<GSNHistory>"
+                },
+                {
+                    "name": "i",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "Writer",
+                    "description": "",
+                    "type": "StringWriter"
+                }
+            ],
+            "class": "TagUtils"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 591,
+            "itemtype": "method",
+            "name": "GetString",
+            "params": [
+                {
+                    "name": "TagMap",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "Key",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "DefValue",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "TagUtils"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 608,
+            "itemtype": "method",
+            "name": "GetInteger",
+            "params": [
+                {
+                    "name": "TagMap",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "Key",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "DefValue",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "TagUtils"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 680,
+            "itemtype": "method",
+            "name": "IsGoal",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 688,
+            "itemtype": "method",
+            "name": "IsStrategy",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 696,
+            "itemtype": "method",
+            "name": "IsContext",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 704,
+            "itemtype": "method",
+            "name": "IsEvidence",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 712,
+            "itemtype": "method",
+            "name": "NonNullSubNodeList",
+            "return": {
+                "description": "",
+                "type": "Array<GSNNode>"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 720,
+            "itemtype": "method",
+            "name": "Remap",
+            "params": [
+                {
+                    "name": "NodeMap",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 732,
+            "itemtype": "method",
+            "name": "GetGoalLevel",
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 748,
+            "itemtype": "method",
+            "name": "GetLabel",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 756,
+            "itemtype": "method",
+            "name": "@GetHistoryTaple",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 764,
+            "itemtype": "method",
+            "name": "GetLabelNumber",
+            "return": {
+                "description": ""
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 772,
+            "itemtype": "method",
+            "name": "IsModified",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 780,
+            "itemtype": "method",
+            "name": "SetContent",
+            "params": [
+                {
+                    "name": "LineList",
+                    "description": "",
+                    "type": "Array<String>"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 811,
+            "itemtype": "method",
+            "name": "UpdateContent",
+            "params": [
+                {
+                    "name": "TextDoc",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 819,
+            "itemtype": "method",
+            "name": "GetHtmlContent",
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 843,
+            "description": "GetNodeHistoryList",
+            "return": {
+                "description": "",
+                "type": "Array<GSNNode>"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 867,
+            "itemtype": "method",
+            "name": "AppendSubNode",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "Node",
+                    "description": "",
+                    "type": "GSNNode"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 880,
+            "itemtype": "method",
+            "name": "HasSubNode",
+            "params": [
+                {
+                    "name": "NodeType",
+                    "description": "",
+                    "type": "GSNType"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 895,
+            "itemtype": "method",
+            "name": "GetCloseGoal",
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 907,
+            "itemtype": "method",
+            "name": "GetTagMap",
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 926,
+            "itemtype": "method",
+            "name": "MergeTagMap",
+            "params": [
+                {
+                    "name": "BaseMap",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "NewMap",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 950,
+            "itemtype": "method",
+            "name": "GetTagMapWithLexicalScope",
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 972,
+            "itemtype": "method",
+            "name": "GetLastNode",
+            "params": [
+                {
+                    "name": "NodeType",
+                    "description": "",
+                    "type": "GSNType"
+                },
+                {
+                    "name": "Creation",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 993,
+            "itemtype": "method",
+            "name": "FormatNode",
+            "params": [
+                {
+                    "name": "Writer",
+                    "description": "",
+                    "type": "StringWriter"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1034,
+            "itemtype": "method",
+            "name": "FormatSubNode",
+            "params": [
+                {
+                    "name": "GoalLevel",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "Writer",
+                    "description": "",
+                    "type": "StringWriter"
+                },
+                {
+                    "name": "IsRecursive",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1078,
+            "itemtype": "method",
+            "name": "ReplaceSubNode",
+            "params": [
+                {
+                    "name": "NewNode",
+                    "description": "",
+                    "type": "GSNNode"
+                },
+                {
+                    "name": "IsRecursive",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1103,
+            "itemtype": "method",
+            "name": "ReplaceSubNodeAsText",
+            "params": [
+                {
+                    "name": "DocText",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "IsRecursive",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1128,
+            "itemtype": "method",
+            "name": "HasSubNodeUID",
+            "params": [
+                {
+                    "name": "UID",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1145,
+            "itemtype": "method",
+            "name": "MergeSubNode",
+            "params": [
+                {
+                    "name": "NewNode",
+                    "description": "",
+                    "type": "GSNNode"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1173,
+            "itemtype": "method",
+            "name": "IsNewerTree",
+            "params": [
+                {
+                    "name": "ModifiedRev",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1192,
+            "itemtype": "method",
+            "name": "ListSubGoalNode",
+            "params": [
+                {
+                    "name": "BufferList",
+                    "description": "",
+                    "type": "Array<GSNNode>"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1208,
+            "itemtype": "method",
+            "name": "ListSectionNode",
+            "params": [
+                {
+                    "name": "BufferList",
+                    "description": "",
+                    "type": "Array<GSNNode>"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1224,
+            "itemtype": "method",
+            "name": "RenumberGoalRecursive",
+            "params": [
+                {
+                    "name": "GoalCount",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "NextGoalCount",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "LabelMap",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1264,
+            "itemtype": "method",
+            "name": "RenumberGoal",
+            "params": [
+                {
+                    "name": "GoalCount",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "NextGoalCount",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1274,
+            "itemtype": "method",
+            "name": "SearchNode",
+            "params": [
+                {
+                    "name": "SearchWord",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array<GSNNode>"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1291,
+            "itemtype": "method",
+            "name": "GetNodeCount",
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1320,
+            "itemtype": "method",
+            "name": "DeepCopy",
+            "params": [
+                {
+                    "name": "Author",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Role",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Date",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Process",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNDoc"
+            },
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1339,
+            "itemtype": "method",
+            "name": "DuplicateTagMap",
+            "params": [
+                {
+                    "name": "TagMap",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1357,
+            "itemtype": "method",
+            "name": "UpdateDocHeader",
+            "params": [
+                {
+                    "name": "Reader",
+                    "description": "",
+                    "type": "StringReader"
+                }
+            ],
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1378,
+            "itemtype": "method",
+            "name": "GetNode",
+            "params": [
+                {
+                    "name": "UID",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1387,
+            "itemtype": "method",
+            "name": "UncheckAddNode",
+            "params": [
+                {
+                    "name": "Node",
+                    "description": "",
+                    "type": "GSNNode"
+                }
+            ],
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1395,
+            "itemtype": "method",
+            "name": "AddNode",
+            "params": [
+                {
+                    "name": "Node",
+                    "description": "",
+                    "type": "GSNNode"
+                }
+            ],
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1415,
+            "itemtype": "method",
+            "name": "RemapNodeMap",
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1426,
+            "itemtype": "method",
+            "name": "RemoveNode",
+            "params": [
+                {
+                    "name": "Node",
+                    "description": ""
+                }
+            ],
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1438,
+            "itemtype": "method",
+            "name": "FormatDoc",
+            "params": [
+                {
+                    "name": "Stream",
+                    "description": "",
+                    "type": "StringWriter"
+                }
+            ],
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1449,
+            "itemtype": "method",
+            "name": "GetLabelMap",
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1469,
+            "itemtype": "method",
+            "name": "GetNodeCount",
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1477,
+            "itemtype": "method",
+            "name": "RenumberAll",
+            "class": "GSNDoc"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1499,
+            "itemtype": "method",
+            "name": "DeepCopy",
+            "return": {
+                "description": "GSNRecord"
+            },
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1513,
+            "itemtype": "method",
+            "name": "GetHistory",
+            "params": [
+                {
+                    "name": "Rev",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNHistory"
+            },
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1525,
+            "itemtype": "method",
+            "name": "GetHistoryDoc",
+            "params": [
+                {
+                    "name": "Rev",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNDoc"
+            },
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1538,
+            "itemtype": "method",
+            "name": "NewHistory",
+            "params": [
+                {
+                    "name": "Author",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Role",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Date",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Process",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Doc",
+                    "description": "",
+                    "type": "GSNDoc"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNHistory"
+            },
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1553,
+            "itemtype": "method",
+            "name": "AddHistory",
+            "params": [
+                {
+                    "name": "Rev",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "Author",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Role",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Date",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Process",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Doc",
+                    "description": "",
+                    "type": "GSNDoc"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1579,
+            "itemtype": "method",
+            "name": "ParseHistoryTag",
+            "params": [
+                {
+                    "name": "Line",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Reader",
+                    "description": "",
+                    "type": "StringReader"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1598,
+            "itemtype": "method",
+            "name": "Parse",
+            "params": [
+                {
+                    "name": "TextDoc",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1612,
+            "itemtype": "method",
+            "name": "RenumberAll",
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1622,
+            "itemtype": "method",
+            "name": "OpenEditor",
+            "params": [
+                {
+                    "name": "Author",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Role",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Date",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Process",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1641,
+            "itemtype": "method",
+            "name": "CloseEditor",
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1648,
+            "itemtype": "method",
+            "name": "Merge",
+            "params": [
+                {
+                    "name": "NewRecord",
+                    "description": "",
+                    "type": "GSNRecord"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1670,
+            "itemtype": "method",
+            "name": "MergeAsFastFoward",
+            "params": [
+                {
+                    "name": "NewRecord",
+                    "description": "",
+                    "type": "GSNRecord"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1684,
+            "itemtype": "method",
+            "name": "MergeAsReplaceTopGoal",
+            "params": [
+                {
+                    "name": "NewRecord",
+                    "description": "",
+                    "type": "GSNRecord"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1700,
+            "itemtype": "method",
+            "name": "MergeAsIncrementalAddition",
+            "params": [
+                {
+                    "name": "Rev1",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "Record1",
+                    "description": "",
+                    "type": "GSNRecord"
+                },
+                {
+                    "name": "Rev2",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "Record2",
+                    "description": "",
+                    "type": "GSNRecord"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1737,
+            "itemtype": "method",
+            "name": "GetLatestDoc",
+            "return": {
+                "description": "",
+                "type": "GSNDoc"
+            },
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1751,
+            "itemtype": "method",
+            "name": "FormatRecord",
+            "params": [
+                {
+                    "name": "Writer",
+                    "description": "",
+                    "type": "StringWriter"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1789,
+            "itemtype": "method",
+            "name": "SetLastNode",
+            "params": [
+                {
+                    "name": "Node",
+                    "description": "",
+                    "type": "GSNNode"
+                }
+            ],
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1803,
+            "itemtype": "method",
+            "name": "GetStrategyOfGoal",
+            "params": [
+                {
+                    "name": "Level",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1818,
+            "itemtype": "method",
+            "name": "GetGoalStackAt",
+            "params": [
+                {
+                    "name": "Level",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1830,
+            "itemtype": "method",
+            "name": "SetGoalStackAt",
+            "params": [
+                {
+                    "name": "Node",
+                    "description": "",
+                    "type": "GSNNode"
+                }
+            ],
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1843,
+            "itemtype": "method",
+            "name": "IsValidSection",
+            "params": [
+                {
+                    "name": "Line",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Reader",
+                    "description": "",
+                    "type": "StringReader"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1885,
+            "itemtype": "method",
+            "name": "CreateNewNode",
+            "params": [
+                {
+                    "name": "LabelLine",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "Reader",
+                    "description": "",
+                    "type": "StringReader"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1916,
+            "itemtype": "method",
+            "name": "RemoveSentinel",
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1925,
+            "itemtype": "method",
+            "name": "ParseNode",
+            "params": [
+                {
+                    "name": "Reader",
+                    "description": "",
+                    "type": "StringReader"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "GSNNode"
+            },
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1969,
+            "itemtype": "method",
+            "name": "UpdateContent",
+            "params": [
+                {
+                    "name": "LastNode",
+                    "description": "",
+                    "type": "GSNNode"
+                },
+                {
+                    "name": "LineList",
+                    "description": "",
+                    "type": "Array<String>"
+                }
+            ],
+            "class": "ParserContext"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1991,
+            "itemtype": "method",
+            "name": "merge",
+            "static": 1,
+            "params": [
+                {
+                    "name": "MasterFile",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "BranchFile",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "AssureNoteParsr"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 2012,
+            "itemtype": "method",
+            "name": "ts_merge",
+            "static": 1,
+            "class": "AssureNoteParsr"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 2033,
+            "itemtype": "method",
+            "name": "main",
+            "params": [
+                {
+                    "name": "argv",
+                    "description": "",
+                    "type": "Array<String>"
+                }
+            ],
+            "class": "AssureNoteParsr"
+        },
+        {
+            "file": "src/Panel.js",
+            "line": 297,
+            "itemtype": "method",
+            "name": "MoveToNearestNode",
+            "params": [
+                {
+                    "name": "Dir",
+                    "description": "",
+                    "type": "AssureNote.Direction"
+                }
+            ],
+            "class": "AssureNote.PictgramPanel"
+        },
+        {
+            "file": "src/Panel.js",
+            "line": 309,
+            "itemtype": "method",
+            "name": "FindNearestNode",
+            "params": [
+                {
+                    "name": "CenterNode",
+                    "description": "",
+                    "type": "AssureNote.NodeView"
+                },
+                {
+                    "name": "Dir",
+                    "description": "",
+                    "type": "AssureNote.Direction"
+                }
+            ],
+            "return": {
+                "description": "Found node. If no node is found, null is retured.",
+                "type": "AssureNote.NodeView"
+            },
+            "class": "AssureNote.PictgramPanel"
+        },
+        {
+            "file": "src/Panel.js",
+            "line": 360,
+            "itemtype": "method",
+            "name": "FoldDeepSubGoals",
+            "params": [
+                {
+                    "name": "NodeView",
+                    "description": "",
+                    "type": "NodeView"
+                }
+            ],
+            "class": "AssureNote.PictgramPanel"
+        },
+        {
+            "file": "src/Panel.js",
+            "line": 376,
             "itemtype": "method",
             "name": "ChangeFocusedLabel",
             "params": [
@@ -88,7 +4010,7 @@
             "class": "AssureNote.PictgramPanel"
         },
         {
-            "file": "src\\Tooltip.js",
+            "file": "src/Tooltip.js",
             "line": 44,
             "description": "Remove Tooltip from Content layer.",
             "params": [
@@ -100,8 +4022,8 @@
             "class": "AssureNote.ScrollManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 216,
+            "file": "src/Viewport.js",
+            "line": 243,
             "itemtype": "method",
             "name": "GetCameraScale",
             "return": {
@@ -111,8 +4033,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 228,
+            "file": "src/Viewport.js",
+            "line": 255,
             "itemtype": "method",
             "name": "SetCameraScale",
             "params": [
@@ -125,8 +4047,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 257,
+            "file": "src/Viewport.js",
+            "line": 284,
             "itemtype": "method",
             "name": "GetCameraGX",
             "return": {
@@ -136,8 +4058,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 265,
+            "file": "src/Viewport.js",
+            "line": 292,
             "itemtype": "method",
             "name": "GetCameraGY",
             "return": {
@@ -147,8 +4069,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 273,
+            "file": "src/Viewport.js",
+            "line": 300,
             "itemtype": "method",
             "name": "SetCameraPosition",
             "params": [
@@ -166,8 +4088,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 282,
+            "file": "src/Viewport.js",
+            "line": 309,
             "description": "Set camera's position and scale one time.",
             "itemtype": "method",
             "name": "SetCamera",
@@ -191,8 +4113,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 301,
+            "file": "src/Viewport.js",
+            "line": 328,
             "itemtype": "method",
             "name": "GetCameraPageCenterX",
             "return": {
@@ -202,8 +4124,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 309,
+            "file": "src/Viewport.js",
+            "line": 336,
             "itemtype": "method",
             "name": "GetCameraPageCenterY",
             "return": {
@@ -213,8 +4135,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 317,
+            "file": "src/Viewport.js",
+            "line": 344,
             "description": "Set camera's vanishing point in web page.",
             "itemtype": "method",
             "name": "SetCameraPageCenter",
@@ -233,8 +4155,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 328,
+            "file": "src/Viewport.js",
+            "line": 355,
             "description": "Calcurate PageX from GX",
             "itemtype": "method",
             "name": "PageXFromGX",
@@ -252,8 +4174,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 338,
+            "file": "src/Viewport.js",
+            "line": 365,
             "description": "Calcurate PageY from GY",
             "itemtype": "method",
             "name": "PageYFromGY",
@@ -271,8 +4193,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 348,
+            "file": "src/Viewport.js",
+            "line": 375,
             "description": "Calcurate GX from PageX",
             "itemtype": "method",
             "name": "GXFromPageX",
@@ -290,8 +4212,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 358,
+            "file": "src/Viewport.js",
+            "line": 385,
             "description": "Calcurate GY from PageY",
             "itemtype": "method",
             "name": "GYFromPageY",
@@ -309,8 +4231,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 392,
+            "file": "src/Viewport.js",
+            "line": 419,
             "description": "Move camera position relatively and change scale.",
             "itemtype": "method",
             "name": "Move",
@@ -340,8 +4262,8 @@
             "class": "AssureNote.ViewportManager"
         },
         {
-            "file": "src\\Viewport.js",
-            "line": 405,
+            "file": "src/Viewport.js",
+            "line": 432,
             "description": "Move camera position and scale one time.",
             "itemtype": "method",
             "name": "MoveTo",
@@ -373,8 +4295,1472 @@
     ],
     "warnings": [
         {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:19"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:27"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:35"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:43"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:51"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:59"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:121"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:146"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:173"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:195"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:219"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:238"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:252"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:252"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:279"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:296"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:313"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:338"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:348"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:360"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:374"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:393"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:408"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:431"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:447"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:472"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:480"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:504"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:524"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:561"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:581"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:603"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1021"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1089"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1110"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1193"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1239"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1257"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1290"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1316"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1332"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1345"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1356"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1369"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1383"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1394"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1406"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1418"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:1438"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1438"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1455"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1484"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1540"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1558"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1577"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1636"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:1656"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1656"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1733"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:1749"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1749"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1767"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:1782"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1782"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1802"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:1819"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1819"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1836"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1854"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1864"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1885"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1904"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:1931"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2032"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2054"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2062"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2073"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2086"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2107"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2133"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2150"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2223"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2234"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2245"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2275"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2296"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2304"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2304"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2342"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2342"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2355"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2368"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2368"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2380"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2392"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2401"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2414"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2414"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2425"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2453"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2475"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2483"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2483"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2502"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2502"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2519"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2519"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2532"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2579"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2579"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:2597"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2597"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2618"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:2993"
+        },
+        {
+            "message": "unknown tag: costructor",
+            "line": " lib/socket.io.js:3001"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3001"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3021"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3021"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3040"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3057"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3057"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3070"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3112"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3112"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3124"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3124"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3153"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3163"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3163"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3185"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3185"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3215"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3236"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3244"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3277"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3295"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3317"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3317"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3329"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3347"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3347"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3360"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3387"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3411"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3419"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3419"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3434"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3483"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3501"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3520"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3541"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3558"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3587"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3595"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3683"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3722"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3737"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3754"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " lib/socket.io.js:3765"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3765"
+        },
+        {
+            "message": "unknown tag: api",
+            "line": " lib/socket.io.js:3776"
+        },
+        {
+            "message": "Missing item type\nbootstrap.js v3.0.0 by @fat and @mdo\nCopyright 2013 Twitter Inc.\nhttp://www.apache.org/licenses/LICENSE-2.0",
+            "line": " lib/bootstrap/js/bootstrap.min.js:1"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:5478"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:5479"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:5480"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:5683"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:5684"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:5685"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:6030"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:6031"
+        },
+        {
+            "message": "Missing item type",
+            "line": " lib/jquery-ui.js:6032"
+        },
+        {
+            "message": "Missing item type\nhttp://notifyjs.com/\nCopyright (c) 2013 Jaime Pillora - MIT",
+            "line": " lib/notify.min.js:1"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:3"
+        },
+        {
+            "message": "Missing item type\nIO namespace.",
+            "line": " lib/socket.io.js:11"
+        },
+        {
+            "message": "Missing item type\nSocket.IO version",
+            "line": " lib/socket.io.js:19"
+        },
+        {
+            "message": "Missing item type\nProtocol implemented.",
+            "line": " lib/socket.io.js:27"
+        },
+        {
+            "message": "Missing item type\nAvailable transports, these will be populated with the available transports",
+            "line": " lib/socket.io.js:35"
+        },
+        {
+            "message": "Missing item type\nKeep track of jsonp callbacks.",
+            "line": " lib/socket.io.js:43"
+        },
+        {
+            "message": "Missing item type\nKeep track of our io.Sockets",
+            "line": " lib/socket.io.js:51"
+        },
+        {
+            "message": "Missing item type\nManages connections to hosts.",
+            "line": " lib/socket.io.js:59"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:105"
+        },
+        {
+            "message": "Missing item type\nUtilities namespace.",
+            "line": " lib/socket.io.js:113"
+        },
+        {
+            "message": "Missing item type\nParses an URI",
+            "line": " lib/socket.io.js:121"
+        },
+        {
+            "message": "Missing item type\nProduces a unique url that identifies a Socket.IO connection.",
+            "line": " lib/socket.io.js:146"
+        },
+        {
+            "message": "Missing item type\nMergest 2 query strings in to once unique query string",
+            "line": " lib/socket.io.js:173"
+        },
+        {
+            "message": "Missing item type\nTransforms a querystring in to an object",
+            "line": " lib/socket.io.js:195"
+        },
+        {
+            "message": "Missing item type\nExecutes the given function when the page is loaded.\n\n    io.util.load(function () { console.log('page loaded'); });",
+            "line": " lib/socket.io.js:219"
+        },
+        {
+            "message": "Missing item type\nAdds an event.",
+            "line": " lib/socket.io.js:238"
+        },
+        {
+            "message": "Missing item type\nGenerates the correct `XMLHttpRequest` for regular and cross domain requests.",
+            "line": " lib/socket.io.js:252"
+        },
+        {
+            "message": "Missing item type\nXHR based transport constructor.",
+            "line": " lib/socket.io.js:279"
+        },
+        {
+            "message": "Missing item type\nChange the internal pageLoaded value.",
+            "line": " lib/socket.io.js:286"
+        },
+        {
+            "message": "Missing item type\nDefers a function to ensure a spinner is not displayed by the browser",
+            "line": " lib/socket.io.js:296"
+        },
+        {
+            "message": "Missing item type\nMerges two objects.",
+            "line": " lib/socket.io.js:313"
+        },
+        {
+            "message": "Missing item type\nMerges prototypes from objects",
+            "line": " lib/socket.io.js:338"
+        },
+        {
+            "message": "Missing item type\nShortcut for prototypical and static inheritance.",
+            "line": " lib/socket.io.js:348"
+        },
+        {
+            "message": "Missing item type\nChecks if the given object is an Array.\n\n    io.util.isArray([]); // true\n    io.util.isArray({}); // false",
+            "line": " lib/socket.io.js:360"
+        },
+        {
+            "message": "Missing item type\nIntersects values of two arrays into a third",
+            "line": " lib/socket.io.js:374"
+        },
+        {
+            "message": "Missing item type\nArray indexOf compatibility.",
+            "line": " lib/socket.io.js:393"
+        },
+        {
+            "message": "Missing item type\nConverts enumerables to array.",
+            "line": " lib/socket.io.js:408"
+        },
+        {
+            "message": "Missing item type\nUA / engines detection namespace.",
+            "line": " lib/socket.io.js:423"
+        },
+        {
+            "message": "Missing item type\nWhether the UA supports CORS for XHR.",
+            "line": " lib/socket.io.js:431"
+        },
+        {
+            "message": "Missing item type\nDetect webkit.",
+            "line": " lib/socket.io.js:447"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:458"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:466"
+        },
+        {
+            "message": "Missing item type\nEvent emitter constructor.",
+            "line": " lib/socket.io.js:472"
+        },
+        {
+            "message": "Missing item type\nAdds a listener",
+            "line": " lib/socket.io.js:480"
+        },
+        {
+            "message": "Missing item type\nAdds a volatile listener.",
+            "line": " lib/socket.io.js:504"
+        },
+        {
+            "message": "Missing item type\nRemoves a listener.",
+            "line": " lib/socket.io.js:524"
+        },
+        {
+            "message": "Missing item type\nRemoves all listeners for an event.",
+            "line": " lib/socket.io.js:561"
+        },
+        {
+            "message": "Missing item type\nGets all listeners for a certain event.",
+            "line": " lib/socket.io.js:581"
+        },
+        {
+            "message": "Missing item type\nEmits an event.",
+            "line": " lib/socket.io.js:603"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:642"
+        },
+        {
+            "message": "Missing item type\nBased on JSON2 (http://www.JSON.org/js.html).",
+            "line": " lib/socket.io.js:648"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:964"
+        },
+        {
+            "message": "Missing item type\nParser namespace.",
+            "line": " lib/socket.io.js:972"
+        },
+        {
+            "message": "Missing item type\nPacket types.",
+            "line": " lib/socket.io.js:980"
+        },
+        {
+            "message": "Missing item type\nErrors reasons.",
+            "line": " lib/socket.io.js:996"
+        },
+        {
+            "message": "Missing item type\nErrors advice.",
+            "line": " lib/socket.io.js:1006"
+        },
+        {
+            "message": "Missing item type\nShortcuts.",
+            "line": " lib/socket.io.js:1014"
+        },
+        {
+            "message": "Missing item type\nEncodes a packet.",
+            "line": " lib/socket.io.js:1021"
+        },
+        {
+            "message": "Missing item type\nEncodes multiple messages (payload).",
+            "line": " lib/socket.io.js:1089"
+        },
+        {
+            "message": "Missing item type\nDecodes a packet",
+            "line": " lib/socket.io.js:1110"
+        },
+        {
+            "message": "Missing item type\nDecodes data payload. Detects multiple messages",
+            "line": " lib/socket.io.js:1193"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:1225"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:1233"
+        },
+        {
+            "message": "Missing item type\nThis is the transport template for all supported transport methods.",
+            "line": " lib/socket.io.js:1239"
+        },
+        {
+            "message": "Missing item type\nApply EventEmitter mixin.",
+            "line": " lib/socket.io.js:1251"
+        },
+        {
+            "message": "Missing item type\nHandles the response from the server. When a new response is received\nit will automatically update the timeout, decode the message and\nforwards the response to the onMessage function for further processing.",
+            "line": " lib/socket.io.js:1257"
+        },
+        {
+            "message": "Missing item type\nHandles packets.",
+            "line": " lib/socket.io.js:1290"
+        },
+        {
+            "message": "Missing item type\nSets close timeout",
+            "line": " lib/socket.io.js:1316"
+        },
+        {
+            "message": "Missing item type\nCalled when transport disconnects.",
+            "line": " lib/socket.io.js:1332"
+        },
+        {
+            "message": "Missing item type\nCalled when transport connects",
+            "line": " lib/socket.io.js:1345"
+        },
+        {
+            "message": "Missing item type\nClears close timeout",
+            "line": " lib/socket.io.js:1356"
+        },
+        {
+            "message": "Missing item type\nClear timeouts",
+            "line": " lib/socket.io.js:1369"
+        },
+        {
+            "message": "Missing item type\nSends a packet",
+            "line": " lib/socket.io.js:1383"
+        },
+        {
+            "message": "Missing item type\nSend the received heartbeat message back to server. So the server\nknows we are still connected.",
+            "line": " lib/socket.io.js:1394"
+        },
+        {
+            "message": "Missing item type\nCalled when the transport opens.",
+            "line": " lib/socket.io.js:1406"
+        },
+        {
+            "message": "Missing item type\nNotifies the base when the connection with the Socket.IO server\nhas been disconnected.",
+            "line": " lib/socket.io.js:1418"
+        },
+        {
+            "message": "Missing item type\nGenerates a connection url based on the Socket.IO URL Protocol.\nSee <https://github.com/learnboost/socket.io-node/> for more details.",
+            "line": " lib/socket.io.js:1438"
+        },
+        {
+            "message": "Missing item type\nChecks if the transport is ready to start a connection.",
+            "line": " lib/socket.io.js:1455"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:1470"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:1478"
+        },
+        {
+            "message": "Missing item type\nCreate a new `Socket.IO client` which can establish a persistent\nconnection with a Socket.IO enabled server.",
+            "line": " lib/socket.io.js:1484"
+        },
+        {
+            "message": "Missing item type\nApply EventEmitter mixin.",
+            "line": " lib/socket.io.js:1534"
+        },
+        {
+            "message": "Missing item type\nReturns a namespace listener/emitter for this socket",
+            "line": " lib/socket.io.js:1540"
+        },
+        {
+            "message": "Missing item type\nEmits the given event to the Socket and all namespaces",
+            "line": " lib/socket.io.js:1558"
+        },
+        {
+            "message": "Missing item type\nPerforms the handshake",
+            "line": " lib/socket.io.js:1577"
+        },
+        {
+            "message": "Missing item type\nFind an available transport based on the options supplied in the constructor.",
+            "line": " lib/socket.io.js:1636"
+        },
+        {
+            "message": "Missing item type\nConnects to the server.",
+            "line": " lib/socket.io.js:1656"
+        },
+        {
+            "message": "Missing item type\nClears and sets a new heartbeat timeout using the value given by the\nserver during the handshake.",
+            "line": " lib/socket.io.js:1733"
+        },
+        {
+            "message": "Missing item type\nSends a message.",
+            "line": " lib/socket.io.js:1749"
+        },
+        {
+            "message": "Missing item type\nSets buffer state",
+            "line": " lib/socket.io.js:1767"
+        },
+        {
+            "message": "Missing item type\nDisconnect the established connect.",
+            "line": " lib/socket.io.js:1782"
+        },
+        {
+            "message": "Missing item type\nDisconnects the socket with a sync XHR.",
+            "line": " lib/socket.io.js:1802"
+        },
+        {
+            "message": "Missing item type\nCheck if we need to use cross domain enabled transports. Cross domain would\nbe a different port or different domain name.",
+            "line": " lib/socket.io.js:1819"
+        },
+        {
+            "message": "Missing item type\nCalled upon handshake.",
+            "line": " lib/socket.io.js:1836"
+        },
+        {
+            "message": "Missing item type\nCalled when the transport opens",
+            "line": " lib/socket.io.js:1854"
+        },
+        {
+            "message": "Missing item type\nCalled when the transport closes.",
+            "line": " lib/socket.io.js:1864"
+        },
+        {
+            "message": "Missing item type\nCalled when the transport first opens a connection",
+            "line": " lib/socket.io.js:1875"
+        },
+        {
+            "message": "Missing item type\nHandles an error.",
+            "line": " lib/socket.io.js:1885"
+        },
+        {
+            "message": "Missing item type\nCalled when the transport disconnects.",
+            "line": " lib/socket.io.js:1904"
+        },
+        {
+            "message": "Missing item type\nCalled upon reconnection.",
+            "line": " lib/socket.io.js:1931"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:2018"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:2026"
+        },
+        {
+            "message": "Missing item type\nSocket namespace constructor.",
+            "line": " lib/socket.io.js:2032"
+        },
+        {
+            "message": "Missing item type\nApply EventEmitter mixin.",
+            "line": " lib/socket.io.js:2048"
+        },
+        {
+            "message": "Missing item type\nCopies emit since we override it",
+            "line": " lib/socket.io.js:2054"
+        },
+        {
+            "message": "Missing item type\nCreates a new namespace, by proxying the request to the socket. This\nallows us to use the synax as we do on the server.",
+            "line": " lib/socket.io.js:2062"
+        },
+        {
+            "message": "Missing item type\nSends a packet.",
+            "line": " lib/socket.io.js:2073"
+        },
+        {
+            "message": "Missing item type\nSends a message",
+            "line": " lib/socket.io.js:2086"
+        },
+        {
+            "message": "Missing item type\nEmits an event",
+            "line": " lib/socket.io.js:2107"
+        },
+        {
+            "message": "Missing item type\nDisconnects the namespace",
+            "line": " lib/socket.io.js:2133"
+        },
+        {
+            "message": "Missing item type\nHandles a packet",
+            "line": " lib/socket.io.js:2150"
+        },
+        {
+            "message": "Missing item type\nFlag interface.",
+            "line": " lib/socket.io.js:2223"
+        },
+        {
+            "message": "Missing item type\nSend a message",
+            "line": " lib/socket.io.js:2234"
+        },
+        {
+            "message": "Missing item type\nEmit an event",
+            "line": " lib/socket.io.js:2245"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:2261"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:2269"
+        },
+        {
+            "message": "Missing item type\nThe WebSocket transport uses the HTML5 WebSocket API to establish an\npersistent connection with the Socket.IO server. This transport will also\nbe inherited by the FlashSocket fallback as it provides a API compatible\npolyfill for the WebSockets.",
+            "line": " lib/socket.io.js:2275"
+        },
+        {
+            "message": "Missing item type\nInherits from Transport.",
+            "line": " lib/socket.io.js:2290"
+        },
+        {
+            "message": "Missing item type\nTransport name",
+            "line": " lib/socket.io.js:2296"
+        },
+        {
+            "message": "Missing item type\nInitializes a new `WebSocket` connection with the Socket.IO server. We attach\nall the appropriate listeners to handle the responses from the server.",
+            "line": " lib/socket.io.js:2304"
+        },
+        {
+            "message": "Missing item type\nSend a message to the Socket.IO server. The message will automatically be\nencoded in the correct message format.",
+            "line": " lib/socket.io.js:2342"
+        },
+        {
+            "message": "Missing item type\nPayload",
+            "line": " lib/socket.io.js:2355"
+        },
+        {
+            "message": "Missing item type\nDisconnect the established `WebSocket` connection.",
+            "line": " lib/socket.io.js:2368"
+        },
+        {
+            "message": "Missing item type\nHandle the errors that `WebSocket` might be giving when we\nare attempting to connect or send messages.",
+            "line": " lib/socket.io.js:2380"
+        },
+        {
+            "message": "Missing item type\nReturns the appropriate scheme for the URI generation.",
+            "line": " lib/socket.io.js:2392"
+        },
+        {
+            "message": "Missing item type\nChecks if the browser has support for native `WebSockets` and that\nit's not the polyfill created for the FlashSocket transport.",
+            "line": " lib/socket.io.js:2401"
+        },
+        {
+            "message": "Missing item type\nCheck if the `WebSocket` transport support cross domain communications.",
+            "line": " lib/socket.io.js:2414"
+        },
+        {
+            "message": "Missing item type\nAdd the transport to your public io.transports array.",
+            "line": " lib/socket.io.js:2425"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:2439"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:2447"
+        },
+        {
+            "message": "Missing item type\nThe FlashSocket transport. This is a API wrapper for the HTML5 WebSocket\nspecification. It uses a .swf file to communicate with the server. If you want\nto serve the .swf file from a other server than where the Socket.IO script is\ncoming from you need to use the insecure version of the .swf. More information\nabout this can be found on the github page.",
+            "line": " lib/socket.io.js:2453"
+        },
+        {
+            "message": "Missing item type\nInherits from Transport.",
+            "line": " lib/socket.io.js:2469"
+        },
+        {
+            "message": "Missing item type\nTransport name",
+            "line": " lib/socket.io.js:2475"
+        },
+        {
+            "message": "Missing item type\nDisconnect the established `FlashSocket` connection. This is done by adding a \nnew task to the FlashSocket. The rest will be handled off by the `WebSocket` \ntransport.",
+            "line": " lib/socket.io.js:2483"
+        },
+        {
+            "message": "Missing item type\nSends a message to the Socket.IO server. This is done by adding a new\ntask to the FlashSocket. The rest will be handled off by the `WebSocket` \ntransport.",
+            "line": " lib/socket.io.js:2502"
+        },
+        {
+            "message": "Missing item type\nDisconnects the established `FlashSocket` connection.",
+            "line": " lib/socket.io.js:2519"
+        },
+        {
+            "message": "Missing item type\nThe WebSocket fall back needs to append the flash container to the body\nelement, so we need to make sure we have access to it. Or defer the call\nuntil we are sure there is a body element.",
+            "line": " lib/socket.io.js:2532"
+        },
+        {
+            "message": "Missing item type\nCheck if the FlashSocket transport is supported as it requires that the Adobe\nFlash Player plug-in version `10.0.0` or greater is installed. And also check if\nthe polyfill is correctly loaded.",
+            "line": " lib/socket.io.js:2579"
+        },
+        {
+            "message": "Missing item type\nCheck if the FlashSocket transport can be used as cross domain / cross origin \ntransport. Because we can't see which type (secure or insecure) of .swf is used\nwe will just return true.",
+            "line": " lib/socket.io.js:2597"
+        },
+        {
+            "message": "Missing item type\nDisable AUTO_INITIALIZATION",
+            "line": " lib/socket.io.js:2610"
+        },
+        {
+            "message": "Missing item type\nAdd the transport to your public io.transports array.",
+            "line": " lib/socket.io.js:2618"
+        },
+        {
+            "message": "Missing item type\nThis class represents a faux web socket.",
+            "line": " lib/socket.io.js:2660"
+        },
+        {
+            "message": "Missing item type\nSend data to the web socket.",
+            "line": " lib/socket.io.js:2690"
+        },
+        {
+            "message": "Missing item type\nClose this web socket gracefully.",
+            "line": " lib/socket.io.js:2716"
+        },
+        {
+            "message": "Missing item type\nImplementation of {@link <a href=\"http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration\">DOM 2 EventTarget Interface</a>}",
+            "line": " lib/socket.io.js:2727"
+        },
+        {
+            "message": "Missing item type\nImplementation of {@link <a href=\"http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration\">DOM 2 EventTarget Interface</a>}",
+            "line": " lib/socket.io.js:2742"
+        },
+        {
+            "message": "Missing item type\nImplementation of {@link <a href=\"http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration\">DOM 2 EventTarget Interface</a>}",
+            "line": " lib/socket.io.js:2761"
+        },
+        {
+            "message": "Missing item type\nHandles an event from Flash.",
+            "line": " lib/socket.io.js:2776"
+        },
+        {
+            "message": "Missing item type\nDefine the WebSocket readyState enumeration.",
+            "line": " lib/socket.io.js:2825"
+        },
+        {
+            "message": "Missing item type\nLoad a new flash security policy file.",
+            "line": " lib/socket.io.js:2838"
+        },
+        {
+            "message": "Missing item type\nLoads WebSocketMain.swf and creates WebSocketMain object in Flash.",
+            "line": " lib/socket.io.js:2848"
+        },
+        {
+            "message": "Missing item type\nCalled by Flash to notify JS that it's fully loaded and ready\nfor communication.",
+            "line": " lib/socket.io.js:2900"
+        },
+        {
+            "message": "Missing item type\nCalled by Flash to notify WebSockets events are fired.",
+            "line": " lib/socket.io.js:2918"
+        },
+        {
+            "message": "Missing item type\nTest if the browser is running flash lite.",
+            "line": " lib/socket.io.js:2956"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:2985"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:2993"
+        },
+        {
+            "message": "Missing item type\nXHR constructor",
+            "line": " lib/socket.io.js:3001"
+        },
+        {
+            "message": "Missing item type\nInherits from Transport.",
+            "line": " lib/socket.io.js:3015"
+        },
+        {
+            "message": "Missing item type\nEstablish a connection",
+            "line": " lib/socket.io.js:3021"
+        },
+        {
+            "message": "Missing item type\nCheck if we need to send data to the Socket.IO server, if we have data in our\nbuffer we encode it and forward it to the `post` method.",
+            "line": " lib/socket.io.js:3040"
+        },
+        {
+            "message": "Missing item type\nSend data to the Socket.IO server.",
+            "line": " lib/socket.io.js:3057"
+        },
+        {
+            "message": "Missing item type\nPosts a encoded message to the Socket.IO server.",
+            "line": " lib/socket.io.js:3070"
+        },
+        {
+            "message": "Missing item type\nDisconnects the established `XHR` connection.",
+            "line": " lib/socket.io.js:3112"
+        },
+        {
+            "message": "Missing item type\nGenerates a configured XHR request",
+            "line": " lib/socket.io.js:3124"
+        },
+        {
+            "message": "Missing item type\nReturns the scheme to use for the transport URLs.",
+            "line": " lib/socket.io.js:3153"
+        },
+        {
+            "message": "Missing item type\nCheck if the XHR transports are supported",
+            "line": " lib/socket.io.js:3163"
+        },
+        {
+            "message": "Missing item type\nCheck if the XHR transport supports cross domain requests.",
+            "line": " lib/socket.io.js:3185"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:3201"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:3209"
+        },
+        {
+            "message": "Missing item type\nThe HTMLFile transport creates a `forever iframe` based transport\nfor Internet Explorer. Regular forever iframe implementations will \ncontinuously trigger the browsers buzy indicators. If the forever iframe\nis created inside a `htmlfile` these indicators will not be trigged.",
+            "line": " lib/socket.io.js:3215"
+        },
+        {
+            "message": "Missing item type\nInherits from XHR transport.",
+            "line": " lib/socket.io.js:3230"
+        },
+        {
+            "message": "Missing item type\nTransport name",
+            "line": " lib/socket.io.js:3236"
+        },
+        {
+            "message": "Missing item type\nCreates a new Ac...eX `htmlfile` with a forever loading iframe\nthat can be used to listen to messages. Inside the generated\n`htmlfile` a reference will be made to the HTMLFile transport.",
+            "line": " lib/socket.io.js:3244"
+        },
+        {
+            "message": "Missing item type\nThe Socket.IO server will write script tags inside the forever\niframe, this function will be used as callback for the incoming\ninformation.",
+            "line": " lib/socket.io.js:3277"
+        },
+        {
+            "message": "Missing item type\nDestroy the established connection, iframe and `htmlfile`.\nAnd calls the `CollectGarbage` function of Internet Explorer\nto release the memory.",
+            "line": " lib/socket.io.js:3295"
+        },
+        {
+            "message": "Missing item type\nDisconnects the established connection.",
+            "line": " lib/socket.io.js:3317"
+        },
+        {
+            "message": "Missing item type\nChecks if the browser supports this transport. The browser\nmust have an `Ac...eXObject` implementation.",
+            "line": " lib/socket.io.js:3329"
+        },
+        {
+            "message": "Missing item type\nCheck if cross domain requests are supported.",
+            "line": " lib/socket.io.js:3347"
+        },
+        {
+            "message": "Missing item type\nAdd the transport to your public io.transports array.",
+            "line": " lib/socket.io.js:3360"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:3373"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:3381"
+        },
+        {
+            "message": "Missing item type\nThe XHR-polling transport uses long polling XHR requests to create a\n\"persistent\" connection with the server.",
+            "line": " lib/socket.io.js:3387"
+        },
+        {
+            "message": "Missing item type\nInherits from XHR transport.",
+            "line": " lib/socket.io.js:3399"
+        },
+        {
+            "message": "Missing item type\nMerge the properties from XHR transport",
+            "line": " lib/socket.io.js:3405"
+        },
+        {
+            "message": "Missing item type\nTransport name",
+            "line": " lib/socket.io.js:3411"
+        },
+        {
+            "message": "Missing item type\nEstablish a connection, for iPhone and Android this will be done once the page\nis loaded.",
+            "line": " lib/socket.io.js:3419"
+        },
+        {
+            "message": "Missing item type\nStarts a XHR request to wait for incoming messages.",
+            "line": " lib/socket.io.js:3434"
+        },
+        {
+            "message": "Missing item type\nHandle the unclean close behavior.",
+            "line": " lib/socket.io.js:3483"
+        },
+        {
+            "message": "Missing item type\nWebkit based browsers show a infinit spinner when you start a XHR request\nbefore the browsers onload event is called so we need to defer opening of\nthe transport until the onload event is called. Wrapping the cb in our\ndefer method solve this.",
+            "line": " lib/socket.io.js:3501"
+        },
+        {
+            "message": "Missing item type\nAdd the transport to your public io.transports array.",
+            "line": " lib/socket.io.js:3520"
+        },
+        {
+            "message": "Missing item type\nsocket.io\nCopyright(c) 2011 LearnBoost <dev@learnboost.com>\nMIT Licensed",
+            "line": " lib/socket.io.js:3534"
+        },
+        {
+            "message": "Missing item type\nThere is a way to hide the loading indicator in Firefox. If you create and\nremove a iframe it will stop showing the current loading indicator.\nUnfortunately we can't feature detect that and UA sniffing is evil.",
+            "line": " lib/socket.io.js:3541"
+        },
+        {
+            "message": "Missing item type\nExpose constructor.",
+            "line": " lib/socket.io.js:3552"
+        },
+        {
+            "message": "Missing item type\nThe JSONP transport creates an persistent connection by dynamically\ninserting a script tag in the page. This script tag will receive the\ninformation of the Socket.IO server. When new information is received\nit creates a new script tag for the new data stream.",
+            "line": " lib/socket.io.js:3558"
+        },
+        {
+            "message": "Missing item type\nInherits from XHR polling transport.",
+            "line": " lib/socket.io.js:3581"
+        },
+        {
+            "message": "Missing item type\nTransport name",
+            "line": " lib/socket.io.js:3587"
+        },
+        {
+            "message": "Missing item type\nPosts a encoded message to the Socket.IO server using an iframe.\nThe iframe is used because script tags can create POST based requests.\nThe iframe is positioned outside of the view so the user does not\nnotice it's existence.",
+            "line": " lib/socket.io.js:3595"
+        },
+        {
+            "message": "Missing item type\nCreates a new JSONP poll that can be used to listen\nfor messages from the Socket.IO server.",
+            "line": " lib/socket.io.js:3683"
+        },
+        {
+            "message": "Missing item type\nCallback function for the incoming message stream from the Socket.IO server.",
+            "line": " lib/socket.io.js:3722"
+        },
+        {
+            "message": "Missing item type\nThe indicator hack only works after onload",
+            "line": " lib/socket.io.js:3737"
+        },
+        {
+            "message": "Missing item type\nChecks if browser supports this transport.",
+            "line": " lib/socket.io.js:3754"
+        },
+        {
+            "message": "Missing item type\nCheck if cross domain requests are supported",
+            "line": " lib/socket.io.js:3765"
+        },
+        {
+            "message": "Missing item type\nAdd the transport to your public io.transports array.",
+            "line": " lib/socket.io.js:3776"
+        },
+        {
+            "message": "Missing item type\nGetNodeHistoryList",
+            "line": " src/AssureNoteParser.js:843"
+        },
+        {
             "message": "Missing item type\nRemove Tooltip from Content layer.",
-            "line": " src\\Tooltip.js:44"
+            "line": " src/Tooltip.js:44"
         }
     ]
 }
