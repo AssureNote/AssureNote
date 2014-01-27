@@ -1877,26 +1877,8 @@ export class ParserContext {
 		if (this.LastGoalNode != null && Lib.Array_size(this.GoalStack) <= Level) {
 			Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
 			return false;
-		}
-		if (NodeType == GSNType.Context) {
-			return true;
-		}
-		if (NodeType == GSNType.Evidence) {
-			if(this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Strategy)) {
-				Reader.LogError("Evidence is only linked to Goal", Line);
-				return false;
-			}
-			return true;
-		}
-		if (NodeType == GSNType.Strategy) {
-			if(this.LastGoalNode != null && this.LastGoalNode.HasSubNode(GSNType.Evidence)) {
-				Reader.LogError("Strategy is only linked to Goal", Line);				
-				return false;
-			}
-			return true;
-		}
-		Reader.LogError("undefined element", Line);				
-		return false;
+		}		
+		return true;
 	}
 
 	/**

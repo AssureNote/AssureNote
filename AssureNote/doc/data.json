@@ -275,7 +275,7 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/AssureNoteParser.js",
-            "line": 1773,
+            "line": 1781,
             "is_constructor": 1,
             "params": [
                 {
@@ -295,7 +295,7 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/AssureNoteParser.js",
-            "line": 1984,
+            "line": 1974,
             "is_constructor": 1
         },
         "AssureNote.PictgramPanel": {
@@ -3656,6 +3656,13 @@
             "file": "src/AssureNoteParser.js",
             "line": 1648,
             "itemtype": "method",
+            "name": "DiscardEditor",
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1656,
+            "itemtype": "method",
             "name": "Merge",
             "params": [
                 {
@@ -3668,7 +3675,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1670,
+            "line": 1678,
             "itemtype": "method",
             "name": "MergeAsFastFoward",
             "params": [
@@ -3682,7 +3689,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1684,
+            "line": 1692,
             "itemtype": "method",
             "name": "MergeAsReplaceTopGoal",
             "params": [
@@ -3696,7 +3703,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1700,
+            "line": 1708,
             "itemtype": "method",
             "name": "MergeAsIncrementalAddition",
             "params": [
@@ -3725,7 +3732,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1737,
+            "line": 1745,
             "itemtype": "method",
             "name": "GetLatestDoc",
             "return": {
@@ -3736,7 +3743,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1751,
+            "line": 1759,
             "itemtype": "method",
             "name": "FormatRecord",
             "params": [
@@ -3750,7 +3757,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1789,
+            "line": 1797,
             "itemtype": "method",
             "name": "SetLastNode",
             "params": [
@@ -3764,7 +3771,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1803,
+            "line": 1811,
             "itemtype": "method",
             "name": "GetStrategyOfGoal",
             "params": [
@@ -3782,7 +3789,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1818,
+            "line": 1826,
             "itemtype": "method",
             "name": "GetGoalStackAt",
             "params": [
@@ -3800,7 +3807,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1830,
+            "line": 1838,
             "itemtype": "method",
             "name": "SetGoalStackAt",
             "params": [
@@ -3814,7 +3821,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1843,
+            "line": 1851,
             "itemtype": "method",
             "name": "IsValidSection",
             "params": [
@@ -3837,7 +3844,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1885,
+            "line": 1875,
             "itemtype": "method",
             "name": "CreateNewNode",
             "params": [
@@ -3860,14 +3867,14 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1916,
+            "line": 1906,
             "itemtype": "method",
             "name": "RemoveSentinel",
             "class": "ParserContext"
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1925,
+            "line": 1915,
             "itemtype": "method",
             "name": "ParseNode",
             "params": [
@@ -3885,7 +3892,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1969,
+            "line": 1959,
             "itemtype": "method",
             "name": "UpdateContent",
             "params": [
@@ -3904,7 +3911,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1991,
+            "line": 1981,
             "itemtype": "method",
             "name": "merge",
             "static": 1,
@@ -3924,7 +3931,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 2012,
+            "line": 2002,
             "itemtype": "method",
             "name": "ts_merge",
             "static": 1,
@@ -3932,7 +3939,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 2033,
+            "line": 2023,
             "itemtype": "method",
             "name": "main",
             "params": [
