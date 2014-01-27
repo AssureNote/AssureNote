@@ -53,7 +53,7 @@ var AssureNote;
             if (ContextModel == null) {
                 return;
             }
-            var TagMap = ContextModel.GetTagMap();
+            var TagMap = ContextModel.GetTagMapWithLexicalScope();
             this.Location = TagMap.get("Location");
             this.Condition = TagMap.get("Condition");
             this.ExtractTypeFromCondition();
