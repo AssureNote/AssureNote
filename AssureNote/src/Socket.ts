@@ -59,7 +59,12 @@ module AssureNote {
         EnableListeners(): void{
             var self = this;
             this.socket.on('disconnect', function (data) {
-                self.socket = null
+                self.socket = null;
+
+            });
+            this.socket.on('close', function(data) {
+                self.UpdateView();
+                self.UpdateWGSN();
             });
             this.socket.on('join', function (data) {
                 console.log('join');
@@ -75,15 +80,13 @@ module AssureNote {
             });
             this.socket.on('sync', function (data: {PosX: number; PosY: number}) {
                 console.log('sync');
-                self.AssureNoteApp.PictgramPanel.Viewport.MoveTo(data.PosX, data.PosY, 1.0, 100);
+            //    self.AssureNoteApp.PictgramPanel.Viewport.MoveTo(data.PosX, data.PosY, 1.0, 100);
             });
-            this.socket.on('startedit', function(data: {Label: string; UID: number; IsRecursive: boolean; UserName: string}) {
+            this.socket.on('startedit', function(data : {Label: string; UID: number; IsRecursive: boolean; UserName: string; SID: number}) {
                 console.log('edit');
+                console.log(data);
                 self.EditingNodes.push(data);
-                var NewNodeView: NodeView = new NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
-                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
-                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+                self.UpdateView();
 
                 var CurrentNodeView: NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
                 self.AddUserNameOn(CurrentNodeView, {User:data.UserName, IsRecursive:data.IsRecursive});
@@ -92,11 +95,14 @@ module AssureNote {
             this.socket.on('finishedit', function(data: {Label: string; UID: number}) {
                 console.log('finishedit');
                 self.DeleteID(data.UID);
-                var NewNodeView: NodeView = new NodeView(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
-                NewNodeView.SaveFoldedFlag(self.AssureNoteApp.PictgramPanel.ViewMap);
-                self.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-                self.AssureNoteApp.PictgramPanel.Draw(self.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+                self.UpdateView();
+
                 console.log('here is ID array after delete = ' + self.EditingNodes);
+            });
+
+            $(window).on("beforeunload", function () {
+                self.Emit("close", "");
+                self.DisConnect();
             });
 
             for (var key in this.handler) {
@@ -135,6 +141,13 @@ module AssureNote {
                     return;
                 }
             }
+        }
+
+        UpdateView() {
+            var NewNodeView: NodeView = new NodeView(this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
+            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
+            this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
+            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
         }
 
         IsEditable(UID: number) {
