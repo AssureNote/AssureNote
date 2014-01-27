@@ -246,6 +246,9 @@ module AssureNote {
             static IsAnimationFrameEnabled(): boolean {
                 return !!UserAgant.ua.AnimationFrame;
             }
+            static IsTouchDevice(): boolean {
+                return UserAgant.ua.Touch;
+            }
         }
 
         export function RequestAnimationFrame(Callback: Function): number {

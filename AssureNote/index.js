@@ -35,6 +35,12 @@
 var Debug = {};
 
 $(function () {
+    //Browser detection
+    if (AssureNote.AssureNoteUtils.UserAgant.IsTrident() || AssureNote.AssureNoteUtils.UserAgant.IsPresto() || AssureNote.AssureNoteUtils.UserAgant.IsTouchDevice()) {
+        alert('Not supported browser. Use Chrome/Safari/FireFox.');
+        return;
+    }
+
     //safari does not support window.performance
     if (window.performance == null) {
         window.performance = {};
@@ -68,13 +74,5 @@ $(function () {
     window.addEventListener('hashchange', function (ev) {
         document.documentElement.scrollTop = 0;
     });
-    if (location.hash != null) {
-        var label = location.hash.substring(1);
-        var NodeView = App.PictgramPanel.ViewMap[label];
-        if (NodeView) {
-            App.PictgramPanel.ChangeFocusedLabel(label);
-            App.PictgramPanel.Viewport.SetCamera(NodeView.GetGX(), NodeView.GetGY(), 1);
-        }
-    }
 });
 //# sourceMappingURL=index.js.map
