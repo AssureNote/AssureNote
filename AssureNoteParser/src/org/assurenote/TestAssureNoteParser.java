@@ -379,4 +379,17 @@ public class TestAssureNoteParser {
 		assertEquals(1, LatestDoc.GetNodeCount());
 		assertNull(LatestDoc.TopNode.SubNodeList);
 	}
+	
+	@Test
+	public void GES() {
+		String input = "*G\n*E\n*S";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNotNull(TopNode);
+		assertEquals(2, TopNode.SubNodeList.size());
+	}
 }
