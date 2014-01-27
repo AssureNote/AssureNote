@@ -13,6 +13,13 @@
             "fors": {},
             "namespaces": {}
         },
+        "lib/codemirror/addon/edit/closetag.js": {
+            "name": "lib/codemirror/addon/edit/closetag.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "lib/jquery-ui.js": {
             "name": "lib/jquery-ui.js",
             "modules": {},
@@ -56,6 +63,7 @@
             "name": "src/Panel.js",
             "modules": {},
             "classes": {
+                "AssureNote.Panel": 1,
                 "AssureNote.PictgramPanel": 1
             },
             "fors": {},
@@ -298,6 +306,18 @@
             "line": 1974,
             "is_constructor": 1
         },
+        "AssureNote.Panel": {
+            "name": "AssureNote.Panel",
+            "shortname": "AssureNote.Panel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/Panel.js",
+            "line": 41
+        },
         "AssureNote.PictgramPanel": {
             "name": "AssureNote.PictgramPanel",
             "shortname": "AssureNote.PictgramPanel",
@@ -308,7 +328,8 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/Panel.js",
-            "line": 35
+            "line": 96,
+            "extends": "AssureNote.Panel"
         },
         "AssureNote.ScrollManager": {
             "name": "AssureNote.ScrollManager",
@@ -341,6 +362,12 @@
             "file": "lib/bootstrap/js/bootstrap.min.js",
             "line": 1,
             "description": "bootstrap.js v3.0.0 by @fat and @mdo\nCopyright 2013 Twitter Inc.\nhttp://www.apache.org/licenses/LICENSE-2.0",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/codemirror/addon/edit/closetag.js",
+            "line": 1,
+            "description": "Tag-closer extension for CodeMirror.\n\nThis extension adds an \"autoCloseTags\" option that can be set to\neither true to get the default behavior, or an object to further\nconfigure its behavior.\n\nThese are supported options:\n\n`whenClosing` (default true)\n  Whether to autoclose when the '/' of a closing tag is typed.\n`whenOpening` (default true)\n  Whether to autoclose the tag when the final '>' of an opening\n  tag is typed.\n`dontCloseTags` (default is empty tags for HTML, none for XML)\n  An array of tag names that should not be autoclosed.\n`indentTags` (default is block tags for HTML, none for XML)\n  An array of tag names that should, when opened, cause a\n  blank line to be added inside the tag, and the blank line and\n  closing line to be indented.\n\nSee demos/closetag.html for a usage example.",
             "class": "StringReader"
         },
         {
@@ -3953,7 +3980,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 297,
+            "line": 326,
             "itemtype": "method",
             "name": "MoveToNearestNode",
             "params": [
@@ -3967,7 +3994,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 309,
+            "line": 345,
             "itemtype": "method",
             "name": "FindNearestNode",
             "params": [
@@ -3990,7 +4017,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 360,
+            "line": 396,
             "itemtype": "method",
             "name": "FoldDeepSubGoals",
             "params": [
@@ -4004,7 +4031,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 376,
+            "line": 412,
             "itemtype": "method",
             "name": "ChangeFocusedLabel",
             "params": [
@@ -4030,7 +4057,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 243,
+            "line": 248,
             "itemtype": "method",
             "name": "GetCameraScale",
             "return": {
@@ -4041,7 +4068,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 255,
+            "line": 260,
             "itemtype": "method",
             "name": "SetCameraScale",
             "params": [
@@ -4055,7 +4082,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 284,
+            "line": 289,
             "itemtype": "method",
             "name": "GetCameraGX",
             "return": {
@@ -4066,7 +4093,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 292,
+            "line": 297,
             "itemtype": "method",
             "name": "GetCameraGY",
             "return": {
@@ -4077,7 +4104,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 300,
+            "line": 305,
             "itemtype": "method",
             "name": "SetCameraPosition",
             "params": [
@@ -4096,7 +4123,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 309,
+            "line": 314,
             "description": "Set camera's position and scale one time.",
             "itemtype": "method",
             "name": "SetCamera",
@@ -4121,7 +4148,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 328,
+            "line": 333,
             "itemtype": "method",
             "name": "GetCameraPageCenterX",
             "return": {
@@ -4132,7 +4159,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 336,
+            "line": 341,
             "itemtype": "method",
             "name": "GetCameraPageCenterY",
             "return": {
@@ -4143,7 +4170,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 344,
+            "line": 349,
             "description": "Set camera's vanishing point in web page.",
             "itemtype": "method",
             "name": "SetCameraPageCenter",
@@ -4163,7 +4190,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 355,
+            "line": 360,
             "description": "Calcurate PageX from GX",
             "itemtype": "method",
             "name": "PageXFromGX",
@@ -4182,7 +4209,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 365,
+            "line": 370,
             "description": "Calcurate PageY from GY",
             "itemtype": "method",
             "name": "PageYFromGY",
@@ -4201,7 +4228,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 375,
+            "line": 380,
             "description": "Calcurate GX from PageX",
             "itemtype": "method",
             "name": "GXFromPageX",
@@ -4220,7 +4247,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 385,
+            "line": 390,
             "description": "Calcurate GY from PageY",
             "itemtype": "method",
             "name": "GYFromPageY",
@@ -4239,7 +4266,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 419,
+            "line": 424,
             "description": "Move camera position relatively and change scale.",
             "itemtype": "method",
             "name": "Move",
@@ -4270,7 +4297,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 432,
+            "line": 437,
             "description": "Move camera position and scale one time.",
             "itemtype": "method",
             "name": "MoveTo",
@@ -4948,6 +4975,10 @@
         {
             "message": "Missing item type\nbootstrap.js v3.0.0 by @fat and @mdo\nCopyright 2013 Twitter Inc.\nhttp://www.apache.org/licenses/LICENSE-2.0",
             "line": " lib/bootstrap/js/bootstrap.min.js:1"
+        },
+        {
+            "message": "Missing item type\nTag-closer extension for CodeMirror.\n\nThis extension adds an \"autoCloseTags\" option that can be set to\neither true to get the default behavior, or an object to further\nconfigure its behavior.\n\nThese are supported options:\n\n`whenClosing` (default true)\n  Whether to autoclose when the '/' of a closing tag is typed.\n`whenOpening` (default true)\n  Whether to autoclose the tag when the final '>' of an opening\n  tag is typed.\n`dontCloseTags` (default is empty tags for HTML, none for XML)\n  An array of tag names that should not be autoclosed.\n`indentTags` (default is block tags for HTML, none for XML)\n  An array of tag names that should, when opened, cause a\n  blank line to be added inside the tag, and the blank line and\n  closing line to be indented.\n\nSee demos/closetag.html for a usage example.",
+            "line": " lib/codemirror/addon/edit/closetag.js:1"
         },
         {
             "message": "Missing item type",

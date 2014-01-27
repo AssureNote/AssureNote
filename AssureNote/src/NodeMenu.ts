@@ -39,7 +39,7 @@ module AssureNote {
         }
     }
 
-    export class NodeMenu extends Pane{
+    export class NodeMenu extends Panel{
         Menu: JQuery;
         CurrentView: NodeView;
         IsEnable: boolean;

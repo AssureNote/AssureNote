@@ -198,6 +198,7 @@ module AssureNote {
         private PageHeight: number = window.innerHeight;
         private CameraCenterPageX: number;
         private CameraCenterPageY: number;
+        IsPointerEnabled: boolean = true;
 
         private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
             Element.style["transformOrigin"] = Value;
@@ -220,13 +221,13 @@ module AssureNote {
             this.SetTransformOriginToElement(this.ContentLayer, "left top");
             this.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
-            var OnPointer = (e: PointerEvent) => { this.ScrollManager.OnPointerEvent(e, this); };
+            var OnPointer = (e: PointerEvent) => { if (this.IsPointerEnabled) { this.ScrollManager.OnPointerEvent(e, this); } };
             this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
             this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
             this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
-            $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { this.ScrollManager.OnMouseWheel(e, this); });
+            $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { if (this.IsPointerEnabled) { this.ScrollManager.OnMouseWheel(e, this); } });
         }
 
         /**
@@ -481,11 +482,11 @@ module AssureNote {
 
         private IsEventMapUpper: boolean = false;
         public SetEventMapLayerPosition(IsUpper: boolean) {
-            //if (IsUpper && !this.IsEventMapUpper) {
-            //    $(this.ControlLayer).after(this.EventMapLayer);
-            //} else if (!IsUpper && this.IsEventMapUpper) {
-            //    $(this.ContentLayer).before(this.EventMapLayer);
-            //}
+            if (IsUpper && !this.IsEventMapUpper) {
+                $(this.ControlLayer).after(this.EventMapLayer);
+            } else if (!IsUpper && this.IsEventMapUpper) {
+                $(this.ContentLayer).before(this.EventMapLayer);
+            }
             this.IsEventMapUpper = IsUpper;
         }
 

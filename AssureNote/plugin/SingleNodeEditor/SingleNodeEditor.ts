@@ -28,7 +28,7 @@
 
 module AssureNote {
     export class SingleNodeEditorCommand extends Command {
-        constructor(App: AssureNote.AssureNoteApp, public EditorUtil: EditorUtil) {
+        constructor(App: AssureNote.AssureNoteApp) {
             super(App);
         }
 
@@ -50,17 +50,13 @@ module AssureNote {
             var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                //if (TargetView.GetNodeType() == GSNType.Strategy) {
-                //    this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
-                //    return;
-                //}
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, false);
                 var Top = this.App.PictgramPanel.Viewport.PageYFromGY(TargetView.GetGY());
                 var Left = this.App.PictgramPanel.Viewport.PageXFromGX(TargetView.GetGX());
                 var Width = TargetView.GetShape().GetNodeWidth();
                 var Height = Math.max(100, TargetView.GetShape().GetNodeHeight());
-                this.EditorUtil.UpdateCSS({
+                this.App.SingleNodeEditorPanel.UpdateCSS({
                     position: "fixed",
                     top: Top,
                     left: Left,
@@ -68,48 +64,33 @@ module AssureNote {
                     height: Height,
                     background: "rgba(255, 255, 255, 1.00)",
                 });
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, false);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
         }
     }
     export class SingleNodeEditorPlugin extends Plugin {
-        public EditorUtil: EditorUtil;
-        constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
+        constructor(public App: AssureNoteApp) {
             super();
-            this.SetMenuBarButton(true);
-            this.SetEditor(true);
-            this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
-                position: "absolute",
-            });
+            this.SetHasMenuBarButton(true);
+            this.SetHasEditor(true);
 
-            this.AssureNoteApp.RegistCommand(new SingleNodeEditorCommand(this.AssureNoteApp, this.EditorUtil));
+            this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
             return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
                 (event: Event, TargetView: NodeView) => {
-                    var Writer = new StringWriter();
-                    TargetView.Model.FormatSubNode(1, Writer, false);
-                    var Top = this.AssureNoteApp.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
-                    var Left = this.AssureNoteApp.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
-                    var Width = NodeView.GetShape().GetNodeWidth();
-                    var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
-                    this.EditorUtil.UpdateCSS({
-                        position: "fixed",
-                        top: Top,
-                        left: Left,
-                        width: Width,
-                        height: Height,
-                        background: "rgba(255, 255, 255, 1.00)",
-                    });
-
-                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+                    var Command = this.App.FindCommandByCommandLineName("SingleEdit");
+                    if (Command) {
+                        Command.Invoke(null, [TargetView.Label]);
+                    }
             });
         }
     }
 }
 
 AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
+    App.PluginManager.SetPlugin("open-single", new AssureNote.SingleNodeEditorPlugin(App));
 });

@@ -94,12 +94,12 @@ module AssureNote {
 
         constructor(AssureNoteApp: AssureNoteApp) {
             super();
-            this.SetDoubleClicked(true);
+            this.SetHasDoubleClicked(true);
             this.FoldingCommand = new FoldingCommand(AssureNoteApp);
             AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
 
-        ExecDoubleClicked(NodeView: NodeView): void {
+        OnNodeDoubleClicked(NodeView: NodeView): void {
             this.FoldingCommand.Fold(NodeView);
         }
     }

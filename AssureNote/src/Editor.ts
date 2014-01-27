@@ -26,24 +26,29 @@
 ///<reference path='../d.ts/codemirror.d.ts'/>
 
 module AssureNote {
-    export class EditorUtil {
+    export class CodeMirrorEditorPanel extends Panel {
         Element: JQuery;
         Timeout: number;
+        Editor: CodeMirror.Editor;
 
-        constructor(public AssureNoteApp: AssureNoteApp, public TextArea: CodeMirror.Editor, public Selector: string, public CSS: any) {
-            $(this.TextArea.getWrapperElement()).css({
+        constructor(public App: AssureNoteApp, private IsEditRecursive: boolean, TextArea: HTMLTextAreaElement, CodeMirrorConfig: CodeMirror.EditorConfiguration, private Wrapper: HTMLElement, public WrapperCSS: any) {
+            super(App);
+            this.Editor = CodeMirror.fromTextArea(TextArea, CodeMirrorConfig);
+            $(this.Editor.getWrapperElement()).css({
                 height: "100%",
                 width: "100%",
                 background: "rgba(255, 255, 255, 0.85)"
             });
-            this.Element = $(Selector);
-            this.Element.css(CSS);
+            this.Element = $(Wrapper);
+            this.Element.css(WrapperCSS);
             this.Element.css({ display: "none" });
         }
 
         UpdateCSS(CSS: any) {
             this.Element.css(CSS);
         }
+
+        private OnOutSideClicked: (Event: MouseEvent) => void;
 
         EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive: boolean): void {
             if (this.Timeout) {
@@ -52,73 +57,89 @@ module AssureNote {
             }
             this.Timeout = null;
             var Model = NodeView.Model;
-            this.AssureNoteApp.PluginPanel.IsVisible = false;
-            this.AssureNoteApp.SocketManager.StartEdit({"Label": Model.GetLabel(), "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.AssureNoteApp.GetUserName()});
+            this.App.FullScreenEditorPanel.IsVisible = false;
+            this.App.SocketManager.StartEdit({"Label": Model.GetLabel(), "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName()});
 
             var Callback = (event: MouseEvent) => {
                 this.Element.blur();
             };
-            var App = this.AssureNoteApp;
+            var App = this.App;
 
-            (<any>this.TextArea).setValue(WGSN);
-            this.Element.off("blur");
-            this.Element.off("keydown");
-            this.Element.css({ display: "block" }).on("keydown", (e: JQueryEventObject) => {
-                this.TextArea.focus();
-                if (e.keyCode == 27 /* Esc */) {
-                    e.stopPropagation();
-                    this.Element.blur();
-                }
-            }).on("blur", (e: JQueryEventObject) => {
+            (<any>this.Editor).setValue(WGSN);
+            this.Element.show().css("opacity", 1).off("blur").on("blur", (e: JQueryEventObject) => {
                 e.stopPropagation();
                 e.preventDefault();
-                this.DisableEditor(NodeView, IsRecursive);
-                App.PictgramPanel.ContentLayer.removeEventListener("pointerdown", Callback);
-                App.PictgramPanel.ContentLayer.removeEventListener("contextmenu", Callback);
-                App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", Callback);
-                App.PictgramPanel.EventMapLayer.removeEventListener("contextmenu", Callback);
+                this.DisableEditor(NodeView, WGSN);
             });
-            this.AssureNoteApp.PictgramPanel.ContentLayer.addEventListener("pointerdown", Callback);
-            this.AssureNoteApp.PictgramPanel.ContentLayer.addEventListener("contextmenu", Callback);
-            this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("pointerdown", Callback);
-            this.AssureNoteApp.PictgramPanel.EventMapLayer.addEventListener("contextmenu", Callback);
-            this.TextArea.refresh();
-            this.TextArea.focus();
+            this.OnOutSideClicked = () => {
+                this.Element.blur();
+            };
+            this.App.PictgramPanel.ContentLayer.addEventListener("pointerdown", this.OnOutSideClicked);
+            this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
+            this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            this.Editor.refresh();
+            this.Editor.focus();
+            this.Activate();
         }
-        DisableEditor(OldNodeView: NodeView, IsRecursive: boolean): void {
-            var WGSN: string = (<any>this.TextArea).getValue();
-            this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
-            var Node: GSNNode = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+
+        DisableEditor(OldNodeView: NodeView, OldWGSN: string): void {
+            var WGSN: string = (<any>this.Editor).getValue();
+            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
+            var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode: GSNNode;
-            NewNode = Node.ReplaceSubNodeAsText(WGSN, IsRecursive);
+            NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
             var Writer: StringWriter = new StringWriter();
-            if (NewNode && NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != WGSN) {
-                this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();
-                var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
+            if (NewNode && NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim()) {
+                this.App.MasterRecord.EditingDoc.RenumberAll();
+                var TopGoal = this.App.MasterRecord.EditingDoc.TopNode;
 
                 var NewNodeView: NodeView = new NodeView(TopGoal, true);
-                NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
-                this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-                this.AssureNoteApp.PictgramPanel.Draw(null);
+                NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
+                this.App.PictgramPanel.InitializeView(NewNodeView);
+                this.App.PictgramPanel.Draw(null);
 
-                this.AssureNoteApp.PluginPanel.IsVisible = true;
+                this.App.FullScreenEditorPanel.IsVisible = true;
                 /* TODO resolve conflict */
-                this.AssureNoteApp.SocketManager.UpdateWGSN();
-                this.AssureNoteApp.MasterRecord.CloseEditor();
+                this.App.SocketManager.UpdateWGSN();
+                this.App.MasterRecord.CloseEditor();
             } else {
-                this.AssureNoteApp.MasterRecord.DiscardEditor();
+                this.App.MasterRecord.DiscardEditor();
             }
-            this.AssureNoteApp.SocketManager.Emit('finishedit', {"Label": OldNodeView.Model.GetLabel(), "UID": OldNodeView.Model.UID});
-            $(this.Selector).addClass("animated fadeOutUp");
+            this.App.SocketManager.Emit('finishedit', {"Label": OldNodeView.Model.GetLabel(), "UID": OldNodeView.Model.UID});
+            $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
 
-            /* Need to wait a bit for the end of animation */
-            this.Timeout = setTimeout(() => {
-                this.Element.removeClass();
-                this.Element.css({ display: "none" });
-                this.Timeout = null;
-                //this.StopEventFlag = false;
-            }, 1300);
+            this.App.PictgramPanel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
+            this.App.PictgramPanel.ContentLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+            this.App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
+            this.App.PictgramPanel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+
+            this.App.PictgramPanel.Activate();
             return null;
+        }
+
+        OnKeyDown(Event: KeyboardEvent): void {
+            this.Editor.focus();
+            if (Event.keyCode == 27 /* Esc */) {
+                Event.stopPropagation();
+                this.Element.blur();
+            }
+        }
+    }
+
+    export class SingleNodeEditorPanel extends CodeMirrorEditorPanel {
+        constructor(App: AssureNoteApp) {
+            var TextArea = <HTMLTextAreaElement>document.getElementById('singlenode-editor');
+            var Wrapper = document.getElementById('singlenode-editor-wrapper');
+            super(App, false, TextArea, { lineNumbers: false, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "absolute" });
+        }
+    }
+
+    export class WGSNEditorPanel extends CodeMirrorEditorPanel {
+        constructor(App: AssureNoteApp) {
+            var TextArea = <HTMLTextAreaElement>document.getElementById('editor');
+            var Wrapper = document.getElementById('editor-wrapper');
+            super(App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
         }
     }
 }

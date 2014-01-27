@@ -99,11 +99,11 @@ var AssureNote;
         __extends(FoldingViewSwitchPlugin, _super);
         function FoldingViewSwitchPlugin(AssureNoteApp) {
             _super.call(this);
-            this.SetDoubleClicked(true);
+            this.SetHasDoubleClicked(true);
             this.FoldingCommand = new FoldingCommand(AssureNoteApp);
             AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
-        FoldingViewSwitchPlugin.prototype.ExecDoubleClicked = function (NodeView) {
+        FoldingViewSwitchPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
             this.FoldingCommand.Fold(NodeView);
         };
         return FoldingViewSwitchPlugin;

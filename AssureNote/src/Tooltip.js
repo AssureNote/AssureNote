@@ -82,7 +82,7 @@ var AssureNote;
             });
         };
         return Tooltip;
-    })(AssureNote.Pane);
+    })(AssureNote.Panel);
     AssureNote.Tooltip = Tooltip;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Tooltip.js.map

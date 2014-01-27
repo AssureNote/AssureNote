@@ -102,7 +102,7 @@ var AssureNote;
             this.IsEnable = false;
         };
         return NodeMenu;
-    })(AssureNote.Pane);
+    })(AssureNote.Panel);
     AssureNote.NodeMenu = NodeMenu;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=NodeMenu.js.map

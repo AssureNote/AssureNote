@@ -25,7 +25,7 @@
 ///<reference path="./AssureNote.ts" />
 
 module AssureNote {
-    export class Tooltip extends Pane{
+    export class Tooltip extends Panel{
         Tooltip: JQuery;
         CurrentView: NodeView;
         constructor(public AssureNoteApp: AssureNoteApp) {

@@ -21,6 +21,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 ///<reference path='../d.ts/jquery.d.ts'/>
 var AssureNote;
 (function (AssureNote) {
@@ -76,9 +82,12 @@ var AssureNote;
     })();
     AssureNote.CommandParser = CommandParser;
 
-    var CommandLine = (function () {
+    var CommandLine = (function (_super) {
+        __extends(CommandLine, _super);
         //TODO search libreadline API
-        function CommandLine() {
+        function CommandLine(App) {
+            _super.call(this, App);
+            this.App = App;
             this.Element = $("#command-line");
             this.IsEnable = true;
             this.IsVisible = false;
@@ -129,6 +138,15 @@ var AssureNote;
             }
         };
 
+        CommandLine.prototype.OnActivate = function () {
+            this.Show();
+        };
+
+        CommandLine.prototype.OnDeactivate = function () {
+            this.Hide();
+            this.Clear();
+        };
+
         //TODO recognize : or / or @
         CommandLine.prototype.ShowNextHistory = function () {
             if (this.HistoryIndex > 0) {
@@ -149,8 +167,50 @@ var AssureNote;
         CommandLine.prototype.IsEmpty = function () {
             return this.Element.val() == "";
         };
+
+        CommandLine.prototype.OnKeyDown = function (Event) {
+            var handled = true;
+            switch (Event.keyCode) {
+                case 27:
+                    this.App.PictgramPanel.Activate();
+                    Event.preventDefault();
+                    break;
+                case 38:
+                    this.ShowPrevHistory();
+                    break;
+                case 40:
+                    this.ShowNextHistory();
+                    break;
+                case 8:
+                    if (this.IsEmpty()) {
+                        this.App.PictgramPanel.Activate();
+                        Event.preventDefault();
+                        break;
+                    }
+                    break;
+                case 13:
+                    Event.preventDefault();
+                    var ParsedCommand = new CommandParser();
+                    ParsedCommand.Parse(this.GetValue());
+                    if (ParsedCommand.GetMethod() == "search") {
+                        this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.MasterView, ParsedCommand.GetArgs()[0]);
+                    }
+                    this.App.ExecCommand(ParsedCommand);
+                    this.AddHistory(ParsedCommand.GetRawString());
+                    if (this.IsActive()) {
+                        this.App.PictgramPanel.Activate();
+                    }
+                    break;
+                default:
+                    handled = false;
+                    break;
+            }
+            if (handled) {
+                Event.stopPropagation();
+            }
+        };
         return CommandLine;
-    })();
+    })(AssureNote.Panel);
     AssureNote.CommandLine = CommandLine;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=CommandLine.js.map

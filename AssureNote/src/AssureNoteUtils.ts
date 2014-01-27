@@ -275,7 +275,6 @@ module AssureNote {
         static Highlight: string = "assurenote-default-highlight";
         static ToDo: string = "assurenote-todo";
         static Searched: string = "assurenote-search";
-        static SearchHighlight: string = "assurenote-search-highlight";
         static Danger: string = "assurenote-danger";
         static Editing: string = "assurenote-editing";
     }
