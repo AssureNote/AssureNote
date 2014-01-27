@@ -53,7 +53,7 @@ var AssureNote;
             if (ContextModel == null) {
                 return;
             }
-            var TagMap = ContextModel.GetTagMap();
+            var TagMap = ContextModel.GetTagMapWithLexicalScope();
             this.Location = TagMap.get("Location");
             this.Condition = TagMap.get("Condition");
             this.ExtractTypeFromCondition();
@@ -329,6 +329,7 @@ var AssureNote;
 
                         var MNode = new MonitorNode(this.App, Label);
                         if (!MNode.IsValid()) {
+                            this.App.DebugP("Node(" + Label + ") is not a monitor");
                             continue;
                         }
 
@@ -349,7 +350,7 @@ var AssureNote;
 
                     var MNode = new MonitorNode(this.App, Label);
                     if (!MNode.IsValid()) {
-                        this.App.DebugP("This node is not monitor");
+                        this.App.DebugP("This node is not a monitor");
                         return;
                     }
 
@@ -358,8 +359,10 @@ var AssureNote;
                     MNodeManager.SetMonitorNode(MNode);
                 }
 
-                MNodeManager.UpdateView(this.App.MasterRecord.EditingDoc);
-                this.App.MasterRecord.CloseEditor();
+                if (this.App.MasterRecord.EditingDoc != null) {
+                    MNodeManager.UpdateView(this.App.MasterRecord.EditingDoc);
+                    this.App.MasterRecord.CloseEditor();
+                }
 
                 if (MNodeManager.NodeCount > 0 && !MNodeManager.IsRunning) {
                     MNodeManager.StartMonitoring(5000);
