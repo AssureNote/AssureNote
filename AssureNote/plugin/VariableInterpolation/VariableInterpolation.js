@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -55,10 +55,16 @@ var AssureNote;
                 }
                 var b = params[0];
                 var value = TagMap[b];
+                while (TagMap[value]) {
+                    value = TagMap[value];
+                }
                 if ((typeof value === 'string' && value != '') || typeof value === 'number') {
                     return _this.Style(value, 'node-variable');
                 }
                 value = LabelMap[b];
+                while (LabelMap[value]) {
+                    value = LabelMap[value];
+                }
                 if (typeof value === 'string' && value != '') {
                     return _this.Style(value, 'node-variable');
                 }
