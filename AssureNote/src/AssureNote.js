@@ -68,7 +68,6 @@ var AssureNote;
                     ]),
                     new AssureNote.DividerMenuItem(),
                     new AssureNote.HelpMenuItem(),
-                    new AssureNote.CommandListMenuItem(),
                     new AssureNote.AboutMenuItem()
                 ])
             ]);
