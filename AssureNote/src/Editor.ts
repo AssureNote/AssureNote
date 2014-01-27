@@ -93,9 +93,8 @@ module AssureNote {
             var Node: GSNNode = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode: GSNNode;
             NewNode = Node.ReplaceSubNodeAsText(WGSN, IsRecursive);
-            console.log(Node);
-            console.log(NewNode);
-            if (NewNode) {
+            var Writer: StringWriter = new StringWriter();
+            if (NewNode && NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != WGSN) {
                 this.AssureNoteApp.MasterRecord.EditingDoc.RenumberAll();
                 var TopGoal = this.AssureNoteApp.MasterRecord.EditingDoc.TopNode;
 
@@ -107,9 +106,11 @@ module AssureNote {
                 this.AssureNoteApp.PluginPanel.IsVisible = true;
                 /* TODO resolve conflict */
                 this.AssureNoteApp.SocketManager.UpdateWGSN();
+                this.AssureNoteApp.MasterRecord.CloseEditor();
+            } else {
+                this.AssureNoteApp.MasterRecord.DiscardEditor();
             }
             this.AssureNoteApp.SocketManager.Emit('finishedit', {"Label": OldNodeView.Model.GetLabel(), "UID": OldNodeView.Model.UID});
-            this.AssureNoteApp.MasterRecord.CloseEditor();
             $(this.Selector).addClass("animated fadeOutUp");
 
             /* Need to wait a bit for the end of animation */

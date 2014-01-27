@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\Panel.js - AssureNote</title>
+    <title>src/Panel.js - AssureNote</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -47,6 +47,26 @@
             
                 <li><a href="../classes/AssureNote.ViewportManager.html">AssureNote.ViewportManager</a></li>
             
+                <li><a href="../classes/AssureNoteParsr.html">AssureNoteParsr</a></li>
+            
+                <li><a href="../classes/GSNDoc.html">GSNDoc</a></li>
+            
+                <li><a href="../classes/GSNHistory.html">GSNHistory</a></li>
+            
+                <li><a href="../classes/GSNNode.html">GSNNode</a></li>
+            
+                <li><a href="../classes/GSNRecord.html">GSNRecord</a></li>
+            
+                <li><a href="../classes/ParserContext.html">ParserContext</a></li>
+            
+                <li><a href="../classes/StringReader.html">StringReader</a></li>
+            
+                <li><a href="../classes/StringWriter.html">StringWriter</a></li>
+            
+                <li><a href="../classes/TagUtils.html">TagUtils</a></li>
+            
+                <li><a href="../classes/WikiSyntax.html">WikiSyntax</a></li>
+            
             </ul>
 
             <ul id="api-modules" class="apis modules">
@@ -86,7 +106,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\Panel.js</h1>
+                        <h1 class="file-heading">File: src/Panel.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -128,6 +148,7 @@ var AssureNote;
     @class AssureNote.PictgramPanel
     */
     var PictgramPanel = (function () {
+        // We do not use FocusedView but FocusedLabel to make it modular.
         function PictgramPanel(AssureNoteApp) {
             var _this = this;
             this.AssureNoteApp = AssureNoteApp;
@@ -174,8 +195,12 @@ var AssureNote;
                     if (Tooltip.IsEnable) {
                         Tooltip.Remove();
                     }
-                    var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
-                    Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
+                    if (_this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
+                        var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
+                        Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
+                    } else {
+                        $.notify(&quot;Warning:Other user edits this node!&quot;, &quot;warn&quot;);
+                    }
                 } else {
                     _this.FocusedLabel = null;
                 }
@@ -243,27 +268,64 @@ var AssureNote;
                         }
                         break;
                     case 37:
-                        if (!_this.CmdLine.IsVisible &amp;&amp; !_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(-100, 0, _this.Viewport.GetCameraScale(), 50);
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(0 /* Left */);
                         }
                         break;
                     case 38:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowPrevHistory();
-                        } else if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(0, -100, _this.Viewport.GetCameraScale(), 50);
+                        } else {
+                            _this.MoveToNearestNode(1 /* Top */);
                         }
                         break;
                     case 39:
-                        if (!_this.CmdLine.IsVisible &amp;&amp; !_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(100, 0, _this.Viewport.GetCameraScale(), 50);
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(2 /* Right */);
                         }
                         break;
                     case 40:
                         if (_this.CmdLine.IsVisible) {
                             _this.CmdLine.ShowNextHistory();
-                        } else if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                            _this.Viewport.Move(0, 100, _this.Viewport.GetCameraScale(), 50);
+                        } else {
+                            _this.MoveToNearestNode(3 /* Bottom */);
+                        }
+                        break;
+                    case 72:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(0 /* Left */);
+                        }
+                        break;
+                    case 74:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(3 /* Bottom */);
+                        }
+                        break;
+                    case 75:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(1 /* Top */);
+                        }
+                        break;
+                    case 76:
+                        if (!_this.CmdLine.IsVisible) {
+                            _this.MoveToNearestNode(2 /* Right */);
+                        }
+                        break;
+                    case 70:
+                        if (!_this.CmdLine.IsVisible) {
+                            var FoldCommand = _this.AssureNoteApp.FindCommandByCommandLineName(&quot;fold&quot;);
+                            if (FoldCommand &amp;&amp; _this.FocusedLabel) {
+                                FoldCommand.Invoke(null, [_this.FocusedLabel]);
+                            }
+                        }
+                        break;
+                    case 65:
+                    case 73:
+                        if (!_this.CmdLine.IsVisible) {
+                            var FoldCommand = _this.AssureNoteApp.FindCommandByCommandLineName(&quot;edit&quot;);
+                            if (FoldCommand &amp;&amp; _this.FocusedLabel) {
+                                FoldCommand.Invoke(null, [_this.FocusedLabel]);
+                            }
                         }
                         break;
                     case 8:
@@ -344,10 +406,77 @@ var AssureNote;
                 $(&quot;#auto-expand-area&quot;).hide(100);
             };
         }
-        PictgramPanel.prototype.SetFoldedAllGoalNode = function (NodeView) {
+        /**
+        @method MoveToNearestNode
+        @param {AssureNote.Direction} Dir
+        */
+        PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
+            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
+            if (NextNode != null) {
+                this.ChangeFocusedLabel(NextNode.Label);
+                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+            }
+        };
+
+        /**
+        @method FindNearestNode
+        @param {AssureNote.NodeView} CenterNode
+        @param {AssureNote.Direction} Dir
+        @return {AssureNote.NodeView} Found node. If no node is found, null is retured.
+        */
+        PictgramPanel.prototype.FindNearestNode = function (CenterNode, Dir) {
+            if (!CenterNode) {
+                return null;
+            }
+            var RightLimitVectorX = 1;
+            var RightLimitVectorY = 1;
+            var LeftLimitVectorX = 1;
+            var LeftLimitVectorY = 1;
+
+            switch (Dir) {
+                case 2 /* Right */:
+                    LeftLimitVectorY = -1;
+                    break;
+                case 0 /* Left */:
+                    RightLimitVectorX = -1;
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    break;
+                case 1 /* Top */:
+                    RightLimitVectorY = -1;
+                    LeftLimitVectorX = -1;
+                    LeftLimitVectorY = -1;
+                    break;
+                case 3 /* Bottom */:
+                    RightLimitVectorX = -1;
+                    break;
+            }
+            var NearestNode = null;
+            var CurrentMinimumDistanceSquere = Infinity;
+            this.MasterView.TraverseVisibleNode(function (Node) {
+                var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
+                var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
+                var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
+                if (DDotR &gt; 0 &amp;&amp; DDotL &gt; 0) {
+                    var DistanceSquere = DX * DX + DY * DY;
+                    if (DistanceSquere &lt; CurrentMinimumDistanceSquere) {
+                        CurrentMinimumDistanceSquere = DistanceSquere;
+                        NearestNode = Node;
+                    }
+                }
+            });
+            return NearestNode;
+        };
+
+        /**
+        @method FoldDeepSubGoals
+        @param {NodeView} NodeView
+        */
+        PictgramPanel.prototype.FoldDeepSubGoals = function (NodeView) {
             var _this = this;
             NodeView.ForEachVisibleChildren(function (SubNode) {
-                _this.SetFoldedAllGoalNode(SubNode);
+                _this.FoldDeepSubGoals(SubNode);
                 if (SubNode.GetNodeType() == 0 /* Goal */ &amp;&amp; SubNode.Children != null) {
                     if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != 3 /* Evidence */) {
                         SubNode.IsFolded = true;
@@ -361,10 +490,11 @@ var AssureNote;
         @param {string} Label If label is null, there is no focused label.
         */
         PictgramPanel.prototype.ChangeFocusedLabel = function (Label) {
+            AssureNote.AssureNoteUtils.UpdateHash(Label);
             if (Label == null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(AssureNote.ColorStyle.Highlight);
                 }
                 this.FocusedLabel = null;
                 return;
@@ -373,10 +503,10 @@ var AssureNote;
             if (NodeView != null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
-                    oldNodeView.ChangeColorStyle(AssureNote.ColorStyle.Default);
+                    oldNodeView.RemoveColorStyle(AssureNote.ColorStyle.Highlight);
                 }
                 this.FocusedLabel = Label;
-                NodeView.ChangeColorStyle(AssureNote.ColorStyle.Highlight);
+                NodeView.AddColorStyle(AssureNote.ColorStyle.Highlight);
             }
         };
 

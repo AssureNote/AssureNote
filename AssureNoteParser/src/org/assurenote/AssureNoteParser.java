@@ -171,6 +171,12 @@ class Lib {
 }
 //endif VAJA
 
+/**
+ *
+ * @class StringReader
+ * @constructor
+ * @param {String} text
+ */
 class StringReader {
 	/*field*/int CurrentPos;
 	/*field*/int PreviousPos;
@@ -184,10 +190,18 @@ class StringReader {
 		this.Linenum = 0;
 	}
 
+	/**
+	 * @method HasNext
+	 * @return {Boolean}
+	 */
 	boolean HasNext() {
 		return this.CurrentPos < this.Text.length();
 	}
 
+	/**
+	 * @method ReadLine
+	 * @return {String}
+	 */
 	String ReadLine() {
 		/*local*/int StartPos = this.CurrentPos;
 		/*local*/int i;
@@ -218,11 +232,19 @@ class StringReader {
 		return this.Text.substring(StartPos, this.CurrentPos).trim();
 	}
 
+	/**
+	 * @method RoollbackLineFeed
+	 */
 	void RollbackLineFeed() {
 		this.CurrentPos = this.PreviousPos;
 		this.Linenum -= 1;
 	}
 
+	/**
+	 * @method ReadLineList
+	 * @param {Array<String>} LineList
+	 * @param {Boolean} UntilSection
+	 */
 	void ReadLineList(ArrayList<String> LineList, boolean UntilSection) {
 		while(this.HasNext()) {
 			/*local*/String Line = this.ReadLine();
@@ -234,22 +256,41 @@ class StringReader {
 		}
 	}
 
+	/**
+	 * @method GetLineList
+	 * @param {Boolean} UntilSection
+	 * @return {Array<String>}
+	 */
 	ArrayList<String> GetLineList(boolean UntilSection) {
 		/*local*/ArrayList<String> LineList = new ArrayList<String>();
 		this.ReadLineList(LineList, UntilSection);
 		return LineList;
 	}
 	
+	/**
+	 * @method LogError
+	 * @param {String} Message
+	 * @param {String} Line
+	 */
 	void LogError(String Message, String Line) {
 		System.err.println("(error:" + this.Linenum + ") " + Message + ": " + Line);
 	}
-	
+
+	/**
+	 * @method LogWarning
+	 * @param {String} Message
+	 * @param {String} Line
+	 */
 	void LogWarning(String Message, String Line) {
 		System.err.println("(warning:" + this.Linenum + ") " + Message + ": " + Line);
 	}
 
 }
 
+/**
+ * @class StringWriter
+ * @constructor
+ */
 class StringWriter {
 	/*field*/StringBuilder sb;
 	StringWriter/*constructor*/() {
@@ -265,6 +306,11 @@ class StringWriter {
 	void newline() {
 		this.sb.append(Lib.LineFeed);
 	}
+
+	/**
+	 * @method toString
+	 * @return {String}
+	 */
 	public String toString() {
 		return this.sb.toString();
 	}
@@ -274,6 +320,17 @@ enum GSNType {
 	Goal, Context, Strategy, Evidence, Undefined
 }
 
+/**
+ * @class GSNHistory
+ * @constructor
+ * @param {Number} Rev
+ * @param {String} Author
+ * @param {String} Role
+ * @param {String} DateString
+ * @param {String} Process
+ * @param {GSNDoc} Doc
+ *
+ */
 class GSNHistory {
 	/*field*/int Rev;
 	/*field*/String Author;
@@ -286,18 +343,41 @@ class GSNHistory {
 		this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
 	}
 
+	/**
+	 * @method toString
+	 * @return {String}
+	 */
 	public String toString() {
 		return this.Date + ";" + this.Author + ";" + this.Role + ";" + this.Process;
 	}
 
+	/**
+	 * @method EqualsHistory
+	 * @param {GSNHistory} aHistory
+	 * @return {Boolean}
+	 */
 	public boolean EqualsHistory(GSNHistory aHistory) {
 		return (Lib.Object_equals(this.Date, aHistory.Date) && Lib.Object_equals(this.Author, aHistory.Author));
 	}
-	
+
+	/**
+	 * @method CompareDate
+	 * @param {GSNHistory} aHistory
+	 * @return {Number}
+	 */
 	public int CompareDate(GSNHistory aHistory) {
 		return (Lib.String_compareTo(this.Date, aHistory.Date));
 	}
-	
+
+	/**
+	 * @method UpdateHistory
+	 * @param {Number} Rev
+	 * @param {String} Author
+	 * @param {String} Role
+	 * @param {String} DateString
+	 * @param {String} Process
+	 * @param {GSNDoc} Doc
+	 */
 	public void UpdateHistory(int Rev, String Author, String Role, String DateString, String Process, GSNDoc Doc) {
 		this.Rev = Rev;
 		this.Author = Author;
@@ -308,7 +388,17 @@ class GSNHistory {
 	}
 }
 
-class WikiSyntax {	
+/**
+ * @class WikiSyntax
+ * @constructor
+ */
+class WikiSyntax {
+	/**
+	 * @method ParseInt
+	 * @param {String} NumText
+	 * @param {Number} DefVal
+	 * @return {Number}
+	 */
 	static int ParseInt(String NumText, int DefVal) {
 		try {
 			return Lib.parseInt(NumText);
@@ -316,6 +406,12 @@ class WikiSyntax {
 		}
 		return DefVal;
 	}
+
+	/**
+	 * @method ParseGoalLevel
+	 * @param {String} LabelLine
+	 * @return {Number}
+	 */
 	static int ParseGoalLevel(String LabelLine) {
 		/*local*/int GoalLevel = 0;
 		for (/*local*/int i = 0; i < LabelLine.length(); i++) {
@@ -324,6 +420,12 @@ class WikiSyntax {
 		}
 		return GoalLevel;
 	}
+
+	/**
+	 * @method FormatGoalLevel
+	 * @param {Number} GoalLevel
+	 * @return {String}
+	 */
 	static String FormatGoalLevel(int GoalLevel) {
 		/*local*/StringBuilder sb = new StringBuilder();
 		for (/*local*/int i = 0; i < GoalLevel; i++) {
@@ -331,7 +433,13 @@ class WikiSyntax {
 		}
 		return sb.toString();
 	}
-	
+
+	/**
+	 * @method GetLabelPos
+	 * @static
+	 * @param {String} LabelLine
+	 * @return {Number}
+	 */
 	static int GetLabelPos (String LabelLine) {
 		/* Returns the row of the abel (e.g., 'G'). */
 		/*local*/int i;
@@ -343,7 +451,12 @@ class WikiSyntax {
 		}
 		return i;
 	}
-	
+
+	/**
+	 * @method ParseNodeType
+	 * @param {String} LabelLine
+	 * @return {GSNType}
+	 */
 	static GSNType ParseNodeType(String LabelLine) {
 		/*local*/int i = WikiSyntax.GetLabelPos(LabelLine);
 		if (i < LabelLine.length()) {
@@ -363,7 +476,12 @@ class WikiSyntax {
 		}
 		return GSNType.Undefined;
 	}
-	
+
+	/**
+	 * @method ParseLabelName
+	 * @param {String} LabelLine
+	 * @return {String}
+	 */
 	static String ParseLabelName(String LabelLine) {
 		/*local*/int i = WikiSyntax.GetLabelPos(LabelLine);
 		/*local*/StringBuilder sb = new StringBuilder();
@@ -379,6 +497,11 @@ class WikiSyntax {
 		return sb.toString();
 	}
 
+	/**
+	 * @method FormatNodeType
+	 * @param {GSNType} NodeType
+	 * @return {String}
+	 */
 	static String FormatNodeType(GSNType NodeType) {
 		switch (NodeType) {
 		case /*enum(GSNType)*/Goal:
@@ -394,6 +517,11 @@ class WikiSyntax {
 		return "U";
 	}
 
+	/**
+	 * @method ParseLabelNumber
+	 * @param {String} LabelLine
+	 * @return {String}
+	 */
 	static String ParseLabelNumber(String LabelLine) {
 		/*local*/int StartIdx = WikiSyntax.GetLabelPos(LabelLine)+1;
 		if (StartIdx >= LabelLine.length() || LabelLine.charAt(StartIdx) == ':') return null;
@@ -415,7 +543,12 @@ class WikiSyntax {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * @method ParseUID
+	 * @param {String} LabelLine
+	 * @return {String}
+	 */
 	static String ParseUID(String LabelLine) {
 		/*local*/int StartIdx = LabelLine.indexOf("&") + 1; // eat '&'
 		if (StartIdx == 0) return null;
@@ -425,6 +558,12 @@ class WikiSyntax {
 		return UID;
 	}
 
+	/**
+	 * @method ParseRevisionHistory
+	 * @static
+	 * @param {LabelLine} LabelLine
+	 * @return {String}
+	 */
 	public static String ParseRevisionHistory(String LabelLine) {
 		/*local*/int Loc = LabelLine.indexOf("#");
 		if (Loc != -1) {
@@ -433,6 +572,12 @@ class WikiSyntax {
 		return null;
 	}
 
+	/**
+	 * @method ParseHistory
+	 * @param {String} LabelLine
+	 * @param {GSNDoc} BaseDoc
+	 * @return {String}
+	 */
 	public static GSNHistory[] ParseHistory(String LabelLine, GSNDoc BaseDoc) {
 		if(BaseDoc != null) {
 			/*local*/int Loc = LabelLine.indexOf("#");
@@ -454,10 +599,23 @@ class WikiSyntax {
 		}
 		return null;
 	}
+
+	/**
+	 * @method FormatRefKey
+	 * @static
+	 * @param {GSNType} NodeType
+	 * @param {String} HistoryTaple
+	 * @return {String}
+	 */
 	public static String FormatRefKey(GSNType NodeType, String HistoryTaple) {
 		return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
 	}
-	
+
+	/**
+	 * @method CommentOutAll
+	 * @param {String} DocText
+	 * @return {String}
+	 */
 	public static String CommentOutAll(String DocText) {
 		/*local*/StringReader Reader = new StringReader(DocText);
 		/*local*/StringWriter Writer = new StringWriter();
@@ -469,7 +627,13 @@ class WikiSyntax {
 		}
 		return Writer.toString();
 	}
-	
+
+	/**
+	 * @method CommentOutSubNode
+	 * @static
+	 * @param {String} DocText
+	 * @return {String}
+	 */
 	public static String CommentOutSubNode(String DocText) {
 		/*local*/StringReader Reader = new StringReader(DocText);
 		/*local*/StringWriter Writer = new StringWriter();
@@ -486,7 +650,12 @@ class WikiSyntax {
 		return Writer.toString();
 	}
 	
-	
+	/**
+	 * @method FormatDateString
+	 * @static
+	 * @param {String} DateString
+	 * @return {String}
+	 */
 	public static String FormatDateString(String DateString) {
 		/*local*/SimpleDateFormat Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		 if (DateString != null){
@@ -501,7 +670,18 @@ class WikiSyntax {
 	}
 }
 
+/**
+ * @class TagUtils
+ * @static
+ *
+ */
 class TagUtils {
+	/**
+	 * @method ParseTag
+	 * @static
+	 * @param {Object} TagMap
+	 * @param {String} Line
+	 */
 	static void ParseTag(HashMap<String, String> TagMap, String Line) {
 		/*local*/int loc = Line.indexOf("::");
 		if (loc != -1) {
@@ -511,6 +691,12 @@ class TagUtils {
 		}
 	}
 
+	/**
+	 * @method FormatTag
+	 * @static
+	 * @param {Object} TagMap
+	 * @param {StringWriter} Writer
+	 */
 	static void FormatTag(HashMap<String, String> TagMap, StringWriter Writer) {
 		if (TagMap != null) {
 			/*local*/String[] keyArray = (/*cast*/String[])TagMap.keySet().toArray();
@@ -521,6 +707,12 @@ class TagUtils {
 		}
 	}
 
+	/**
+	 * @method FormatHistoryTag
+	 * @param {Array<GSNHistory>} HistoryList
+	 * @param {Number} i
+	 * @param {StringWriter} Writer
+	 */
 	static void FormatHistoryTag(ArrayList<GSNHistory> HistoryList, int i, StringWriter Writer) {
 		/*local*/GSNHistory History = Lib.Array_get(HistoryList, i);
 		if (History != null) {
@@ -528,6 +720,13 @@ class TagUtils {
 		}
 	}
 
+	/**
+	 * @method GetString
+	 * @param {Object} TagMap
+	 * @param {String} Key
+	 * @param {String} DefValue
+	 * @return {String}
+	 */
 	static String GetString(HashMap<String, String> TagMap, String Key, String DefValue) {
 		if (TagMap != null) {
 			/*local*/String Value = TagMap.get(Key);
@@ -538,6 +737,13 @@ class TagUtils {
 		return DefValue;
 	}
 
+	/**
+	 * @method GetInteger
+	 * @param {Object} TagMap
+	 * @param {String} Key
+	 * @param {Number} DefValue
+	 * @return
+	 */
 	static int GetInteger(HashMap<String, String> TagMap, String Key, int DefValue) {
 		if (TagMap != null) {
 			return WikiSyntax.ParseInt(TagMap.get(Key), DefValue);
@@ -546,6 +752,16 @@ class TagUtils {
 	}
 }
 
+/**
+ * @class GSNNode
+ * @constructor
+ * @param {GSNDoc} BaseDoc
+ * @param {GSNNode} ParentNode
+ * @param {GSNType} NodeType
+ * @param {String} LabelName
+ * @param {Number} UID
+ * @param {Array<GSNHistory>} HistoryTaple
+ */
 class GSNNode {
 	/*field*/GSNDoc  BaseDoc;
 	/*field*/GSNNode ParentNode;
@@ -611,23 +827,50 @@ class GSNNode {
 		return NewNode;
 	}
 
+	/**
+	 * @method IsGoal
+	 * @return {Boolean}
+	 */
 	public boolean IsGoal() {
 		return (this.NodeType == GSNType.Goal);
 	}
+
+	/**
+	 * @method IsStrategy
+	 * @return {Boolean}
+	 */
 	public boolean IsStrategy() {
 		return (this.NodeType == GSNType.Strategy);
 	}
+
+	/**
+	 * @method IsContext
+	 * @return {Boolean}
+	 */
 	public boolean IsContext() {
 		return (this.NodeType == GSNType.Context);
 	}
+
+	/**
+	 * @method IsEvidence
+	 * @return {Boolean}
+	 */
 	public boolean IsEvidence() {
 		return (this.NodeType == GSNType.Evidence);
 	}
 
+	/**
+	 * @method NonNullSubNodeList
+	 * @return {Array<GSNNode>}
+	 */
 	ArrayList<GSNNode> NonNullSubNodeList() {
 		return this.SubNodeList == null ? Lib.EmptyNodeList : this.SubNodeList;
 	}
 
+	/**
+	 * @method Remap
+	 * @param {Object} NodeMap
+	 */
 	public void Remap(HashMap<Integer, GSNNode> NodeMap) {
 		NodeMap.put(this.UID, this);
 		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
@@ -635,7 +878,11 @@ class GSNNode {
 			Node.Remap(NodeMap);
 		}
 	}
-	
+
+	/**
+	 * @method GetGoalLevel
+	 * @return {Number}
+	 */
 	public int GetGoalLevel() {
 		/*local*/int GoalCount = this.IsGoal() ? 1 : 0;
 		/*local*/GSNNode Node = this.ParentNode;
@@ -647,23 +894,43 @@ class GSNNode {
 		}
 		return GoalCount;
 	}
-	
+
+	/**
+	 * @method GetLabel
+	 * @return {String}
+	 */
 	String GetLabel() {
 		return WikiSyntax.FormatNodeType(this.NodeType) + this.GetLabelNumber();
 	}
-	
+
+	/**
+	 * @method @GetHistoryTaple
+	 * @return {String}
+	 */
 	String GetHistoryTaple() {
 		return "#" + this.Created.Rev + ":" + this.LastModified.Rev;
 	}
-	
+
+	/**
+	 * @method GetLabelNumber
+	 * @return
+	 */
 	String GetLabelNumber() {
 		return this.AssignedLabelNumber;
 	}
-	
+
+	/**
+	 * @method IsModified
+	 * @return {Boolean}
+	 */
 	boolean IsModified() {
 		return this.LastModified == this.BaseDoc.DocHistory;
 	}
-	
+
+	/**
+	 * @method SetContent
+	 * @param {Array<String>} LineList
+	 */
 	void SetContent(ArrayList<String> LineList) {
 		/*local*/byte[] OldDigest = this.Digest;
 		/*local*/int LineCount = 0;
@@ -691,10 +958,17 @@ class GSNNode {
 		}
 	}
 
+	/**
+	 * @method UpdateContent
+	 * @param {String} TextDoc
+	 */
 	void UpdateContent(String TextDoc) {
 		this.SetContent(new StringReader(TextDoc).GetLineList(true/*UntilSection*/));
 	}
-	
+
+	/**
+	 * @method GetHtmlContent
+	 */
 	void GetHtmlContent() {
 		if(this.Digest != null) {
 			/*local*/StringReader Reader = new StringReader(this.NodeDoc);
@@ -716,7 +990,10 @@ class GSNNode {
 		}
 	}
 
-	
+	/**
+	 * GetNodeHistoryList
+	 * @return {Array<GSNNode>}
+	 */
 	ArrayList<GSNNode> GetNodeHistoryList() {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
 		/*local*/GSNNode LastNode = null;
@@ -736,7 +1013,12 @@ class GSNNode {
 		}
 		return NodeList;
 	}
-	
+
+	/**
+	 * @method AppendSubNode
+	 * @private
+	 * @param {GSNNode} Node
+	 */
 	private void AppendSubNode(GSNNode Node) {
 		assert(Node.BaseDoc == this.BaseDoc);
 		if (this.SubNodeList == null) {
@@ -745,6 +1027,11 @@ class GSNNode {
 		Lib.Array_add(this.SubNodeList,  Node);
 	}
 
+	/**
+	 * @method HasSubNode
+	 * @param {GSNType} NodeType
+	 * @return {Boolean}
+	 */
 	boolean HasSubNode(GSNType NodeType) {
 		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
@@ -755,6 +1042,10 @@ class GSNNode {
 		return false;
 	}
 
+	/**
+	 * @method GetCloseGoal
+	 * @return {GSNNode}
+	 */
 	GSNNode GetCloseGoal() {
 		/*local*/GSNNode Node = this;
 		while (Node.NodeType != GSNType.Goal) {
@@ -763,6 +1054,10 @@ class GSNNode {
 		return Node;
 	}
 
+	/**
+	 * @method GetTagMap
+	 * @return {Object}
+	 */
 	HashMap<String, String> GetTagMap() {
 		if (this.TagMap == null && this.HasTag) {
 			this.TagMap = new HashMap<String, String>();
@@ -777,7 +1072,13 @@ class GSNNode {
 		}
 		return this.TagMap;
 	}
-	
+
+	/**
+	 * @method MergeTagMap
+	 * @param {Object} BaseMap
+	 * @param {Object} NewMap
+	 * @return {Object}
+	 */
 	HashMap<String, String> MergeTagMap(HashMap<String, String> BaseMap, HashMap<String, String> NewMap) {
 		if (BaseMap == null) return NewMap;
 		if (NewMap == null) return BaseMap;
@@ -793,7 +1094,11 @@ class GSNNode {
 		}
 		return Result;
 	}
-	
+
+	/**
+	 * @method  GetTagMapWithLexicalScope
+	 * @return {Object}
+	 */
 	HashMap<String, String> GetTagMapWithLexicalScope() {
 		/*local*/HashMap<String, String> Result = null;
 		if (this.ParentNode != null) {
@@ -812,6 +1117,12 @@ class GSNNode {
 		return Result;
 	}
 
+	/**
+	 * @method GetLastNode
+	 * @param {GSNType} NodeType
+	 * @param {Boolean} Creation
+	 * @return {GSNNode}
+	 */
 	GSNNode GetLastNode(GSNType NodeType, boolean Creation) {
 		if (this.SubNodeList != null) {
 			for (/*local*/int i = Lib.Array_size(this.SubNodeList) - 1; i >= 0; i--) {
@@ -827,6 +1138,10 @@ class GSNNode {
 		return null;
 	}
 
+	/**
+	 * @method FormatNode
+	 * @param {StringWriter} Writer
+	 */
 	void FormatNode(StringWriter Writer) {
 		Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
 		Writer.print(" ");
@@ -863,6 +1178,12 @@ class GSNNode {
 		}
 	}
 
+	/**
+	 * @method FormatSubNode
+	 * @param {Number} GoalLevel
+	 * @param {StringWriter} Writer
+	 * @param {Boolean} IsRecursive
+	 */
 	// SubNode
 	void FormatSubNode(int GoalLevel, StringWriter Writer, boolean IsRecursive) {
 		Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
@@ -898,7 +1219,13 @@ class GSNNode {
 			}
 		}
 	}
-	
+
+	/**
+	 * @method ReplaceSubNode
+	 * @param {GSNNode} NewNode
+	 * @param {Boolean} IsRecursive
+	 * @return {GSNNode}
+	 */
 	GSNNode ReplaceSubNode(GSNNode NewNode, boolean IsRecursive) {
 		this.MergeSubNode(NewNode);
 		if(this.ParentNode != null) {
@@ -919,6 +1246,12 @@ class GSNNode {
 		return NewNode;
 	}
 
+	/**
+	 * @method ReplaceSubNodeAsText
+	 * @param {String} DocText
+	 * @param {Boolean} IsRecursive
+	 * @return {GSNNode}
+	 */
 	GSNNode ReplaceSubNodeAsText(String DocText, boolean IsRecursive) {
 		if (!IsRecursive) {
 			DocText = WikiSyntax.CommentOutSubNode(DocText);
@@ -937,7 +1270,12 @@ class GSNNode {
 		}
 		return NewNode;
 	}
-	
+
+	/**
+	 * @method HasSubNodeUID
+	 * @param {Number} UID
+	 * @return {Boolean}
+	 */
 	boolean HasSubNodeUID(int UID) {
 		if(UID == this.UID) {
 			return true;
@@ -948,7 +1286,11 @@ class GSNNode {
 		}
 		return false;
 	}
-	
+
+	/**
+	 * @method MergeSubNode
+	 * @param {GSNNode} NewNode
+	 */
 	void MergeSubNode(GSNNode NewNode) {
 		assert(this.BaseDoc != null);
 		NewNode.LastModified = null; // this.BaseDoc has Last
@@ -973,6 +1315,11 @@ class GSNNode {
 		}
 	}
 
+	/**
+	 * @method IsNewerTree
+	 * @param {Number} ModifiedRev
+	 * @return {Boolean}
+	 */
 	// Merge
 	boolean IsNewerTree(int ModifiedRev) {
 		if (ModifiedRev <= this.LastModified.Rev) {
@@ -987,6 +1334,10 @@ class GSNNode {
 		return false;
 	}
 
+	/**
+	 * @method ListSubGoalNode
+	 * @param {Array<GSNNode>} BufferList
+	 */
 	void ListSubGoalNode(ArrayList<GSNNode> BufferList) {
 		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
@@ -999,6 +1350,10 @@ class GSNNode {
 		}
 	}
 
+	/**
+	 * @method ListSectionNode
+	 * @param {Array<GSNNode>} BufferList
+	 */
 	void ListSectionNode(ArrayList<GSNNode> BufferList) {
 		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
 			/*local*/GSNNode Node = Lib.Array_get(this.NonNullSubNodeList(), i);
@@ -1011,6 +1366,12 @@ class GSNNode {
 		}
 	}
 
+	/**
+	 * @method RenumberGoalRecursive
+	 * @param {Number} GoalCount
+	 * @param {Number} NextGoalCount
+	 * @param {Object} LabelMap
+	 */
 	void RenumberGoalRecursive(int GoalCount, int NextGoalCount, HashMap<String, String> LabelMap) {
 		assert(this.IsGoal());
 		
@@ -1041,12 +1402,22 @@ class GSNNode {
 			}
 		}
 	}
-	
+
+	/**
+	 * @method RenumberGoal
+	 * @param {Number} GoalCount
+	 * @param {Number} NextGoalCount
+	 */
 	void RenumberGoal(int GoalCount, int NextGoalCount) {
 		/*local*/HashMap<String, String> LabelMap = new HashMap<String, String>();
 		this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
 	}
-	
+
+	/**
+	 * @method SearchNode
+	 * @param {String} SearchWord
+	 * @return {Array<GSNNode>}
+	 */
 	ArrayList<GSNNode> SearchNode(String SearchWord) {
 		/*local*/ArrayList<GSNNode> NodeList = new ArrayList<GSNNode>();
 		if(Lib.String_matches(this.NodeDoc, SearchWord)) {
@@ -1058,7 +1429,11 @@ class GSNNode {
 		}
 		return NodeList;
 	}
-	
+
+	/**
+	 * @method GetNodeCount
+	 * @return {Number}
+	 */
 	int GetNodeCount() {
 		/*local*/int res = 1;
 		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
@@ -1069,6 +1444,11 @@ class GSNNode {
 
 }
 
+/**
+ * @class GSNDoc
+ * @constructor
+ * @param {GSNRecord} Record
+ */
 class GSNDoc {
 	/*field*/GSNRecord Record;
 	/*field*/GSNNode   TopNode;
@@ -1086,6 +1466,14 @@ class GSNDoc {
 		this.GoalCount = 0;
 	}
 
+	/**
+	 * @method DeepCopy
+	 * @param {String} Author
+	 * @param {String} Role
+	 * @param {String} Date
+	 * @param {String} Process
+	 * @return {GSNDoc}
+	 */
 	GSNDoc DeepCopy(String Author, String Role, String Date, String Process) {
 		/*local*/GSNDoc NewDoc = new GSNDoc(this.Record);
 		NewDoc.GoalCount = this.GoalCount;
@@ -1097,6 +1485,11 @@ class GSNDoc {
 		return NewDoc;
 	}
 
+	/**
+	 * @method DuplicateTagMap
+	 * @param {Object} TagMap
+	 * @return {Object}
+	 */
 	HashMap<String, String> DuplicateTagMap(HashMap<String, String> TagMap) {
 		if (TagMap != null) {
 			/*local*/HashMap<String, String> NewMap = new HashMap<String, String>();
@@ -1110,6 +1503,10 @@ class GSNDoc {
 		return null;
 	}
 
+	/**
+	 * @method UpdateDocHeader
+	 * @param {StringReader} Reader
+	 */
 	void UpdateDocHeader(StringReader Reader) {
 		/*local*/int Revision = TagUtils.GetInteger(this.DocTagMap, "Revision", -1);
 		if (Revision != -1) {
@@ -1127,14 +1524,27 @@ class GSNDoc {
 		}
 	}
 
+	/**
+	 * @method GetNode
+	 * @param {Number} UID
+	 * @return {GSNNode}
+	 */
 	public GSNNode GetNode(int UID) {
 		return this.NodeMap.get(UID);
 	}
 
+	/**
+	 * @method UncheckAddNode
+	 * @param {GSNNode} Node
+	 */
 	void UncheckAddNode(GSNNode Node) {
 		this.NodeMap.put(Node.UID, Node);
 	}
 
+	/**
+	 * @method AddNode
+	 * @param {GSNNode} Node
+	 */
 	void AddNode(GSNNode Node) {
 		/*local*/int Key = Node.UID;
 		/*local*/GSNNode OldNode = this.NodeMap.get(Key);
@@ -1151,6 +1561,9 @@ class GSNDoc {
 		}
 	}
 
+	/**
+	 * @method RemapNodeMap
+	 */
 	void RemapNodeMap() {
 		/*local*/HashMap<Integer, GSNNode> NodeMap = new HashMap<Integer, GSNNode>();
 		if(this.TopNode != null) {
@@ -1159,6 +1572,10 @@ class GSNDoc {
 		this.NodeMap = NodeMap;
 	}
 
+	/**
+	 * @method RemoveNode
+	 * @param Node
+	 */
 	void RemoveNode(GSNNode Node) {
 		assert(this == Node.BaseDoc);
 		if(Node.ParentNode != null) {
@@ -1166,14 +1583,22 @@ class GSNDoc {
 		}
 		this.RemapNodeMap();
 	}
-	
+
+	/**
+	 * @method FormatDoc
+	 * @param {StringWriter} Stream
+	 */
 	void FormatDoc(StringWriter Stream) {
 		if (this.TopNode != null) {
 			Stream.println("Revision:: " + this.DocHistory.Rev);
 			this.TopNode.FormatNode(Stream);
 		}
 	}
-	
+
+	/**
+	 * @method GetLabelMap
+	 * @return {Object}
+	 */
 	HashMap<String, String> GetLabelMap() {
 		/*local*/HashMap<String, String> LabelMap = new HashMap<String, String>();
 		/*local*/GSNNode CurrentNode;
@@ -1189,11 +1614,18 @@ class GSNDoc {
 		}
 		return LabelMap;
 	}
-	
+
+	/**
+	 * @method GetNodeCount
+	 * @return {Number}
+	 */
 	int GetNodeCount() {
 		return this.TopNode.GetNodeCount();
 	}
-	
+
+	/**
+	 * @method RenumberAll
+	 */
 	void RenumberAll() {
 		if (this.TopNode != null) {
 			this.TopNode.RenumberGoal(1,  2);
@@ -1202,7 +1634,11 @@ class GSNDoc {
 	
 }
 
-
+/**
+ * @class GSNRecord
+ * @constructor
+ *
+ */
 class GSNRecord {
 	/*field*/ArrayList<GSNHistory> HistoryList;
 	/*field*/GSNDoc                EditingDoc;
@@ -1212,6 +1648,10 @@ class GSNRecord {
 		this.EditingDoc = null;
 	}
 
+	/**
+	 * @method DeepCopy
+	 * @return GSNRecord
+	 */
 	GSNRecord DeepCopy() {
 		/*local*/GSNRecord NewRecord = new GSNRecord();
 		for(/*local*/int i = 0; i < Lib.Array_size(this.HistoryList); i++) {
@@ -1221,7 +1661,12 @@ class GSNRecord {
 		NewRecord.EditingDoc = this.EditingDoc;
 		return NewRecord;
 	}
-	
+
+	/**
+	 * @method GetHistory
+	 * @param {Number} Rev
+	 * @return {GSNHistory}
+	 */
 	GSNHistory GetHistory(int Rev) {
 		if (Rev < Lib.Array_size(this.HistoryList)) {
 			return Lib.Array_get(this.HistoryList, Rev);
@@ -1229,6 +1674,11 @@ class GSNRecord {
 		return null;
 	}
 
+	/**
+	 * @method GetHistoryDoc
+	 * @param {Number} Rev
+	 * @return {GSNDoc}
+	 */
 	GSNDoc GetHistoryDoc(int Rev) {
 		/*local*/GSNHistory history = this.GetHistory(Rev);
 		if(history != null) {
@@ -1236,13 +1686,31 @@ class GSNRecord {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * @method NewHistory
+	 * @param {String} Author
+	 * @param {String} Role
+	 * @param {String} Date
+	 * @param {String} Process
+	 * @param {GSNDoc} Doc
+	 * @return {GSNHistory}
+	 */
 	GSNHistory NewHistory(String Author, String Role, String Date, String Process, GSNDoc Doc) {
 		/*local*/GSNHistory History = new GSNHistory(Lib.Array_size(this.HistoryList), Author, Role, Date, Process, Doc);
 		Lib.Array_add(this.HistoryList, History);
 		return History;
 	}
 
+	/**
+	 * @method AddHistory
+	 * @param {Number} Rev
+	 * @param {String} Author
+	 * @param {String} Role
+	 * @param {String} Date
+	 * @param {String} Process
+	 * @param {GSNDoc} Doc
+	 */
 	void AddHistory(int Rev, String Author, String Role, String Date, String Process, GSNDoc Doc) {
 		if(Rev >= 0) {
 			/*local*/GSNHistory History = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
@@ -1260,6 +1728,11 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method ParseHistoryTag
+	 * @param {String} Line
+	 * @param {StringReader} Reader
+	 */
 	void ParseHistoryTag(String Line, StringReader Reader) {
 		/*local*/int loc = Line.indexOf("::");
 		if (loc != -1) {
@@ -1274,6 +1747,10 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method Parse
+	 * @param {String} TextDoc
+	 */
 	void Parse(String TextDoc) {
 		/*local*/StringReader Reader = new StringReader(TextDoc);
 		while (Reader.HasNext()) {
@@ -1283,7 +1760,10 @@ class GSNRecord {
 			Doc.RenumberAll();
 		}
 	}
-	
+
+	/**
+	 * @method RenumberAll
+	 */
 	void RenumberAll() {
 		/*local*/GSNDoc LatestDoc = this.GetLatestDoc();
 		if(LatestDoc!= null && LatestDoc.TopNode != null) {
@@ -1291,6 +1771,13 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method OpenEditor
+	 * @param {String} Author
+	 * @param {String} Role
+	 * @param {String} Date
+	 * @param {String} Process
+	 */
 	public void OpenEditor(String Author, String Role, String Date, String Process) {
 		if (this.EditingDoc == null) {
 			/*local*/GSNDoc Doc = this.GetLatestDoc();
@@ -1303,10 +1790,26 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method CloseEditor
+	 */
 	public void CloseEditor() {
 		this.EditingDoc = null;
 	}
 
+	/**
+	 * @method DiscardEditor
+	 */
+	public void DiscardEditor() {
+		this.EditingDoc = null;
+		Lib.Array_remove(this.HistoryList, Lib.Array_size(this.HistoryList) - 1);
+		
+	}
+	
+	/**
+	 * @method Merge
+	 * @param {GSNRecord} NewRecord
+	 */
 	public void Merge(GSNRecord NewRecord) {
 		/*local*/int CommonHistory = -1;
 		for (/*local*/int Rev = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
@@ -1326,6 +1829,10 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method MergeAsFastFoward
+	 * @param {GSNRecord} NewRecord
+	 */
 	public void MergeAsFastFoward(GSNRecord NewRecord) {
 		for (/*local*/int i = Lib.Array_size(this.HistoryList); i < Lib.Array_size(NewRecord.HistoryList); i++) {
 			/*local*/GSNDoc BranchDoc = NewRecord.GetHistoryDoc(i);
@@ -1336,6 +1843,10 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method MergeAsReplaceTopGoal
+	 * @param {GSNRecord} NewRecord
+	 */
 	public void MergeAsReplaceTopGoal(GSNRecord NewRecord) {
 		for(/*local*/int i = 0; i < Lib.Array_size(NewRecord.HistoryList); i++) {
 			/*local*/GSNHistory NewHistory = Lib.Array_get(NewRecord.HistoryList, i);
@@ -1348,6 +1859,13 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method MergeAsIncrementalAddition
+	 * @param {Number} Rev1
+	 * @param {GSNRecord} Record1
+	 * @param {Number} Rev2
+	 * @param {GSNRecord} Record2
+	 */
 	public void MergeAsIncrementalAddition(int Rev1, GSNRecord Record1, int Rev2, GSNRecord Record2) {
 		while(Rev1 < Lib.Array_size(Record1.HistoryList) && Rev2 < Lib.Array_size(Record2.HistoryList)) {
 			/*local*/GSNHistory History1 = Record1.GetHistory(Rev1);
@@ -1375,6 +1893,10 @@ class GSNRecord {
 		}
 	}
 
+	/**
+	 * @method GetLatestDoc
+	 * @return {GSNDoc}
+	 */
 	GSNDoc GetLatestDoc() {
 		for(/*local*/int i = Lib.Array_size(this.HistoryList) - 1; i >= 0; i++) {
 			/*local*/GSNDoc Doc = this.GetHistoryDoc(i);
@@ -1385,6 +1907,10 @@ class GSNRecord {
 		return null;
 	}
 
+	/**
+	 * @method FormatRecord
+	 * @param {StringWriter} Writer
+	 */
 	public void FormatRecord(StringWriter Writer) {
 		/*local*/int DocCount = 0;
 		for (/*local*/int i = Lib.Array_size(this.HistoryList)- 1 ; i >= 0; i--) {
@@ -1402,6 +1928,11 @@ class GSNRecord {
 
 }
 
+/**
+ * @class ParserContext
+ * @constructor
+ * @param {GSNDoc} NullableDoc
+ */
 class ParserContext {
 	/*field*/GSNDoc NullableDoc;
 	/*field*/ArrayList<GSNNode> GoalStack;
@@ -1421,6 +1952,10 @@ class ParserContext {
 		this.SetGoalStackAt(ParentNode);
 	}
 
+	/**
+	 * @method SetLastNode
+	 * @param {GSNNode} Node
+	 */
 	void SetLastNode(GSNNode Node) {
 		if(Node.IsGoal()) {
 			this.LastGoalNode = Node;
@@ -1430,7 +1965,12 @@ class ParserContext {
 			this.LastNonContextNode = Node;			
 		}
 	}
-	
+
+	/**
+	 * @method GetStrategyOfGoal
+	 * @param {Number} Level
+	 * @return {GSNNode}
+	 */
 	GSNNode GetStrategyOfGoal(int Level) {
 		if (Level - 1 < Lib.Array_size(this.GoalStack)) {
 			/*local*/GSNNode ParentGoal = this.GetGoalStackAt(Level - 1);
@@ -1441,6 +1981,11 @@ class ParserContext {
 		return null;
 	}
 
+	/**
+	 * @method GetGoalStackAt
+	 * @param {Number} Level
+	 * @return {GSNNode}
+	 */
 	GSNNode GetGoalStackAt(int Level) {
 		if (Level >= 0 && Level < Lib.Array_size(this.GoalStack)) {
 				return Lib.Array_get(this.GoalStack, Level);
@@ -1448,6 +1993,10 @@ class ParserContext {
 		return null;
 	}
 
+	/**
+	 * @method SetGoalStackAt
+	 * @param {GSNNode} Node
+	 */
 	void SetGoalStackAt(GSNNode Node) {
 		/*local*/int GoalLevel = Node.GetGoalLevel();
 //		System.out.println("GoalLevel="+GoalLevel+ ", stack="+this.GoalStackList.size());
@@ -1457,6 +2006,12 @@ class ParserContext {
 		Lib.Array_set(this.GoalStack, GoalLevel-1, Node);
 	}
 
+	/**
+	 * @method IsValidSection
+	 * @param {String} Line
+	 * @param {StringReader} Reader
+	 * @return {Boolean}
+	 */
 	boolean IsValidSection(String Line, StringReader Reader) {
 		/*local*/GSNType NodeType = WikiSyntax.ParseNodeType(Line);
 		/*local*/int Level = WikiSyntax.ParseGoalLevel(Line);
@@ -1493,6 +2048,12 @@ class ParserContext {
 		return false;
 	}
 
+	/**
+	 * @method CreateNewNode
+	 * @param {String} LabelLine
+	 * @param {StringReader} Reader
+	 * @return {GSNNode}
+	 */
 	GSNNode CreateNewNode(String LabelLine, StringReader Reader) {
 		/*local*/GSNType NodeType = WikiSyntax.ParseNodeType(LabelLine);
 		/*local*/String LabelName = WikiSyntax.ParseLabelName(LabelLine);
@@ -1517,13 +2078,21 @@ class ParserContext {
 		}
 		return NewNode;
 	}
-	
+
+	/**
+	 * @method RemoveSentinel
+	 */
 	void RemoveSentinel() {
 		if (this.FirstNode != null && this.FirstNode.ParentNode != null) {
 			this.FirstNode.ParentNode = null;
 		}
 	}
 
+	/**
+	 * @method ParseNode
+	 * @param {StringReader} Reader
+	 * @return {GSNNode}
+	 */
 	GSNNode ParseNode(StringReader Reader) {
 		while (Reader.HasNext()) {
 			/*local*/String Line = Reader.ReadLine();
@@ -1563,6 +2132,11 @@ class ParserContext {
 		return this.FirstNode;
 	}
 
+	/**
+	 * @method UpdateContent
+	 * @param {GSNNode} LastNode
+	 * @param {Array<String>} LineList
+	 */
 	private void UpdateContent(GSNNode LastNode, ArrayList<String> LineList) {
 		if (LastNode != null) {
 			LastNode.SetContent(LineList);
@@ -1571,7 +2145,17 @@ class ParserContext {
 	}
 }
 
+/**
+ * @class AssureNoteParsr
+ * @constructor
+ */
 public class AssureNoteParser {
+	/**
+	 * @method merge
+	 * @static
+	 * @param {String} MasterFile
+	 * @param {String} BranchFile
+	 */
 	public final static void merge(String MasterFile, String BranchFile) {
 		/*local*/GSNRecord MasterRecord = new GSNRecord();
 		MasterRecord.Parse(Lib.ReadFile(MasterFile));
@@ -1587,7 +2171,11 @@ public class AssureNoteParser {
 		MasterRecord.FormatRecord(Writer);
 		System.out.println(Writer.toString());
 	}
-	
+
+	/**
+	 * @method ts_merge
+	 * @static
+	 */
 	public final static void ts_merge() {
 		/*local*/String MasterFile = (Lib.Input.length > 0) ? Lib.Input[0] : null;
 		/*local*/String BranchFile = (Lib.Input.length > 1) ? Lib.Input[1] : null;
@@ -1606,6 +2194,10 @@ public class AssureNoteParser {
 		System.out.println(Writer.toString());
 	}
 
+	/**
+	 * @method main
+	 * @param {Array<String>}argv
+	 */
 	public final static void main(String[] argv) {
 		if(argv.length == 2) {
 			//AssureNoteParser.merge(argv[0], argv[1]);

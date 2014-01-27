@@ -58,7 +58,7 @@ var AssureNote;
 
             this.SetDestination(this.HitNodes[0]);
             this.AddAllHitNodesColor(ViewMap, AssureNote.ColorStyle.Searched);
-            ViewMap[this.HitNodes[0].GetLabel()].Shape.AddColorStyle(AssureNote.ColorStyle.SearchHighlight);
+            this.AssureNoteApp.PictgramPanel.ChangeFocusedLabel(this.HitNodes[0].GetLabel());
             this.MoveToNext(ViewPort, function () {
                 _this.IsMoving = false;
             });
@@ -71,7 +71,7 @@ var AssureNote;
             if (this.HitNodes.length == 1) {
                 return;
             }
-            var OldIndex = this.NodeIndex;
+
             if (!IsReversed) {
                 this.NodeIndex++;
                 if (this.NodeIndex >= this.HitNodes.length) {
@@ -87,8 +87,7 @@ var AssureNote;
             this.IsMoving = true;
             this.SetDestination(this.HitNodes[this.NodeIndex]);
             this.MoveToNext(this.AssureNoteApp.PictgramPanel.Viewport, function () {
-                ViewMap[_this.HitNodes[OldIndex].GetLabel()].Shape.RemoveColorStyle(AssureNote.ColorStyle.SearchHighlight);
-                ViewMap[_this.HitNodes[_this.NodeIndex].GetLabel()].Shape.AddColorStyle(AssureNote.ColorStyle.SearchHighlight);
+                _this.AssureNoteApp.PictgramPanel.ChangeFocusedLabel(_this.HitNodes[_this.NodeIndex].GetLabel());
                 _this.IsMoving = false;
             });
         };
