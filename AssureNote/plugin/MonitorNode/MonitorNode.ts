@@ -224,6 +224,43 @@ module AssureNote {
             this.App.PictgramPanel.Draw(Doc.TopNode.GetLabel());
         }
 
+        SucceedToPresumedNodeColor(): void {
+            var self = this;
+            var LabelMap = this.App.MasterRecord.GetLatestDoc().GetLabelMap();
+            var TopGoalView = this.App.PictgramPanel.MasterView;
+            TopGoalView.TraverseNode(function(View: NodeView): any {
+                var Model = View.Model;
+                if(Model.HasTag) {
+                    // Get label name
+                    var LabelName = null;
+                    var TagValue = Model.GetTagMap().get("Presume");
+                    if(TagValue != null) {
+                        LabelName = TagValue.replace(/\[|\]/g, "");
+                    }
+
+                    // Get label
+                    var Label = null;
+                    if(LabelName != null) {
+                        Label = LabelMap.get(LabelName);
+                    }
+                    if(Label == null) {
+                        Label = LabelName;
+                    }
+
+                    // succeed to presumed node color
+                    var PresumedNodeIsRedNode = self.RedNodeMap[Label];
+                    if((PresumedNodeIsRedNode != null) && PresumedNodeIsRedNode) {
+                        if(View.Model.IsContext()) {
+                            View = View.Parent;
+                        }
+                        View.TraverseNode(function(View: NodeView): any {
+                            self.RedNodeMap[View.Label] = true;
+                        });
+                    }
+                }
+            });
+        }
+
         UpdateRedNodeMap(): void {
             this.RedNodeMap = {};
             for(var MNode in this.MonitorNodeMap) {
@@ -235,6 +272,7 @@ module AssureNote {
                     }
                 }
             }
+            this.SucceedToPresumedNodeColor();
         }
 
         StartMonitoring(Interval: number): void {
@@ -286,6 +324,9 @@ module AssureNote {
                         }
                     }
                 }
+
+                // Succeed to presumed node color
+                self.SucceedToPresumedNodeColor();
 
                 // Update view
                 self.InitializeView(Doc);
