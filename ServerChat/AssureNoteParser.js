@@ -1867,25 +1867,7 @@ var ParserContext = (function () {
             Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
             return false;
         }
-        if (NodeType == 1 /* Context */) {
-            return true;
-        }
-        if (NodeType == 3 /* Evidence */) {
-            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(2 /* Strategy */)) {
-                Reader.LogError("Evidence is only linked to Goal", Line);
-                return false;
-            }
-            return true;
-        }
-        if (NodeType == 2 /* Strategy */) {
-            if (this.LastGoalNode != null && this.LastGoalNode.HasSubNode(3 /* Evidence */)) {
-                Reader.LogError("Strategy is only linked to Goal", Line);
-                return false;
-            }
-            return true;
-        }
-        Reader.LogError("undefined element", Line);
-        return false;
+        return true;
     };
 
     /**
