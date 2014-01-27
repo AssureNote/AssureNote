@@ -189,6 +189,9 @@ var AssureNote;
             UserAgant.IsAnimationFrameEnabled = function () {
                 return !!UserAgant.ua.AnimationFrame;
             };
+            UserAgant.IsTouchDevice = function () {
+                return UserAgant.ua.Touch;
+            };
             UserAgant.ua = (function () {
                 return {
                     ltIE6: typeof window.addEventListener == "undefined" && typeof document.documentElement.style.maxHeight == "undefined",

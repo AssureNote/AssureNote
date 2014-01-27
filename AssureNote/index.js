@@ -35,6 +35,12 @@
 var Debug = {};
 
 $(function () {
+    //Browser detection
+    if (AssureNote.AssureNoteUtils.UserAgant.IsTrident() || AssureNote.AssureNoteUtils.UserAgant.IsPresto() || AssureNote.AssureNoteUtils.UserAgant.IsTouchDevice()) {
+        alert('Not supported browser. Use Chrome/Safari/FireFox.');
+        return;
+    }
+
     //safari does not support window.performance
     if (window.performance == null) {
         window.performance = {};
