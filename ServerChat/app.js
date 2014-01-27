@@ -16,12 +16,23 @@ var AssureNoteServer = (function () {
             console.log('id: ' + socket.id + ' connected');
             socket.emit('init', { id: socket.id, list: self.GetUserList() });
             socket.broadcast.emit('join', { id: socket.id, list: self.GetUserList() });
-        });
 
-        this.io.sockets.on('disconnect', function (socket) {
-            socket.unjoin(self.room);
-            console.log('id: ' + socket.id + ' leave');
-            socket.broadcast.emit('leave', { id: socket.id, list: self.GetUserList() });
+            socket.on('disconnect', function () {
+                this.leave(self.room);
+                console.log('id: ' + this.id + ' leave');
+                console.log('close');
+                this.broadcast.emit('leave', { id: this.id, list: self.GetUserList() });
+                if (self.EditingNodes.length != 0) {
+                    for (var i = 0; i < self.EditingNodes.length; i++) {
+                        if (self.EditingNodes[i]["SID"] == socket.id) {
+                            this.broadcast.emit('finishedit', { Label: self.EditingNodes[i]['Label'], UID: self.EditingNodes[i]['UID'] });
+                            self.EditingNodes.splice(i, 1);
+                        }
+                    }
+                } else {
+                    this.broadcast.emit('close', "Window closed: " + socket.id);
+                }
+            });
         });
     }
     AssureNoteServer.prototype.EnableListeners = function (socket) {
@@ -32,20 +43,6 @@ var AssureNoteServer = (function () {
 
         socket.on('update', function (data) {
             socket.broadcast.emit('update', data);
-        });
-
-        socket.on('close', function (message) {
-            console.log('close');
-            if (self.EditingNodes.length != 0) {
-                for (var i = 0; i < self.EditingNodes.length; i++) {
-                    if (self.EditingNodes[i]["SID"] == socket.id) {
-                        socket.broadcast.emit('finishedit', { Label: self.EditingNodes[i]['Label'], UID: self.EditingNodes[i]['UID'] });
-                        self.EditingNodes.splice(i, 1);
-                    }
-                }
-            } else {
-                socket.broadcast.emit('close', "Window closed: " + socket.id);
-            }
         });
 
         socket.on('sync', function (data) {
