@@ -140,7 +140,7 @@ export class ForbiddenError extends ApplicationError {
  */
 export class NotFoundError extends ApplicationError {
     constructor(msg:string, data?:any) {
-        super(HTTP_STATUS.OK, RPC_ERROR.DATA_NOT_FOUND, msg, data);
+        super(HTTP_STATUS.NOT_FOUND, RPC_ERROR.DATA_NOT_FOUND, msg, data);
     }
 }
 

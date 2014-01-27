@@ -177,9 +177,7 @@ module AssureNote {
 
         export function UpdateHash(hash: string) {
             if (!hash) hash = '';
-            var scr = document.body.scrollTop;
             window.location.hash = hash;
-            document.body.scrollTop = scr;
         }
 
         export class UserAgant {

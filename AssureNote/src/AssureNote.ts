@@ -136,9 +136,16 @@ module AssureNote {
 
         LoadDefaultWGSN(): void {
             if(window.location.pathname.match("/file/") != null) {
-                AssureNoteUtils.postJsonRPC("download", {fileId: window.location.pathname.replace(/\/.*\//,"")}, (result: any) => {
-                    this.LoadNewWGSN("hello.wgsn", result.content);
-                });
+                AssureNoteUtils.postJsonRPC("download",
+                        {fileId: window.location.pathname.replace(/\/.*\//,"")},
+                        (result: any) => {
+                            this.LoadNewWGSN("hello.wgsn", result.content);
+                        },() => {
+                            //TODO impl error UI
+                            console.log("Assurance Case not found.");
+                            alert("Assurance Case not found.");
+                        }
+                );
             } else {
                 var lang: string = navigator.browserLanguage || navigator.language || navigator.userLanguage;
                 if (!lang || lang == "ja") {

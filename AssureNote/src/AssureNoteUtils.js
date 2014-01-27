@@ -137,9 +137,7 @@ var AssureNote;
         function UpdateHash(hash) {
             if (!hash)
                 hash = '';
-            var scr = document.body.scrollTop;
             window.location.hash = hash;
-            document.body.scrollTop = scr;
         }
         AssureNoteUtils.UpdateHash = UpdateHash;
 

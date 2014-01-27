@@ -118,6 +118,10 @@ var AssureNote;
             if (window.location.pathname.match("/file/") != null) {
                 AssureNote.AssureNoteUtils.postJsonRPC("download", { fileId: window.location.pathname.replace(/\/.*\//, "") }, function (result) {
                     _this.LoadNewWGSN("hello.wgsn", result.content);
+                }, function () {
+                    //TODO impl error UI
+                    console.log("Assurance Case not found.");
+                    alert("Assurance Case not found.");
                 });
             } else {
                 var lang = navigator.browserLanguage || navigator.language || navigator.userLanguage;
