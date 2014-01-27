@@ -106,6 +106,7 @@ var AssureNote;
                     Tooltip.Remove();
                 }
                 _this.AssureNoteApp.ExecDoubleClicked(NodeView);
+                _this.AssureNoteApp.SocketManager.FoldNode({ "IsFolded": NodeView.IsFolded, "UID": NodeView.Model.UID });
                 event.preventDefault();
             });
 
@@ -281,6 +282,7 @@ var AssureNote;
                         var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
                             _this.AssureNoteApp.ExecDoubleClicked(Node);
+                            _this.AssureNoteApp.SocketManager.FoldNode({ "IsFolded": Node.IsFolded, "UID": Node.Model.UID });
                         }
                         return false;
                     }

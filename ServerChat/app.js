@@ -49,6 +49,10 @@ var AssureNoteServer = (function () {
             socket.broadcast.emit('sync', data);
         });
 
+        socket.on('fold', function (data) {
+            socket.broadcast.emit('fold', data);
+        });
+
         socket.on('startedit', function (data) {
             var datas = {};
             datas['Label'] = data.Label;

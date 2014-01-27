@@ -121,6 +121,7 @@ module AssureNote {
                     Tooltip.Remove();
                 }
                 this.AssureNoteApp.ExecDoubleClicked(NodeView);
+                this.AssureNoteApp.SocketManager.FoldNode({"IsFolded": NodeView.IsFolded, "UID": NodeView.Model.UID});
                 event.preventDefault();
             });
 
@@ -301,6 +302,7 @@ module AssureNote {
                         var R = 150 / this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
                             this.AssureNoteApp.ExecDoubleClicked(Node);
+                            this.AssureNoteApp.SocketManager.FoldNode({"IsFolded": Node.IsFolded, "UID": Node.Model.UID});
                         }
                         return false;
                     }

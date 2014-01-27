@@ -53,6 +53,10 @@ class AssureNoteServer {
             socket.broadcast.emit('sync', data);
         });
 
+        socket.on('fold', function (data: {IsFolded: boolean; UID: number}) {
+            socket.broadcast.emit('fold', data);
+        });
+
         socket.on('startedit', function(data: {Label: string; UID: number; IsRecursive: boolean; UserName: string}) {
             var datas = {};
             datas['Label'] = data.Label;

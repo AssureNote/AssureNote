@@ -55,6 +55,7 @@ var AssureNote;
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
                 this.Fold(TargetView);
+                this.App.SocketManager.FoldNode({ "IsFolded": TargetView.IsFolded, "UID": TargetView.Model.UID });
             } else {
                 this.App.DebugP(Label + " not found.");
             }
