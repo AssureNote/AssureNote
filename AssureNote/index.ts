@@ -40,9 +40,8 @@ var Debug = <any>{};
 $(() => {
 
     //Browser detection
-    if (AssureNote.AssureNoteUtils.UserAgant.IsTrident() ||
-        AssureNote.AssureNoteUtils.UserAgant.IsPresto() ||
-        AssureNote.AssureNoteUtils.UserAgant.IsTouchDevice()) {
+    var UA = AssureNote.AssureNoteUtils.UserAgant;
+    if (!UA.IsBlink() && !UA.IsWebkit() && !UA.IsGecko()){
             alert('Not supported browser. Use Chrome/Safari/FireFox.');
             return;
     }
