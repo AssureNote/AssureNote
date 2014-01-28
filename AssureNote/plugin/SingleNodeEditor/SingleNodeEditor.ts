@@ -48,23 +48,24 @@ module AssureNote {
                 Label = Params[0].toUpperCase();
             }
             var event = document.createEvent("UIEvents");
-            var TargetView = this.App.PictgramPanel.ViewMap[Label];
-            if (TargetView != null) {
+            var NodeView = this.App.PictgramPanel.ViewMap[Label];
+            if (NodeView != null) {
                 var Writer = new StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer, false);
-                var Top = this.App.PictgramPanel.Viewport.PageYFromGY(TargetView.GetGY());
-                var Left = this.App.PictgramPanel.Viewport.PageXFromGX(TargetView.GetGX());
-                var Width = TargetView.GetShape().GetNodeWidth();
-                var Height = Math.max(100, TargetView.GetShape().GetNodeHeight());
+                NodeView.Model.FormatSubNode(1, Writer, false);
+                var Top = this.App.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
+                var Left = this.App.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
+                var Width = NodeView.GetShape().GetNodeWidth();
+                var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
+                var StrokeWidth = Number($(NodeView.Shape.ShapeGroup).css('stroke-width').charAt(0));
                 this.App.SingleNodeEditorPanel.UpdateCSS({
                     position: "fixed",
-                    top: Top,
-                    left: Left,
-                    width: Width,
-                    height: Height,
+                    top: Top - (StrokeWidth / 2) + "px",
+                    left: Left - (StrokeWidth / 2) + "px",
+                    width: Width + StrokeWidth + "px",
+                    height: Height + StrokeWidth + "px",
                     background: "rgba(255, 255, 255, 1.00)",
                 });
-                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, false);
+                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
