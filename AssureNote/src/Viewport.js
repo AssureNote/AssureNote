@@ -445,6 +445,8 @@ var AssureNote;
         */
         ViewportManager.prototype.MoveTo = function (GX, GY, Scale, Duration) {
             var _this = this;
+            //            var App = new AssureNote.AssureNoteApp();
+            //            App.SocketManager.SyncScreenFocus({"X": GX, "Y": GY, "Scale": Scale});
             Scale = ViewportManager.LimitScale(Scale);
             if (Duration <= 0) {
                 this.SetCamera(GX, GY, Scale);

@@ -37,7 +37,9 @@ var AssureNote;
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
-            this.ReceivedEvent = true;
+            this.IsSyncMode = true;
+            this.ReceivedSyncFocusEvent = false;
+            this.ReceivedFoldEvent = false;
             this.EditingNodes = [];
             if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found');
@@ -76,16 +78,23 @@ var AssureNote;
                 console.log(data);
             });
             this.socket.on('fold', function (data) {
-                var NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
-                self.AssureNoteApp.ExecDoubleClicked(NodeView);
+                if (!self.ReceivedFoldEvent) {
+                    console.log('false => true');
+                    self.ReceivedFoldEvent = true;
+                    var NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                    self.AssureNoteApp.ExecDoubleClicked(NodeView);
+                }
             });
             this.socket.on('update', function (data) {
                 console.log('update');
                 self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
             });
-            this.socket.on('sync', function (data) {
+            this.socket.on('syncfocus', function (data) {
                 console.log('sync');
-                //    self.AssureNoteApp.PictgramPanel.Viewport.MoveTo(data.PosX, data.PosY, 1.0, 100);
+                if (!self.ReceivedSyncFocusEvent) {
+                    self.ReceivedSyncFocusEvent = true;
+                    self.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(data.X, data.Y);
+                }
             });
             this.socket.on('startedit', function (data) {
                 console.log('edit');
@@ -213,20 +222,27 @@ var AssureNote;
             }
         };
 
-        SocketManager.prototype.GetCurrentUserName = function () {
-            return this.GetCurrentUserName();
-        };
-
         SocketManager.prototype.StartEdit = function (data) {
-            this.Emit('startedit', data);
+            if (this.IsConnected()) {
+                this.Emit('startedit', data);
+            }
         };
 
         SocketManager.prototype.FoldNode = function (data) {
-            this.Emit('fold', data);
+            if (this.IsConnected() && !this.ReceivedFoldEvent) {
+                this.Emit('fold', data);
+            } else {
+                console.log('true => false');
+                this.ReceivedFoldEvent = false;
+            }
         };
 
         SocketManager.prototype.SyncScreenFocus = function (PosData) {
-            this.Emit('sync', PosData);
+            if (this.IsConnected() && !this.ReceivedSyncFocusEvent) {
+                this.Emit('syncfocus', PosData);
+            } else {
+                this.ReceivedSyncFocusEvent = true;
+            }
         };
 
         SocketManager.prototype.UpdateWGSN = function () {

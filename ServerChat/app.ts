@@ -49,8 +49,8 @@ class AssureNoteServer {
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('sync', function (data: {PosX: number; PosY: number}) {
-            socket.broadcast.emit('sync', data);
+        socket.on('syncfocus', function (data: {X: number; Y: number; Scale: number}) {
+            socket.broadcast.emit('syncfocus', data);
         });
 
         socket.on('fold', function (data: {IsFolded: boolean; UID: number}) {

@@ -33,7 +33,9 @@ module AssureNote {
     export class SocketManager {
         private socket: any;
         private handler: { [key: string]: (any) => void };
-        ReceivedEvent: boolean = true;
+        IsSyncMode: boolean = true;
+        ReceivedSyncFocusEvent: boolean = false;
+        ReceivedFoldEvent: boolean = false;
         EditingNodes: any[] = [];
         CurrentUserName: string;
 
@@ -77,16 +79,23 @@ module AssureNote {
                 console.log(data);
             });
             this.socket.on('fold', function (data: {IsFolded: boolean; UID: number}) {
-                var NodeView: NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
-                self.AssureNoteApp.ExecDoubleClicked(NodeView);
+                if (!self.ReceivedFoldEvent) {
+                    console.log('false => true');
+                    self.ReceivedFoldEvent = true;
+                    var NodeView: NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                    self.AssureNoteApp.ExecDoubleClicked(NodeView);
+                }
             });
             this.socket.on('update', function (data: {name: string; WGSN: string}) {
                 console.log('update');
                 self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
             });
-            this.socket.on('sync', function (data: {PosX: number; PosY: number}) {
+            this.socket.on('syncfocus', function (data: {X: number; Y: number; Scale: number}) {
                 console.log('sync');
-            //    self.AssureNoteApp.PictgramPanel.Viewport.MoveTo(data.PosX, data.PosY, 1.0, 100);
+                if (!self.ReceivedSyncFocusEvent) {
+                    self.ReceivedSyncFocusEvent = true;
+                    self.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(data.X, data.Y);
+                }
             });
             this.socket.on('startedit', function(data : {Label: string; UID: number; IsRecursive: boolean; UserName: string; SID: number}) {
                 console.log('edit');
@@ -209,20 +218,27 @@ module AssureNote {
             }
         }
 
-        GetCurrentUserName() : string {
-            return this.GetCurrentUserName();
-        }
-
         StartEdit(data: {Label: string; UID: number}) {
-            this.Emit('startedit' ,data);
+            if(this.IsConnected()) {
+                this.Emit('startedit' ,data);
+            }
         }
 
         FoldNode(data: {IsFolded: boolean; UID: number}) {
-            this.Emit('fold', data);
+            if(this.IsConnected() && !this.ReceivedFoldEvent) {
+                this.Emit('fold', data);
+            } else {
+                console.log('true => false');
+                this.ReceivedFoldEvent = false;
+            }
         }
 
-        SyncScreenFocus (PosData: {PosX: number; PosY: number})  {
-            this.Emit('sync', PosData);
+        SyncScreenFocus (PosData: {X: number; Y: number; Scale: number})  {
+            if(this.IsConnected() && !this.ReceivedSyncFocusEvent) {
+                this.Emit('syncfocus', PosData);
+            } else {
+                this.ReceivedSyncFocusEvent = true;
+            }
         }
 
         UpdateWGSN() {

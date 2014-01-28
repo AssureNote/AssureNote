@@ -431,6 +431,8 @@ module AssureNote {
             @async
         */
         MoveTo(GX: number, GY: number, Scale: number, Duration: number): void {
+//            var App = new AssureNote.AssureNoteApp();
+//            App.SocketManager.SyncScreenFocus({"X": GX, "Y": GY, "Scale": Scale});
             Scale = ViewportManager.LimitScale(Scale);
             if (Duration <= 0) {
                 this.SetCamera(GX, GY, Scale);
@@ -455,7 +457,7 @@ module AssureNote {
             }
 
             var lastTime: number = performance.now();
-            var startTime = lastTime; 
+            var startTime = lastTime;
 
             var update: any = () => {
                 var currentTime: number = performance.now();
