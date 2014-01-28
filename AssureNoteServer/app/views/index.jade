@@ -16,7 +16,7 @@ html
     +css('/css/index.css')
     +css('/css/topmenu.css')
     +css('/css/codehighlight.css')
-  body(style='overflow: hidden; margin: 0px;')
+  body
     #assure-note(style='width: 100%; height: 100%;')
       input#file-open-dialog(type='file', accept='.wgsn,.dcase_model', style='display:none;')
       #auto-expand-area
@@ -91,12 +91,12 @@ html
     +js('/src/AssureNoteUtils.js')
     +js('/src/AssureNoteParser.js')
     +js('/src/DCaseModelXMLParser.js')
+    +js('/src/Panel.js')
     +js('/src/CommandLine.js')
     +js('/src/Command.js')
     +js('/src/TopMenu.js')
     +js('/src/GSNShape.js')
     +js('/src/NodeView.js')
-    +js('/src/Panel.js')
     +js('/src/LayoutEngine.js')
     +js('/src/AssureNote.js')
     +js('/src/Viewport.js')

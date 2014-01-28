@@ -47,11 +47,8 @@ $(() => {
     }
 
     //safari does not support window.performance
-    if(window.performance == null) {
-        window.performance = <any>{};
-        if(window.performance.now == null) {
-            window.performance.now = () => { return Date.now();}
-        }
+    if(!UA.IsPerformanceEnabled()) {
+        window.performance = <any>{ now: () => { return Date.now(); } };
     }
     var App = new AssureNote.AssureNoteApp();
     Debug.AssureNote = App;
@@ -72,8 +69,4 @@ $(() => {
     }
 
     App.LoadDefaultWGSN();
-    document.documentElement.scrollTop = 0;
-    window.addEventListener('hashchange', (ev: Event) => {
-        document.documentElement.scrollTop = 0;
-    });
 });
