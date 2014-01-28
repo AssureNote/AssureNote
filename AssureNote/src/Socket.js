@@ -130,7 +130,9 @@ var AssureNote;
             } else {
                 this.socket = io.connect(host);
             }
-            this.AssureNoteApp.ModeManager.Enable();
+            if (this.IsConnected()) {
+                this.AssureNoteApp.ModeManager.Enable();
+            }
             this.EnableListeners();
         };
 
