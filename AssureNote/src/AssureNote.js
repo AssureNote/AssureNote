@@ -189,6 +189,7 @@ var AssureNote;
                 reader.onload = function (event) {
                     var Contents = event.target.result;
                     var Name = Files[0].name;
+                    AssureNote.AssureNoteUtils.UpdateHash(null);
                     _this.LoadNewWGSN(Name, Contents);
 
                     /* TODO resolve conflict */

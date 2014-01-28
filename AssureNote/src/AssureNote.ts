@@ -212,6 +212,7 @@ module AssureNote {
                 reader.onload = (event) => {
                     var Contents: string = (<any>event.target).result;
                     var Name: string = Files[0].name;
+                    AssureNoteUtils.UpdateHash(null);
                     this.LoadNewWGSN(Name, Contents);
 
                     /* TODO resolve conflict */
