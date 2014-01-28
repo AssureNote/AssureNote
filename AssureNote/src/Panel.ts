@@ -109,6 +109,8 @@ module AssureNote {
         MasterView: NodeView;
         CmdLine: CommandLine;
         Search: Search;
+        ContextMenu: NodeMenu;
+        NodeTooltip: Tooltip;
 
         CurrentDoc: GSNDoc;// Convert to caseview
         private FocusedLabel: string;// A label pointed out or clicked.
@@ -123,19 +125,20 @@ module AssureNote {
             this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.App);
 
-            var Bar = new NodeMenu(App);
-            var Tooltip: Tooltip = new AssureNote.Tooltip(App);
+            this.ContextMenu = new NodeMenu(App);
+            this.NodeTooltip = new AssureNote.Tooltip(App);
+
             this.ContentLayer.addEventListener("click", (event: MouseEvent) => {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 this.App.DebugP("click:" + Label);
-                if (this.IsActive) {
+                if (this.IsActive()) {
                     this.ChangeFocusedLabel(Label);
                 }
-                if (Bar.IsEnable) {
-                    Bar.Remove();
+                if (this.ContextMenu.IsEnable) {
+                    this.ContextMenu.Remove();
                 }
-                if (Tooltip.IsEnable) {
-                    Tooltip.Remove();
+                if (this.NodeTooltip.IsEnable) {
+                    this.NodeTooltip.Remove();
                 }
                 event.preventDefault();
             });
@@ -144,12 +147,6 @@ module AssureNote {
                 if (this.IsActive()) {
                     this.ChangeFocusedLabel(null);
                 }
-                if (Bar.IsEnable) {
-                    Bar.Remove();
-                }
-                if (Tooltip.IsEnable) {
-                    Tooltip.Remove();
-                }
             });
 
             this.ContentLayer.addEventListener("contextmenu", (event: MouseEvent) => {
@@ -157,15 +154,9 @@ module AssureNote {
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null) {
                     this.ChangeFocusedLabel(Label);
-                    if (Bar.IsEnable) {
-                        Bar.Remove();
-                    }
-                    if (Tooltip.IsEnable) {
-                        Tooltip.Remove();
-                    }
                     if (this.App.SocketManager.IsEditable(NodeView.Model.UID)) {
                         var Buttons = this.App.PluginManager.GetMenuBarButtons(NodeView);
-                        Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
+                        this.ContextMenu.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
                     } else {
                         (<any>$).notify("Warning:Other user edits this node!", "warn");
                     }
@@ -179,11 +170,11 @@ module AssureNote {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = this.ViewMap[Label];
                 this.App.DebugP("double click:" + Label);
-                if (Bar.IsEnable) {
-                    Bar.Remove();
+                if (this.ContextMenu.IsEnable) {
+                    this.ContextMenu.Remove();
                 }
-                if (Tooltip.IsEnable) {
-                    Tooltip.Remove();
+                if (this.NodeTooltip.IsEnable) {
+                    this.NodeTooltip.Remove();
                 }
                 this.App.ExecDoubleClicked(NodeView);
                 event.preventDefault();
@@ -202,7 +193,7 @@ module AssureNote {
                 if (NodeView != null && ToolTipFocusedLabel != Label) {
                     ToolTipFocusedLabel = Label;
                     var Tooltips = this.App.PluginManager.GetTooltipContents(NodeView);
-                    Tooltip.Create(NodeView, this.ControlLayer, Tooltips);
+                    this.NodeTooltip.Create(NodeView, this.ControlLayer, Tooltips);
                 }
             });
 
@@ -210,8 +201,8 @@ module AssureNote {
                 /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
                    every time the pointer enters the sub-element of ContentLayer.
                    Mouseleave can prevent this annoying event firing. */
-                if (Tooltip.IsEnable) {
-                    Tooltip.Remove();
+                if (this.NodeTooltip.IsEnable) {
+                    this.NodeTooltip.Remove();
                     ToolTipFocusedLabel = null;
                 }
             });
@@ -437,6 +428,12 @@ module AssureNote {
         */
         ChangeFocusedLabel(Label: string): void {
             AssureNoteUtils.UpdateHash(Label);
+            if (this.ContextMenu.IsEnable) {
+                this.ContextMenu.Remove();
+            }
+            if (this.NodeTooltip.IsEnable) {
+                this.NodeTooltip.Remove();
+            }
             if (Label == null) {
                 var oldNodeView = this.ViewMap[this.FocusedLabel];
                 if (oldNodeView != null) {
