@@ -529,6 +529,10 @@ var AssureNote;
             this.SVGLayer.setAttribute("transform", attr);
             this.SetTransformToElement(this.ContentLayer, style);
             this.SetTransformToElement(this.ControlLayer, style);
+
+            if (this.OnScroll) {
+                this.OnScroll(this);
+            }
         };
         return ViewportManager;
     })();

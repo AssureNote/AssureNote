@@ -198,7 +198,8 @@ module AssureNote {
         private PageHeight: number = window.innerHeight;
         private CameraCenterPageX: number;
         private CameraCenterPageY: number;
-        IsPointerEnabled: boolean = true;
+        public IsPointerEnabled: boolean = true;
+        public OnScroll: (Viewport: ViewportManager) => void;
 
         private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
             Element.style["transformOrigin"] = Value;
@@ -514,6 +515,11 @@ module AssureNote {
             this.SVGLayer.setAttribute("transform", attr);
             this.SetTransformToElement(this.ContentLayer, style);
             this.SetTransformToElement(this.ControlLayer, style);
+
+            if (this.OnScroll) {
+                this.OnScroll(this);
+            }
         }
+
     }
 }
