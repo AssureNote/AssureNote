@@ -36,7 +36,8 @@ var AssureNote;
             this.PluginManager = new AssureNote.PluginManager(this);
             this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
-            this.PluginPanel = new AssureNote.PluginPanel(this);
+            this.FullScreenEditorPanel = new AssureNote.WGSNEditorPanel(this);
+            this.SingleNodeEditorPanel = new AssureNote.SingleNodeEditorPanel(this);
             this.ModeManager = new AssureNote.ModeManager(this, 0 /* Edit */);
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
@@ -95,7 +96,7 @@ var AssureNote;
 
         AssureNoteApp.prototype.ExecDoubleClicked = function (NodeView) {
             var Plugin = this.PluginManager.GetDoubleClicked();
-            Plugin.ExecDoubleClicked(NodeView);
+            Plugin.OnNodeDoubleClicked(NodeView);
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {

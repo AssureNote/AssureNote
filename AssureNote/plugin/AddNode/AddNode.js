@@ -36,7 +36,7 @@ var AssureNote;
         function AddNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
-            this.SetMenuBarButton(true);
+            this.SetHasMenuBarButton(true);
             //this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
         }
         AddNodePlugin.prototype.CreateCallback = function (Type) {

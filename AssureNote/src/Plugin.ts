@@ -38,13 +38,10 @@ module AssureNote {
             this.hasDoubleClicked = false;
         }
 
-        ExecCommand(AssureNote: AssureNoteApp, Args: string[]): void {
+        Display(PluginPanel: WGSNEditorPanel, GSNDoc: GSNDoc, Label: string): void {
         }
 
-        Display(PluginPanel: PluginPanel, GSNDoc: GSNDoc, Label: string): void {
-        }
-
-        ExecDoubleClicked(NodeView: NodeView): void {
+        OnNodeDoubleClicked(NodeView: NodeView): void {
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
@@ -59,14 +56,6 @@ module AssureNote {
             return null;
         }
 
-        EditorEnableCallback(): () => void {
-            return null;
-        }
-
-        EditorDisableCallback(): () => void {
-            return null;
-        }
-
         RenderHTML(NodeDoc: string, Model: GSNNode): string {
             /* Do nothing */
             return NodeDoc;
@@ -76,7 +65,7 @@ module AssureNote {
             /* Do nothing */
         }
 
-        SetMenuBarButton(b: boolean) {
+        SetHasMenuBarButton(b: boolean) {
             this.hasMenuBarButton = b;
         }
 
@@ -84,7 +73,7 @@ module AssureNote {
             return this.hasMenuBarButton;
         }
 
-        SetEditor(b: boolean): void {
+        SetHasEditor(b: boolean): void {
             this.hasEditor = b;
         }
 
@@ -92,7 +81,7 @@ module AssureNote {
             return this.hasEditor;
         }
 
-        SetDoubleClicked(b: boolean): void {
+        SetHasDoubleClicked(b: boolean): void {
             this.hasDoubleClicked = b;
         }
 
@@ -100,20 +89,6 @@ module AssureNote {
             return this.hasDoubleClicked;
         }
     }
-
-
-    //export class SamplePlugin extends Plugin {
-    //    constructor() {
-    //        super();
-    //        this.HasMenuBarButton = true;
-    //    }
-
-    //    CreateMenuBarButton(): MenuBarButton {
-    //        return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
-    //            alert(TargetView.Label);
-    //        });
-    //    }
-    //}
 
     export function OnLoadPlugin(Callback: (App: AssureNoteApp) => void) {
         PluginManager.OnLoadPlugin.push(Callback);

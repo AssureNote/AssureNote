@@ -28,9 +28,6 @@
 
 module AssureNote {
     export class FullScreenEditorCommand extends Command {
-        constructor(App: AssureNote.AssureNoteApp, public EditorUtil: EditorUtil) {
-            super(App);
-        }
 
         public GetCommandLineNames(): string[]{
             return ["edit"];
@@ -56,7 +53,7 @@ module AssureNote {
                 }
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, true);
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
+                this.App.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
@@ -64,20 +61,11 @@ module AssureNote {
     }
 
     export class FullScreenEditorPlugin extends Plugin {
-        public EditorUtil: EditorUtil;
-        constructor(public AssureNoteApp: AssureNoteApp, public textarea: CodeMirror.Editor, public selector: string) {
+        constructor(public AssureNoteApp: AssureNoteApp) {
             super();
-            this.SetMenuBarButton(true);
-            this.SetEditor(true);
-            this.EditorUtil = new EditorUtil(AssureNoteApp, textarea, selector, {
-                position: "fixed",
-                top: "5%",
-                left: "5%",
-                width: "90%",
-                height: "90%"
-            });
-            CodeMirror.on(this.textarea, 'cursorActivity', (doc: CodeMirror.Doc) => this.MoveBackgroundNode(doc));
-            this.AssureNoteApp.RegistCommand(new FullScreenEditorCommand(this.AssureNoteApp, this.EditorUtil));
+            this.SetHasMenuBarButton(true);
+            this.SetHasEditor(true);
+            this.AssureNoteApp.RegistCommand(new FullScreenEditorCommand(this.AssureNoteApp));
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
@@ -88,7 +76,7 @@ module AssureNote {
                 (event: Event, TargetView: NodeView) => {
                     var Writer = new StringWriter();
                     TargetView.Model.FormatSubNode(1, Writer, true);
-                    this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, true);
+                    this.AssureNoteApp.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
             });
         }
 
@@ -120,4 +108,5 @@ module AssureNote {
 }
 
 AssureNote.OnLoadPlugin((App: AssureNote.AssureNoteApp) => {
+    App.PluginManager.SetPlugin("open", new AssureNote.FullScreenEditorPlugin(App));
 });

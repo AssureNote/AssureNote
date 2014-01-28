@@ -63,6 +63,7 @@
             "name": "src/Panel.js",
             "modules": {},
             "classes": {
+                "AssureNote.Panel": 1,
                 "AssureNote.PictgramPanel": 1
             },
             "fors": {},
@@ -305,6 +306,18 @@
             "line": 1974,
             "is_constructor": 1
         },
+        "AssureNote.Panel": {
+            "name": "AssureNote.Panel",
+            "shortname": "AssureNote.Panel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "namespace": "",
+            "file": "src/Panel.js",
+            "line": 41
+        },
         "AssureNote.PictgramPanel": {
             "name": "AssureNote.PictgramPanel",
             "shortname": "AssureNote.PictgramPanel",
@@ -315,7 +328,8 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/Panel.js",
-            "line": 35
+            "line": 96,
+            "extends": "AssureNote.Panel"
         },
         "AssureNote.ScrollManager": {
             "name": "AssureNote.ScrollManager",
@@ -3966,7 +3980,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 299,
+            "line": 326,
             "itemtype": "method",
             "name": "MoveToNearestNode",
             "params": [
@@ -3980,7 +3994,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 311,
+            "line": 345,
             "itemtype": "method",
             "name": "FindNearestNode",
             "params": [
@@ -4003,7 +4017,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 362,
+            "line": 396,
             "itemtype": "method",
             "name": "FoldDeepSubGoals",
             "params": [
@@ -4017,7 +4031,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 378,
+            "line": 412,
             "itemtype": "method",
             "name": "ChangeFocusedLabel",
             "params": [
@@ -4043,7 +4057,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 243,
+            "line": 248,
             "itemtype": "method",
             "name": "GetCameraScale",
             "return": {
@@ -4054,7 +4068,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 255,
+            "line": 260,
             "itemtype": "method",
             "name": "SetCameraScale",
             "params": [
@@ -4068,7 +4082,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 284,
+            "line": 289,
             "itemtype": "method",
             "name": "GetCameraGX",
             "return": {
@@ -4079,7 +4093,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 292,
+            "line": 297,
             "itemtype": "method",
             "name": "GetCameraGY",
             "return": {
@@ -4090,7 +4104,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 300,
+            "line": 305,
             "itemtype": "method",
             "name": "SetCameraPosition",
             "params": [
@@ -4109,7 +4123,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 309,
+            "line": 314,
             "description": "Set camera's position and scale one time.",
             "itemtype": "method",
             "name": "SetCamera",
@@ -4134,7 +4148,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 328,
+            "line": 333,
             "itemtype": "method",
             "name": "GetCameraPageCenterX",
             "return": {
@@ -4145,7 +4159,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 336,
+            "line": 341,
             "itemtype": "method",
             "name": "GetCameraPageCenterY",
             "return": {
@@ -4156,7 +4170,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 344,
+            "line": 349,
             "description": "Set camera's vanishing point in web page.",
             "itemtype": "method",
             "name": "SetCameraPageCenter",
@@ -4176,7 +4190,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 355,
+            "line": 360,
             "description": "Calcurate PageX from GX",
             "itemtype": "method",
             "name": "PageXFromGX",
@@ -4195,7 +4209,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 365,
+            "line": 370,
             "description": "Calcurate PageY from GY",
             "itemtype": "method",
             "name": "PageYFromGY",
@@ -4214,7 +4228,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 375,
+            "line": 380,
             "description": "Calcurate GX from PageX",
             "itemtype": "method",
             "name": "GXFromPageX",
@@ -4233,7 +4247,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 385,
+            "line": 390,
             "description": "Calcurate GY from PageY",
             "itemtype": "method",
             "name": "GYFromPageY",
@@ -4252,7 +4266,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 419,
+            "line": 424,
             "description": "Move camera position relatively and change scale.",
             "itemtype": "method",
             "name": "Move",
@@ -4283,7 +4297,7 @@
         },
         {
             "file": "src/Viewport.js",
-            "line": 432,
+            "line": 437,
             "description": "Move camera position and scale one time.",
             "itemtype": "method",
             "name": "MoveTo",

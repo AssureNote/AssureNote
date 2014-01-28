@@ -67,7 +67,7 @@ module AssureNote {
     }
 
     export class MessageChatPlugin extends Plugin {
-        public EditorUtil: EditorUtil;
+        public EditorUtil: CodeMirrorEditorPanel;
         constructor(public AssureNoteApp: AssureNoteApp) {
             super();
             this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {

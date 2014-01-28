@@ -31,13 +31,10 @@ var AssureNote;
             this.hasEditor = false;
             this.hasDoubleClicked = false;
         }
-        Plugin.prototype.ExecCommand = function (AssureNote, Args) {
-        };
-
         Plugin.prototype.Display = function (PluginPanel, GSNDoc, Label) {
         };
 
-        Plugin.prototype.ExecDoubleClicked = function (NodeView) {
+        Plugin.prototype.OnNodeDoubleClicked = function (NodeView) {
         };
 
         Plugin.prototype.CreateMenuBarButton = function (NodeView) {
@@ -52,14 +49,6 @@ var AssureNote;
             return null;
         };
 
-        Plugin.prototype.EditorEnableCallback = function () {
-            return null;
-        };
-
-        Plugin.prototype.EditorDisableCallback = function () {
-            return null;
-        };
-
         Plugin.prototype.RenderHTML = function (NodeDoc, Model) {
             /* Do nothing */
             return NodeDoc;
@@ -69,7 +58,7 @@ var AssureNote;
             /* Do nothing */
         };
 
-        Plugin.prototype.SetMenuBarButton = function (b) {
+        Plugin.prototype.SetHasMenuBarButton = function (b) {
             this.hasMenuBarButton = b;
         };
 
@@ -77,7 +66,7 @@ var AssureNote;
             return this.hasMenuBarButton;
         };
 
-        Plugin.prototype.SetEditor = function (b) {
+        Plugin.prototype.SetHasEditor = function (b) {
             this.hasEditor = b;
         };
 
@@ -85,7 +74,7 @@ var AssureNote;
             return this.hasEditor;
         };
 
-        Plugin.prototype.SetDoubleClicked = function (b) {
+        Plugin.prototype.SetHasDoubleClicked = function (b) {
             this.hasDoubleClicked = b;
         };
 
@@ -96,17 +85,6 @@ var AssureNote;
     })();
     AssureNote.Plugin = Plugin;
 
-    //export class SamplePlugin extends Plugin {
-    //    constructor() {
-    //        super();
-    //        this.HasMenuBarButton = true;
-    //    }
-    //    CreateMenuBarButton(): MenuBarButton {
-    //        return new MenuBarButton("sample-id", "images/copy.png", "sample", (event: Event, TargetView: NodeView) => {
-    //            alert(TargetView.Label);
-    //        });
-    //    }
-    //}
     function OnLoadPlugin(Callback) {
         PluginManager.OnLoadPlugin.push(Callback);
         if (PluginManager.Current != null) {

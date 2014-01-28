@@ -122,12 +122,6 @@ h4 {
 
 .assurenote-search{
 	fill: #fae9b1;
-	/*stroke: none;*/
-}
-
-.assurenote-search-highlight{
-	fill: #fae9b1;
-	stroke: orange;
 }
 
 .assurenote-danger {

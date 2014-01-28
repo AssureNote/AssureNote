@@ -246,7 +246,6 @@ var AssureNote;
         ColorStyle.Highlight = "assurenote-default-highlight";
         ColorStyle.ToDo = "assurenote-todo";
         ColorStyle.Searched = "assurenote-search";
-        ColorStyle.SearchHighlight = "assurenote-search-highlight";
         ColorStyle.Danger = "assurenote-danger";
         ColorStyle.Editing = "assurenote-editing";
         return ColorStyle;

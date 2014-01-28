@@ -34,11 +34,71 @@
 ///<reference path='../plugin/SingleNodeEditor/SingleNodeEditor.ts'/>
 
 module AssureNote {
+
+    /**
+        @class AssureNote.Panel
+    */
+    export class Panel {
+        private static ActivePanel: Panel;
+        private static Initialized: boolean = false;
+
+        IsVisible = false;
+
+        IsEnable: boolean;
+        public App: AssureNoteApp;
+        constructor(App: AssureNoteApp) {
+            this.App = App;
+            if (!Panel.Initialized) {
+                Panel.ActivePanel = this;
+                document.addEventListener("keydown", (Event: KeyboardEvent) => {
+                    Panel.ActivePanel.OnKeyDown(Event);
+                });
+                Panel.Initialized = true;
+            }
+        }
+
+        Create(NodeView: NodeView, ControlLayer: HTMLDivElement, contents: any) {
+            /* Do nothing */
+        }
+
+        OnKeyDown(Event: KeyboardEvent): void {
+        }
+
+        OnActivate(): void {
+        }
+
+        OnDeactivate(): void {
+        }
+
+        Remove(): void {
+        }
+
+        Show(): void {
+            this.IsEnable = true;
+        }
+
+        Hide(): void {
+            this.IsVisible = false;
+        }
+
+        Activate(): void {
+            if (!this.IsActive()) {
+                Panel.ActivePanel.OnDeactivate();
+                Panel.ActivePanel = this;
+                this.OnActivate();
+            }
+        }
+
+        IsActive(): boolean {
+            return Panel.ActivePanel == this;
+        }
+    }
+
     /**
         @class AssureNote.PictgramPanel
+        @extends AssureNote.Panel
     */
-
-    export class PictgramPanel {
+    export class PictgramPanel extends Panel {
         LayoutEngine: LayoutEngine;
         SVGLayer: SVGGElement;
         EventMapLayer: HTMLDivElement;
@@ -54,20 +114,23 @@ module AssureNote {
         private FocusedLabel: string;// A label pointed out or clicked.
         // We do not use FocusedView but FocusedLabel to make it modular.
 
-        constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(public App: AssureNoteApp) {
+            super(App);
             this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));
             this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
             this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
             this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
             this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
-            this.LayoutEngine = new SimpleLayoutEngine(this.AssureNoteApp);
+            this.LayoutEngine = new SimpleLayoutEngine(this.App);
 
-            var Bar = new NodeMenu(AssureNoteApp);
-            var Tooltip: Tooltip = new AssureNote.Tooltip(AssureNoteApp);
+            var Bar = new NodeMenu(App);
+            var Tooltip: Tooltip = new AssureNote.Tooltip(App);
             this.ContentLayer.addEventListener("click", (event: MouseEvent) => {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
-                this.AssureNoteApp.DebugP("click:" + Label);
-                this.ChangeFocusedLabel(Label);
+                this.App.DebugP("click:" + Label);
+                if (this.IsActive) {
+                    this.ChangeFocusedLabel(Label);
+                }
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -78,7 +141,9 @@ module AssureNote {
             });
 
             this.EventMapLayer.addEventListener("pointerdown", (event: MouseEvent) => {
-                this.ChangeFocusedLabel(null);
+                if (this.IsActive()) {
+                    this.ChangeFocusedLabel(null);
+                }
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -98,8 +163,8 @@ module AssureNote {
                     if (Tooltip.IsEnable) {
                         Tooltip.Remove();
                     }
-                    if (this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
-                        var Buttons = this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
+                    if (this.App.SocketManager.IsEditable(NodeView.Model.UID)) {
+                        var Buttons = this.App.PluginManager.GetMenuBarButtons(NodeView);
                         Bar.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
                     } else {
                         (<any>$).notify("Warning:Other user edits this node!", "warn");
@@ -113,147 +178,30 @@ module AssureNote {
             this.ContentLayer.addEventListener("dblclick", (event: MouseEvent) => {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = this.ViewMap[Label];
-                this.AssureNoteApp.DebugP("double click:" + Label);
+                this.App.DebugP("double click:" + Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                 }
-                this.AssureNoteApp.ExecDoubleClicked(NodeView);
-                this.AssureNoteApp.SocketManager.FoldNode({"IsFolded": NodeView.IsFolded, "UID": NodeView.Model.UID});
+                this.App.ExecDoubleClicked(NodeView);
                 event.preventDefault();
             });
 
-            this.CmdLine = new CommandLine();
-            this.Search = new Search(AssureNoteApp);
-
-            // Following event handler is a little dirty. We need refactoring.
-
-            document.addEventListener("keydown", (event: KeyboardEvent) => {
-                if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-                    return;
-                }
-                switch (event.keyCode) {
-                    case 58: /*: in Firefox*/
-                        if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
-                            break;
-                        }
-                    case 186: /*:*/
-                    case 191: /*/*/
-                    case 219: /*@*/
-                        if (this.Search.IsSearching()) {
-                            this.Search.ResetParam();
-                        }
-                        this.CmdLine.Show();
-                        break;
-                    case 13: /*Enter*/
-                        if (this.CmdLine.IsVisible && this.CmdLine.IsEnable) {
-                            var ParsedCommand = new CommandParser();
-                            ParsedCommand.Parse(this.CmdLine.GetValue());
-                            if (ParsedCommand.GetMethod() == "search") {
-                                this.Search.Search(this.MasterView, ParsedCommand.GetArgs()[0]);
-                            }
-                            this.AssureNoteApp.ExecCommand(ParsedCommand);
-                            this.CmdLine.AddHistory(ParsedCommand.GetRawString());
-                            this.CmdLine.Hide();
-                            this.CmdLine.Clear();
-                            event.preventDefault();
-                        } else if (!this.CmdLine.IsVisible && this.Search.IsSearching()) {
-                            this.Search.SearchNext(this.MasterView, event.shiftKey);
-                        }
-                        break;
-                    case 27: /*Esc*/
-                        if (this.Search.IsSearching()) {
-                            this.Search.ResetParam();
-                        }
-                        if (this.CmdLine.IsVisible) {
-                            this.CmdLine.Hide();
-                            this.CmdLine.Clear();
-                        }
-                        break;
-                    case 37: /*left*/
-                        if (!this.CmdLine.IsVisible) {
-                            this.MoveToNearestNode(Direction.Left);
-                        }
-                        break;
-                    case 38: /*up*/
-                        if (this.CmdLine.IsVisible) {
-                            this.CmdLine.ShowPrevHistory();
-                        } else {
-                            this.MoveToNearestNode(Direction.Top);
-                        }
-                        break;
-                    case 39: /*right*/
-                        if (!this.CmdLine.IsVisible) {
-                            this.MoveToNearestNode(Direction.Right);
-                        }
-                        break;
-                    case 40: /*down*/
-                        if (this.CmdLine.IsVisible) {
-                            this.CmdLine.ShowNextHistory();
-                        } else {
-                            this.MoveToNearestNode(Direction.Bottom);
-                        }
-                        break;
-                    case 72: /*h*/
-                        if (!this.CmdLine.IsVisible) {
-                            this.MoveToNearestNode(Direction.Left);
-                        }
-                        break;
-                    case 74: /*j*/
-                        if (!this.CmdLine.IsVisible) {
-                            this.MoveToNearestNode(Direction.Bottom);
-                        }
-                        break;
-                    case 75: /*k*/
-                        if (!this.CmdLine.IsVisible) {
-                            this.MoveToNearestNode(Direction.Top);
-                        }
-                        break;
-                    case 76: /*l*/
-                        if (!this.CmdLine.IsVisible) {
-                            this.MoveToNearestNode(Direction.Right);
-                        }
-                        break;
-                    case 70: /*f*/
-                        if (!this.CmdLine.IsVisible) {
-                            var FoldCommand = this.AssureNoteApp.FindCommandByCommandLineName("fold");
-                            if (FoldCommand && this.FocusedLabel) {
-                                FoldCommand.Invoke(null, [this.FocusedLabel]);
-                            }
-                        }
-                        break;
-                    case 65: /*a*/
-                    case 73: /*i*/
-                        if (!this.CmdLine.IsVisible) {
-                            var FoldCommand = this.AssureNoteApp.FindCommandByCommandLineName("edit");
-                            if (FoldCommand && this.FocusedLabel) {
-                                FoldCommand.Invoke(null, [this.FocusedLabel]);
-                            }
-                        }
-                        break;
-                    case 8: /*BackSpace*/
-                        if(this.CmdLine.IsVisible && this.CmdLine.IsEmpty()) {
-                            this.CmdLine.Hide();
-                            this.CmdLine.Clear();
-                            event.preventDefault();
-                            break;
-                        }
-                        break;
-                }
-            });
+            this.CmdLine = new CommandLine(App);
+            this.Search = new Search(App);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", (event: MouseEvent) => {
-                if (!this.AssureNoteApp.PluginPanel.IsVisible) {
+                if (this.App.FullScreenEditorPanel.IsActive()) {
                     return;
                 }
                 var Label = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null && ToolTipFocusedLabel != Label) {
                     ToolTipFocusedLabel = Label;
-                    var Tooltips = this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
+                    var Tooltips = this.App.PluginManager.GetTooltipContents(NodeView);
                     Tooltip.Create(NodeView, this.ControlLayer, Tooltips);
                 }
             });
@@ -262,10 +210,6 @@ module AssureNote {
                 /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
                    every time the pointer enters the sub-element of ContentLayer.
                    Mouseleave can prevent this annoying event firing. */
-                if (!this.AssureNoteApp.PluginPanel.IsVisible) {
-                    return;
-                }
-
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                     ToolTipFocusedLabel = null;
@@ -273,20 +217,18 @@ module AssureNote {
             });
 
             var DragHandler = (e) => {
-                if (this.AssureNoteApp.PluginPanel.IsVisible) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
+                e.stopPropagation();
+                e.preventDefault();
             };
             $(this.EventMapLayer)
                 .on('dragenter', DragHandler)
                 .on('dragover', DragHandler)
                 .on('dragleave', DragHandler)
                 .on('drop', (event: JQueryEventObject) => {
-                    if (this.AssureNoteApp.PluginPanel.IsVisible) {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        this.AssureNoteApp.LoadFiles((<any>(<any>event.originalEvent).dataTransfer).files);
+                    event.stopPropagation();
+                    event.preventDefault();
+                    if (this.IsActive()) {
+                        this.App.LoadFiles((<any>(<any>event.originalEvent).dataTransfer).files);
                     }
                 });
 
@@ -301,8 +243,7 @@ module AssureNote {
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            this.AssureNoteApp.ExecDoubleClicked(Node);
-                            this.AssureNoteApp.SocketManager.FoldNode({"IsFolded": Node.IsFolded, "UID": Node.Model.UID});
+                            this.App.ExecDoubleClicked(Node);
                         }
                         return false;
                     }
@@ -318,15 +259,109 @@ module AssureNote {
 
         }
 
+        OnKeyDown(Event: KeyboardEvent): void {
+            var handled = true;
+            switch (Event.keyCode) {
+                case 58: /*: in Firefox*/
+                case 186: /*:*/
+                case 191: /*/*/
+                case 219: /*@*/
+                    if (this.Search.IsSearching()) {
+                        this.Search.EndSearch();
+                    }
+                    this.CmdLine.Activate();
+                    break;
+                case 27: /*Esc*/
+                    if (this.Search.IsSearching()) {
+                        this.Search.EndSearch();
+                        Event.preventDefault();
+                    }
+                    break;
+                case 13: /*Enter*/
+                    if (this.Search.IsSearching()) {
+                        this.Search.SearchNext(this.MasterView, event.shiftKey);
+                        Event.preventDefault();
+                    }
+                    break;
+                case 72: /*h*/
+                case 37: /*left*/
+                    this.NavigateLeft();
+                    Event.preventDefault();
+                    break;
+                case 74: /*j*/
+                case 40: /*down*/
+                    this.NavigateDown();
+                    Event.preventDefault();
+                    break;
+                case 75: /*k*/
+                case 38: /*up*/
+                    this.NavigateUp();
+                    Event.preventDefault();
+                    break;
+                case 76: /*l*/
+                case 39: /*right*/
+                    this.NavigateRight();
+                    Event.preventDefault();
+                    break;
+                case 36: /*home*/
+                    this.NavigateHome();
+                    Event.preventDefault();
+                    break;
+                case 70: /*f*/
+                    if (!this.CmdLine.IsVisible) {
+                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 65: /*a*/
+                case 73: /*i*/
+                    var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                    if (EditCommand && this.FocusedLabel) {
+                        EditCommand.Invoke(null, [this.FocusedLabel]);
+                    }
+                    Event.preventDefault();
+                    break;
+                default:
+                    handled = false;
+                    break;
+            }
+            if (handled) {
+                Event.stopPropagation();
+            }
+        }
+
+        OnActivate(): void {
+            this.Viewport.IsPointerEnabled = true;
+        }
+
+        OnDeactivate(): void {
+            this.Viewport.IsPointerEnabled = false;
+        }
+
         /**
             @method MoveToNearestNode
             @param {AssureNote.Direction} Dir 
         */
         MoveToNearestNode(Dir: Direction): void {
             var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
-            if (NextNode != null) {
-                this.ChangeFocusedLabel(NextNode.Label);
-                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+            this.FocusAndMoveToNode(NextNode);
+        }
+
+        /**
+            @method FocusAndMoveToNode
+        */
+        FocusAndMoveToNode(Node: NodeView): void;
+        FocusAndMoveToNode(Label: string): void;
+        FocusAndMoveToNode(Node: any): void {
+            if (Node != null) {
+                var NextNode: NodeView = Node.constructor == String ? this.ViewMap[Node] : Node;
+                if (NextNode != null) {
+                    this.ChangeFocusedLabel(NextNode.Label);
+                    this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+                }
             }
         }
 
@@ -431,10 +466,6 @@ module AssureNote {
             this.MasterView.UpdateViewMap(this.ViewMap);
         }
 
-        DisplayPictgram(): void {
-            this.AssureNoteApp.PluginPanel.Clear();
-        }
-
         Draw(Label?: string, Duration?: number): void {
 
             this.Clear();
@@ -470,8 +501,8 @@ module AssureNote {
         }
 
         DisplayPluginPanel(PluginName: string, Label?: string): void {
-            var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.MasterRecord.GetLatestDoc(), Label);
+            var Plugin = this.App.PluginManager.GetPanelPlugin(PluginName, Label);
+            Plugin.Display(this.App.FullScreenEditorPanel, this.App.MasterRecord.GetLatestDoc(), Label);
         }
 
         GetFocusedView(): NodeView {
@@ -488,52 +519,21 @@ module AssureNote {
             return null;
         }
 
-        //TODO
-        NavigateUp(): void { }
-        NavigateDown(): void { }
-        NavigateLeft(): void { }
-        NavigateRight(): void { }
-        NavigateHome(): void { }
-
-    }
-
-    export class PluginPanel {
-        FullScreenEditor: Plugin;
-        SingleNodeEditor: Plugin;
-        IsVisible: boolean = true;
-
-        constructor(public AssureNoteApp: AssureNoteApp) {
-            var textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('editor'), {
-                lineNumbers: true,
-                mode: 'wgsn',
-                lineWrapping: true,
-            });
-            this.FullScreenEditor = new FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
-            $("#plugin-layer").on('mousewheel', (event: MouseWheelEvent) => { event.stopPropagation(); });
-
-            textarea = CodeMirror.fromTextArea(<HTMLTextAreaElement>document.getElementById('singlenode-editor'), {
-                lineNumbers: false,
-                mode: 'wgsn',
-                lineWrapping: true,
-            });
-            this.SingleNodeEditor = new SingleNodeEditorPlugin(AssureNoteApp, textarea, '#singlenode-editor-wrapper');
-            AssureNoteApp.PluginManager.SetPlugin("open-single", this.SingleNodeEditor);
-            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
+        NavigateUp(): void {
+            this.MoveToNearestNode(Direction.Top);
+        }
+        NavigateDown(): void {
+            this.MoveToNearestNode(Direction.Bottom);
+        }
+        NavigateLeft(): void {
+            this.MoveToNearestNode(Direction.Left);
+        }
+        NavigateRight(): void {
+            this.MoveToNearestNode(Direction.Right);
+        }
+        NavigateHome(): void {
+            this.FocusAndMoveToNode(this.MasterView);
         }
 
-        Clear(): void {
-        }
-    }
-
-    export class Pane {
-        IsEnable: boolean;
-        constructor(public AssureNoteApp: AssureNoteApp) { }
-
-        Create(NodeView: NodeView, ControlLayer: HTMLDivElement, contents: any) {
-            /* Do nothing */
-        }
-
-        Remove(): void {
-        }
     }
 }

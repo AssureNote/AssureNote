@@ -82,14 +82,15 @@ module AssureNote {
 
     }
 
-    export class CommandLine {
+    export class CommandLine extends Panel {
         Element: JQuery;
         IsVisible: boolean;
         IsEnable: boolean;
         private HistoryList: string[];
         private HistoryIndex: number;
         //TODO search libreadline API
-        constructor() {
+        constructor(public App: AssureNoteApp) {
+            super(App);
             this.Element = $("#command-line");
             this.IsEnable = true;
             this.IsVisible = false;
@@ -141,6 +142,15 @@ module AssureNote {
             }
         }
 
+        OnActivate(): void {
+            this.Show();
+        }
+
+        OnDeactivate(): void {
+            this.Hide();
+            this.Clear();
+        }
+
         //TODO recognize : or / or @
         ShowNextHistory(): void {
             if(this.HistoryIndex > 0) {
@@ -160,6 +170,48 @@ module AssureNote {
 
         IsEmpty(): boolean {
             return this.Element.val() == "";
+        }
+
+        OnKeyDown(Event: KeyboardEvent): void {
+            var handled = true;
+            switch (Event.keyCode) {
+                case 27: /*Esc*/
+                    this.App.PictgramPanel.Activate();
+                    Event.preventDefault();
+                    break;
+                case 38: /*up*/
+                    this.ShowPrevHistory();
+                    break;
+                case 40: /*down*/
+                    this.ShowNextHistory();
+                    break;
+                case 8: /*BackSpace*/
+                    if (this.IsEmpty()) {
+                        this.App.PictgramPanel.Activate();
+                        Event.preventDefault();
+                        break;
+                    }
+                    break;
+                case 13: /*Enter*/
+                    Event.preventDefault();
+                    var ParsedCommand = new CommandParser();
+                    ParsedCommand.Parse(this.GetValue());
+                    if (ParsedCommand.GetMethod() == "search") {
+                        this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.MasterView, ParsedCommand.GetArgs()[0]);
+                    }
+                    this.App.ExecCommand(ParsedCommand);
+                    this.AddHistory(ParsedCommand.GetRawString());
+                    if (this.IsActive()) {
+                        this.App.PictgramPanel.Activate();
+                    }
+                    break;
+                default:
+                    handled = false;
+                    break;
+            }
+            if (handled) {
+                Event.stopPropagation();
+            }
         }
     }
 

@@ -86,7 +86,7 @@ module AssureNote {
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             super();
-            this.SetMenuBarButton(true);
+            this.SetHasMenuBarButton(true);
             this.AssureNoteApp.RegistCommand(new RemoveCommand(this.AssureNoteApp));
         }
 

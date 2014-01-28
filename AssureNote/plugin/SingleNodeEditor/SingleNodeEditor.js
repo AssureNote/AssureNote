@@ -34,9 +34,8 @@ var AssureNote;
 (function (AssureNote) {
     var SingleNodeEditorCommand = (function (_super) {
         __extends(SingleNodeEditorCommand, _super);
-        function SingleNodeEditorCommand(App, EditorUtil) {
+        function SingleNodeEditorCommand(App) {
             _super.call(this, App);
-            this.EditorUtil = EditorUtil;
         }
         SingleNodeEditorCommand.prototype.GetCommandLineNames = function () {
             return ["singleedit"];
@@ -56,17 +55,13 @@ var AssureNote;
             var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                //if (TargetView.GetNodeType() == GSNType.Strategy) {
-                //    this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
-                //    return;
-                //}
                 var Writer = new AssureNote.StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, false);
                 var Top = this.App.PictgramPanel.Viewport.PageYFromGY(TargetView.GetGY());
                 var Left = this.App.PictgramPanel.Viewport.PageXFromGX(TargetView.GetGX());
                 var Width = TargetView.GetShape().GetNodeWidth();
                 var Height = Math.max(100, TargetView.GetShape().GetNodeHeight());
-                this.EditorUtil.UpdateCSS({
+                this.App.SingleNodeEditorPanel.UpdateCSS({
                     position: "fixed",
                     top: Top,
                     left: Left,
@@ -74,7 +69,7 @@ var AssureNote;
                     height: Height,
                     background: "rgba(255, 255, 255, 1.00)"
                 });
-                this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, false);
             } else {
                 this.App.DebugP(Label + " not found.");
             }
@@ -84,38 +79,21 @@ var AssureNote;
     AssureNote.SingleNodeEditorCommand = SingleNodeEditorCommand;
     var SingleNodeEditorPlugin = (function (_super) {
         __extends(SingleNodeEditorPlugin, _super);
-        function SingleNodeEditorPlugin(AssureNoteApp, textarea, selector) {
+        function SingleNodeEditorPlugin(App) {
             _super.call(this);
-            this.AssureNoteApp = AssureNoteApp;
-            this.textarea = textarea;
-            this.selector = selector;
-            this.SetMenuBarButton(true);
-            this.SetEditor(true);
-            this.EditorUtil = new AssureNote.EditorUtil(AssureNoteApp, textarea, selector, {
-                position: "absolute"
-            });
+            this.App = App;
+            this.SetHasMenuBarButton(true);
+            this.SetHasEditor(true);
 
-            this.AssureNoteApp.RegistCommand(new SingleNodeEditorCommand(this.AssureNoteApp, this.EditorUtil));
+            this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
         SingleNodeEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
             return new AssureNote.NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor", function (event, TargetView) {
-                var Writer = new AssureNote.StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer, false);
-                var Top = _this.AssureNoteApp.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
-                var Left = _this.AssureNoteApp.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
-                var Width = NodeView.GetShape().GetNodeWidth();
-                var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
-                _this.EditorUtil.UpdateCSS({
-                    position: "fixed",
-                    top: Top,
-                    left: Left,
-                    width: Width,
-                    height: Height,
-                    background: "rgba(255, 255, 255, 1.00)"
-                });
-
-                _this.EditorUtil.EnableEditor(Writer.toString().trim(), TargetView, false);
+                var Command = _this.App.FindCommandByCommandLineName("SingleEdit");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label]);
+                }
             });
         };
         return SingleNodeEditorPlugin;
@@ -124,5 +102,6 @@ var AssureNote;
 })(AssureNote || (AssureNote = {}));
 
 AssureNote.OnLoadPlugin(function (App) {
+    App.PluginManager.SetPlugin("open-single", new AssureNote.SingleNodeEditorPlugin(App));
 });
 //# sourceMappingURL=SingleNodeEditor.js.map

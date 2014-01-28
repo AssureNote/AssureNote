@@ -35,7 +35,8 @@ module AssureNote {
         SocketManager: SocketManager;
         ModeManager: ModeManager;
         PictgramPanel: PictgramPanel;
-        PluginPanel: PluginPanel;
+        FullScreenEditorPanel: WGSNEditorPanel;
+        SingleNodeEditorPanel: SingleNodeEditorPanel;
         IsDebugMode: boolean;
         MasterRecord: GSNRecord;
         WGSNName: string;
@@ -54,7 +55,8 @@ module AssureNote {
             this.PluginManager = new PluginManager(this);
             this.SocketManager = new SocketManager(this);
             this.PictgramPanel = new PictgramPanel(this);
-            this.PluginPanel = new PluginPanel(this);
+            this.FullScreenEditorPanel = new WGSNEditorPanel(this);
+            this.SingleNodeEditorPanel = new SingleNodeEditorPanel(this);
             this.ModeManager = new ModeManager(this, AssureNoteMode.Edit);
 
             this.DefaultCommand = new CommandMissingCommand(this);
@@ -86,7 +88,6 @@ module AssureNote {
                     ]),
                     new DividerMenuItem(),
                     new HelpMenuItem(),
-                    //new CommandListMenuItem(),
                     new AboutMenuItem()
                 ])
             ]);
@@ -117,7 +118,7 @@ module AssureNote {
 
         ExecDoubleClicked(NodeView: NodeView): void {
             var Plugin = this.PluginManager.GetDoubleClicked();
-            Plugin.ExecDoubleClicked(NodeView);
+            Plugin.OnNodeDoubleClicked(NodeView);
         }
 
         FindCommandByCommandLineName(Name: string): Command {

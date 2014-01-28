@@ -21,6 +21,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 ///<reference path='./AssureNote.ts'/>
 ///<reference path='./AssureNoteUtils.ts'/>
 ///<reference path='./CommandLine.ts'/>
@@ -33,26 +39,86 @@
 var AssureNote;
 (function (AssureNote) {
     /**
-    @class AssureNote.PictgramPanel
+    @class AssureNote.Panel
     */
-    var PictgramPanel = (function () {
+    var Panel = (function () {
+        function Panel(App) {
+            this.IsVisible = false;
+            this.App = App;
+            if (!Panel.Initialized) {
+                Panel.ActivePanel = this;
+                document.addEventListener("keydown", function (Event) {
+                    Panel.ActivePanel.OnKeyDown(Event);
+                });
+                Panel.Initialized = true;
+            }
+        }
+        Panel.prototype.Create = function (NodeView, ControlLayer, contents) {
+            /* Do nothing */
+        };
+
+        Panel.prototype.OnKeyDown = function (Event) {
+        };
+
+        Panel.prototype.OnActivate = function () {
+        };
+
+        Panel.prototype.OnDeactivate = function () {
+        };
+
+        Panel.prototype.Remove = function () {
+        };
+
+        Panel.prototype.Show = function () {
+            this.IsEnable = true;
+        };
+
+        Panel.prototype.Hide = function () {
+            this.IsVisible = false;
+        };
+
+        Panel.prototype.Activate = function () {
+            if (!this.IsActive()) {
+                Panel.ActivePanel.OnDeactivate();
+                Panel.ActivePanel = this;
+                this.OnActivate();
+            }
+        };
+
+        Panel.prototype.IsActive = function () {
+            return Panel.ActivePanel == this;
+        };
+        Panel.Initialized = false;
+        return Panel;
+    })();
+    AssureNote.Panel = Panel;
+
+    /**
+    @class AssureNote.PictgramPanel
+    @extends AssureNote.Panel
+    */
+    var PictgramPanel = (function (_super) {
+        __extends(PictgramPanel, _super);
         // We do not use FocusedView but FocusedLabel to make it modular.
-        function PictgramPanel(AssureNoteApp) {
+        function PictgramPanel(App) {
             var _this = this;
-            this.AssureNoteApp = AssureNoteApp;
+            _super.call(this, App);
+            this.App = App;
             this.SVGLayer = document.getElementById("svg-layer");
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
             this.ControlLayer = (document.getElementById("control-layer"));
             this.Viewport = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
-            this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.AssureNoteApp);
+            this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.App);
 
-            var Bar = new AssureNote.NodeMenu(AssureNoteApp);
-            var Tooltip = new AssureNote.Tooltip(AssureNoteApp);
+            var Bar = new AssureNote.NodeMenu(App);
+            var Tooltip = new AssureNote.Tooltip(App);
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
-                _this.AssureNoteApp.DebugP("click:" + Label);
-                _this.ChangeFocusedLabel(Label);
+                _this.App.DebugP("click:" + Label);
+                if (_this.IsActive) {
+                    _this.ChangeFocusedLabel(Label);
+                }
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -63,7 +129,9 @@ var AssureNote;
             });
 
             this.EventMapLayer.addEventListener("pointerdown", function (event) {
-                _this.ChangeFocusedLabel(null);
+                if (_this.IsActive()) {
+                    _this.ChangeFocusedLabel(null);
+                }
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
@@ -83,8 +151,8 @@ var AssureNote;
                     if (Tooltip.IsEnable) {
                         Tooltip.Remove();
                     }
-                    if (_this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
-                        var Buttons = _this.AssureNoteApp.PluginManager.GetMenuBarButtons(NodeView);
+                    if (_this.App.SocketManager.IsEditable(NodeView.Model.UID)) {
+                        var Buttons = _this.App.PluginManager.GetMenuBarButtons(NodeView);
                         Bar.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
                     } else {
                         $.notify("Warning:Other user edits this node!", "warn");
@@ -98,146 +166,30 @@ var AssureNote;
             this.ContentLayer.addEventListener("dblclick", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = _this.ViewMap[Label];
-                _this.AssureNoteApp.DebugP("double click:" + Label);
+                _this.App.DebugP("double click:" + Label);
                 if (Bar.IsEnable) {
                     Bar.Remove();
                 }
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                 }
-                _this.AssureNoteApp.ExecDoubleClicked(NodeView);
-                _this.AssureNoteApp.SocketManager.FoldNode({ "IsFolded": NodeView.IsFolded, "UID": NodeView.Model.UID });
+                _this.App.ExecDoubleClicked(NodeView);
                 event.preventDefault();
             });
 
-            this.CmdLine = new AssureNote.CommandLine();
-            this.Search = new AssureNote.Search(AssureNoteApp);
-
-            // Following event handler is a little dirty. We need refactoring.
-            document.addEventListener("keydown", function (event) {
-                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                    return;
-                }
-                switch (event.keyCode) {
-                    case 58:
-                        if (window.navigator.userAgent.toLowerCase().match("firefox").length == 0) {
-                            break;
-                        }
-                    case 186:
-                    case 191:
-                    case 219:
-                        if (_this.Search.IsSearching()) {
-                            _this.Search.ResetParam();
-                        }
-                        _this.CmdLine.Show();
-                        break;
-                    case 13:
-                        if (_this.CmdLine.IsVisible && _this.CmdLine.IsEnable) {
-                            var ParsedCommand = new AssureNote.CommandParser();
-                            ParsedCommand.Parse(_this.CmdLine.GetValue());
-                            if (ParsedCommand.GetMethod() == "search") {
-                                _this.Search.Search(_this.MasterView, ParsedCommand.GetArgs()[0]);
-                            }
-                            _this.AssureNoteApp.ExecCommand(ParsedCommand);
-                            _this.CmdLine.AddHistory(ParsedCommand.GetRawString());
-                            _this.CmdLine.Hide();
-                            _this.CmdLine.Clear();
-                            event.preventDefault();
-                        } else if (!_this.CmdLine.IsVisible && _this.Search.IsSearching()) {
-                            _this.Search.SearchNext(_this.MasterView, event.shiftKey);
-                        }
-                        break;
-                    case 27:
-                        if (_this.Search.IsSearching()) {
-                            _this.Search.ResetParam();
-                        }
-                        if (_this.CmdLine.IsVisible) {
-                            _this.CmdLine.Hide();
-                            _this.CmdLine.Clear();
-                        }
-                        break;
-                    case 37:
-                        if (!_this.CmdLine.IsVisible) {
-                            _this.MoveToNearestNode(0 /* Left */);
-                        }
-                        break;
-                    case 38:
-                        if (_this.CmdLine.IsVisible) {
-                            _this.CmdLine.ShowPrevHistory();
-                        } else {
-                            _this.MoveToNearestNode(1 /* Top */);
-                        }
-                        break;
-                    case 39:
-                        if (!_this.CmdLine.IsVisible) {
-                            _this.MoveToNearestNode(2 /* Right */);
-                        }
-                        break;
-                    case 40:
-                        if (_this.CmdLine.IsVisible) {
-                            _this.CmdLine.ShowNextHistory();
-                        } else {
-                            _this.MoveToNearestNode(3 /* Bottom */);
-                        }
-                        break;
-                    case 72:
-                        if (!_this.CmdLine.IsVisible) {
-                            _this.MoveToNearestNode(0 /* Left */);
-                        }
-                        break;
-                    case 74:
-                        if (!_this.CmdLine.IsVisible) {
-                            _this.MoveToNearestNode(3 /* Bottom */);
-                        }
-                        break;
-                    case 75:
-                        if (!_this.CmdLine.IsVisible) {
-                            _this.MoveToNearestNode(1 /* Top */);
-                        }
-                        break;
-                    case 76:
-                        if (!_this.CmdLine.IsVisible) {
-                            _this.MoveToNearestNode(2 /* Right */);
-                        }
-                        break;
-                    case 70:
-                        if (!_this.CmdLine.IsVisible) {
-                            var FoldCommand = _this.AssureNoteApp.FindCommandByCommandLineName("fold");
-                            if (FoldCommand && _this.FocusedLabel) {
-                                FoldCommand.Invoke(null, [_this.FocusedLabel]);
-                            }
-                        }
-                        break;
-                    case 65:
-                    case 73:
-                        if (!_this.CmdLine.IsVisible) {
-                            var FoldCommand = _this.AssureNoteApp.FindCommandByCommandLineName("edit");
-                            if (FoldCommand && _this.FocusedLabel) {
-                                FoldCommand.Invoke(null, [_this.FocusedLabel]);
-                            }
-                        }
-                        break;
-                    case 8:
-                        if (_this.CmdLine.IsVisible && _this.CmdLine.IsEmpty()) {
-                            _this.CmdLine.Hide();
-                            _this.CmdLine.Clear();
-                            event.preventDefault();
-                            break;
-                        }
-                        break;
-                }
-            });
+            this.CmdLine = new AssureNote.CommandLine(App);
+            this.Search = new AssureNote.Search(App);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", function (event) {
-                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
+                if (_this.App.FullScreenEditorPanel.IsActive()) {
                     return;
                 }
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = _this.ViewMap[Label];
                 if (NodeView != null && ToolTipFocusedLabel != Label) {
                     ToolTipFocusedLabel = Label;
-                    var Tooltips = _this.AssureNoteApp.PluginManager.GetTooltipContents(NodeView);
+                    var Tooltips = _this.App.PluginManager.GetTooltipContents(NodeView);
                     Tooltip.Create(NodeView, _this.ControlLayer, Tooltips);
                 }
             });
@@ -246,10 +198,6 @@ var AssureNote;
                 /* We use mouseleave event instead of mouseout since mouseout/mouseenter fires
                 every time the pointer enters the sub-element of ContentLayer.
                 Mouseleave can prevent this annoying event firing. */
-                if (!_this.AssureNoteApp.PluginPanel.IsVisible) {
-                    return;
-                }
-
                 if (Tooltip.IsEnable) {
                     Tooltip.Remove();
                     ToolTipFocusedLabel = null;
@@ -257,16 +205,14 @@ var AssureNote;
             });
 
             var DragHandler = function (e) {
-                if (_this.AssureNoteApp.PluginPanel.IsVisible) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
+                e.stopPropagation();
+                e.preventDefault();
             };
             $(this.EventMapLayer).on('dragenter', DragHandler).on('dragover', DragHandler).on('dragleave', DragHandler).on('drop', function (event) {
-                if (_this.AssureNoteApp.PluginPanel.IsVisible) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    _this.AssureNoteApp.LoadFiles(event.originalEvent.dataTransfer.files);
+                event.stopPropagation();
+                event.preventDefault();
+                if (_this.IsActive()) {
+                    _this.App.LoadFiles(event.originalEvent.dataTransfer.files);
                 }
             });
 
@@ -281,8 +227,7 @@ var AssureNote;
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            _this.AssureNoteApp.ExecDoubleClicked(Node);
-                            _this.AssureNoteApp.SocketManager.FoldNode({ "IsFolded": Node.IsFolded, "UID": Node.Model.UID });
+                            _this.App.ExecDoubleClicked(Node);
                         }
                         return false;
                     }
@@ -296,15 +241,104 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
+        PictgramPanel.prototype.OnKeyDown = function (Event) {
+            var handled = true;
+            switch (Event.keyCode) {
+                case 58:
+                case 186:
+                case 191:
+                case 219:
+                    if (this.Search.IsSearching()) {
+                        this.Search.EndSearch();
+                    }
+                    this.CmdLine.Activate();
+                    break;
+                case 27:
+                    if (this.Search.IsSearching()) {
+                        this.Search.EndSearch();
+                        Event.preventDefault();
+                    }
+                    break;
+                case 13:
+                    if (this.Search.IsSearching()) {
+                        this.Search.SearchNext(this.MasterView, event.shiftKey);
+                        Event.preventDefault();
+                    }
+                    break;
+                case 72:
+                case 37:
+                    this.NavigateLeft();
+                    Event.preventDefault();
+                    break;
+                case 74:
+                case 40:
+                    this.NavigateDown();
+                    Event.preventDefault();
+                    break;
+                case 75:
+                case 38:
+                    this.NavigateUp();
+                    Event.preventDefault();
+                    break;
+                case 76:
+                case 39:
+                    this.NavigateRight();
+                    Event.preventDefault();
+                    break;
+                case 36:
+                    this.NavigateHome();
+                    Event.preventDefault();
+                    break;
+                case 70:
+                    if (!this.CmdLine.IsVisible) {
+                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 65:
+                case 73:
+                    var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                    if (EditCommand && this.FocusedLabel) {
+                        EditCommand.Invoke(null, [this.FocusedLabel]);
+                    }
+                    Event.preventDefault();
+                    break;
+                default:
+                    handled = false;
+                    break;
+            }
+            if (handled) {
+                Event.stopPropagation();
+            }
+        };
+
+        PictgramPanel.prototype.OnActivate = function () {
+            this.Viewport.IsPointerEnabled = true;
+        };
+
+        PictgramPanel.prototype.OnDeactivate = function () {
+            this.Viewport.IsPointerEnabled = false;
+        };
+
         /**
         @method MoveToNearestNode
         @param {AssureNote.Direction} Dir
         */
         PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
             var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
-            if (NextNode != null) {
-                this.ChangeFocusedLabel(NextNode.Label);
-                this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+            this.FocusAndMoveToNode(NextNode);
+        };
+
+        PictgramPanel.prototype.FocusAndMoveToNode = function (Node) {
+            if (Node != null) {
+                var NextNode = Node.constructor == String ? this.ViewMap[Node] : Node;
+                if (NextNode != null) {
+                    this.ChangeFocusedLabel(NextNode.Label);
+                    this.Viewport.MoveTo(NextNode.GetCenterGX(), NextNode.GetCenterGY(), this.Viewport.GetCameraScale(), 50);
+                }
             }
         };
 
@@ -410,10 +444,6 @@ var AssureNote;
             this.MasterView.UpdateViewMap(this.ViewMap);
         };
 
-        PictgramPanel.prototype.DisplayPictgram = function () {
-            this.AssureNoteApp.PluginPanel.Clear();
-        };
-
         PictgramPanel.prototype.Draw = function (Label, Duration) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
@@ -448,8 +478,8 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
-            var Plugin = this.AssureNoteApp.PluginManager.GetPanelPlugin(PluginName, Label);
-            Plugin.Display(this.AssureNoteApp.PluginPanel, this.AssureNoteApp.MasterRecord.GetLatestDoc(), Label);
+            var Plugin = this.App.PluginManager.GetPanelPlugin(PluginName, Label);
+            Plugin.Display(this.App.FullScreenEditorPanel, this.App.MasterRecord.GetLatestDoc(), Label);
         };
 
         PictgramPanel.prototype.GetFocusedView = function () {
@@ -467,62 +497,23 @@ var AssureNote;
             return null;
         };
 
-        //TODO
         PictgramPanel.prototype.NavigateUp = function () {
+            this.MoveToNearestNode(1 /* Top */);
         };
         PictgramPanel.prototype.NavigateDown = function () {
+            this.MoveToNearestNode(3 /* Bottom */);
         };
         PictgramPanel.prototype.NavigateLeft = function () {
+            this.MoveToNearestNode(0 /* Left */);
         };
         PictgramPanel.prototype.NavigateRight = function () {
+            this.MoveToNearestNode(2 /* Right */);
         };
         PictgramPanel.prototype.NavigateHome = function () {
+            this.FocusAndMoveToNode(this.MasterView);
         };
         return PictgramPanel;
-    })();
+    })(Panel);
     AssureNote.PictgramPanel = PictgramPanel;
-
-    var PluginPanel = (function () {
-        function PluginPanel(AssureNoteApp) {
-            this.AssureNoteApp = AssureNoteApp;
-            this.IsVisible = true;
-            var textarea = CodeMirror.fromTextArea(document.getElementById('editor'), {
-                lineNumbers: true,
-                mode: 'wgsn',
-                lineWrapping: true
-            });
-            this.FullScreenEditor = new AssureNote.FullScreenEditorPlugin(AssureNoteApp, textarea, '#editor-wrapper');
-            $("#plugin-layer").on('mousewheel', function (event) {
-                event.stopPropagation();
-            });
-
-            textarea = CodeMirror.fromTextArea(document.getElementById('singlenode-editor'), {
-                lineNumbers: false,
-                mode: 'wgsn',
-                lineWrapping: true
-            });
-            this.SingleNodeEditor = new AssureNote.SingleNodeEditorPlugin(AssureNoteApp, textarea, '#singlenode-editor-wrapper');
-            AssureNoteApp.PluginManager.SetPlugin("open-single", this.SingleNodeEditor);
-            AssureNoteApp.PluginManager.SetPlugin("open", this.FullScreenEditor);
-        }
-        PluginPanel.prototype.Clear = function () {
-        };
-        return PluginPanel;
-    })();
-    AssureNote.PluginPanel = PluginPanel;
-
-    var Pane = (function () {
-        function Pane(AssureNoteApp) {
-            this.AssureNoteApp = AssureNoteApp;
-        }
-        Pane.prototype.Create = function (NodeView, ControlLayer, contents) {
-            /* Do nothing */
-        };
-
-        Pane.prototype.Remove = function () {
-        };
-        return Pane;
-    })();
-    AssureNote.Pane = Pane;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Panel.js.map

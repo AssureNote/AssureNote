@@ -93,7 +93,7 @@ var AssureNote;
         function RemoveNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
-            this.SetMenuBarButton(true);
+            this.SetHasMenuBarButton(true);
             this.AssureNoteApp.RegistCommand(new RemoveCommand(this.AssureNoteApp));
         }
         RemoveNodePlugin.prototype.CreateMenuBarButton = function (View) {
