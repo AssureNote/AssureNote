@@ -43,13 +43,10 @@ $(function () {
     }
 
     //safari does not support window.performance
-    if (window.performance == null) {
-        window.performance = {};
-        if (window.performance.now == null) {
-            window.performance.now = function () {
+    if (!UA.IsPerformanceEnabled()) {
+        window.performance = { now: function () {
                 return Date.now();
-            };
-        }
+            } };
     }
     var App = new AssureNote.AssureNoteApp();
     Debug.AssureNote = App;
@@ -71,9 +68,5 @@ $(function () {
     };
 
     App.LoadDefaultWGSN();
-    document.documentElement.scrollTop = 0;
-    window.addEventListener('hashchange', function (ev) {
-        document.documentElement.scrollTop = 0;
-    });
 });
 //# sourceMappingURL=index.js.map
