@@ -213,6 +213,43 @@ var AssureNote;
             this.App.PictgramPanel.Draw(Doc.TopNode.GetLabel());
         };
 
+        MonitorNodeManager.prototype.SucceedToPresumedNodeColor = function () {
+            var self = this;
+            var LabelMap = this.App.MasterRecord.GetLatestDoc().GetLabelMap();
+            var TopGoalView = this.App.PictgramPanel.MasterView;
+            TopGoalView.TraverseNode(function (View) {
+                var Model = View.Model;
+                if (Model.HasTag) {
+                    // Get label name
+                    var LabelName = null;
+                    var TagValue = Model.GetTagMap().get("Presume");
+                    if (TagValue != null) {
+                        LabelName = TagValue.replace(/\[|\]/g, "");
+                    }
+
+                    // Get label
+                    var Label = null;
+                    if (LabelName != null) {
+                        Label = LabelMap.get(LabelName);
+                    }
+                    if (Label == null) {
+                        Label = LabelName;
+                    }
+
+                    // succeed to presumed node color
+                    var PresumedNodeIsRedNode = self.RedNodeMap[Label];
+                    if ((PresumedNodeIsRedNode != null) && PresumedNodeIsRedNode) {
+                        if (View.Model.IsContext()) {
+                            View = View.Parent;
+                        }
+                        View.TraverseNode(function (View) {
+                            self.RedNodeMap[View.Label] = true;
+                        });
+                    }
+                }
+            });
+        };
+
         MonitorNodeManager.prototype.UpdateRedNodeMap = function () {
             this.RedNodeMap = {};
             for (var MNode in this.MonitorNodeMap) {
@@ -224,6 +261,7 @@ var AssureNote;
                     }
                 }
             }
+            this.SucceedToPresumedNodeColor();
         };
 
         MonitorNodeManager.prototype.StartMonitoring = function (Interval) {
@@ -276,6 +314,9 @@ var AssureNote;
                         }
                     }
                 }
+
+                // Succeed to presumed node color
+                self.SucceedToPresumedNodeColor();
 
                 // Update view
                 self.InitializeView(Doc);
