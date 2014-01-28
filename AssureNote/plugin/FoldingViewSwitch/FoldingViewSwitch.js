@@ -64,6 +64,8 @@ var AssureNote;
             var Panel = this.App.PictgramPanel;
             var ViewPort = Panel.Viewport;
 
+            this.App.SocketManager.FoldNode({ "IsFolded": TargetView.IsFolded, "UID": TargetView.Model.UID });
+
             if (TargetView.GetNodeType() == 2 /* Strategy */) {
                 if (TargetView.Children != null) {
                     for (var i = 0; i < TargetView.Children.length; i++) {

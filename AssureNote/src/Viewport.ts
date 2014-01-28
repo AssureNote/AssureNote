@@ -455,7 +455,7 @@ module AssureNote {
             }
 
             var lastTime: number = performance.now();
-            var startTime = lastTime; 
+            var startTime = lastTime;
 
             var update: any = () => {
                 var currentTime: number = performance.now();
