@@ -26,18 +26,32 @@ var AssureNote;
 (function (AssureNote) {
     var ModeManager = (function () {
         function ModeManager(App, Mode) {
-            var _this = this;
             this.App = App;
             this.Mode = Mode;
             this.WrapperElement = $('.edit-mode');
-            var input = document.createElement('input');
-            input.id = 'mode-switch';
-            input.setAttribute('type', 'checkbox');
-            input.setAttribute('checked', '');
-            input.setAttribute('data-on-label', 'Edit');
-            input.setAttribute('data-off-label', 'View');
-
+            this.Input = document.createElement('input');
+            this.Input.id = 'mode-switch';
+            this.Input.setAttribute('type', 'checkbox');
+            this.Input.setAttribute('checked', '');
+            this.Input.setAttribute('data-on-label', 'Edit');
+            this.Input.setAttribute('data-off-label', 'View');
             //$(input).appendTo(this.WrapperElement);
+        }
+        ModeManager.prototype.GetMode = function () {
+            return this.Mode;
+        };
+
+        ModeManager.prototype.SetMode = function (Mode) {
+            this.Mode = Mode;
+        };
+
+        ModeManager.prototype.Disable = function () {
+            $(this.WrapperElement.empty());
+        };
+
+        ModeManager.prototype.Enable = function () {
+            var _this = this;
+            $(this.Input).appendTo(this.WrapperElement.empty());
             $('#mode-switch').bootstrapSwitch();
             $('#mode-switch').bootstrapSwitch('setSizeClass', '').on('switch-change', function (e) {
                 var data = [];
@@ -47,13 +61,6 @@ var AssureNote;
                 var value = data[0].value;
                 _this.SetMode((value) ? 0 /* Edit */ : 1 /* View */);
             });
-        }
-        ModeManager.prototype.GetMode = function () {
-            return this.Mode;
-        };
-
-        ModeManager.prototype.SetMode = function (Mode) {
-            this.Mode = Mode;
         };
         return ModeManager;
     })();

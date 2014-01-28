@@ -28,23 +28,18 @@ module AssureNote {
     export class ModeManager {
         private Mode: AssureNoteMode;
         private WrapperElement: JQuery;
+        private Input: HTMLInputElement;
         constructor(public App: AssureNoteApp, Mode: AssureNoteMode) {
             this.Mode = Mode;
             this.WrapperElement = $('.edit-mode');
-            var input = document.createElement('input');
-            input.id = 'mode-switch';
-            input.setAttribute('type', 'checkbox');
-            input.setAttribute('checked', '');
-            input.setAttribute('data-on-label', 'Edit');
-            input.setAttribute('data-off-label', 'View');
+            this.Input = document.createElement('input');
+            this.Input.id = 'mode-switch';
+            this.Input.setAttribute('type', 'checkbox');
+            this.Input.setAttribute('checked', '');
+            this.Input.setAttribute('data-on-label', 'Edit');
+            this.Input.setAttribute('data-off-label', 'View');
 
             //$(input).appendTo(this.WrapperElement);
-            $('#mode-switch').bootstrapSwitch();
-            $('#mode-switch').bootstrapSwitch('setSizeClass', '')
-                .on('switch-change', (e, ...data) => {
-                    var value = data[0].value;
-                    this.SetMode((value) ? AssureNoteMode.Edit : AssureNoteMode.View);
-                });
         }
 
         GetMode(): AssureNoteMode {
@@ -53,6 +48,20 @@ module AssureNote {
 
         SetMode(Mode: AssureNoteMode): void {
             this.Mode = Mode;
+        }
+
+        Disable(): void {
+            $(this.WrapperElement.empty());
+        }
+
+        Enable(): void {
+            $(this.Input).appendTo(this.WrapperElement.empty());
+            $('#mode-switch').bootstrapSwitch();
+            $('#mode-switch').bootstrapSwitch('setSizeClass', '')
+                .on('switch-change', (e, ...data) => {
+                    var value = data[0].value;
+                    this.SetMode((value) ? AssureNoteMode.Edit : AssureNoteMode.View);
+                });
         }
     }
 }

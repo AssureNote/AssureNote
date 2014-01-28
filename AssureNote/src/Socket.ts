@@ -60,6 +60,7 @@ module AssureNote {
         EnableListeners(): void{
             var self = this;
             this.socket.on('disconnect', function (data) {
+                self.AssureNoteApp.ModeManager.Disable();
                 self.socket = null;
 
             });
@@ -121,6 +122,7 @@ module AssureNote {
             } else {
                 this.socket = io.connect(host);
             }
+            this.AssureNoteApp.ModeManager.Enable();
             this.EnableListeners();
         }
 
