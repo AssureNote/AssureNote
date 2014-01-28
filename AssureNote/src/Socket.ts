@@ -33,6 +33,7 @@ module AssureNote {
     export class SocketManager {
         private socket: any;
         private handler: { [key: string]: (any) => void };
+        ReceivedEvent: boolean = true;
         EditingNodes: any[] = [];
         CurrentUserName: string;
 
@@ -73,6 +74,10 @@ module AssureNote {
             this.socket.on('init', function (data) {
                 console.log('init');
                 console.log(data);
+            });
+            this.socket.on('fold', function (data: {IsFolded: boolean; UID: number}) {
+                var NodeView: NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                self.AssureNoteApp.ExecDoubleClicked(NodeView);
             });
             this.socket.on('update', function (data: {name: string; WGSN: string}) {
                 console.log('update');
@@ -208,6 +213,10 @@ module AssureNote {
 
         StartEdit(data: {Label: string; UID: number}) {
             this.Emit('startedit' ,data);
+        }
+
+        FoldNode(data: {IsFolded: boolean; UID: number}) {
+            this.Emit('fold', data);
         }
 
         SyncScreenFocus (PosData: {PosX: number; PosY: number})  {

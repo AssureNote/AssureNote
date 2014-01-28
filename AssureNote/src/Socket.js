@@ -37,6 +37,7 @@ var AssureNote;
     var SocketManager = (function () {
         function SocketManager(AssureNoteApp) {
             this.AssureNoteApp = AssureNoteApp;
+            this.ReceivedEvent = true;
             this.EditingNodes = [];
             if (!this.IsOperational()) {
                 AssureNoteApp.DebugP('socket.io not found');
@@ -72,6 +73,10 @@ var AssureNote;
             this.socket.on('init', function (data) {
                 console.log('init');
                 console.log(data);
+            });
+            this.socket.on('fold', function (data) {
+                var NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                self.AssureNoteApp.ExecDoubleClicked(NodeView);
             });
             this.socket.on('update', function (data) {
                 console.log('update');
@@ -212,6 +217,10 @@ var AssureNote;
 
         SocketManager.prototype.StartEdit = function (data) {
             this.Emit('startedit', data);
+        };
+
+        SocketManager.prototype.FoldNode = function (data) {
+            this.Emit('fold', data);
         };
 
         SocketManager.prototype.SyncScreenFocus = function (PosData) {
