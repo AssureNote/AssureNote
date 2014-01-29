@@ -405,4 +405,82 @@ public class TestAssureNoteParser {
 		assertNotNull(TopNode);
 		assertEquals(2, TopNode.SubNodeList.size());
 	}
+	
+	@Test
+	public void Merge_FastForward() {
+		String input = "*G\n*S\n*E";
+		String input_updated = "*G\n*S\n*E\nupdated content";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNRecord BranchRecord = MasterRecord.DeepCopy();
+		BranchRecord.Parse(input_updated);
+		MasterRecord.Merge(BranchRecord);
+		
+		assertEquals(2, MasterRecord.HistoryList.size());
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNotNull(TopNode.SubNodeList);
+		assertEquals(2, TopNode.SubNodeList.size());
+		assertEquals("updated content", TopNode.SubNodeList.get(1).NodeDoc);
+	}
+	
+	@Test
+	public void Merge_NoEffect() {
+		String input = "*G\n*S\n*E";
+		String input_updated = "*G\n*S\n*E\nupdated content";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNRecord BranchRecord = MasterRecord.DeepCopy();
+		BranchRecord.Parse(input_updated);
+		BranchRecord.Merge(MasterRecord);
+		
+		assertEquals(2, BranchRecord.HistoryList.size());
+		
+		GSNDoc LatestDoc = BranchRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNotNull(TopNode.SubNodeList);
+		assertEquals(2, TopNode.SubNodeList.size());
+		assertEquals("updated content", TopNode.SubNodeList.get(1).NodeDoc);
+	}
+	
+	@Test
+	public void Merge_Conflict() {
+		String input = "*G &1\n*S &2\n*E &3";
+		String input_updated1 = "*G &1\n*S &2\n*E &3\nupdated content";
+		String input_updated2 = "*G &1\n*S &2\nupdated content\n*E &3\n";
+		GSNRecord BaseRecord = new GSNRecord();
+		BaseRecord.Parse(input);
+		
+		StringWriter Writer = new StringWriter();
+		BaseRecord.FormatRecord(Writer);
+		
+		GSNRecord MasterRecord = new GSNRecord();
+		GSNRecord BranchRecord = new GSNRecord();
+		MasterRecord.Parse(Writer.toString());
+		BranchRecord.Parse(Writer.toString());
+		
+		MasterRecord.OpenEditor("unknown", "test", null, "test");
+		MasterRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input_updated1, true);
+		MasterRecord.CloseEditor();
+		BranchRecord.OpenEditor("AuthorHasBeenChanged", "test", null, "test");
+		BranchRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input_updated2, true);
+		BranchRecord.CloseEditor();
+		MasterRecord.Merge(BranchRecord);
+		
+		assertEquals(4, MasterRecord.HistoryList.size());
+		
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNotNull(TopNode.SubNodeList);
+		assertEquals(2, TopNode.SubNodeList.size());
+
+		assertEquals("updated content", TopNode.SubNodeList.get(0).NodeDoc);
+		assertEquals("updated content", TopNode.SubNodeList.get(1).NodeDoc);
+	}
 }

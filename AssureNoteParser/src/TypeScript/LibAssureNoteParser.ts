@@ -118,8 +118,14 @@ export class LinkedList <E> extends Queue <E> {
 export class HashMap <K, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
-	constructor() {
+    constructor(map?: HashMap<K, V>) {
 		this.hash = {};
+        if (map != null) {
+            var keySet: string[] = map.keySet();
+            for (var i = 0; i < keySet.length; i++) {
+                this.hash[keySet[i]] = map[keySet[i]];
+            }
+        }
 	}
 	put(key: K, value: V) : void {
 		this.hash[String(key)] = value;

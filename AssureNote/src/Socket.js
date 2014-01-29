@@ -110,7 +110,6 @@ var AssureNote;
                 self.UseOnScrollEvent = false;
                 self.App.PictgramPanel.Viewport.SetCamera(data.X, data.Y, data.Scale);
                 self.UseOnScrollEvent = true;
-                console.log(self.GetCurrentMode());
             });
             this.socket.on('startedit', function (data) {
                 console.log('edit');
@@ -200,10 +199,6 @@ var AssureNote;
                 CurrentView = CurrentView.Parent;
             }
             return true;
-        };
-
-        SocketManager.prototype.GetCurrentMode = function () {
-            return this.App.ModeManager.GetMode();
         };
 
         SocketManager.prototype.AddUserNameOn = function (NodeView, Data) {
