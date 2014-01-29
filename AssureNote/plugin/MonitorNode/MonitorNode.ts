@@ -133,17 +133,18 @@ module AssureNote {
                 return;
             }
 
+            // Update status
+            this.Data = LatestLog.data;
+            var Script = "var "+this.Type+"="+this.Data+";";
+            Script += this.Condition+";";
+            this.Status = eval(Script);   // FIXME Don't use eval()
+            LatestLog.status = this.Status;
+
             // Update past logs
             if(this.PastLogs.length > 10) {
                 this.PastLogs.pop();
             }
             this.PastLogs.unshift(LatestLog);
-
-            // Update status
-            this.Data = LatestLog.data;
-            var script = "var "+this.Type+"="+this.Data+";";
-            script += this.Condition+";";
-            this.Status = eval(script);   // FIXME Don't use eval()
 
             // Update model
             this.UpdateModel();
@@ -548,7 +549,12 @@ module AssureNote {
 
             for(var i: number = 0; i < MNode.PastLogs.length; i++) {
                 var Log = MNode.PastLogs[i];
-                TableInnerHTML += '<tr align="center">'
+                if(Log.status == true) {
+                    TableInnerHTML += '<tr align="center">'
+                }
+                else {
+                    TableInnerHTML += '<tr align="center" bgcolor="#ffaa7d">'
+                }
                 TableInnerHTML += '<td>'+Log.timestamp+'</td>';
                 TableInnerHTML += '<td>'+Log.data+'</td>';
                 TableInnerHTML += '</tr>'
