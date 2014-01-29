@@ -447,4 +447,30 @@ public class TestAssureNoteParser {
 		assertEquals(2, TopNode.SubNodeList.size());
 		assertEquals("updated content", TopNode.SubNodeList.get(1).NodeDoc);
 	}
+	
+	@Test
+	public void Merge_Conflict() {
+		String input = "*G\n*S\n*E";
+		String input_updated1 = "*G\n*S\n*E\nupdated content";
+		String input_updated2 = "*G\n*S\nupdated content\n*E\n";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input);
+		
+		GSNRecord BranchRecord = MasterRecord.DeepCopy();
+		
+		MasterRecord.Parse(input_updated1);
+		BranchRecord.Parse(input_updated2);
+		MasterRecord.Merge(BranchRecord);
+		
+		assertEquals(2, BranchRecord.HistoryList.size());
+		
+		GSNDoc LatestDoc = BranchRecord.GetLatestDoc();
+		GSNNode TopNode = LatestDoc.TopNode;
+		
+		assertNotNull(TopNode.SubNodeList);
+		assertEquals(2, TopNode.SubNodeList.size());
+
+		assertEquals("updated content", TopNode.SubNodeList.get(0).NodeDoc);
+		assertEquals("updated content", TopNode.SubNodeList.get(1).NodeDoc);
+	}
 }
