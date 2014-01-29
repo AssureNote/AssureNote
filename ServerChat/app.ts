@@ -8,6 +8,7 @@ class AssureNoteServer {
     io: SocketManager;
     room: string = 'room';
     EditingNodes: any[] = [];
+    WGSNName: string = null;
     MasterRecord: parser.GSNRecord = null;
 
     constructor() {
@@ -17,7 +18,12 @@ class AssureNoteServer {
             self.EnableListeners(socket);
             socket.join(self.room);
             console.log('id: ' + socket.id + ' connected');
-            socket.emit('init', {id: socket.id, list: self.GetUserList()});
+            socket.emit('init', {
+                id   : socket.id,
+                list : self.GetUserList(),
+                name : self.WGSNName,
+                WGSN : self.GetLatestWGSN()
+            });
             socket.broadcast.emit('join', {id: socket.id, list: self.GetUserList()});
 
             socket.on('disconnect', function () {
@@ -47,6 +53,7 @@ class AssureNoteServer {
         });
 
         socket.on('update', function(data: {name: string; WGSN: string}) {
+            if (self.WGSNName == null) self.WGSNName = data.name;
             var NewRecord: parser.GSNRecord  = new parser.GSNRecord();
             NewRecord.Parse(data.WGSN);
             if (self.MasterRecord == null) {
@@ -54,9 +61,7 @@ class AssureNoteServer {
             } else {
                 self.MasterRecord.Merge(NewRecord);
             }
-            var Writer: parser.StringWriter = new parser.StringWriter();
-            self.MasterRecord.FormatRecord(Writer);
-            data.WGSN = Writer.toString();
+            data.WGSN = self.GetLatestWGSN();
             socket.broadcast.emit('update', data);
         });
 
@@ -91,6 +96,7 @@ class AssureNoteServer {
             }
         });
     }
+
     GetUserList() {
         var res = [];
         var Clients: Socket[] = this.io.sockets.clients(this.room);
@@ -98,6 +104,13 @@ class AssureNoteServer {
             res.push(Clients[i].id);
         }
         return res;
+    }
+
+    GetLatestWGSN() {
+        if (!this.MasterRecord) return null;
+        var Writer: parser.StringWriter = new parser.StringWriter();
+        this.MasterRecord.FormatRecord(Writer);
+        return Writer.toString();
     }
 
     Parse(WGSN: string) : parser.GSNNode {

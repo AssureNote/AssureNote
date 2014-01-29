@@ -4016,7 +4016,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 315,
+            "line": 322,
             "itemtype": "method",
             "name": "MoveToNearestNode",
             "params": [
@@ -4030,7 +4030,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 334,
+            "line": 341,
             "itemtype": "method",
             "name": "FindNearestNode",
             "params": [
@@ -4053,7 +4053,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 385,
+            "line": 392,
             "itemtype": "method",
             "name": "FoldDeepSubGoals",
             "params": [
@@ -4067,7 +4067,7 @@
         },
         {
             "file": "src/Panel.js",
-            "line": 401,
+            "line": 408,
             "itemtype": "method",
             "name": "ChangeFocusedLabel",
             "params": [

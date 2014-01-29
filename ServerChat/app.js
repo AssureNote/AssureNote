@@ -7,6 +7,7 @@ var AssureNoteServer = (function () {
     function AssureNoteServer() {
         this.room = 'room';
         this.EditingNodes = [];
+        this.WGSNName = null;
         this.MasterRecord = null;
         var self = this;
         this.io = socketio.listen(3002);
@@ -14,7 +15,12 @@ var AssureNoteServer = (function () {
             self.EnableListeners(socket);
             socket.join(self.room);
             console.log('id: ' + socket.id + ' connected');
-            socket.emit('init', { id: socket.id, list: self.GetUserList() });
+            socket.emit('init', {
+                id: socket.id,
+                list: self.GetUserList(),
+                name: self.WGSNName,
+                WGSN: self.GetLatestWGSN()
+            });
             socket.broadcast.emit('join', { id: socket.id, list: self.GetUserList() });
 
             socket.on('disconnect', function () {
@@ -43,6 +49,8 @@ var AssureNoteServer = (function () {
         });
 
         socket.on('update', function (data) {
+            if (self.WGSNName == null)
+                self.WGSNName = data.name;
             var NewRecord = new parser.GSNRecord();
             NewRecord.Parse(data.WGSN);
             if (self.MasterRecord == null) {
@@ -50,9 +58,7 @@ var AssureNoteServer = (function () {
             } else {
                 self.MasterRecord.Merge(NewRecord);
             }
-            var Writer = new parser.StringWriter();
-            self.MasterRecord.FormatRecord(Writer);
-            data.WGSN = Writer.toString();
+            data.WGSN = self.GetLatestWGSN();
             socket.broadcast.emit('update', data);
         });
 
@@ -88,6 +94,7 @@ var AssureNoteServer = (function () {
             }
         });
     };
+
     AssureNoteServer.prototype.GetUserList = function () {
         var res = [];
         var Clients = this.io.sockets.clients(this.room);
@@ -95,6 +102,14 @@ var AssureNoteServer = (function () {
             res.push(Clients[i].id);
         }
         return res;
+    };
+
+    AssureNoteServer.prototype.GetLatestWGSN = function () {
+        if (!this.MasterRecord)
+            return null;
+        var Writer = new parser.StringWriter();
+        this.MasterRecord.FormatRecord(Writer);
+        return Writer.toString();
     };
 
     AssureNoteServer.prototype.Parse = function (WGSN) {

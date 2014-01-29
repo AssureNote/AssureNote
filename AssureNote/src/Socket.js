@@ -89,8 +89,13 @@ var AssureNote;
             });
 
             this.socket.on('init', function (data) {
-                console.log('init');
-                console.log(data);
+                if (data.WGSN != null && self.App.MasterRecord.HistoryList.length > 1) {
+                    /* TODO: Make a choice  */
+                    alert('Your changes will disappear. TODO: Make a choice.');
+                }
+                if (data.WGSN != null) {
+                    self.App.LoadNewWGSN(data.name, data.WGSN);
+                }
             });
             this.socket.on('fold', function (data) {
                 if (!self.ReceivedFoldEvent) {
