@@ -125,8 +125,6 @@ module AssureNote {
             return this.Shape;
         }
 
-
-
         // Global X: Scale-independent and transform-independent X distance from leftside of the top goal.
         // Return always 0 if this is top goal.
         GetGX(): number {

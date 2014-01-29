@@ -59,9 +59,12 @@ var AssureNote;
                 this.Element.removeClass();
                 clearInterval(this.Timeout);
             }
+
+            /* TODO Remove this */
             if (IsRecursive && (NodeView.Status == 1 /* SingleEditable */)) {
                 return;
             }
+
             this.Timeout = null;
             var Model = NodeView.Model;
             this.App.FullScreenEditorPanel.IsVisible = false;
