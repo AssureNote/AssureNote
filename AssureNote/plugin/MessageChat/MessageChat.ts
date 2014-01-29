@@ -78,9 +78,17 @@ module AssureNote {
         }
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
-            if (!this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
-                NodeView.AddColorStyle(ColorStyle.Editing);
+            switch (NodeView.Status) {
+                case EditStatus.SingleEditable:
+                    NodeView.AddColorStyle(ColorStyle.SingleEdit); break;
+
+                case EditStatus.Locked:
+                    NodeView.AddColorStyle(ColorStyle.Locked); break;
+
             }
+//            if (!this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
+//                NodeView.AddColorStyle(ColorStyle.Editing);
+//            }
         }
     }
 

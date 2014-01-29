@@ -140,11 +140,18 @@ var AssureNote;
                 var NodeView = _this.ViewMap[Label];
                 if (NodeView != null) {
                     _this.ChangeFocusedLabel(Label);
-                    if (_this.App.SocketManager.IsEditable(NodeView.Model.UID)) {
-                        var Buttons = _this.App.PluginManager.GetMenuBarButtons(NodeView);
-                        _this.ContextMenu.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
-                    } else {
-                        $.notify("Warning:Other user edits this node!", "warn");
+                    switch (NodeView.Status) {
+                        case 0 /* TreeEditable */:
+                            var Buttons = _this.App.PluginManager.GetMenuBarButtons(NodeView);
+                            _this.ContextMenu.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
+                            break;
+                        case 1 /* SingleEditable */:
+                            var Buttons = _this.App.PluginManager.GetMenuBarButtons(NodeView);
+                            _this.ContextMenu.Create(_this.ViewMap[Label], _this.ControlLayer, Buttons);
+                            break;
+                        case 2 /* Locked */:
+                            $.notify("Warning: currently edited", 'warn');
+                            break;
                     }
                 } else {
                     _this.FocusedLabel = null;

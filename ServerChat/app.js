@@ -46,7 +46,7 @@ var AssureNoteServer = (function () {
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('move', function (data) {
+        socket.on('sync', function (data) {
             console.log('=================================syncfocus');
             socket.broadcast.emit('syncfocus', data);
         });

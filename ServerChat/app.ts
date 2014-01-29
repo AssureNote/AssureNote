@@ -50,7 +50,7 @@ class AssureNoteServer {
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('move', function (data: {X: number; Y: number; Scale: number}) {
+        socket.on('sync', function (data: {X: number; Y: number; Scale: number}) {
             console.log('=================================syncfocus');
             socket.broadcast.emit('syncfocus', data);
         });

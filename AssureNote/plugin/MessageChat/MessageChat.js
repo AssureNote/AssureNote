@@ -94,9 +94,18 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
         MessageChatPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
-            if (!this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
-                NodeView.AddColorStyle(AssureNote.ColorStyle.Editing);
+            switch (NodeView.Status) {
+                case 1 /* SingleEditable */:
+                    NodeView.AddColorStyle(AssureNote.ColorStyle.SingleEdit);
+                    break;
+
+                case 2 /* Locked */:
+                    NodeView.AddColorStyle(AssureNote.ColorStyle.Locked);
+                    break;
             }
+            //            if (!this.AssureNoteApp.SocketManager.IsEditable(NodeView.Model.UID)) {
+            //                NodeView.AddColorStyle(ColorStyle.Editing);
+            //            }
         };
         return MessageChatPlugin;
     })(AssureNote.Plugin);

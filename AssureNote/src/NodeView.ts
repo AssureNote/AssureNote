@@ -48,12 +48,14 @@ module AssureNote {
         Right: NodeView[] = null;
         Children: NodeView[] = null;
         Shape: GSNShape = null;
+        Status: EditStatus;
 
         constructor(public Model: GSNNode, IsRecursive: boolean) {
             this.Label = Model.GetLabel();
             this.NodeDoc = Model.NodeDoc;
             this.IsVisible = true;
             this.IsFolded = false;
+            this.Status   = EditStatus.TreeEditable;
             if (IsRecursive && Model.SubNodeList != null) {
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
@@ -122,6 +124,8 @@ module AssureNote {
             this.Shape = AssureNoteUtils.CreateGSNShape(this);
             return this.Shape;
         }
+
+
 
         // Global X: Scale-independent and transform-independent X distance from leftside of the top goal.
         // Return always 0 if this is top goal.
@@ -192,13 +196,20 @@ module AssureNote {
             this.Shape.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
         }
 
-        SaveFoldedFlag(OldViewMap: { [index: string]: NodeView }): void {
+        SaveFlags(OldViewMap: { [index: string]: NodeView }): void {
             if (OldViewMap[this.Model.GetLabel()]) {
                 this.IsFolded = OldViewMap[this.Model.GetLabel()].IsFolded;
+                this.Status   = OldViewMap[this.Model.GetLabel()].Status;
             }
 
             for (var i = 0; this.Children && i < this.Children.length; i++) {
-                this.Children[i].SaveFoldedFlag(OldViewMap);
+                this.Children[i].SaveFlags(OldViewMap);
+            }
+            for (var i = 0; this.Left && i < this.Left.length; i++) {
+                this.Left[i].SaveFlags(OldViewMap);
+            }
+            for (var i = 0; this.Right && i < this.Right.length; i++) {
+                this.Right[i].SaveFlags(OldViewMap);
             }
         }
 
@@ -333,5 +344,9 @@ module AssureNote {
         RemoveColorStyle(ColorStyle: string): void {    
             this.Shape.RemoveColorStyle(ColorStyle);
         }
+    }
+
+    export enum EditStatus {
+        TreeEditable, SingleEditable, Locked
     }
 }
