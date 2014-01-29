@@ -1082,7 +1082,7 @@ var AssureNote;
         * @return {GSNNode}
         */
         GSNNode.prototype.ReplaceSubNode = function (NewNode, IsRecursive) {
-            this.MergeSubNode(NewNode);
+            this.MergeDocHistory(NewNode);
             if (this.ParentNode != null) {
                 for (var i = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
                     if (Lib.Array_get(this.ParentNode.SubNodeList, i) == this) {
@@ -1143,10 +1143,38 @@ var AssureNote;
         };
 
         /**
-        * @method MergeSubNode
+        * We have to assume that node-level conflict never happen.
+        * @method Merge
         * @param {GSNNode} NewNode
         */
-        GSNNode.prototype.MergeSubNode = function (NewNode) {
+        GSNNode.prototype.Merge = function (NewNode, CommonRevision) {
+            if (NewNode.LastModified.Rev > CommonRevision) {
+                this.ReplaceSubNode(NewNode, true);
+                return this;
+            }
+
+            for (var i = 0, j = 0; NewNode.SubNodeList != null && i < Lib.Array_size(NewNode.SubNodeList); i++) {
+                var SubNewNode = Lib.Array_get(NewNode.SubNodeList, i);
+                for (; this.SubNodeList != null && j < Lib.Array_size(this.SubNodeList); j++) {
+                    var SubMasterNode = Lib.Array_get(this.SubNodeList, j);
+                    if (SubMasterNode.UID == SubNewNode.UID) {
+                        SubMasterNode.Merge(SubNewNode, CommonRevision);
+                        break;
+                    }
+                }
+                if (j == Lib.Array_size(this.SubNodeList)) {
+                    Lib.Array_add(this.SubNodeList, SubNewNode);
+                }
+            }
+            return this;
+        };
+
+        /**
+        * Update GSNNode.(Created/LastModified)
+        * @method MergeDocHistory
+        * @param {GSNNode} NewNode
+        */
+        GSNNode.prototype.MergeDocHistory = function (NewNode) {
             (this.BaseDoc != null);
             NewNode.LastModified = null; // this.BaseDoc has Last
             var UID = NewNode.UID;
@@ -1166,7 +1194,7 @@ var AssureNote;
             NewNode.BaseDoc = this.BaseDoc;
             for (var i = 0; i < Lib.Array_size(NewNode.NonNullSubNodeList()); i++) {
                 var SubNode = Lib.Array_get(NewNode.NonNullSubNodeList(), i);
-                this.MergeSubNode(SubNode);
+                this.MergeDocHistory(SubNode);
             }
         };
 
@@ -1343,13 +1371,7 @@ var AssureNote;
         */
         GSNDoc.prototype.DuplicateTagMap = function (TagMap) {
             if (TagMap != null) {
-                var NewMap = new HashMap();
-                var keyArray = TagMap.keySet();
-                for (var i = 0; i < keyArray.length; i++) {
-                    var Key = keyArray[i];
-                    NewMap.put(Key, TagMap.get(Key));
-                }
-                return NewMap;
+                return new HashMap(TagMap);
             }
             return null;
         };
@@ -1658,21 +1680,43 @@ var AssureNote;
         * @param {GSNRecord} NewRecord
         */
         GSNRecord.prototype.Merge = function (NewRecord) {
-            var CommonHistory = -1;
+            var CommonRevision = -1;
             for (var Rev = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
                 var MasterHistory = this.GetHistory(Rev);
                 var NewHistory = NewRecord.GetHistory(Rev);
-                if (NewHistory != null && MasterHistory.EqualsHistory(MasterHistory)) {
-                    CommonHistory = Rev;
+                if (NewHistory != null && MasterHistory.EqualsHistory(NewHistory)) {
+                    CommonRevision = Rev;
                     continue;
                 }
                 break;
             }
-            if (CommonHistory == -1) {
+            if (CommonRevision == -1) {
                 this.MergeAsReplaceTopGoal(NewRecord);
-            } else if (CommonHistory == Lib.Array_size(this.HistoryList) - 1) {
+            } else if (CommonRevision == Lib.Array_size(this.HistoryList) - 1) {
                 this.MergeAsFastFoward(NewRecord);
+            } else if (CommonRevision != Lib.Array_size(NewRecord.HistoryList) - 1) {
+                this.MergeConflict(NewRecord, CommonRevision);
             }
+        };
+
+        /**
+        * Resolve conflict and create new record to merge records.
+        * Node-level conflict will never happen.
+        * @method MergeConflict
+        * @param {GSNRecord} NewRecord
+        * @param {Number} CommonRevision Both this and NewRecord have one or more newer revisions.
+        */
+        GSNRecord.prototype.MergeConflict = function (BranchRecord, CommonRevision) {
+            var MasterHistory = Lib.Array_get(this.HistoryList, Lib.Array_size(this.HistoryList) - 1);
+            var BranchHistory = null;
+            for (var i = CommonRevision + 1; i < Lib.Array_size(BranchRecord.HistoryList); i++) {
+                BranchHistory = Lib.Array_get(BranchRecord.HistoryList, i);
+                Lib.Array_add(this.HistoryList, BranchHistory);
+            }
+
+            var MergeDoc = new GSNDoc(this);
+            MergeDoc.TopNode = MasterHistory.Doc.TopNode.Merge(BranchHistory.Doc.TopNode, CommonRevision);
+            MergeDoc.DocHistory = this.NewHistory(BranchHistory.Author, BranchHistory.Role, null, "merge", MergeDoc);
         };
 
         /**
@@ -2184,8 +2228,14 @@ var AssureNote;
     AssureNote.LinkedList = LinkedList;
 
     var HashMap = (function () {
-        function HashMap() {
+        function HashMap(map) {
             this.hash = {};
+            if (map != null) {
+                var keySet = map.keySet();
+                for (var i = 0; i < keySet.length; i++) {
+                    this.hash[keySet[i]] = map[keySet[i]];
+                }
+            }
         }
         HashMap.prototype.put = function (key, value) {
             this.hash[String(key)] = value;
@@ -2750,4 +2800,3 @@ var AssureNote;
         $.md5 = md5;
     }(Lib));
 })(AssureNote || (AssureNote = {}));
-//# sourceMappingURL=AssureNoteParser.js.map

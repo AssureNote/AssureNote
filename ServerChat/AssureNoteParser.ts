@@ -1081,7 +1081,7 @@ export class GSNNode {
 	 * @return {GSNNode}
 	 */
 	ReplaceSubNode(NewNode: GSNNode, IsRecursive: boolean): GSNNode {
-		this.MergeSubNode(NewNode);
+		this.MergeDocHistory(NewNode);
 		if(this.ParentNode != null) {
 			for(var i: number = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
 				if(Lib.Array_get(this.ParentNode.SubNodeList, i) == this) {
@@ -1139,12 +1139,40 @@ export class GSNNode {
 		}
 		return false;
 	}
-
+	
 	/**
-	 * @method MergeSubNode
+	 * We have to assume that node-level conflict never happen.
+	 * @method Merge
 	 * @param {GSNNode} NewNode
 	 */
-	MergeSubNode(NewNode: GSNNode): void {(this.BaseDoc != null);
+	Merge(NewNode: GSNNode, CommonRevision: number): GSNNode {
+		if (NewNode.LastModified.Rev > CommonRevision) {
+			this.ReplaceSubNode(NewNode, true);
+			return this;
+		}
+		
+		for (var i: number = 0, j = 0; NewNode.SubNodeList != null && i < Lib.Array_size(NewNode.SubNodeList); i++) {
+			var SubNewNode: GSNNode = Lib.Array_get(NewNode.SubNodeList, i);
+			for (; this.SubNodeList != null && j < Lib.Array_size(this.SubNodeList); j++) {
+				var SubMasterNode: GSNNode = Lib.Array_get(this.SubNodeList, j);
+				if (SubMasterNode.UID == SubNewNode.UID) {
+					SubMasterNode.Merge(SubNewNode, CommonRevision);
+					break;
+				}
+			}
+			if (j == Lib.Array_size(this.SubNodeList)) {
+				Lib.Array_add(this.SubNodeList, SubNewNode);
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Update GSNNode.(Created/LastModified)
+	 * @method MergeDocHistory
+	 * @param {GSNNode} NewNode
+	 */
+	MergeDocHistory(NewNode: GSNNode): void {(this.BaseDoc != null);
 		NewNode.LastModified = null; // this.BaseDoc has Last
 		var UID: number = NewNode.UID;
 		var OldNode: GSNNode = this.BaseDoc.GetNode(UID);
@@ -1163,7 +1191,7 @@ export class GSNNode {
 		NewNode.BaseDoc = this.BaseDoc;
 		for(var i: number = 0; i < Lib.Array_size(NewNode.NonNullSubNodeList()); i++) {
 			var SubNode: GSNNode = Lib.Array_get(NewNode.NonNullSubNodeList(), i);
-			this.MergeSubNode(SubNode);
+			this.MergeDocHistory(SubNode);
 		}
 	}
 
@@ -1343,13 +1371,7 @@ export class GSNDoc {
 	 */
 	DuplicateTagMap(TagMap: HashMap<string, string>): HashMap<string, string> {
 		if (TagMap != null) {
-			var NewMap: HashMap<string, string> = new HashMap<string, string>();
-			var keyArray: string[] = <string[]>TagMap.keySet();
-			for(var i: number = 0; i < keyArray.length; i++) {
-				var Key: string = keyArray[i];
-				NewMap.put(Key, TagMap.get(Key));
-			}
-			return NewMap;
+			return new HashMap<string, string>(TagMap);
 		}
 		return null;
 	}
@@ -1661,22 +1683,43 @@ export class GSNRecord {
 	 * @param {GSNRecord} NewRecord
 	 */
 	public Merge(NewRecord: GSNRecord): void {
-		var CommonHistory: number = -1;
+		var CommonRevision: number = -1;
 		for (var Rev: number = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
 			var MasterHistory: GSNHistory = this.GetHistory(Rev);
 			var NewHistory: GSNHistory = NewRecord.GetHistory(Rev);
-			if (NewHistory != null && MasterHistory.EqualsHistory(MasterHistory)) {
-				CommonHistory = Rev;
+			if (NewHistory != null && MasterHistory.EqualsHistory(NewHistory)) {
+				CommonRevision = Rev;
 				continue;
 			}
 			break;
 		}
-		if(CommonHistory == -1) {
+		if(CommonRevision == -1) {
 			this.MergeAsReplaceTopGoal(NewRecord);
-		}
-		else if(CommonHistory == Lib.Array_size(this.HistoryList)-1) {
+		} else if(CommonRevision == Lib.Array_size(this.HistoryList)-1) {
 			this.MergeAsFastFoward(NewRecord);
+		} else if (CommonRevision != Lib.Array_size(NewRecord.HistoryList)-1){
+			this.MergeConflict(NewRecord, CommonRevision);
 		}
+	}
+	
+	/**
+	 * Resolve conflict and create new record to merge records.
+	 * Node-level conflict will never happen.
+	 * @method MergeConflict
+	 * @param {GSNRecord} NewRecord
+	 * @param {Number} CommonRevision Both this and NewRecord have one or more newer revisions.
+	 */
+	private MergeConflict(BranchRecord: GSNRecord, CommonRevision: number): void {
+		var MasterHistory: GSNHistory = Lib.Array_get(this.HistoryList, Lib.Array_size(this.HistoryList)-1);
+		var BranchHistory: GSNHistory = null;
+		for (var i: number = CommonRevision+1; i < Lib.Array_size(BranchRecord.HistoryList); i++) {
+			BranchHistory = Lib.Array_get(BranchRecord.HistoryList, i);
+			Lib.Array_add(this.HistoryList, BranchHistory);
+		}
+		
+		var MergeDoc: GSNDoc = new GSNDoc(this);
+		MergeDoc.TopNode = MasterHistory.Doc.TopNode.Merge(BranchHistory.Doc.TopNode, CommonRevision);
+		MergeDoc.DocHistory = this.NewHistory(BranchHistory.Author, BranchHistory.Role, null, "merge", MergeDoc);
 	}
 
 	/**
@@ -2167,8 +2210,14 @@ export class LinkedList <E> extends Queue <E> {
 export class HashMap <K, V>{
 	/* the type of key must be either string or number */
 	hash : {[key: string]: V};
-	constructor() {
+    constructor(map?: HashMap<K, V>) {
 		this.hash = {};
+        if (map != null) {
+            var keySet: string[] = map.keySet();
+            for (var i = 0; i < keySet.length; i++) {
+                this.hash[keySet[i]] = map[keySet[i]];
+            }
+        }
 	}
 	put(key: K, value: V) : void {
 		this.hash[String(key)] = value;

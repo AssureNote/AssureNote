@@ -1298,16 +1298,16 @@ class GSNNode {
 			return this;
 		}
 		
-		for (/*local*/int i = 0, j = 0; NewNode.SubNodeList != null && i < NewNode.SubNodeList.size(); i++) {
-			/*local*/GSNNode SubNewNode = NewNode.SubNodeList.get(i);
-			for (; this.SubNodeList != null && j < this.SubNodeList.size(); j++) {
-				/*local*/GSNNode SubMasterNode = this.SubNodeList.get(j);
+		for (/*local*/int i = 0, j = 0; NewNode.SubNodeList != null && i < Lib.Array_size(NewNode.SubNodeList); i++) {
+			/*local*/GSNNode SubNewNode = Lib.Array_get(NewNode.SubNodeList, i);
+			for (; this.SubNodeList != null && j < Lib.Array_size(this.SubNodeList); j++) {
+				/*local*/GSNNode SubMasterNode = Lib.Array_get(this.SubNodeList, j);
 				if (SubMasterNode.UID == SubNewNode.UID) {
 					SubMasterNode.Merge(SubNewNode, CommonRevision);
 					break;
 				}
 			}
-			if (j == this.SubNodeList.size()) {
+			if (j == Lib.Array_size(this.SubNodeList)) {
 				Lib.Array_add(this.SubNodeList, SubNewNode);
 			}
 		}
@@ -1860,10 +1860,10 @@ class GSNRecord {
 	 * @param {Number} CommonRevision Both this and NewRecord have one or more newer revisions.
 	 */
 	private void MergeConflict(GSNRecord BranchRecord, int CommonRevision) {
-		/*local*/GSNHistory MasterHistory = this.HistoryList.get(this.HistoryList.size()-1);
+		/*local*/GSNHistory MasterHistory = Lib.Array_get(this.HistoryList, Lib.Array_size(this.HistoryList)-1);
 		/*local*/GSNHistory BranchHistory = null;
-		for (/*local*/int i = CommonRevision+1; i < BranchRecord.HistoryList.size(); i++) {
-			BranchHistory = BranchRecord.HistoryList.get(i);
+		for (/*local*/int i = CommonRevision+1; i < Lib.Array_size(BranchRecord.HistoryList); i++) {
+			BranchHistory = Lib.Array_get(BranchRecord.HistoryList, i);
 			Lib.Array_add(this.HistoryList, BranchHistory);
 		}
 		

@@ -13,6 +13,13 @@
             "fors": {},
             "namespaces": {}
         },
+        "lib/codemirror/addon/edit/closetag.js": {
+            "name": "lib/codemirror/addon/edit/closetag.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "lib/jquery-ui.js": {
             "name": "lib/jquery-ui.js",
             "modules": {},
@@ -243,7 +250,7 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/AssureNoteParser.js",
-            "line": 1306,
+            "line": 1334,
             "is_constructor": 1,
             "params": [
                 {
@@ -263,7 +270,7 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/AssureNoteParser.js",
-            "line": 1489,
+            "line": 1511,
             "is_constructor": 1
         },
         "ParserContext": {
@@ -276,7 +283,7 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/AssureNoteParser.js",
-            "line": 1781,
+            "line": 1825,
             "is_constructor": 1,
             "params": [
                 {
@@ -296,7 +303,7 @@
             "extension_for": [],
             "namespace": "",
             "file": "src/AssureNoteParser.js",
-            "line": 1974,
+            "line": 2018,
             "is_constructor": 1
         },
         "AssureNote.Panel": {
@@ -355,6 +362,12 @@
             "file": "lib/bootstrap/js/bootstrap.min.js",
             "line": 1,
             "description": "bootstrap.js v3.0.0 by @fat and @mdo\nCopyright 2013 Twitter Inc.\nhttp://www.apache.org/licenses/LICENSE-2.0",
+            "class": "StringReader"
+        },
+        {
+            "file": "lib/codemirror/addon/edit/closetag.js",
+            "line": 1,
+            "description": "Tag-closer extension for CodeMirror.\n\nThis extension adds an \"autoCloseTags\" option that can be set to\neither true to get the default behavior, or an object to further\nconfigure its behavior.\n\nThese are supported options:\n\n`whenClosing` (default true)\n  Whether to autoclose when the '/' of a closing tag is typed.\n`whenOpening` (default true)\n  Whether to autoclose the tag when the final '>' of an opening\n  tag is typed.\n`dontCloseTags` (default is empty tags for HTML, none for XML)\n  An array of tag names that should not be autoclosed.\n`indentTags` (default is block tags for HTML, none for XML)\n  An array of tag names that should, when opened, cause a\n  blank line to be added inside the tag, and the blank line and\n  closing line to be indented.\n\nSee demos/closetag.html for a usage example.",
             "class": "StringReader"
         },
         {
@@ -3164,8 +3177,9 @@
         {
             "file": "src/AssureNoteParser.js",
             "line": 1145,
+            "description": "We have to assume that node-level conflict never happen.",
             "itemtype": "method",
-            "name": "MergeSubNode",
+            "name": "Merge",
             "params": [
                 {
                     "name": "NewNode",
@@ -3177,7 +3191,22 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1173,
+            "line": 1172,
+            "description": "Update GSNNode.(Created/LastModified)",
+            "itemtype": "method",
+            "name": "MergeDocHistory",
+            "params": [
+                {
+                    "name": "NewNode",
+                    "description": "",
+                    "type": "GSNNode"
+                }
+            ],
+            "class": "GSNNode"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1201,
             "itemtype": "method",
             "name": "IsNewerTree",
             "params": [
@@ -3195,7 +3224,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1192,
+            "line": 1220,
             "itemtype": "method",
             "name": "ListSubGoalNode",
             "params": [
@@ -3209,7 +3238,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1208,
+            "line": 1236,
             "itemtype": "method",
             "name": "ListSectionNode",
             "params": [
@@ -3223,7 +3252,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1224,
+            "line": 1252,
             "itemtype": "method",
             "name": "RenumberGoalRecursive",
             "params": [
@@ -3247,7 +3276,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1264,
+            "line": 1292,
             "itemtype": "method",
             "name": "RenumberGoal",
             "params": [
@@ -3266,7 +3295,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1274,
+            "line": 1302,
             "itemtype": "method",
             "name": "SearchNode",
             "params": [
@@ -3284,7 +3313,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1291,
+            "line": 1319,
             "itemtype": "method",
             "name": "GetNodeCount",
             "return": {
@@ -3295,7 +3324,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1320,
+            "line": 1348,
             "itemtype": "method",
             "name": "DeepCopy",
             "params": [
@@ -3328,7 +3357,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1339,
+            "line": 1367,
             "itemtype": "method",
             "name": "DuplicateTagMap",
             "params": [
@@ -3346,7 +3375,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1357,
+            "line": 1379,
             "itemtype": "method",
             "name": "UpdateDocHeader",
             "params": [
@@ -3360,7 +3389,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1378,
+            "line": 1400,
             "itemtype": "method",
             "name": "GetNode",
             "params": [
@@ -3378,7 +3407,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1387,
+            "line": 1409,
             "itemtype": "method",
             "name": "UncheckAddNode",
             "params": [
@@ -3392,7 +3421,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1395,
+            "line": 1417,
             "itemtype": "method",
             "name": "AddNode",
             "params": [
@@ -3406,14 +3435,14 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1415,
+            "line": 1437,
             "itemtype": "method",
             "name": "RemapNodeMap",
             "class": "GSNDoc"
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1426,
+            "line": 1448,
             "itemtype": "method",
             "name": "RemoveNode",
             "params": [
@@ -3426,7 +3455,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1438,
+            "line": 1460,
             "itemtype": "method",
             "name": "FormatDoc",
             "params": [
@@ -3440,7 +3469,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1449,
+            "line": 1471,
             "itemtype": "method",
             "name": "GetLabelMap",
             "return": {
@@ -3451,7 +3480,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1469,
+            "line": 1491,
             "itemtype": "method",
             "name": "GetNodeCount",
             "return": {
@@ -3462,14 +3491,14 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1477,
+            "line": 1499,
             "itemtype": "method",
             "name": "RenumberAll",
             "class": "GSNDoc"
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1499,
+            "line": 1521,
             "itemtype": "method",
             "name": "DeepCopy",
             "return": {
@@ -3479,7 +3508,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1513,
+            "line": 1535,
             "itemtype": "method",
             "name": "GetHistory",
             "params": [
@@ -3497,7 +3526,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1525,
+            "line": 1547,
             "itemtype": "method",
             "name": "GetHistoryDoc",
             "params": [
@@ -3515,7 +3544,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1538,
+            "line": 1560,
             "itemtype": "method",
             "name": "NewHistory",
             "params": [
@@ -3553,7 +3582,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1553,
+            "line": 1575,
             "itemtype": "method",
             "name": "AddHistory",
             "params": [
@@ -3592,7 +3621,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1579,
+            "line": 1601,
             "itemtype": "method",
             "name": "ParseHistoryTag",
             "params": [
@@ -3611,7 +3640,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1598,
+            "line": 1620,
             "itemtype": "method",
             "name": "Parse",
             "params": [
@@ -3625,14 +3654,14 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1612,
+            "line": 1634,
             "itemtype": "method",
             "name": "RenumberAll",
             "class": "GSNRecord"
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1622,
+            "line": 1644,
             "itemtype": "method",
             "name": "OpenEditor",
             "params": [
@@ -3661,21 +3690,21 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1641,
+            "line": 1663,
             "itemtype": "method",
             "name": "CloseEditor",
             "class": "GSNRecord"
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1648,
+            "line": 1670,
             "itemtype": "method",
             "name": "DiscardEditor",
             "class": "GSNRecord"
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1656,
+            "line": 1678,
             "itemtype": "method",
             "name": "Merge",
             "params": [
@@ -3689,7 +3718,27 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1678,
+            "line": 1702,
+            "description": "Resolve conflict and create new record to merge records.\nNode-level conflict will never happen.",
+            "itemtype": "method",
+            "name": "MergeConflict",
+            "params": [
+                {
+                    "name": "NewRecord",
+                    "description": "",
+                    "type": "GSNRecord"
+                },
+                {
+                    "name": "CommonRevision",
+                    "description": "Both this and NewRecord have one or more newer revisions.",
+                    "type": "Number"
+                }
+            ],
+            "class": "GSNRecord"
+        },
+        {
+            "file": "src/AssureNoteParser.js",
+            "line": 1722,
             "itemtype": "method",
             "name": "MergeAsFastFoward",
             "params": [
@@ -3703,7 +3752,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1692,
+            "line": 1736,
             "itemtype": "method",
             "name": "MergeAsReplaceTopGoal",
             "params": [
@@ -3717,7 +3766,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1708,
+            "line": 1752,
             "itemtype": "method",
             "name": "MergeAsIncrementalAddition",
             "params": [
@@ -3746,7 +3795,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1745,
+            "line": 1789,
             "itemtype": "method",
             "name": "GetLatestDoc",
             "return": {
@@ -3757,7 +3806,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1759,
+            "line": 1803,
             "itemtype": "method",
             "name": "FormatRecord",
             "params": [
@@ -3771,7 +3820,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1797,
+            "line": 1841,
             "itemtype": "method",
             "name": "SetLastNode",
             "params": [
@@ -3785,7 +3834,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1811,
+            "line": 1855,
             "itemtype": "method",
             "name": "GetStrategyOfGoal",
             "params": [
@@ -3803,7 +3852,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1826,
+            "line": 1870,
             "itemtype": "method",
             "name": "GetGoalStackAt",
             "params": [
@@ -3821,7 +3870,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1838,
+            "line": 1882,
             "itemtype": "method",
             "name": "SetGoalStackAt",
             "params": [
@@ -3835,7 +3884,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1851,
+            "line": 1895,
             "itemtype": "method",
             "name": "IsValidSection",
             "params": [
@@ -3858,7 +3907,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1875,
+            "line": 1919,
             "itemtype": "method",
             "name": "CreateNewNode",
             "params": [
@@ -3881,14 +3930,14 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1906,
+            "line": 1950,
             "itemtype": "method",
             "name": "RemoveSentinel",
             "class": "ParserContext"
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1915,
+            "line": 1959,
             "itemtype": "method",
             "name": "ParseNode",
             "params": [
@@ -3906,7 +3955,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1959,
+            "line": 2003,
             "itemtype": "method",
             "name": "UpdateContent",
             "params": [
@@ -3925,7 +3974,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 1981,
+            "line": 2025,
             "itemtype": "method",
             "name": "merge",
             "static": 1,
@@ -3945,7 +3994,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 2002,
+            "line": 2046,
             "itemtype": "method",
             "name": "ts_merge",
             "static": 1,
@@ -3953,7 +4002,7 @@
         },
         {
             "file": "src/AssureNoteParser.js",
-            "line": 2023,
+            "line": 2067,
             "itemtype": "method",
             "name": "main",
             "params": [
@@ -4962,6 +5011,10 @@
         {
             "message": "Missing item type\nbootstrap.js v3.0.0 by @fat and @mdo\nCopyright 2013 Twitter Inc.\nhttp://www.apache.org/licenses/LICENSE-2.0",
             "line": " lib/bootstrap/js/bootstrap.min.js:1"
+        },
+        {
+            "message": "Missing item type\nTag-closer extension for CodeMirror.\n\nThis extension adds an \"autoCloseTags\" option that can be set to\neither true to get the default behavior, or an object to further\nconfigure its behavior.\n\nThese are supported options:\n\n`whenClosing` (default true)\n  Whether to autoclose when the '/' of a closing tag is typed.\n`whenOpening` (default true)\n  Whether to autoclose the tag when the final '>' of an opening\n  tag is typed.\n`dontCloseTags` (default is empty tags for HTML, none for XML)\n  An array of tag names that should not be autoclosed.\n`indentTags` (default is block tags for HTML, none for XML)\n  An array of tag names that should, when opened, cause a\n  blank line to be added inside the tag, and the blank line and\n  closing line to be indented.\n\nSee demos/closetag.html for a usage example.",
+            "line": " lib/codemirror/addon/edit/closetag.js:1"
         },
         {
             "message": "Missing item type",
