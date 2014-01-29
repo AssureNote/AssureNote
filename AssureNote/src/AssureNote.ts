@@ -53,8 +53,8 @@ module AssureNote {
             this.CommandLineTable = {};
 
             this.PluginManager = new PluginManager(this);
-            this.SocketManager = new SocketManager(this);
             this.PictgramPanel = new PictgramPanel(this);
+            this.SocketManager = new SocketManager(this);
             this.FullScreenEditorPanel = new WGSNEditorPanel(this);
             this.SingleNodeEditorPanel = new SingleNodeEditorPanel(this);
             this.ModeManager = new ModeManager(this, AssureNoteMode.Edit);

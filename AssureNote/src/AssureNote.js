@@ -34,8 +34,8 @@ var AssureNote;
             this.CommandLineTable = {};
 
             this.PluginManager = new AssureNote.PluginManager(this);
-            this.SocketManager = new AssureNote.SocketManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
+            this.SocketManager = new AssureNote.SocketManager(this);
             this.FullScreenEditorPanel = new AssureNote.WGSNEditorPanel(this);
             this.SingleNodeEditorPanel = new AssureNote.SingleNodeEditorPanel(this);
             this.ModeManager = new AssureNote.ModeManager(this, 0 /* Edit */);

@@ -29,6 +29,7 @@ class AssureNoteServer {
                     for (var i:number = 0; i < self.EditingNodes.length; i++) {
                         if (self.EditingNodes[i]["SID"] == socket.id) {
                             this.broadcast.emit('finishedit', {Label:self.EditingNodes[i]['Label'], UID:self.EditingNodes[i]['UID']});
+                            this.broadcast.emit('close', "Window Closed");
                             self.EditingNodes.splice(i, 1);
                         }
                     }
@@ -49,7 +50,8 @@ class AssureNoteServer {
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('syncfocus', function (data: {X: number; Y: number; Scale: number}) {
+        socket.on('move', function (data: {X: number; Y: number; Scale: number}) {
+            console.log('=================================syncfocus');
             socket.broadcast.emit('syncfocus', data);
         });
 
@@ -64,7 +66,7 @@ class AssureNoteServer {
             datas['IsRecursive'] = data.IsRecursive;
             datas['UserName']    = data.UserName;
             datas['SID']    = socket.id;
-            console.log('data\'s socketID is ' + datas['SID']);
+//            console.log('data\'s socketID is ' + datas['SID']);
             socket.broadcast.emit('startedit', datas);
             self.EditingNodes.push(datas);
             console.log("this is editing list" + self.EditingNodes);
@@ -78,7 +80,7 @@ class AssureNoteServer {
                 }
             }
         });
-    } 
+    }
     GetUserList() {
         var res = [];
         var Clients: Socket[] = this.io.sockets.clients(this.room);

@@ -23,6 +23,7 @@
 // **************************************************************************
 
 ///<reference path='./AssureNoteParser.ts'/>
+
 declare var io: any;
 
 module AssureNote {
@@ -33,16 +34,30 @@ module AssureNote {
     export class SocketManager {
         private socket: any;
         private handler: { [key: string]: (any) => void };
-        IsSyncMode: boolean = true;
-        ReceivedSyncFocusEvent: boolean = false;
-        ReceivedFoldEvent: boolean = false;
+        private IsEditMode: boolean = true;
+        private UseOnScrollEvent: boolean = true;
+        private ReceivedFoldEvent: boolean = false;
+
         EditingNodes: any[] = [];
         CurrentUserName: string;
 
-        constructor(public AssureNoteApp: AssureNoteApp) {
+        constructor(public App: AssureNoteApp) {
             if (!this.IsOperational()) {
-                AssureNoteApp.DebugP('socket.io not found')
+                App.DebugP('socket.io not found')
             }
+            console.log(App.PictgramPanel);
+            //var self = this;
+            App.PictgramPanel.Viewport.OnScroll = (Viewport: ViewportManager) => {
+                if (this.IsConnected() && this.UseOnScrollEvent) {
+                    console.log('StartEmit');
+                    var X = Viewport.GetCameraGX();
+                    var Y = Viewport.GetCameraGY();
+                    var Scale = Viewport.GetCameraScale();
+
+                    console.log("X = " + X + " Y = " + Y + " Scale = " + Scale);
+                    this.Emit("move", {"X": X, "Y": Y, "Scale": Scale});
+                }
+            };
             this.socket = null;
             this.handler = {};
         }
@@ -53,16 +68,18 @@ module AssureNote {
 
         Emit(method: string, params: any) {
             if (!this.IsConnected()) {
-                this.AssureNoteApp.DebugP('Socket not enable.');
+                this.App.DebugP('Socket not enable.');
                 return;
             }
+
+            console.log('this socket = ' + this.socket);
             this.socket.emit(method, params);
         }
 
         EnableListeners(): void{
             var self = this;
             this.socket.on('disconnect', function (data) {
-                self.AssureNoteApp.ModeManager.Disable();
+                self.App.ModeManager.Disable();
                 self.socket = null;
 
             });
@@ -82,28 +99,25 @@ module AssureNote {
                 if (!self.ReceivedFoldEvent) {
                     console.log('false => true');
                     self.ReceivedFoldEvent = true;
-                    var NodeView: NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
-                    self.AssureNoteApp.ExecDoubleClicked(NodeView);
+                    var NodeView: NodeView = self.App.PictgramPanel.GetNodeViewFromUID(data.UID);
+                    self.App.ExecDoubleClicked(NodeView);
                 }
             });
             this.socket.on('update', function (data: {name: string; WGSN: string}) {
                 console.log('update');
-                self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
+                self.App.LoadNewWGSN(data.name, data.WGSN);
             });
-            this.socket.on('syncfocus', function (data: {X: number; Y: number; Scale: number}) {
-                console.log('sync');
-                if (!self.ReceivedSyncFocusEvent) {
-                    self.ReceivedSyncFocusEvent = true;
-                    self.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(data.X, data.Y);
-                }
+            this.socket.on('move', function (data: {X: number; Y: number; Scale: number}) {
+                self.UseOnScrollEvent = false;
+                self.App.PictgramPanel.Viewport.SetCamera(data.X, data.Y, data.Scale);
+                self.UseOnScrollEvent = true;
             });
             this.socket.on('startedit', function(data : {Label: string; UID: number; IsRecursive: boolean; UserName: string; SID: number}) {
                 console.log('edit');
-                console.log(data);
                 self.EditingNodes.push(data);
                 self.UpdateView();
 
-                var CurrentNodeView: NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                var CurrentNodeView: NodeView = self.App.PictgramPanel.GetNodeViewFromUID(data.UID);
                 self.AddUserNameOn(CurrentNodeView, {User:data.UserName, IsRecursive:data.IsRecursive});
                 console.log('here is ID array = ' + self.EditingNodes);
             });
@@ -113,11 +127,6 @@ module AssureNote {
                 self.UpdateView();
 
                 console.log('here is ID array after delete = ' + self.EditingNodes);
-            });
-
-            $(window).on("beforeunload", function () {
-                self.Emit("close", "");
-                self.DisConnect();
             });
 
             for (var key in this.handler) {
@@ -132,7 +141,7 @@ module AssureNote {
                 this.socket = io.connect(host);
             }
             if (this.IsConnected()) {
-                this.AssureNoteApp.ModeManager.Enable();
+                this.App.ModeManager.Enable();
             }
             this.EnableListeners();
         }
@@ -162,15 +171,15 @@ module AssureNote {
         }
 
         UpdateView() {
-            var NewNodeView: NodeView = new NodeView(this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
-            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
-            this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+            var NewNodeView: NodeView = new NodeView(this.App.MasterRecord.GetLatestDoc().TopNode, true);
+            NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
+            this.App.PictgramPanel.InitializeView(NewNodeView);
+            this.App.PictgramPanel.Draw(this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel());
         }
 
         IsEditable(UID: number) {
             var index: number = 0;
-            var CurrentView: NodeView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID).Parent;
+            var CurrentView: NodeView = this.App.PictgramPanel.GetNodeViewFromUID(UID).Parent;
 
             if (this.EditingNodes.length == 0) return true;
             for (var i:number = 0; i < this.EditingNodes.length; i++) {
@@ -235,19 +244,15 @@ module AssureNote {
             }
         }
 
-        SyncScreenFocus (PosData: {X: number; Y: number; Scale: number})  {
-            if(this.IsConnected() && !this.ReceivedSyncFocusEvent) {
-                this.Emit('syncfocus', PosData);
-            } else {
-                this.ReceivedSyncFocusEvent = true;
-            }
+        SyncScreenPos(Data: {X: number; Y: number; Scale: number}) {
+            this.Emit("syncfocus", Data);
         }
 
         UpdateWGSN() {
             var Writer = new StringWriter();
-            this.AssureNoteApp.MasterRecord.FormatRecord(Writer);
+            this.App.MasterRecord.FormatRecord(Writer);
             var WGSN: string = Writer.toString();
-            this.Emit('update', new WGSNSocket(this.AssureNoteApp.WGSNName, WGSN));
+            this.Emit('update', new WGSNSocket(this.App.WGSNName, WGSN));
         }
     }
 }

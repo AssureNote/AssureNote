@@ -26,6 +26,7 @@ var AssureNoteServer = (function () {
                     for (var i = 0; i < self.EditingNodes.length; i++) {
                         if (self.EditingNodes[i]["SID"] == socket.id) {
                             this.broadcast.emit('finishedit', { Label: self.EditingNodes[i]['Label'], UID: self.EditingNodes[i]['UID'] });
+                            this.broadcast.emit('close', "Window Closed");
                             self.EditingNodes.splice(i, 1);
                         }
                     }
@@ -45,16 +46,13 @@ var AssureNoteServer = (function () {
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('sync', function (data) {
-            socket.broadcast.emit('sync', data);
+        socket.on('move', function (data) {
+            console.log('=================================syncfocus');
+            socket.broadcast.emit('syncfocus', data);
         });
 
         socket.on('fold', function (data) {
             socket.broadcast.emit('fold', data);
-        });
-
-        socket.on('move', function (data) {
-            socket.broadcast.emit('move', data);
         });
 
         socket.on('startedit', function (data) {
@@ -64,7 +62,8 @@ var AssureNoteServer = (function () {
             datas['IsRecursive'] = data.IsRecursive;
             datas['UserName'] = data.UserName;
             datas['SID'] = socket.id;
-            console.log('data\'s socketID is ' + datas['SID']);
+
+            //            console.log('data\'s socketID is ' + datas['SID']);
             socket.broadcast.emit('startedit', datas);
             self.EditingNodes.push(datas);
             console.log("this is editing list" + self.EditingNodes);

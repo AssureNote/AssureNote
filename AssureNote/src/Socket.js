@@ -35,15 +35,30 @@ var AssureNote;
     AssureNote.WGSNSocket = WGSNSocket;
 
     var SocketManager = (function () {
-        function SocketManager(AssureNoteApp) {
-            this.AssureNoteApp = AssureNoteApp;
-            this.IsSyncMode = true;
-            this.ReceivedSyncFocusEvent = false;
+        function SocketManager(App) {
+            var _this = this;
+            this.App = App;
+            this.IsEditMode = true;
+            this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.EditingNodes = [];
             if (!this.IsOperational()) {
-                AssureNoteApp.DebugP('socket.io not found');
+                App.DebugP('socket.io not found');
             }
+            console.log(App.PictgramPanel);
+
+            //var self = this;
+            App.PictgramPanel.Viewport.OnScroll = function (Viewport) {
+                if (_this.IsConnected() && _this.UseOnScrollEvent) {
+                    console.log('StartEmit');
+                    var X = Viewport.GetCameraGX();
+                    var Y = Viewport.GetCameraGY();
+                    var Scale = Viewport.GetCameraScale();
+
+                    console.log("X = " + X + " Y = " + Y + " Scale = " + Scale);
+                    _this.Emit("move", { "X": X, "Y": Y, "Scale": Scale });
+                }
+            };
             this.socket = null;
             this.handler = {};
         }
@@ -53,16 +68,18 @@ var AssureNote;
 
         SocketManager.prototype.Emit = function (method, params) {
             if (!this.IsConnected()) {
-                this.AssureNoteApp.DebugP('Socket not enable.');
+                this.App.DebugP('Socket not enable.');
                 return;
             }
+
+            console.log('this socket = ' + this.socket);
             this.socket.emit(method, params);
         };
 
         SocketManager.prototype.EnableListeners = function () {
             var self = this;
             this.socket.on('disconnect', function (data) {
-                self.AssureNoteApp.ModeManager.Disable();
+                self.App.ModeManager.Disable();
                 self.socket = null;
             });
             this.socket.on('close', function (data) {
@@ -81,28 +98,26 @@ var AssureNote;
                 if (!self.ReceivedFoldEvent) {
                     console.log('false => true');
                     self.ReceivedFoldEvent = true;
-                    var NodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
-                    self.AssureNoteApp.ExecDoubleClicked(NodeView);
+                    var NodeView = self.App.PictgramPanel.GetNodeViewFromUID(data.UID);
+                    self.App.ExecDoubleClicked(NodeView);
                 }
             });
             this.socket.on('update', function (data) {
                 console.log('update');
-                self.AssureNoteApp.LoadNewWGSN(data.name, data.WGSN);
+                self.App.LoadNewWGSN(data.name, data.WGSN);
             });
-            this.socket.on('syncfocus', function (data) {
-                console.log('sync');
-                if (!self.ReceivedSyncFocusEvent) {
-                    self.ReceivedSyncFocusEvent = true;
-                    self.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(data.X, data.Y);
-                }
+            this.socket.on('move', function (data) {
+                self.UseOnScrollEvent = false;
+                self.App.PictgramPanel.Viewport.SetCamera(data.X, data.Y, data.Scale);
+                self.UseOnScrollEvent = true;
+                console.log(self.GetCurrentMode());
             });
             this.socket.on('startedit', function (data) {
                 console.log('edit');
-                console.log(data);
                 self.EditingNodes.push(data);
                 self.UpdateView();
 
-                var CurrentNodeView = self.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(data.UID);
+                var CurrentNodeView = self.App.PictgramPanel.GetNodeViewFromUID(data.UID);
                 self.AddUserNameOn(CurrentNodeView, { User: data.UserName, IsRecursive: data.IsRecursive });
                 console.log('here is ID array = ' + self.EditingNodes);
             });
@@ -112,11 +127,6 @@ var AssureNote;
                 self.UpdateView();
 
                 console.log('here is ID array after delete = ' + self.EditingNodes);
-            });
-
-            $(window).on("beforeunload", function () {
-                self.Emit("close", "");
-                self.DisConnect();
             });
 
             for (var key in this.handler) {
@@ -131,7 +141,7 @@ var AssureNote;
                 this.socket = io.connect(host);
             }
             if (this.IsConnected()) {
-                this.AssureNoteApp.ModeManager.Enable();
+                this.App.ModeManager.Enable();
             }
             this.EnableListeners();
         };
@@ -161,15 +171,15 @@ var AssureNote;
         };
 
         SocketManager.prototype.UpdateView = function () {
-            var NewNodeView = new AssureNote.NodeView(this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode, true);
-            NewNodeView.SaveFoldedFlag(this.AssureNoteApp.PictgramPanel.ViewMap);
-            this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.MasterRecord.GetLatestDoc().TopNode.GetLabel());
+            var NewNodeView = new AssureNote.NodeView(this.App.MasterRecord.GetLatestDoc().TopNode, true);
+            NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
+            this.App.PictgramPanel.InitializeView(NewNodeView);
+            this.App.PictgramPanel.Draw(this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel());
         };
 
         SocketManager.prototype.IsEditable = function (UID) {
             var index = 0;
-            var CurrentView = this.AssureNoteApp.PictgramPanel.GetNodeViewFromUID(UID).Parent;
+            var CurrentView = this.App.PictgramPanel.GetNodeViewFromUID(UID).Parent;
 
             if (this.EditingNodes.length == 0)
                 return true;
@@ -190,6 +200,10 @@ var AssureNote;
                 CurrentView = CurrentView.Parent;
             }
             return true;
+        };
+
+        SocketManager.prototype.GetCurrentMode = function () {
+            return this.App.ModeManager.GetMode();
         };
 
         SocketManager.prototype.AddUserNameOn = function (NodeView, Data) {
@@ -239,19 +253,15 @@ var AssureNote;
             }
         };
 
-        SocketManager.prototype.SyncScreenFocus = function (PosData) {
-            if (this.IsConnected() && !this.ReceivedSyncFocusEvent) {
-                this.Emit('syncfocus', PosData);
-            } else {
-                this.ReceivedSyncFocusEvent = true;
-            }
+        SocketManager.prototype.SyncScreenPos = function (Data) {
+            this.Emit("syncfocus", Data);
         };
 
         SocketManager.prototype.UpdateWGSN = function () {
             var Writer = new AssureNote.StringWriter();
-            this.AssureNoteApp.MasterRecord.FormatRecord(Writer);
+            this.App.MasterRecord.FormatRecord(Writer);
             var WGSN = Writer.toString();
-            this.Emit('update', new WGSNSocket(this.AssureNoteApp.WGSNName, WGSN));
+            this.Emit('update', new WGSNSocket(this.App.WGSNName, WGSN));
         };
         return SocketManager;
     })();
