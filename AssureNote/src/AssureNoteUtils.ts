@@ -276,7 +276,8 @@ module AssureNote {
         static ToDo: string = "assurenote-todo";
         static Searched: string = "assurenote-search";
         static Danger: string = "assurenote-danger";
-        static Editing: string = "assurenote-editing";
+        static SingleEdit: string = "assurenote-singleedit";
+        static Locked: string = "assurenote-locked";
     }
 
     export class Rect {

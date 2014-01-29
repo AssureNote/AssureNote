@@ -8,7 +8,7 @@ class AssureNoteServer {
     io: SocketManager;
     room: string = 'room';
     EditingNodes: any[] = [];
-    MasterWGSN  : string = '';
+    MasterRecord: parser.GSNRecord = null;
 
     constructor() {
         var self = this;
@@ -47,10 +47,20 @@ class AssureNoteServer {
         });
 
         socket.on('update', function(data: {name: string; WGSN: string}) {
+            var NewRecord: parser.GSNRecord  = new parser.GSNRecord();
+            NewRecord.Parse(data.WGSN);
+            if (self.MasterRecord == null) {
+                self.MasterRecord = NewRecord;
+            } else {
+                self.MasterRecord.Merge(NewRecord);
+            }
+            var Writer: parser.StringWriter = new parser.StringWriter();
+            self.MasterRecord.FormatRecord(Writer);
+            data.WGSN = Writer.toString();
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('move', function (data: {X: number; Y: number; Scale: number}) {
+        socket.on('sync', function (data: {X: number; Y: number; Scale: number}) {
             console.log('=================================syncfocus');
             socket.broadcast.emit('syncfocus', data);
         });

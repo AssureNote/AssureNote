@@ -217,7 +217,7 @@ module AssureNote {
             var Panel = this.App.PictgramPanel;
             Doc.RenumberAll();
             var NewView = new NodeView(Doc.TopNode, true);
-            NewView.SaveFoldedFlag(Panel.ViewMap);
+            NewView.SaveFlags(Panel.ViewMap);
             Panel.InitializeView(NewView);
         }
 

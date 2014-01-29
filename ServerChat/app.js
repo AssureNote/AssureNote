@@ -7,7 +7,7 @@ var AssureNoteServer = (function () {
     function AssureNoteServer() {
         this.room = 'room';
         this.EditingNodes = [];
-        this.MasterWGSN = '';
+        this.MasterRecord = null;
         var self = this;
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
@@ -43,10 +43,20 @@ var AssureNoteServer = (function () {
         });
 
         socket.on('update', function (data) {
+            var NewRecord = new parser.GSNRecord();
+            NewRecord.Parse(data.WGSN);
+            if (self.MasterRecord == null) {
+                self.MasterRecord = NewRecord;
+            } else {
+                self.MasterRecord.Merge(NewRecord);
+            }
+            var Writer = new parser.StringWriter();
+            self.MasterRecord.FormatRecord(Writer);
+            data.WGSN = Writer.toString();
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('move', function (data) {
+        socket.on('sync', function (data) {
             console.log('=================================syncfocus');
             socket.broadcast.emit('syncfocus', data);
         });

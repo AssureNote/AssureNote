@@ -45,6 +45,7 @@ var AssureNote;
             this.NodeDoc = Model.NodeDoc;
             this.IsVisible = true;
             this.IsFolded = false;
+            this.Status = 0 /* TreeEditable */;
             if (IsRecursive && Model.SubNodeList != null) {
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
@@ -180,13 +181,20 @@ var AssureNote;
             this.Shape.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
         };
 
-        NodeView.prototype.SaveFoldedFlag = function (OldViewMap) {
+        NodeView.prototype.SaveFlags = function (OldViewMap) {
             if (OldViewMap[this.Model.GetLabel()]) {
                 this.IsFolded = OldViewMap[this.Model.GetLabel()].IsFolded;
+                this.Status = OldViewMap[this.Model.GetLabel()].Status;
             }
 
             for (var i = 0; this.Children && i < this.Children.length; i++) {
-                this.Children[i].SaveFoldedFlag(OldViewMap);
+                this.Children[i].SaveFlags(OldViewMap);
+            }
+            for (var i = 0; this.Left && i < this.Left.length; i++) {
+                this.Left[i].SaveFlags(OldViewMap);
+            }
+            for (var i = 0; this.Right && i < this.Right.length; i++) {
+                this.Right[i].SaveFlags(OldViewMap);
             }
         };
 
@@ -328,5 +336,12 @@ var AssureNote;
         return NodeView;
     })();
     AssureNote.NodeView = NodeView;
+
+    (function (EditStatus) {
+        EditStatus[EditStatus["TreeEditable"] = 0] = "TreeEditable";
+        EditStatus[EditStatus["SingleEditable"] = 1] = "SingleEditable";
+        EditStatus[EditStatus["Locked"] = 2] = "Locked";
+    })(AssureNote.EditStatus || (AssureNote.EditStatus = {}));
+    var EditStatus = AssureNote.EditStatus;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=NodeView.js.map

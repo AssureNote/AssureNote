@@ -59,6 +59,12 @@ var AssureNote;
                 this.Element.removeClass();
                 clearInterval(this.Timeout);
             }
+
+            /* TODO Remove this */
+            if (IsRecursive && (NodeView.Status == 1 /* SingleEditable */)) {
+                return;
+            }
+
             this.Timeout = null;
             var Model = NodeView.Model;
             this.App.FullScreenEditorPanel.IsVisible = false;
@@ -99,7 +105,7 @@ var AssureNote;
                 var TopGoal = this.App.MasterRecord.EditingDoc.TopNode;
 
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
+                NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
                 this.App.PictgramPanel.InitializeView(NewNodeView);
                 this.App.PictgramPanel.Draw(null);
 

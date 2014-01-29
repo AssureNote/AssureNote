@@ -115,9 +115,14 @@ h4 {
 .assurenote-todo {
 	stroke-dasharray: 5px, 5px;
 }
-.assurenote-editing {
+.assurenote-singleedit {
 	fill: #FFFFFF;
 	stroke: #5858FA;
+}
+
+.assurenote-locked {
+	file: #FFFFFF;
+	stroke: #F4FA58;
 }
 
 .assurenote-search{

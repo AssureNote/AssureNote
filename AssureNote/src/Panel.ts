@@ -154,11 +154,18 @@ module AssureNote {
                 var NodeView = this.ViewMap[Label];
                 if (NodeView != null) {
                     this.ChangeFocusedLabel(Label);
-                    if (this.App.SocketManager.IsEditable(NodeView.Model.UID)) {
-                        var Buttons = this.App.PluginManager.GetMenuBarButtons(NodeView);
-                        this.ContextMenu.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
-                    } else {
-                        (<any>$).notify("Warning:Other user edits this node!", "warn");
+                    switch (NodeView.Status) {
+                        case EditStatus.TreeEditable:
+                            var Buttons = this.App.PluginManager.GetMenuBarButtons(NodeView);
+                            this.ContextMenu.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
+                            break;
+                        case EditStatus.SingleEditable:
+                            var Buttons = this.App.PluginManager.GetMenuBarButtons(NodeView);
+                            this.ContextMenu.Create(this.ViewMap[Label], this.ControlLayer, Buttons);
+                            break;
+                        case EditStatus.Locked:
+                            (<any>$).notify("Warning: currently edited", 'warn');
+                            break;
                     }
                 } else {
                     this.FocusedLabel = null;
