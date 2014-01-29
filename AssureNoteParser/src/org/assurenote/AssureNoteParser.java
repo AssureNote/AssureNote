@@ -1298,9 +1298,9 @@ class GSNNode {
 			return this;
 		}
 		
-		for (/*local*/int i = 0, j = 0; i < NewNode.SubNodeList.size(); i++) {
+		for (/*local*/int i = 0, j = 0; NewNode.SubNodeList != null && i < NewNode.SubNodeList.size(); i++) {
 			/*local*/GSNNode SubNewNode = NewNode.SubNodeList.get(i);
-			for (; j < this.SubNodeList.size(); j++) {
+			for (; this.SubNodeList != null && j < this.SubNodeList.size(); j++) {
 				/*local*/GSNNode SubMasterNode = this.SubNodeList.get(j);
 				if (SubMasterNode.UID == SubNewNode.UID) {
 					SubMasterNode.Merge(SubNewNode, CommonRevision);
@@ -1520,13 +1520,7 @@ class GSNDoc {
 	 */
 	HashMap<String, String> DuplicateTagMap(HashMap<String, String> TagMap) {
 		if (TagMap != null) {
-			/*local*/HashMap<String, String> NewMap = new HashMap<String, String>();
-			/*local*/String[] keyArray = (/*cast*/String[])TagMap.keySet().toArray();
-			for(/*local*/int i = 0; i < keyArray.length; i++) {
-				/*local*/String Key = keyArray[i];
-				NewMap.put(Key, TagMap.get(Key));
-			}
-			return NewMap;
+			return new HashMap<String, String>(TagMap);
 		}
 		return null;
 	}
@@ -1843,7 +1837,7 @@ class GSNRecord {
 		for (/*local*/int Rev = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
 			/*local*/GSNHistory MasterHistory = this.GetHistory(Rev);
 			/*local*/GSNHistory NewHistory = NewRecord.GetHistory(Rev);
-			if (NewHistory != null && MasterHistory.EqualsHistory(MasterHistory)) {
+			if (NewHistory != null && MasterHistory.EqualsHistory(NewHistory)) {
 				CommonRevision = Rev;
 				continue;
 			}
@@ -1868,14 +1862,14 @@ class GSNRecord {
 	private void MergeConflict(GSNRecord BranchRecord, int CommonRevision) {
 		/*local*/GSNHistory MasterHistory = this.HistoryList.get(this.HistoryList.size()-1);
 		/*local*/GSNHistory BranchHistory = null;
-		for (/*local*/int i = CommonRevision; i < BranchRecord.HistoryList.size()-1; i++) {
+		for (/*local*/int i = CommonRevision+1; i < BranchRecord.HistoryList.size(); i++) {
 			BranchHistory = BranchRecord.HistoryList.get(i);
 			Lib.Array_add(this.HistoryList, BranchHistory);
 		}
 		
 		/*local*/GSNDoc MergeDoc = new GSNDoc(this);
 		MergeDoc.TopNode = MasterHistory.Doc.TopNode.Merge(BranchHistory.Doc.TopNode, CommonRevision);
-		MergeDoc.DocHistory = new GSNHistory(Lib.Array_size(this.HistoryList), BranchHistory.Author, BranchHistory.Role, null, "merge", null);
+		MergeDoc.DocHistory = this.NewHistory(BranchHistory.Author, BranchHistory.Role, null, "merge", MergeDoc);
 	}
 
 	/**

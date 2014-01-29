@@ -450,21 +450,31 @@ public class TestAssureNoteParser {
 	
 	@Test
 	public void Merge_Conflict() {
-		String input = "*G\n*S\n*E";
-		String input_updated1 = "*G\n*S\n*E\nupdated content";
-		String input_updated2 = "*G\n*S\nupdated content\n*E\n";
+		String input = "*G &1\n*S &2\n*E &3";
+		String input_updated1 = "*G &1\n*S &2\n*E &3\nupdated content";
+		String input_updated2 = "*G &1\n*S &2\nupdated content\n*E &3\n";
+		GSNRecord BaseRecord = new GSNRecord();
+		BaseRecord.Parse(input);
+		
+		StringWriter Writer = new StringWriter();
+		BaseRecord.FormatRecord(Writer);
+		
 		GSNRecord MasterRecord = new GSNRecord();
-		MasterRecord.Parse(input);
+		GSNRecord BranchRecord = new GSNRecord();
+		MasterRecord.Parse(Writer.toString());
+		BranchRecord.Parse(Writer.toString());
 		
-		GSNRecord BranchRecord = MasterRecord.DeepCopy();
-		
-		MasterRecord.Parse(input_updated1);
-		BranchRecord.Parse(input_updated2);
+		MasterRecord.OpenEditor("unknown", "test", null, "test");
+		MasterRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input_updated1, true);
+		MasterRecord.CloseEditor();
+		BranchRecord.OpenEditor("AuthorHasBeenChanged", "test", null, "test");
+		BranchRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input_updated2, true);
+		BranchRecord.CloseEditor();
 		MasterRecord.Merge(BranchRecord);
 		
-		assertEquals(2, BranchRecord.HistoryList.size());
+		assertEquals(4, MasterRecord.HistoryList.size());
 		
-		GSNDoc LatestDoc = BranchRecord.GetLatestDoc();
+		GSNDoc LatestDoc = MasterRecord.GetLatestDoc();
 		GSNNode TopNode = LatestDoc.TopNode;
 		
 		assertNotNull(TopNode.SubNodeList);
