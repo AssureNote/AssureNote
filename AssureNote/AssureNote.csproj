@@ -93,6 +93,7 @@
     <TypeScriptCompile Include="src\Plugin.ts" />
     <TypeScriptCompile Include="src\RecApi.ts" />
     <TypeScriptCompile Include="plugin\FullScreenEditor\FullScreenEditor.ts" />
+    <TypeScriptCompile Include="src\XMIParser.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.eot" />

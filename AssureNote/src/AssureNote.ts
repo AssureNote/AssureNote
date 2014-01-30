@@ -169,6 +169,9 @@ module AssureNote {
                 case "dcase_model":
                     new DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
                     break;
+                case "xmi":
+                    new XMIParser(this.MasterRecord).Parse(WGSN);
+                    break;
                 default:
                 case "wgsn":
                     this.MasterRecord.Parse(WGSN);

@@ -65,7 +65,7 @@ var AssureNote;
 
                 var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFoldedFlag(this.App.PictgramPanel.ViewMap);
+                NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
                 this.App.PictgramPanel.InitializeView(NewNodeView);
                 this.App.PictgramPanel.Draw(TopGoal.GetLabel());
             } else {
@@ -116,7 +116,7 @@ var AssureNote;
 
                 var TopGoal = App.MasterRecord.GetLatestDoc().TopNode;
                 var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFoldedFlag(App.PictgramPanel.ViewMap);
+                NewNodeView.SaveFlags(App.PictgramPanel.ViewMap);
                 App.PictgramPanel.InitializeView(NewNodeView);
                 App.PictgramPanel.Draw(TopGoal.GetLabel());
             });

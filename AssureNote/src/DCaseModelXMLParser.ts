@@ -83,14 +83,11 @@ module AssureNote {
                 var NodeType: string = XSIType.split(":").pop();
                 var Id: string = elem.getAttribute("id");
                 var Statement: string = elem.getAttribute("desc");
-                var Label: string = elem.getAttribute("name");
 
                 if (IsRootNode) {
                     this.RootNodeId = Id;
                     IsRootNode = false;
                 }
-                while (Label.charAt(0).search(/[A-Za-z]/) == 0) Label = Label.substr(1); // G1.1 -> 1.1
-                console.log(Label);
                 var Type = this.Text2NodeTypeMap[NodeType];
                 var node: GSNNode = new GSNNode(this.Doc, null, Type, NodeType.charAt(0), AssureNoteUtils.GenerateUID(), null);
                 node.NodeDoc = Statement;
