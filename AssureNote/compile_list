@@ -18,6 +18,7 @@ src/Socket.ts
 src/Viewport.ts
 src/RecApi.ts
 src/Tooltip.ts
+src/XMIParser.ts
 
 plugin/FoldingViewSwitch/FoldingViewSwitch.ts
 plugin/FullScreenEditor/FullScreenEditor.ts
