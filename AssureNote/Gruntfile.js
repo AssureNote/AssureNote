@@ -1,8 +1,8 @@
 module.exports = function(grunt) {
 
     grunt.initConfig({
-    	yuidoc: {
-            compile: {
+        yuidoc: {
+            build: {
                 name: 'AssureNote',
                 description: 'AssureNote auto-generated document',
                 version: '0.0.1',
@@ -15,15 +15,20 @@ module.exports = function(grunt) {
                     outdir: './doc',
                 }
             }
-    	},
+        },
 
         jade: {
-            compile: {
+            build: {
                 files: {
                     'index.html': './index.jade'
                 }
-            }
+            },
 
+            spec_build: {
+                files: {
+                    'test/SpecRunner.html': 'test/SpecRunner.jade'
+                }
+            }
         },
 
         //TODO use grunt-typescript (@compile_list cannot use in grunt-typescript)
@@ -31,12 +36,33 @@ module.exports = function(grunt) {
             typescript: {
                 cmd: 'tsc @compile_list --module "commonjs" --sourcemap'
             }
+        },
+
+        open: {
+            spec: {
+                path: 'test/SpecRunner.html',
+                app: 'Google Chrome'
+            }
+        },
+
+        typescript: {
+            spec_build: {
+                src: ['test/MainSpec.ts'],
+                options: {
+                    sourcemap: true,
+                    module: 'commonjs',
+                    comments: true
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
     grunt.loadNpmTasks('grunt-contrib-jade');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-typescript');
+    grunt.loadNpmTasks('grunt-open');
 
-    grunt.registerTask('default', ['jade:compile', 'exec:typescript']);
+    grunt.registerTask('default', ['jade:build', 'exec:typescript']);
+    grunt.registerTask('test', ['typescript:spec_build', 'jade:spec_build', 'open:spec']);
 };
