@@ -52,6 +52,7 @@ var AssureNote;
                 NewNodeView.SaveFlags(_this.AssureNoteApp.PictgramPanel.ViewMap);
                 _this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
                 _this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+                _this.AssureNoteApp.SocketManager.UpdateWGSN();
                 _this.AssureNoteApp.MasterRecord.CloseEditor();
             };
         };

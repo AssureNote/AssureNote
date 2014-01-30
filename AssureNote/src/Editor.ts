@@ -106,7 +106,6 @@ module AssureNote {
                 this.App.PictgramPanel.Draw(null);
 
                 this.App.FullScreenEditorPanel.IsVisible = true;
-                /* TODO resolve conflict */
                 this.App.SocketManager.UpdateWGSN();
                 this.App.MasterRecord.CloseEditor();
             } else {

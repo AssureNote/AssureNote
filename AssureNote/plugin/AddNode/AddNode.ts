@@ -46,6 +46,7 @@ module AssureNote {
                 NewNodeView.SaveFlags(this.AssureNoteApp.PictgramPanel.ViewMap);
                 this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
                 this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
+                this.AssureNoteApp.SocketManager.UpdateWGSN();
                 this.AssureNoteApp.MasterRecord.CloseEditor();
             };
         }
