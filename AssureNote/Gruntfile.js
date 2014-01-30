@@ -39,9 +39,14 @@ module.exports = function(grunt) {
         },
 
         open: {
-            spec: {
+            spec_chrome: {
                 path: 'test/SpecRunner.html',
                 app: 'Google Chrome'
+            },
+
+            spec_firefox: {
+                path: 'test/SpecRunner.html',
+                app: 'Firefox'
             }
         },
 
@@ -64,5 +69,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-open');
 
     grunt.registerTask('default', ['jade:build', 'exec:typescript']);
-    grunt.registerTask('test', ['typescript:spec_build', 'jade:spec_build', 'open:spec']);
+    grunt.registerTask('test', ['typescript:spec_build', 'jade:spec_build', 'open:spec_chrome']);
 };
