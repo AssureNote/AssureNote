@@ -159,3 +159,9 @@ production.yaml
 
 # MySQL workbench
 *.mwb.bak
+
+# =========================
+# YUIDoc output
+# ========================
+AssureNote/doc/
+AssureNoteServer/doc/
