@@ -4,23 +4,17 @@ module.exports = function(grunt) {
     	yuidoc: {
             compile: {
                 name: 'AssureNote',
-                description: 'AssureNote Server auto-generated document',
+                description: 'AssureNote auto-generated document',
                 version: '0.0.1',
                 url: 'https://github.com/AssureNote/AssureNote',
                 options: {
-                    name: 'AssureNote',
-                    description: 'AssureNote auto-generated document',
-                    version: '0.0.1',
-                    url: 'https://github.com/AssureNote/AssureNote',
-                    options: {
-                        linkNatives: 'true',        
-                        attributesEmit: 'true',
-                        selleck: 'true',
-                        paths: './src',
-                        outdir: './doc'
-                    }
+                    linkNatives: 'true',
+                    attributesEmit: 'true',
+                    selleck: 'true',
+                    paths: './src',
+                    outdir: './doc',
                 }
-    		}
+            }
     	},
 
         jade: {
