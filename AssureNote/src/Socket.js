@@ -37,6 +37,7 @@ var AssureNote;
         function SocketManager(App) {
             var _this = this;
             this.App = App;
+            this.DEFAULT_HOST = 'http://localhost:3002';
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.ClientsInfo = [];
@@ -86,6 +87,11 @@ var AssureNote;
             this.socket.on('join', function (data) {
                 console.log('join');
                 console.log(data);
+            });
+
+            this.socket.on('error', function (data) {
+                $.notify('Cannot establish connection or connection closed', 'error');
+                self.App.ModeManager.Disable();
             });
 
             this.socket.on('init', function (data) {
@@ -138,13 +144,11 @@ var AssureNote;
 
         SocketManager.prototype.Connect = function (host) {
             if (host == null || host == '') {
-                this.socket = io.connect('http://localhost:3002');
+                this.socket = io.connect(this.DEFAULT_HOST);
             } else {
                 this.socket = io.connect(host);
             }
-            if (this.IsConnected()) {
-                this.App.ModeManager.Enable();
-            }
+            this.App.ModeManager.Enable();
             this.EnableListeners();
         };
 

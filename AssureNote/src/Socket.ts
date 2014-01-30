@@ -30,7 +30,8 @@ module AssureNote {
     export class WGSNSocket {
         constructor(public name: string, public WGSN: string) { }
     }
-export class SocketManager {
+    export class SocketManager {
+        private DEFAULT_HOST: string = 'http://localhost:3002';
         private socket: any;
         private handler: { [key: string]: (any) => void };
         private UseOnScrollEvent: boolean = true;
@@ -89,6 +90,11 @@ export class SocketManager {
                 console.log(data);
             });
 
+            this.socket.on('error', function (data) {
+                (<any>$).notify('Cannot establish connection or connection closed', 'error');
+                self.App.ModeManager.Disable();
+            });
+
             this.socket.on('init', function (data) {
                 if (data.WGSN != null && self.App.MasterRecord.HistoryList.length > 1) {
                     /* TODO: Make a choice  */
@@ -139,13 +145,11 @@ export class SocketManager {
 
         Connect(host: string) {
             if (host == null || host =='') {
-                this.socket = io.connect('http://localhost:3002');
+                this.socket = io.connect(this.DEFAULT_HOST);
             } else {
                 this.socket = io.connect(host);
             }
-            if (this.IsConnected()) {
-                this.App.ModeManager.Enable();
-            }
+            this.App.ModeManager.Enable();
             this.EnableListeners();
         }
 
