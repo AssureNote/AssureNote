@@ -25,6 +25,7 @@
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
 ///<reference path='TopMenu.ts'/>
+///<reference path='UserList.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
@@ -43,6 +44,7 @@ module AssureNote {
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
+        UserList: UserList;
 
         TopMenu: TopMenuItem;
 
@@ -75,6 +77,7 @@ module AssureNote {
 
             this.PluginManager.LoadPlugin();
             this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
+            this.UserList = new UserList(this);
 
             this.TopMenu = new TopMenuTopItem([
                 new SubMenuItem("File", "file", [
@@ -160,6 +163,10 @@ module AssureNote {
 
         GetUserName(): string {
             return this.UserName;
+        }
+
+        SetUserName(Name: string): void {
+            this.UserName = Name;
         }
 
         LoadNewWGSN(Name: string, WGSN: string): void {

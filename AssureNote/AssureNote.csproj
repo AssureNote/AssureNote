@@ -86,6 +86,7 @@
     <TypeScriptCompile Include="src\Socket.ts" />
     <TypeScriptCompile Include="src\Tooltip.ts" />
     <TypeScriptCompile Include="src\TopMenu.ts" />
+    <TypeScriptCompile Include="src\UserList.ts" />
     <TypeScriptCompile Include="src\Viewport.ts" />
     <TypeScriptCompile Include="src\AssureNote.ts" />
     <TypeScriptCompile Include="src\CommandLine.ts" />

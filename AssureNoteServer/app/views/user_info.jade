@@ -1,6 +1,6 @@
 #user-info
   .glyphicon.glyphicon-user
-  | &nbsp; #{UserName} 
+  span.user-name &nbsp; #{UserName} 
   if !isLocal
     if(UserName != "Guest")
       a.btn.clickable(href='#{basepath}/logout')
@@ -15,5 +15,5 @@
   else
     a.btn.clickable.change-user
       button.btn.btn-default.btn-large
-        span.glyphicon.glyphicon-log-out
-        | &nbsp; Change Name
+        span.glyphicon.glyphicon-pencil
+        | &nbsp; Change User

@@ -24,6 +24,7 @@
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
 ///<reference path='TopMenu.ts'/>
+///<reference path='UserList.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
 
 var AssureNote;
@@ -56,6 +57,7 @@ var AssureNote;
 
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
+            this.UserList = new AssureNote.UserList(this);
 
             this.TopMenu = new AssureNote.TopMenuTopItem([
                 new AssureNote.SubMenuItem("File", "file", [
@@ -136,6 +138,10 @@ var AssureNote;
 
         AssureNoteApp.prototype.GetUserName = function () {
             return this.UserName;
+        };
+
+        AssureNoteApp.prototype.SetUserName = function (Name) {
+            this.UserName = Name;
         };
 
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
