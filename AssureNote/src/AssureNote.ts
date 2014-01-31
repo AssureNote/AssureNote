@@ -26,6 +26,7 @@
 ///<reference path='Command.ts'/>
 ///<reference path='TopMenu.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
+///<reference path='HistoryView.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
 
@@ -71,6 +72,7 @@ module AssureNote {
             this.RegistCommand(new SetScaleCommand(this));
             this.RegistCommand(new HelpCommand(this));
             this.RegistCommand(new UploadCommand(this));
+            this.RegistCommand(new HistoryCommand(this));
 
             this.PluginManager.LoadPlugin();
             this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';

@@ -25,6 +25,7 @@
 ///<reference path='Command.ts'/>
 ///<reference path='TopMenu.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
+///<reference path='HistoryView.ts'/>
 
 var AssureNote;
 (function (AssureNote) {
@@ -52,6 +53,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
             this.RegistCommand(new AssureNote.HelpCommand(this));
             this.RegistCommand(new AssureNote.UploadCommand(this));
+            this.RegistCommand(new AssureNote.HistoryCommand(this));
 
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';

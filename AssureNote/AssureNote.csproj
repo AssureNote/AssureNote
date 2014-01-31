@@ -79,6 +79,7 @@
     <TypeScriptCompile Include="src\DCaseModelXMLParser.ts" />
     <TypeScriptCompile Include="src\Editor.ts" />
     <TypeScriptCompile Include="src\GSNShape.ts" />
+    <TypeScriptCompile Include="src\HistoryView.ts" />
     <TypeScriptCompile Include="src\ModeManager.ts" />
     <TypeScriptCompile Include="src\NodeMenu.ts" />
     <TypeScriptCompile Include="src\NodeView.ts" />
