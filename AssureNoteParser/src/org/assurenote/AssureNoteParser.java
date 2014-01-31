@@ -1970,18 +1970,6 @@ class GSNRecord {
 	public void Commit(String message) {
 		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
 		this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
-		/*local*/int i = 0;
-		while (i < Lib.Array_size(this.HistoryList)) {
-			/*local*/GSNHistory History = Lib.Array_get(this.HistoryList, i);
-			if (History.IsCommitRevision) {
-				i++;
-				continue;
-			} else {
-				System.out.println(i);
-				Lib.Array_remove(this.HistoryList, i);
-				System.out.println(i);
-			}
-		}
 	}
 	
 	/**

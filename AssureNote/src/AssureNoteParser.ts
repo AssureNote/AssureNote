@@ -1817,18 +1817,6 @@ export class GSNRecord {
 	public Commit(message: string): void {
 		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
 		this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
-		var i: number = 0;
-		while (i < Lib.Array_size(this.HistoryList)) {
-			var History: GSNHistory = Lib.Array_get(this.HistoryList, i);
-			if (History.IsCommitRevision) {
-				i++;
-				continue;
-			} else {
-				console.log(i);
-				Lib.Array_remove(this.HistoryList, i);
-				console.log(i);
-			}
-		}
 	}
 	
 	/**

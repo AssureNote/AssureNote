@@ -45,6 +45,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
             this.RegistCommand(new AssureNote.SaveWGSNCommand(this));
             this.RegistCommand(new AssureNote.SaveDCaseCommand(this));
+            this.RegistCommand(new AssureNote.CommitCommand(this));
             this.RegistCommand(new AssureNote.OpenCommand(this));
             this.RegistCommand(new AssureNote.NewCommand(this));
             this.RegistCommand(new AssureNote.UnfoldAllCommand(this));

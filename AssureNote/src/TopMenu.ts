@@ -200,7 +200,7 @@ module AssureNote {
         Invoke(App: AssureNoteApp): void {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
                 var CommitCommand = App.FindCommandByCommandLineName("commit");
-                Command.Invoke(null, ["Share"]);
+                CommitCommand.Invoke(null, ["Share"]);
             }
             var Command = App.FindCommandByCommandLineName("share");
             Command.Invoke(null, []);
@@ -217,7 +217,7 @@ module AssureNote {
         Invoke(App: AssureNoteApp): void {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
                 var CommitCommand = App.FindCommandByCommandLineName("commit");
-                Command.Invoke(null, ["Save"]);
+                CommitCommand.Invoke(null, ["Save"]);
             }
             var Command = App.FindCommandByCommandLineName("save");
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
@@ -235,7 +235,7 @@ module AssureNote {
         Invoke(App: AssureNoteApp): void {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
                 var CommitCommand = App.FindCommandByCommandLineName("commit");
-                Command.Invoke(null, ["Save"]);
+                CommitCommand.Invoke(null, ["Save"]);
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, "." + this.GetExtention());
             var Command = App.FindCommandByCommandLineName("save");

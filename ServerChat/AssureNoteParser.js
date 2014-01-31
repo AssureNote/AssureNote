@@ -1813,18 +1813,6 @@ var GSNRecord = (function () {
     GSNRecord.prototype.Commit = function (message) {
         this.GetLatestDoc().DocHistory.IsCommitRevision = true;
         this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
-        var i = 0;
-        while (i < Lib.Array_size(this.HistoryList)) {
-            var History = Lib.Array_get(this.HistoryList, i);
-            if (History.IsCommitRevision) {
-                i++;
-                continue;
-            } else {
-                console.log(i);
-                Lib.Array_remove(this.HistoryList, i);
-                console.log(i);
-            }
-        }
     };
 
     /**

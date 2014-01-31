@@ -64,6 +64,7 @@ module AssureNote {
             this.RegistCommand(new SaveSVGCommand(this));
             this.RegistCommand(new SaveWGSNCommand(this));
             this.RegistCommand(new SaveDCaseCommand(this));
+            this.RegistCommand(new CommitCommand(this));
             this.RegistCommand(new OpenCommand(this));
             this.RegistCommand(new NewCommand(this));
             this.RegistCommand(new UnfoldAllCommand(this));
