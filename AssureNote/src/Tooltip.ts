@@ -49,6 +49,8 @@ module AssureNote {
         }
 
         Create(CurrentView: NodeView, ControlLayer: HTMLDivElement, Contents: HTMLLIElement[]): void {
+            if(Contents == null || Contents.length == 0) return;
+
             if (this.Tooltip != null) this.Remove();
             this.IsEnable = true;
             this.CurrentView = CurrentView;

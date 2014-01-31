@@ -1,20 +1,19 @@
 #user-info
   .glyphicon.glyphicon-user
   | &nbsp; #{UserName} 
-  if(UserName != "Guest")
-    a.btn.clickable(href='#{basepath}/logout')
-      button.btn.btn-default.btn-large
-        span.glyphicon.glyphicon-log-out
-        | &nbsp; Logout
+  if !isLocal
+    if(UserName != "Guest")
+      a.btn.clickable(href='#{basepath}/logout')
+        button.btn.btn-default.btn-large
+          span.glyphicon.glyphicon-log-out
+          | &nbsp; Logout
+    else
+      a.btn.clickable(href='#{basepath}/auth/github')
+        button.btn.btn-default.btn-large
+          span.glyphicon.glyphicon-log-out
+          | &nbsp; Login
   else
-    a.btn.clickable(href='#{basepath}/auth/github')
+    a.btn.clickable.change-user
       button.btn.btn-default.btn-large
         span.glyphicon.glyphicon-log-out
-        | &nbsp; Login
-  //.list-group-item-heading
-    a(href='#{basepath}/case/${caseId}/${prevRevision}')
-      span.glyphicon.glyphicon-circle-arrow-left
-    a(href='#{basepath}/case/${caseId}') 
-      span.glyphicon.glyphicon-ok-sign
-    a(href='#{basepath}/case/${caseId}/${nextRevision}')
-      span.glyphicon.glyphicon-circle-arrow-right
+        | &nbsp; Change Name
