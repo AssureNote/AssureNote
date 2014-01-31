@@ -17,7 +17,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            this.History.Activate();
+            this.History.Show();
         }
     }
 
@@ -27,32 +27,38 @@ module AssureNote {
             super(App);
             this.Element = $("#history");
             this.Element.hide();
+            this.Element.click((Event: JQueryEventObject) => {
+                this.Activate();
+            });
+            this.App.PictgramPanel.Viewport.EventMapLayer.addEventListener("pointerdown", (e: PointerEvent) => {
+                this.App.PictgramPanel.Activate();
+            });
         }
 
-        OnActivate(): void {
-            var t = <any>{ Message: "hello", User: "who", DateTime: Date.now(), DateTimeString: Date.now().toString()};
+        Show(): void {
+            var t = <any>{ Message: "hello", User: "who", DateTime: Date.now(), DateTimeString: Date.now().toString() };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
             this.Element.show();
         }
 
-        OnDeactivate(): void {
+        Hide(): void {
             this.Element.empty();
             this.Element.hide();
+        }
+
+        OnActivate(): void {
+        }
+
+        OnDeactivate(): void {
         }
 
         OnKeyDown(Event: KeyboardEvent): void {
             switch (Event.keyCode) {
                 case 27: /*Esc*/
+                    this.Hide();
                     this.App.PictgramPanel.Activate();
             }
         }
 
-        Show(): void {
-            this.IsEnable = true;
-        }
-
-        Hide(): void {
-            this.IsVisible = false;
-        }
     }
 }

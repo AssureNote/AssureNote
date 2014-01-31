@@ -21,7 +21,7 @@ var AssureNote;
         };
 
         HistoryCommand.prototype.Invoke = function (CommandName, Params) {
-            this.History.Activate();
+            this.History.Show();
         };
         return HistoryCommand;
     })(AssureNote.Command);
@@ -30,35 +30,41 @@ var AssureNote;
     var HistoryPanel = (function (_super) {
         __extends(HistoryPanel, _super);
         function HistoryPanel(App) {
+            var _this = this;
             _super.call(this, App);
             this.App = App;
             this.Element = $("#history");
             this.Element.hide();
+            this.Element.click(function (Event) {
+                _this.Activate();
+            });
+            this.App.PictgramPanel.Viewport.EventMapLayer.addEventListener("pointerdown", function (e) {
+                _this.App.PictgramPanel.Activate();
+            });
         }
-        HistoryPanel.prototype.OnActivate = function () {
+        HistoryPanel.prototype.Show = function () {
             var t = { Message: "hello", User: "who", DateTime: Date.now(), DateTimeString: Date.now().toString() };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
             this.Element.show();
         };
 
-        HistoryPanel.prototype.OnDeactivate = function () {
+        HistoryPanel.prototype.Hide = function () {
             this.Element.empty();
             this.Element.hide();
+        };
+
+        HistoryPanel.prototype.OnActivate = function () {
+        };
+
+        HistoryPanel.prototype.OnDeactivate = function () {
         };
 
         HistoryPanel.prototype.OnKeyDown = function (Event) {
             switch (Event.keyCode) {
                 case 27:
+                    this.Hide();
                     this.App.PictgramPanel.Activate();
             }
-        };
-
-        HistoryPanel.prototype.Show = function () {
-            this.IsEnable = true;
-        };
-
-        HistoryPanel.prototype.Hide = function () {
-            this.IsVisible = false;
         };
         return HistoryPanel;
     })(AssureNote.Panel);
