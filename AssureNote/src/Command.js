@@ -432,7 +432,7 @@ var AssureNote;
         CommitCommand.prototype.Invoke = function (CommandName, Params) {
             var message = "Default message";
             if (Params.length >= 1)
-                message = Params[0];
+                message = Params.join(" ");
             this.App.MasterRecord.Commit(message);
         };
         return CommitCommand;

@@ -409,7 +409,7 @@ module AssureNote {
 
         public Invoke(CommandName: string, Params: any[]) {
             var message: string = "Default message";
-            if (Params.length >= 1) message = Params[0];
+            if (Params.length >= 1) message = Params.join(" ");
             this.App.MasterRecord.Commit(message);
         }
     }
