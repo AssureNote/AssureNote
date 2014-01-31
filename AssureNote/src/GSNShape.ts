@@ -188,6 +188,7 @@ module AssureNote {
         FitSizeToContent(): void {
         }
 
+        private willFadein = false;
         private GX = null;
         private GY = null;
 
@@ -221,11 +222,12 @@ module AssureNote {
         }
 
         private AnimationFrameTimerHandle: number = 0;
+        private AnimationFrameTimerHandle2: number = 0;
 
         private Fadein(Duration: number): void {
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
+            if (this.AnimationFrameTimerHandle2) {
+                cancelAnimationFrame(this.AnimationFrameTimerHandle2);
+                this.AnimationFrameTimerHandle2 = 0;
             }
             var lastTime: number = performance.now();
             var startTime = lastTime;
@@ -237,12 +239,13 @@ module AssureNote {
                 var currentTime: number = performance.now();
                 var deltaT = currentTime - lastTime;
                 if (currentTime - startTime < Duration) {
-                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
+                    this.AnimationFrameTimerHandle2 = requestAnimationFrame(update);
                 } else {
                     deltaT = Duration - (lastTime - startTime);
                 }
                 Opacity += V * deltaT;
                 this.SetOpacity(Opacity);
+                this.SetArrowOpacity(Opacity);
                 lastTime = currentTime;
             }
             update();
@@ -254,10 +257,13 @@ module AssureNote {
                 return;
             }
 
-            if (this.GX == null || this.GY == null) {
-                this.SetPosition(x, y);
+            if (this.WillFadein()) {
                 this.Fadein(Duration);
-                return;
+                this.willFadein = false;
+                if (this.GX == null || this.GY == null) {
+                    this.SetPosition(x, y);
+                    return;
+                }
             }
 
             if (this.AnimationFrameTimerHandle) {
@@ -286,9 +292,29 @@ module AssureNote {
             update();
         }
 
+        SetFadeinBasePosition(StartGX: number, StartGY: number): void {
+            this.willFadein = true;
+            this.GX = StartGX;
+            this.GY = StartGY;
+            this.ArrowP1 = this.ArrowP2 = new Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
+        }
+
+        GetGXCache(): number {
+            return this.GX;
+        }
+
+        GetGYCache(): number {
+            return this.GY;
+        }
+
+        WillFadein(): boolean {
+            return this.willFadein || this.GX == null || this.GY == null;
+        }
+
         ClearAnimationCache(): void {
             this.GX = null;
             this.GY = null;
+            this.willFadein = true;
         }
 
         PrerenderSVGContent(manager: PluginManager): void {
@@ -338,41 +364,9 @@ module AssureNote {
             this.ArrowPath.style.opacity = Opacity.toString();
         }
 
-        private FadeinArrow(Duration: number): void {
-            if (this.ArrowAnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.ArrowAnimationFrameTimerHandle);
-                this.ArrowAnimationFrameTimerHandle = 0;
-            }
-            var lastTime: number = performance.now();
-            var startTime = lastTime;
-
-            var V = 1 / Duration;
-            var Opacity = 0;
-
-            var update: any = () => {
-                var currentTime: number = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    this.ArrowAnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
-                Opacity += V * deltaT;
-                this.SetArrowOpacity(Opacity);
-                lastTime = currentTime;
-            }
-            update();
-        }
-
         MoveArrowTo(P1: Point, P2: Point, Dir: Direction, Duration: number) {
             if (Duration <= 0) {
                 this.SetArrowPosition(P1, P2, Dir);
-                return;
-            }
-
-            if (this.GX == null || this.GY == null) {
-                this.SetArrowPosition(P1, P2, Dir);
-                this.FadeinArrow(Duration);
                 return;
             }
 
@@ -396,6 +390,7 @@ module AssureNote {
                 if (currentTime - startTime < Duration) {
                     this.ArrowAnimationFrameTimerHandle = requestAnimationFrame(update);
                 } else {
+                    this.ArrowAnimationFrameTimerHandle = 0;
                     deltaT = Duration - (lastTime - startTime);
                 }
                 var CurrentP1 = this.ArrowP1.Clone();

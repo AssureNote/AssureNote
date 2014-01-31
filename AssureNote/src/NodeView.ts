@@ -222,31 +222,42 @@ module AssureNote {
             this.Shape.MoveArrowTo(P1, P2, Dir, Duration || 0);
         }
 
-        UpdateDocumentPosition(Duration?: number): void {
+        UpdateDocumentPosition(Duration?: number, PositionBaseNode?: NodeView): void {
             Duration = Duration || 0;
             if (!this.IsVisible) {
                 return
             }
-            AssureNoteApp.Assert(this.Shape != null);
+            var UpdateSubNode = (SubNode: NodeView, P1: Point, P2: Point) => {
+                if (!PositionBaseNode && SubNode.Shape.WillFadein()) {
+                    PositionBaseNode = this;
+                }
+                if (PositionBaseNode) {
+                    SubNode.Shape.SetFadeinBasePosition(PositionBaseNode.Shape.GetGXCache(), PositionBaseNode.Shape.GetGYCache());
+                    SubNode.UpdateDocumentPosition(Duration, PositionBaseNode);
+                } else {
+                    SubNode.UpdateDocumentPosition(Duration);
+                }
+            }
+
             var GlobalPosition = this.GetGlobalPosition();
             this.Shape.MoveTo(GlobalPosition.X, GlobalPosition.Y, Duration);
             var P1 = this.GetConnectorPosition(Direction.Bottom, GlobalPosition);
             this.ForEachVisibleChildren((SubNode: NodeView) => {
                 var P2 = SubNode.GetConnectorPosition(Direction.Top, SubNode.GetGlobalPosition());
+                UpdateSubNode(SubNode, P1, P2);
                 SubNode.MoveArrowTo(P1, P2, Direction.Bottom, Duration);
-                SubNode.UpdateDocumentPosition(Duration);
             });
             P1 = this.GetConnectorPosition(Direction.Right, GlobalPosition);
             this.ForEachVisibleRightNodes((SubNode: NodeView) => {
                 var P2 = SubNode.GetConnectorPosition(Direction.Left, SubNode.GetGlobalPosition());
-                SubNode.MoveArrowTo(P1, P2, Direction.Left, Duration);
-                SubNode.UpdateDocumentPosition(Duration);
+                UpdateSubNode(SubNode, P1, P2);
+                SubNode.MoveArrowTo(P1, P2, Direction.Right, Duration);
             });
             P1 = this.GetConnectorPosition(Direction.Left, GlobalPosition);
             this.ForEachVisibleLeftNodes((SubNode: NodeView) => {
                 var P2 = SubNode.GetConnectorPosition(Direction.Right, SubNode.GetGlobalPosition());
-                SubNode.MoveArrowTo(P1, P2, Direction.Right, Duration);
-                SubNode.UpdateDocumentPosition(Duration);
+                UpdateSubNode(SubNode, P1, P2);
+                SubNode.MoveArrowTo(P1, P2, Direction.Left, Duration);
             });
         }
 
