@@ -430,7 +430,7 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]) {
             $("#file-open-dialog").change((e: Event) => {
                 var target = e.target || e.srcElement;
-                this.App.LoadFiles(<any>(<HTMLInputElement>target).files);
+                this.App.LoadFiles((<HTMLInputElement>target).files);
             });
             $("#file-open-dialog").click();
         }

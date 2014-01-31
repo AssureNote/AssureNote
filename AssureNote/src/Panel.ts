@@ -118,7 +118,7 @@ module AssureNote {
 
         constructor(public App: AssureNoteApp) {
             super(App);
-            this.SVGLayer = <SVGGElement>(<any>document.getElementById("svg-layer"));
+            this.SVGLayer = <SVGGElement>(<Element>document.getElementById("svg-layer"));
             this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
             this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
             this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
@@ -218,17 +218,16 @@ module AssureNote {
                 e.stopPropagation();
                 e.preventDefault();
             };
-            $(this.EventMapLayer)
-                .on('dragenter', DragHandler)
-                .on('dragover', DragHandler)
-                .on('dragleave', DragHandler)
-                .on('drop', (event: JQueryEventObject) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    if (this.IsActive()) {
-                        this.App.LoadFiles((<any>(<any>event.originalEvent).dataTransfer).files);
-                    }
-                });
+            this.EventMapLayer.addEventListener("dragenter", DragHandler);
+            this.EventMapLayer.addEventListener("dragover", DragHandler);
+            this.EventMapLayer.addEventListener("dragleave", DragHandler);
+            this.EventMapLayer.addEventListener("drop", (event: DragEvent) => {
+                event.stopPropagation();
+                event.preventDefault();
+                if (this.IsActive()) {
+                    this.App.LoadFiles(event.dataTransfer.files);
+                }
+            });
 
             this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
                 if (!this.MasterView) {

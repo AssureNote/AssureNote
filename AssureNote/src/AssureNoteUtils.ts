@@ -173,7 +173,11 @@ module AssureNote {
         var month: number = day * 30;
         var year: number = month * 365;
 
-        export function FormatDate(time: string) {
+        /**
+        Format date to 'XX ago' style.
+        @param {string} time Date and time that constructor of Date class accepts.
+        */
+        export function FormatDate(time: string): string {
             var deltaTime = new Date().getTime() - new Date(time).getTime();
 
             if (deltaTime < minute) {
@@ -286,9 +290,9 @@ module AssureNote {
             }
         }
 
-        export function RequestAnimationFrame(Callback: Function): number {
+        export function RequestAnimationFrame(Callback: FrameRequestCallback): number {
             if (UserAgant.IsAnimationFrameEnabled()) {
-                return window.requestAnimationFrame(<any>Callback);
+                return window.requestAnimationFrame(Callback);
             }
             return window.setTimeout(Callback, 16.7);
         }

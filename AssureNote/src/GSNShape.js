@@ -41,7 +41,7 @@ var AssureNote;
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
-            this.ColorStyle = AssureNote.ColorStyle.Default;
+            this.ColorStyles = [AssureNote.ColorStyle.Default];
             this.GX = null;
             this.GY = null;
             this.AnimationFrameTimerHandle = 0;
@@ -289,7 +289,7 @@ var AssureNote;
         GSNShape.prototype.PrerenderSVGContent = function (manager) {
             this.ShapeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
-            this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             this.ArrowPath = GSNShape.CreateArrowPath();
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         };
@@ -427,36 +427,32 @@ var AssureNote;
 
         GSNShape.prototype.AddColorStyle = function (ColorStyleCode) {
             if (ColorStyleCode) {
-                var Styles = this.ColorStyle.split(" ");
-                if (Styles.indexOf(ColorStyleCode) < 0) {
-                    Styles.push(ColorStyleCode);
+                if (this.ColorStyles.indexOf(ColorStyleCode) < 0) {
+                    this.ColorStyles.push(ColorStyleCode);
                 }
-                if (Styles.indexOf(AssureNote.ColorStyle.Default) < 0) {
-                    Styles.unshift(AssureNote.ColorStyle.Default);
+                if (this.ShapeGroup) {
+                    this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
                 }
-                this.ColorStyle = Styles.join(" ");
-                this.ShapeGroup.setAttribute("class", this.ColorStyle);
             }
         };
 
         GSNShape.prototype.RemoveColorStyle = function (ColorStyleCode) {
-            if (ColorStyleCode) {
-                var Styles = this.ColorStyle.split(" ");
-                var Index = Styles.indexOf(ColorStyleCode);
+            if (ColorStyleCode && ColorStyleCode != AssureNote.ColorStyle.Default) {
+                var Index = this.ColorStyles.indexOf(ColorStyleCode);
                 if (Index > 0) {
-                    Styles.splice(Index, 1);
+                    this.ColorStyles.splice(Index, 1);
                 }
-                if (Styles.indexOf(AssureNote.ColorStyle.Default) < 0) {
-                    Styles.unshift(AssureNote.ColorStyle.Default);
+                if (this.ShapeGroup) {
+                    this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
                 }
-                this.ColorStyle = Styles.join(" ");
-                this.ShapeGroup.setAttribute("class", this.ColorStyle);
             }
         };
 
         GSNShape.prototype.ClearColorStyle = function () {
-            this.ColorStyle = AssureNote.ColorStyle.Default;
-            this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            this.ColorStyles = [AssureNote.ColorStyle.Default];
+            if (this.ShapeGroup) {
+                this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
+            }
         };
         GSNShape.ArrowPathMaster = null;
         return GSNShape;
