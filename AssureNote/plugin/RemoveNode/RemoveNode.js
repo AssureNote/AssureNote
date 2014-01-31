@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -68,6 +68,7 @@ var AssureNote;
                 NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
                 this.App.PictgramPanel.InitializeView(NewNodeView);
                 this.App.PictgramPanel.Draw(TopGoal.GetLabel());
+                this.App.SocketManager.UpdateWGSN();
             } else {
                 console.log("Need paramter");
             }
@@ -119,6 +120,7 @@ var AssureNote;
                 NewNodeView.SaveFlags(App.PictgramPanel.ViewMap);
                 App.PictgramPanel.InitializeView(NewNodeView);
                 App.PictgramPanel.Draw(TopGoal.GetLabel());
+                App.SocketManager.UpdateWGSN();
             });
         };
         return RemoveNodePlugin;

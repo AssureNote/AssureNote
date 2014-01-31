@@ -57,6 +57,7 @@ module AssureNote {
                     }
                 }
 
+
                 RemoveCommand.RemoveDescendantsRecursive(Node);
 
                 var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
@@ -64,6 +65,8 @@ module AssureNote {
                 NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
                 this.App.PictgramPanel.InitializeView(NewNodeView);
                 this.App.PictgramPanel.Draw(TopGoal.GetLabel());
+                this.App.SocketManager.UpdateWGSN();
+
             } else {
                 console.log("Need paramter");
             }
@@ -113,6 +116,7 @@ module AssureNote {
                 NewNodeView.SaveFlags(App.PictgramPanel.ViewMap);
                 App.PictgramPanel.InitializeView(NewNodeView);
                 App.PictgramPanel.Draw(TopGoal.GetLabel());
+                App.SocketManager.UpdateWGSN();
             });
         }
 
