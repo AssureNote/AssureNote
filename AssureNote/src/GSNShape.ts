@@ -30,6 +30,7 @@
 ///<reference path='./NodeView.ts'/>
 ///<reference path='./AssureNoteUtils.ts'/>
 ///<reference path='../d.ts/codemirror.d.ts'/>
+///<reference path='../d.ts/html5.d.ts'/>
 
 ///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
 
@@ -39,7 +40,6 @@ module AssureNote {
         ShapeGroup: SVGGElement;
         ArrowPath: SVGPathElement;
         Content: HTMLElement;
-        ColorStyle: string = ColorStyle.Default;
         private NodeWidth: number;
         private NodeHeight: number;
         private HeadBoundingBox: Rect; // Head is the node and Left and Right.
@@ -294,7 +294,7 @@ module AssureNote {
         PrerenderSVGContent(manager: PluginManager): void {
             this.ShapeGroup = AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
-            this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            this.ShapeGroup.setAttribute("class", ColorStyle.Default);
             this.ArrowPath = GSNShape.CreateArrowPath();
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         }
@@ -434,37 +434,21 @@ module AssureNote {
         }
 
         AddColorStyle(ColorStyleCode: string): void {
-            if (ColorStyleCode) {
-                var Styles: string[] = this.ColorStyle.split(" ");
-                if (Styles.indexOf(ColorStyleCode) < 0) {
-                    Styles.push(ColorStyleCode);
-                }
-                if (Styles.indexOf(ColorStyle.Default) < 0) {
-                    Styles.unshift(ColorStyle.Default);
-                }
-                this.ColorStyle = Styles.join(" ");
-                this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            if (ColorStyleCode && this.ShapeGroup) {
+                this.ShapeGroup.classList.add(ColorStyleCode);
             }
         }
 
         RemoveColorStyle(ColorStyleCode: string): void {
-            if (ColorStyleCode) {
-                var Styles: string[] = this.ColorStyle.split(" ");
-                var Index = Styles.indexOf(ColorStyleCode);
-                if (Index > 0) {
-                    Styles.splice(Index, 1);
-                }
-                if (Styles.indexOf(ColorStyle.Default) < 0) {
-                    Styles.unshift(ColorStyle.Default);
-                }
-                this.ColorStyle = Styles.join(" ");
-                this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            if (ColorStyleCode && this.ShapeGroup) {
+                this.ShapeGroup.classList.remove(ColorStyleCode);
             }
         }
 
         ClearColorStyle(): void {
-            this.ColorStyle = ColorStyle.Default;
-            this.ShapeGroup.setAttribute("class", this.ColorStyle);
+            if (this.ShapeGroup) {
+                this.ShapeGroup.setAttribute("class", ColorStyle.Default);
+            }
         }
     }
 
