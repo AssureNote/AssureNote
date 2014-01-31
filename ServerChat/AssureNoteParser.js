@@ -236,6 +236,13 @@ var GSNHistory = (function () {
         this.Doc = Doc;
         this.Date = WikiSyntax.FormatDateString(DateString);
     };
+
+    /**
+    * @method GetCommitMessage
+    */
+    GSNHistory.prototype.GetCommitMessage = function () {
+        return TagUtils.GetString(this.Doc.DocTagMap, "CommitMessage", "");
+    };
     return GSNHistory;
 })();
 exports.GSNHistory = GSNHistory;
@@ -1803,8 +1810,9 @@ var GSNRecord = (function () {
     /**
     * @method Commit
     */
-    GSNRecord.prototype.Commit = function () {
+    GSNRecord.prototype.Commit = function (message) {
         this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+        this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
         var i = 0;
         while (i < Lib.Array_size(this.HistoryList)) {
             var History = Lib.Array_get(this.HistoryList, i);

@@ -394,6 +394,26 @@ module AssureNote {
         }
     }
 
+    export class CommitCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["commit"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>commit</code><br>Commit."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var message: string = "Default message";
+            if (Params.length >= 1) message = Params[0];
+            this.App.MasterRecord.Commit(message);
+        }
+    }
+
     export class OpenCommand extends Command {
         constructor(App: AssureNote.AssureNoteApp) {
             super(App);

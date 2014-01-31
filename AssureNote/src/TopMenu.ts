@@ -198,6 +198,10 @@ module AssureNote {
             return "Share";
         }
         Invoke(App: AssureNoteApp): void {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                Command.Invoke(null, ["Share"]);
+            }
             var Command = App.FindCommandByCommandLineName("share");
             Command.Invoke(null, []);
         }
@@ -211,6 +215,10 @@ module AssureNote {
             return "Save";
         }
         Invoke(App: AssureNoteApp): void {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                Command.Invoke(null, ["Save"]);
+            }
             var Command = App.FindCommandByCommandLineName("save");
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             Command.Invoke(null, [DefaultName]);
@@ -225,6 +233,10 @@ module AssureNote {
             return "";
         }
         Invoke(App: AssureNoteApp): void {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                Command.Invoke(null, ["Save"]);
+            }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, "." + this.GetExtention());
             var Command = App.FindCommandByCommandLineName("save");
             var Name = prompt("Enter the file name", DefaultName);
@@ -261,6 +273,10 @@ module AssureNote {
             return "";
         }
         Invoke(App: AssureNoteApp): void {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                Command.Invoke(null, ["Save"]);
+            }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             var Command = App.FindCommandByCommandLineName("save-as-svg");
             var Name = prompt("Enter the file name", DefaultName);

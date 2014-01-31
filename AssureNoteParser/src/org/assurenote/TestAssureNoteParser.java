@@ -503,9 +503,10 @@ public class TestAssureNoteParser {
 		MasterRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input3, true);
 		MasterRecord.CloseEditor();
 		
-		MasterRecord.Commit();
+		MasterRecord.Commit("test");
 		
 		assertEquals(2, MasterRecord.HistoryList.size());
 		assertEquals("Commit", MasterRecord.GetLatestDoc().TopNode.NodeDoc);
+		assertEquals("test", MasterRecord.HistoryList.get(MasterRecord.HistoryList.size()-1).GetCommitMessage());
 	}
 }

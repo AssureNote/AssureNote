@@ -244,6 +244,13 @@ export class GSNHistory {
 		this.Doc = Doc;
 		this.Date = WikiSyntax.FormatDateString(DateString);
 	}
+	
+	/**
+	 * @method GetCommitMessage
+	 */
+	public GetCommitMessage(): string {
+		return TagUtils.GetString(this.Doc.DocTagMap, "CommitMessage", "");
+	}
 }
 
 /**
@@ -1807,8 +1814,9 @@ export class GSNRecord {
 	/**
 	 * @method Commit
 	 */
-	public Commit(): void {
+	public Commit(message: string): void {
 		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+		this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
 		var i: number = 0;
 		while (i < Lib.Array_size(this.HistoryList)) {
 			var History: GSNHistory = Lib.Array_get(this.HistoryList, i);

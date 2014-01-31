@@ -392,6 +392,13 @@ class GSNHistory {
 		this.Doc = Doc;
 		this.Date = WikiSyntax.FormatDateString(DateString);
 	}
+	
+	/**
+	 * @method GetCommitMessage
+	 */
+	public String GetCommitMessage() {
+		return TagUtils.GetString(this.Doc.DocTagMap, "CommitMessage", "");
+	}
 }
 
 /**
@@ -1960,8 +1967,9 @@ class GSNRecord {
 	/**
 	 * @method Commit
 	 */
-	public void Commit() {
+	public void Commit(String message) {
 		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+		this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
 		/*local*/int i = 0;
 		while (i < Lib.Array_size(this.HistoryList)) {
 			/*local*/GSNHistory History = Lib.Array_get(this.HistoryList, i);
