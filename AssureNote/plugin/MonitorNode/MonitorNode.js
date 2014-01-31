@@ -519,6 +519,10 @@ var AssureNote;
 
             var ReturnValue = [];
             var li = document.createElement('li');
+            li.innerHTML = '<b>Monitor</b> is running on <b>' + MNode.Location + '<br><br></b>';
+            ReturnValue.push(li);
+
+            li = document.createElement('li');
             var table = document.createElement('table');
             table.setAttribute('border', '4');
             table.setAttribute('width', '250');
@@ -528,7 +532,7 @@ var AssureNote;
             TableInnerHTML += '<caption>REC Logs</caption>';
             TableInnerHTML += '<tr bgcolor="#cccccc">';
             TableInnerHTML += '<th>Timestamp</th>';
-            TableInnerHTML += '<th>Data</th>';
+            TableInnerHTML += '<th>' + MNode.Type + '</th>';
             TableInnerHTML += '</tr>';
 
             for (var i = 0; i < MNode.PastLogs.length; i++) {
