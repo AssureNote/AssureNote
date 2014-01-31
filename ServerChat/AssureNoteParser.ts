@@ -1471,7 +1471,11 @@ export class GSNDoc {
 	 */
 	FormatDoc(Stream: StringWriter): void {
 		if (this.TopNode != null) {
+			/* FIXME Format DocTagMap */
 			Stream.println("Revision:: " + this.DocHistory.Rev);
+			if (TagUtils.GetString(this.DocTagMap, "CommitMessage", null) != null) {
+				Stream.println("CommitMessage:: " + TagUtils.GetString(this.DocTagMap, "CommitMessage", null));
+			}
 			this.TopNode.FormatNode(Stream);
 		}
 	}
@@ -1639,6 +1643,12 @@ export class GSNRecord {
 			var Parser: ParserContext = new ParserContext(Doc);
 			Doc.TopNode = Parser.ParseNode(Reader);
 			Doc.RenumberAll();
+		}
+		for (var i: number = 0; i < Lib.Array_size(this.HistoryList); i++) {
+			var History: GSNHistory = Lib.Array_get(this.HistoryList, i);
+			if (i != 0 && TagUtils.GetString(History.Doc.DocTagMap, "CommitMessage", null) == null) {
+				History.IsCommitRevision = false;
+			}
 		}
 	}
 

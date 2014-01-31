@@ -1469,7 +1469,11 @@ var GSNDoc = (function () {
     */
     GSNDoc.prototype.FormatDoc = function (Stream) {
         if (this.TopNode != null) {
+            /* FIXME Format DocTagMap */
             Stream.println("Revision:: " + this.DocHistory.Rev);
+            if (TagUtils.GetString(this.DocTagMap, "CommitMessage", null) != null) {
+                Stream.println("CommitMessage:: " + TagUtils.GetString(this.DocTagMap, "CommitMessage", null));
+            }
             this.TopNode.FormatNode(Stream);
         }
     };
@@ -1634,6 +1638,12 @@ var GSNRecord = (function () {
             var Parser = new ParserContext(Doc);
             Doc.TopNode = Parser.ParseNode(Reader);
             Doc.RenumberAll();
+        }
+        for (var i = 0; i < Lib.Array_size(this.HistoryList); i++) {
+            var History = Lib.Array_get(this.HistoryList, i);
+            if (i != 0 && TagUtils.GetString(History.Doc.DocTagMap, "CommitMessage", null) == null) {
+                History.IsCommitRevision = false;
+            }
         }
     };
 
