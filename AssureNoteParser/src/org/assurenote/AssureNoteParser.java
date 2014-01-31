@@ -1949,7 +1949,14 @@ class GSNRecord {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * @method Commit
+	 */
+	public void Commit() {
+		
+	}
+	
 	/**
 	 * @method FormatRecord
 	 * @param {StringWriter} Writer

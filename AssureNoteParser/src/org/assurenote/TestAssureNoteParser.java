@@ -483,4 +483,29 @@ public class TestAssureNoteParser {
 		assertEquals("updated content", TopNode.SubNodeList.get(0).NodeDoc);
 		assertEquals("updated content", TopNode.SubNodeList.get(1).NodeDoc);
 	}
+	
+	@Test
+	public void Commit() {
+		String input1 = "*G &1";
+		String input2 = "*G &1\nIt should be dismissed";
+		String input3 = "*G &1\nCommit";
+		GSNRecord MasterRecord = new GSNRecord();
+		MasterRecord.Parse(input1);
+		
+		MasterRecord.OpenEditor("unknown", "test", null, "test");
+		MasterRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input2, true);
+		MasterRecord.CloseEditor();
+		
+		assertEquals(2, MasterRecord.HistoryList.size());
+		assertEquals("It should be dismissed", MasterRecord.GetLatestDoc().TopNode.NodeDoc);
+		
+		MasterRecord.OpenEditor("unknown", "test", null, "test");
+		MasterRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input3, true);
+		MasterRecord.CloseEditor();
+		
+		MasterRecord.Commit();
+		
+		assertEquals(2, MasterRecord.HistoryList.size());
+		assertEquals("Commit", MasterRecord.GetLatestDoc().TopNode.NodeDoc);
+	}
 }
