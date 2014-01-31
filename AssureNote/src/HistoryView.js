@@ -35,10 +35,9 @@ var AssureNote;
             this.Element = $("#history");
             this.Element.hide();
             this.App.HistoryPanel = this; //FIXME
-            this.Index = 0;
         }
         HistoryPanel.prototype.Show = function () {
-            //var t = <any>{ Message: "hello", User: "who", DateTime: Date.now(), DateTimeString: Date.now().toString() };
+            this.Index = this.App.MasterRecord.HistoryList.length - 1;
             this.Update();
             this.Element.show();
         };
@@ -46,30 +45,34 @@ var AssureNote;
         HistoryPanel.prototype.Hide = function () {
             this.Element.empty();
             this.Element.hide();
-            this.Index = this.App.MasterRecord.HistoryList.length - 1;
+            this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
         };
 
         HistoryPanel.prototype.DrawGSN = function (TopGoal) {
-            this.App.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoal, true));
-            this.App.PictgramPanel.FoldDeepSubGoals(this.App.PictgramPanel.MasterView);
+            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+            this.App.PictgramPanel.InitializeView(NewNodeView);
             this.App.PictgramPanel.Draw();
         };
 
-        HistoryPanel.prototype.UpdatePanelView = function () {
-            //this.Element.hide();
+        HistoryPanel.prototype.Update = function () {
+            var _this = this;
             this.Element.empty();
             var h = this.App.MasterRecord.HistoryList[this.Index];
             var message = h.GetCommitMessage() || "(No Commit Message)";
             var t = { Message: message, User: h.Author, DateTime: h.DateString };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
-            //this.Element.show();
-        };
 
-        HistoryPanel.prototype.Update = function () {
-            var _this = this;
-            this.UpdatePanelView();
+            if (this.Index == 0) {
+                $("#prev-revision").addClass("disabled");
+            }
+
+            if (this.Index == this.App.MasterRecord.HistoryList.length - 1) {
+                $("#next-revision").addClass("disabled");
+            }
+
             $("#prev-revision").click(function () {
                 var length = _this.App.MasterRecord.HistoryList.length;
+                var OldIndex = _this.Index;
                 _this.Index--;
                 if (_this.Index < 0) {
                     _this.Index = 0;
@@ -81,13 +84,17 @@ var AssureNote;
                     }
                     _this.Index--;
                 }
-                var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                _this.DrawGSN(TopGoal);
-                _this.UpdatePanelView();
+                console.log(_this.Index);
+                if (OldIndex != _this.Index) {
+                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
+                    _this.DrawGSN(TopGoal);
+                    _this.Update();
+                }
             });
 
             $("#next-revision").click(function () {
                 var length = _this.App.MasterRecord.HistoryList.length;
+                var OldIndex = _this.Index;
                 _this.Index++;
                 if (_this.Index >= length) {
                     _this.Index = length - 1;
@@ -99,9 +106,12 @@ var AssureNote;
                         break;
                     }
                 }
-                var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                _this.DrawGSN(TopGoal);
-                _this.UpdatePanelView();
+                console.log(_this.Index);
+                if (OldIndex != _this.Index) {
+                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
+                    _this.DrawGSN(TopGoal);
+                    _this.Update();
+                }
             });
         };
         return HistoryPanel;
