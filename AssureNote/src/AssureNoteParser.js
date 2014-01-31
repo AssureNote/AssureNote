@@ -193,6 +193,7 @@ var AssureNote;
     var GSNHistory = (function () {
         function GSNHistory(Rev, Author, Role, DateString, Process, Doc) {
             this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
+            this.IsCommitRevision = true;
         }
         /**
         * @method toString
@@ -236,6 +237,13 @@ var AssureNote;
             this.Process = Process;
             this.Doc = Doc;
             this.Date = WikiSyntax.FormatDateString(DateString);
+        };
+
+        /**
+        * @method GetCommitMessage
+        */
+        GSNHistory.prototype.GetCommitMessage = function () {
+            return TagUtils.GetString(this.Doc.DocTagMap, "CommitMessage", "");
         };
         return GSNHistory;
     })();
@@ -1463,7 +1471,11 @@ var AssureNote;
         */
         GSNDoc.prototype.FormatDoc = function (Stream) {
             if (this.TopNode != null) {
+                /* FIXME Format DocTagMap */
                 Stream.println("Revision:: " + this.DocHistory.Rev);
+                if (TagUtils.GetString(this.DocTagMap, "CommitMessage", null) != null) {
+                    Stream.println("CommitMessage:: " + TagUtils.GetString(this.DocTagMap, "CommitMessage", null));
+                }
                 this.TopNode.FormatNode(Stream);
             }
         };
@@ -1629,6 +1641,12 @@ var AssureNote;
                 Doc.TopNode = Parser.ParseNode(Reader);
                 Doc.RenumberAll();
             }
+            for (var i = 0; i < Lib.Array_size(this.HistoryList); i++) {
+                var History = Lib.Array_get(this.HistoryList, i);
+                if (i != 0 && TagUtils.GetString(History.Doc.DocTagMap, "CommitMessage", null) == null) {
+                    History.IsCommitRevision = false;
+                }
+            }
         };
 
         /**
@@ -1658,6 +1676,7 @@ var AssureNote;
                     this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
                 }
             }
+            this.EditingDoc.DocHistory.IsCommitRevision = false;
         };
 
         /**
@@ -1798,6 +1817,14 @@ var AssureNote;
                 }
             }
             return null;
+        };
+
+        /**
+        * @method Commit
+        */
+        GSNRecord.prototype.Commit = function (message) {
+            this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+            this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
         };
 
         /**

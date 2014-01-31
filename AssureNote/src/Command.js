@@ -416,6 +416,29 @@ var AssureNote;
     })(Command);
     AssureNote.SetScaleCommand = SetScaleCommand;
 
+    var CommitCommand = (function (_super) {
+        __extends(CommitCommand, _super);
+        function CommitCommand(App) {
+            _super.call(this, App);
+        }
+        CommitCommand.prototype.GetCommandLineNames = function () {
+            return ["commit"];
+        };
+
+        CommitCommand.prototype.GetHelpHTML = function () {
+            return "<code>commit</code><br>Commit.";
+        };
+
+        CommitCommand.prototype.Invoke = function (CommandName, Params) {
+            var message = "Default message";
+            if (Params.length >= 1)
+                message = Params[0];
+            this.App.MasterRecord.Commit(message);
+        };
+        return CommitCommand;
+    })(Command);
+    AssureNote.CommitCommand = CommitCommand;
+
     var OpenCommand = (function (_super) {
         __extends(OpenCommand, _super);
         function OpenCommand(App) {

@@ -165,6 +165,10 @@ class Lib {
 		self.remove(obj);
 	}
 	
+	static <T> void Array_remove(ArrayList<T> self, int i) {
+		self.remove(i);
+	}
+	
 	static boolean Object_equals(Object self, Object obj) {
 		return self.equals(obj);
 	}
@@ -338,9 +342,11 @@ class GSNHistory {
 	/*field*/String Date;
 	/*field*/String Process;
 	/*field*/GSNDoc Doc;
+	/*field*/boolean IsCommitRevision;
 
 	GSNHistory/*constructor*/(int Rev, String Author, String Role, String DateString, String Process, GSNDoc Doc) {
 		this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
+		this.IsCommitRevision = true;
 	}
 
 	/**
@@ -385,6 +391,13 @@ class GSNHistory {
 		this.Process = Process;
 		this.Doc = Doc;
 		this.Date = WikiSyntax.FormatDateString(DateString);
+	}
+	
+	/**
+	 * @method GetCommitMessage
+	 */
+	public String GetCommitMessage() {
+		return TagUtils.GetString(this.Doc.DocTagMap, "CommitMessage", "");
 	}
 }
 
@@ -1612,7 +1625,11 @@ class GSNDoc {
 	 */
 	void FormatDoc(StringWriter Stream) {
 		if (this.TopNode != null) {
+			/* FIXME Format DocTagMap */
 			Stream.println("Revision:: " + this.DocHistory.Rev);
+			if (TagUtils.GetString(this.DocTagMap, "CommitMessage", null) != null) {
+				Stream.println("CommitMessage:: " + TagUtils.GetString(this.DocTagMap, "CommitMessage", null));
+			}
 			this.TopNode.FormatNode(Stream);
 		}
 	}
@@ -1781,6 +1798,12 @@ class GSNRecord {
 			Doc.TopNode = Parser.ParseNode(Reader);
 			Doc.RenumberAll();
 		}
+		for (/*local*/int i = 0; i < Lib.Array_size(this.HistoryList); i++) {
+			/*local*/GSNHistory History = Lib.Array_get(this.HistoryList, i);
+			if (i != 0 && TagUtils.GetString(History.Doc.DocTagMap, "CommitMessage", null) == null) {
+				History.IsCommitRevision = false;
+			}
+		}
 	}
 
 	/**
@@ -1810,6 +1833,7 @@ class GSNRecord {
 				this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
 			}
 		}
+		this.EditingDoc.DocHistory.IsCommitRevision = false;
 	}
 
 	/**
@@ -1953,8 +1977,9 @@ class GSNRecord {
 	/**
 	 * @method Commit
 	 */
-	public void Commit() {
-		
+	public void Commit(String message) {
+		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+		this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
 	}
 	
 	/**

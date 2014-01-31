@@ -238,6 +238,10 @@ var AssureNote;
             return "Share";
         };
         UploadMenuItem.prototype.Invoke = function (App) {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                CommitCommand.Invoke(null, ["Share"]);
+            }
             var Command = App.FindCommandByCommandLineName("share");
             Command.Invoke(null, []);
         };
@@ -257,6 +261,10 @@ var AssureNote;
             return "Save";
         };
         SaveMenuItem.prototype.Invoke = function (App) {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                CommitCommand.Invoke(null, ["Save"]);
+            }
             var Command = App.FindCommandByCommandLineName("save");
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
             Command.Invoke(null, [DefaultName]);
@@ -277,6 +285,10 @@ var AssureNote;
             return "";
         };
         SaveAsMenuItem.prototype.Invoke = function (App) {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                CommitCommand.Invoke(null, ["Save"]);
+            }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, "." + this.GetExtention());
             var Command = App.FindCommandByCommandLineName("save");
             var Name = prompt("Enter the file name", DefaultName);
@@ -331,6 +343,10 @@ var AssureNote;
             return "";
         };
         SaveAsSVGMenuItem.prototype.Invoke = function (App) {
+            if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
+                var CommitCommand = App.FindCommandByCommandLineName("commit");
+                Command.Invoke(null, ["Save"]);
+            }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             var Command = App.FindCommandByCommandLineName("save-as-svg");
             var Name = prompt("Enter the file name", DefaultName);

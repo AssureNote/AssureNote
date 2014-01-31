@@ -193,9 +193,11 @@ export class GSNHistory {
 	Date: string;
 	Process: string;
 	Doc: GSNDoc;
+	IsCommitRevision: boolean;
 
 	constructor(Rev: number, Author: string, Role: string, DateString: string, Process: string, Doc: GSNDoc) {
 		this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
+		this.IsCommitRevision = true;
 	}
 
 	/**
@@ -240,6 +242,13 @@ export class GSNHistory {
 		this.Process = Process;
 		this.Doc = Doc;
 		this.Date = WikiSyntax.FormatDateString(DateString);
+	}
+	
+	/**
+	 * @method GetCommitMessage
+	 */
+	public GetCommitMessage(): string {
+		return TagUtils.GetString(this.Doc.DocTagMap, "CommitMessage", "");
 	}
 }
 
@@ -1462,7 +1471,11 @@ export class GSNDoc {
 	 */
 	FormatDoc(Stream: StringWriter): void {
 		if (this.TopNode != null) {
+			/* FIXME Format DocTagMap */
 			Stream.println("Revision:: " + this.DocHistory.Rev);
+			if (TagUtils.GetString(this.DocTagMap, "CommitMessage", null) != null) {
+				Stream.println("CommitMessage:: " + TagUtils.GetString(this.DocTagMap, "CommitMessage", null));
+			}
 			this.TopNode.FormatNode(Stream);
 		}
 	}
@@ -1631,6 +1644,12 @@ export class GSNRecord {
 			Doc.TopNode = Parser.ParseNode(Reader);
 			Doc.RenumberAll();
 		}
+		for (var i: number = 0; i < Lib.Array_size(this.HistoryList); i++) {
+			var History: GSNHistory = Lib.Array_get(this.HistoryList, i);
+			if (i != 0 && TagUtils.GetString(History.Doc.DocTagMap, "CommitMessage", null) == null) {
+				History.IsCommitRevision = false;
+			}
+		}
 	}
 
 	/**
@@ -1660,6 +1679,7 @@ export class GSNRecord {
 				this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
 			}
 		}
+		this.EditingDoc.DocHistory.IsCommitRevision = false;
 	}
 
 	/**
@@ -1799,7 +1819,15 @@ export class GSNRecord {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * @method Commit
+	 */
+	public Commit(message: string): void {
+		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+		this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
+	}
+	
 	/**
 	 * @method FormatRecord
 	 * @param {StringWriter} Writer

@@ -1,9 +1,11 @@
 package org.assurenote;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -353,6 +355,7 @@ public class TestAssureNoteParser {
 		Doc.TopNode = TopNode;
 		
 		MasterRecord.CloseEditor();
+		MasterRecord.Commit("test");
 		StringWriter Writer = new StringWriter();
 		MasterRecord.FormatRecord(Writer);
 
@@ -503,9 +506,12 @@ public class TestAssureNoteParser {
 		MasterRecord.EditingDoc.TopNode.ReplaceSubNodeAsText(input3, true);
 		MasterRecord.CloseEditor();
 		
-		MasterRecord.Commit();
+		MasterRecord.Commit("test");
 		
-		assertEquals(2, MasterRecord.HistoryList.size());
+		assertEquals(3, MasterRecord.HistoryList.size());
+		assertFalse(MasterRecord.HistoryList.get(1).IsCommitRevision);
+		assertTrue(MasterRecord.HistoryList.get(2).IsCommitRevision);
 		assertEquals("Commit", MasterRecord.GetLatestDoc().TopNode.NodeDoc);
+		assertEquals("test", MasterRecord.HistoryList.get(MasterRecord.HistoryList.size()-1).GetCommitMessage());
 	}
 }
