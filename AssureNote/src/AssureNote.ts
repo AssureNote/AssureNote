@@ -209,7 +209,7 @@ module AssureNote {
             $("title").text("AssureNote");
         }
 
-        LoadFiles(Files: File[]): void {
+        LoadFiles(Files: FileList): void {
             if (Files[0]) {
                 var reader = new FileReader();
                 reader.onerror = (event: Event) => {

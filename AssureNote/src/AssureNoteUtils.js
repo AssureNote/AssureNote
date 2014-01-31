@@ -130,6 +130,10 @@ var AssureNote;
         var month = day * 30;
         var year = month * 365;
 
+        /**
+        Format date to 'XX ago' style.
+        @param {string} time Date and time that constructor of Date class accepts.
+        */
         function FormatDate(time) {
             var deltaTime = new Date().getTime() - new Date(time).getTime();
 

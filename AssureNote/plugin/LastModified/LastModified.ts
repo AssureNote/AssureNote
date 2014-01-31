@@ -34,8 +34,10 @@ module AssureNote {
         RenderHTML(NodeDoc: string, Model: GSNNode): string {
             var Author: string = Model.LastModified.Author;
             if (Author && Author != 'unknown') {
-                var iconspan: HTMLSpanElement = document.createElement('span');
-                iconspan.className = 'glyphicon glyphicon-user';
+                var icon_user: HTMLSpanElement = document.createElement('span');
+                icon_user.className = 'glyphicon glyphicon-user';
+                var icon_time: HTMLSpanElement = document.createElement('span');
+                icon_time.className = 'glyphicon glyphicon-time';
                 var span: HTMLSpanElement = document.createElement('span');
 
                 /* Due to Evidence and Strategy's shape. */
@@ -45,8 +47,10 @@ module AssureNote {
                 } else if (Model.IsStrategy()) {
                     span.className = span.className + ' node-author-strategy';
                 }
-                span.textContent = Author + '&nbsp(' + AssureNoteUtils.FormatDate(Model.LastModified.DateString) + ')';
-                span.innerHTML = iconspan.outerHTML + span.textContent;
+                span.textContent = Author + '&nbsp';
+                var small = document.createElement('small');
+                small.innerHTML = icon_time.outerHTML + '&nbsp' + AssureNoteUtils.FormatDate(Model.LastModified.DateString)
+                span.innerHTML = icon_user.outerHTML + span.textContent + small.outerHTML;
                 return NodeDoc + span.outerHTML;
             } else {
                 return NodeDoc;

@@ -75,7 +75,7 @@ var AssureNote;
             };
             var App = this.App;
 
-            this.Editor.setValue(WGSN);
+            this.Editor.getDoc().setValue(WGSN);
             this.Element.show().css("opacity", 1).off("blur").on("blur", function (e) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -94,7 +94,7 @@ var AssureNote;
         };
 
         CodeMirrorEditorPanel.prototype.DisableEditor = function (OldNodeView, OldWGSN) {
-            var WGSN = this.Editor.getValue();
+            var WGSN = this.Editor.getDoc().getValue();
             this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
             var Node = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode;

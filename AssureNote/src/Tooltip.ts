@@ -49,9 +49,9 @@ module AssureNote {
         }
 
         Create(CurrentView: NodeView, ControlLayer: HTMLDivElement, Contents: HTMLLIElement[]): void {
+            if (this.Tooltip != null) this.Remove();
             if(Contents == null || Contents.length == 0) return;
 
-            if (this.Tooltip != null) this.Remove();
             this.IsEnable = true;
             this.CurrentView = CurrentView;
             this.Tooltip = $('<div"></div>');
@@ -66,8 +66,8 @@ module AssureNote {
             this.Tooltip.append(pre);
             this.Tooltip.appendTo(ControlLayer);
 
-            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() - this.Tooltip.height() / 2;
-            var Left = this.CurrentView.GetGX() + this.CurrentView.Shape.GetNodeWidth() - this.Tooltip.width() + 10;
+            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
+            var Left = this.CurrentView.GetGX() + this.CurrentView.Shape.GetNodeWidth() / 2;
             this.Tooltip.css({
                 position: 'absolute',
                 top: Top,

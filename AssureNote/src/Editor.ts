@@ -71,7 +71,7 @@ module AssureNote {
             };
             var App = this.App;
 
-            (<any>this.Editor).setValue(WGSN);
+            this.Editor.getDoc().setValue(WGSN);
             this.Element.show().css("opacity", 1).off("blur").on("blur", (e: JQueryEventObject) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -90,7 +90,7 @@ module AssureNote {
         }
 
         DisableEditor(OldNodeView: NodeView, OldWGSN: string): void {
-            var WGSN: string = (<any>this.Editor).getValue();
+            var WGSN: string = this.Editor.getDoc().getValue();
             this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
             var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
             var NewNode: GSNNode;

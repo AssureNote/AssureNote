@@ -204,11 +204,14 @@ var AssureNote;
                 e.stopPropagation();
                 e.preventDefault();
             };
-            $(this.EventMapLayer).on('dragenter', DragHandler).on('dragover', DragHandler).on('dragleave', DragHandler).on('drop', function (event) {
+            this.EventMapLayer.addEventListener("dragenter", DragHandler);
+            this.EventMapLayer.addEventListener("dragover", DragHandler);
+            this.EventMapLayer.addEventListener("dragleave", DragHandler);
+            this.EventMapLayer.addEventListener("drop", function (event) {
                 event.stopPropagation();
                 event.preventDefault();
                 if (_this.IsActive()) {
-                    _this.App.LoadFiles(event.originalEvent.dataTransfer.files);
+                    _this.App.LoadFiles(event.dataTransfer.files);
                 }
             });
 
