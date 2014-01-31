@@ -53,11 +53,11 @@ var AssureNote;
         };
 
         Tooltip.prototype.Create = function (CurrentView, ControlLayer, Contents) {
+            if (this.Tooltip != null)
+                this.Remove();
             if (Contents == null || Contents.length == 0)
                 return;
 
-            if (this.Tooltip != null)
-                this.Remove();
             this.IsEnable = true;
             this.CurrentView = CurrentView;
             this.Tooltip = $('<div"></div>');
