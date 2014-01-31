@@ -198,7 +198,7 @@ var GSNHistory = (function () {
     * @return {String}
     */
     GSNHistory.prototype.toString = function () {
-        return this.Date + ";" + this.Author + ";" + this.Role + ";" + this.Process;
+        return this.DateString + ";" + this.Author + ";" + this.Role + ";" + this.Process;
     };
 
     /**
@@ -207,7 +207,7 @@ var GSNHistory = (function () {
     * @return {Boolean}
     */
     GSNHistory.prototype.EqualsHistory = function (aHistory) {
-        return (Lib.Object_equals(this.Date, aHistory.Date) && Lib.Object_equals(this.Author, aHistory.Author));
+        return (Lib.Object_equals(this.DateString, aHistory.DateString) && Lib.Object_equals(this.Author, aHistory.Author));
     };
 
     /**
@@ -216,7 +216,7 @@ var GSNHistory = (function () {
     * @return {Number}
     */
     GSNHistory.prototype.CompareDate = function (aHistory) {
-        return (Lib.String_compareTo(this.Date, aHistory.Date));
+        return (Lib.String_compareTo(this.DateString, aHistory.DateString));
     };
 
     /**
@@ -234,7 +234,7 @@ var GSNHistory = (function () {
         this.Role = Role;
         this.Process = Process;
         this.Doc = Doc;
-        this.Date = WikiSyntax.FormatDateString(DateString);
+        this.DateString = WikiSyntax.FormatDateString(DateString);
     };
 
     /**
@@ -1759,7 +1759,7 @@ var GSNRecord = (function () {
             var NewHistory = Lib.Array_get(NewRecord.HistoryList, i);
             var Doc = NewHistory != null ? NewHistory.Doc : null;
             if (Doc != null) {
-                this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
+                this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.DateString, NewHistory.Process);
                 this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode, true);
                 this.CloseEditor();
             }
@@ -1790,12 +1790,12 @@ var GSNRecord = (function () {
                 }
             }
             if (History1.CompareDate(History2) < 0) {
-                this.OpenEditor(History1.Author, History1.Role, History1.Date, History1.Process);
+                this.OpenEditor(History1.Author, History1.Role, History1.DateString, History1.Process);
                 Rev1++;
                 this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode, true);
                 this.CloseEditor();
             } else {
-                this.OpenEditor(History2.Author, History2.Role, History2.Date, History2.Process);
+                this.OpenEditor(History2.Author, History2.Role, History2.DateString, History2.Process);
                 Rev2++;
                 this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode, true);
                 this.CloseEditor();

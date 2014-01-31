@@ -69,15 +69,13 @@ var AssureNote;
             this.Tooltip.append(pre);
             this.Tooltip.appendTo(ControlLayer);
 
-            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
-            var Left = this.CurrentView.GetGX() + (this.CurrentView.Shape.GetNodeWidth() * 3) / 4;
+            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() - this.Tooltip.height() / 2;
+            var Left = this.CurrentView.GetGX() + this.CurrentView.Shape.GetNodeWidth() - this.Tooltip.width() + 10;
             this.Tooltip.css({
-                //width: '250px',
-                //height: '150px',
                 position: 'absolute',
                 top: Top,
                 left: Left,
-                display: 'none',
+                display: 'block',
                 opacity: 100
             });
         };

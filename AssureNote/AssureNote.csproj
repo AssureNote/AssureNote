@@ -58,6 +58,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="d.ts\ASNParser.d.ts" />
     <TypeScriptCompile Include="d.ts\codemirror.d.ts" />
+    <TypeScriptCompile Include="d.ts\html5.d.ts" />
     <TypeScriptCompile Include="d.ts\jquery.d.ts" />
     <TypeScriptCompile Include="d.ts\jquery_plugins.d.ts" />
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
@@ -156,7 +157,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>cd ..
-jade index.jade
+jade --pretty index.jade
 powershell -NoProfile -ExecutionPolicy unrestricted -Command ./compile_list_gen.ps1</PreBuildEvent>
   </PropertyGroup>
 </Project>

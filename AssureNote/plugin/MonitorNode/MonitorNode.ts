@@ -535,6 +535,10 @@ module AssureNote {
 
             var ReturnValue: HTMLLIElement[] = [];
             var li = document.createElement('li');
+            li.innerHTML = '<b>Monitor</b> is running on <b>'+MNode.Location+'<br><br></b>';
+            ReturnValue.push(li);
+
+            li = document.createElement('li');
             var table = document.createElement('table');
             table.setAttribute('border', '4');
             table.setAttribute('width', '250');
@@ -544,7 +548,7 @@ module AssureNote {
             TableInnerHTML += '<caption>REC Logs</caption>';
             TableInnerHTML += '<tr bgcolor="#cccccc">'
             TableInnerHTML += '<th>Timestamp</th>'
-            TableInnerHTML += '<th>Data</th>'
+            TableInnerHTML += '<th>'+MNode.Type+'</th>'
             TableInnerHTML += '</tr>'
 
             for(var i: number = 0; i < MNode.PastLogs.length; i++) {
