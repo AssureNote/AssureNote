@@ -45,7 +45,7 @@ module AssureNote {
                 } else if (Model.IsStrategy()) {
                     span.className = span.className + ' node-author-strategy';
                 }
-                span.textContent = Author;
+                span.textContent = Author + '&nbsp(' + AssureNoteUtils.FormatDate(Model.LastModified.DateString) + ')';
                 span.innerHTML = iconspan.outerHTML + span.textContent;
                 return NodeDoc + span.outerHTML;
             } else {
@@ -55,12 +55,17 @@ module AssureNote {
 
         CreateTooltipContents(NodeView: NodeView): HTMLLIElement[]{
             var res: HTMLLIElement[] = [];
-            var li = document.createElement('li');
-            li.innerHTML = 'Created by <b>'+NodeView.Model.Created.Author+'</b>';
-            res.push(li);
-            li = document.createElement('li');
-            li.innerHTML = 'Last modified by <b>'+NodeView.Model.LastModified.Author+'</b>';
-            res.push(li);
+            var li: HTMLLIElement = null;
+            if (NodeView.Model.Created.Author != 'unknown') {
+                li = document.createElement('li');
+                li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b> ' + AssureNoteUtils.FormatDate(NodeView.Model.Created.DateString);
+                res.push(li);
+            }
+            if (NodeView.Model.LastModified.Author != 'unknown') {
+                li = document.createElement('li');
+                li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b> ' + AssureNoteUtils.FormatDate(NodeView.Model.LastModified.DateString);
+                res.push(li);
+            }
 
             return res;
         }

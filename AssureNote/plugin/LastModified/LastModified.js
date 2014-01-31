@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ var AssureNote;
                 } else if (Model.IsStrategy()) {
                     span.className = span.className + ' node-author-strategy';
                 }
-                span.textContent = Author;
+                span.textContent = Author + '&nbsp(' + AssureNote.AssureNoteUtils.FormatDate(Model.LastModified.DateString) + ')';
                 span.innerHTML = iconspan.outerHTML + span.textContent;
                 return NodeDoc + span.outerHTML;
             } else {
@@ -61,12 +61,17 @@ var AssureNote;
 
         LastModifiedPlugin.prototype.CreateTooltipContents = function (NodeView) {
             var res = [];
-            var li = document.createElement('li');
-            li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b>';
-            res.push(li);
-            li = document.createElement('li');
-            li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b>';
-            res.push(li);
+            var li = null;
+            if (NodeView.Model.Created.Author != 'unknown') {
+                li = document.createElement('li');
+                li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b> ' + AssureNote.AssureNoteUtils.FormatDate(NodeView.Model.Created.DateString);
+                res.push(li);
+            }
+            if (NodeView.Model.LastModified.Author != 'unknown') {
+                li = document.createElement('li');
+                li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b> ' + AssureNote.AssureNoteUtils.FormatDate(NodeView.Model.LastModified.DateString);
+                res.push(li);
+            }
 
             return res;
         };
