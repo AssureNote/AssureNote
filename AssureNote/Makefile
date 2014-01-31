@@ -1,4 +1,4 @@
 build:
 	tsc @compile_list --sourcemap
-	jade index.jade
+	jade --pretty index.jade
 	yuidoc .
