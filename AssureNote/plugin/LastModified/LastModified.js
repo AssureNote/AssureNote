@@ -40,8 +40,10 @@ var AssureNote;
         LastModifiedPlugin.prototype.RenderHTML = function (NodeDoc, Model) {
             var Author = Model.LastModified.Author;
             if (Author && Author != 'unknown') {
-                var iconspan = document.createElement('span');
-                iconspan.className = 'glyphicon glyphicon-user';
+                var icon_user = document.createElement('span');
+                icon_user.className = 'glyphicon glyphicon-user';
+                var icon_time = document.createElement('span');
+                icon_time.className = 'glyphicon glyphicon-time';
                 var span = document.createElement('span');
 
                 /* Due to Evidence and Strategy's shape. */
@@ -51,8 +53,10 @@ var AssureNote;
                 } else if (Model.IsStrategy()) {
                     span.className = span.className + ' node-author-strategy';
                 }
-                span.textContent = Author + '&nbsp(' + AssureNote.AssureNoteUtils.FormatDate(Model.LastModified.DateString) + ')';
-                span.innerHTML = iconspan.outerHTML + span.textContent;
+                span.textContent = Author + '&nbsp';
+                var small = document.createElement('small');
+                small.innerHTML = icon_time.outerHTML + '&nbsp' + AssureNote.AssureNoteUtils.FormatDate(Model.LastModified.DateString);
+                span.innerHTML = icon_user.outerHTML + span.textContent + small.outerHTML;
                 return NodeDoc + span.outerHTML;
             } else {
                 return NodeDoc;
