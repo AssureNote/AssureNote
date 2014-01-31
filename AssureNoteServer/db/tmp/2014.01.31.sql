@@ -1,0 +1,19 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+ALTER TABLE `assurenote`.`assurance_case` DROP FOREIGN KEY `fk_assurance_case_user` ;
+
+ALTER TABLE `assurenote`.`assurance_case` DROP COLUMN `user_key` , CHANGE COLUMN `data` `data` LONGTEXT NOT NULL  , CHANGE COLUMN `meta_data` `meta_data` LONGTEXT NULL DEFAULT NULL  , ADD COLUMN `user_key` VARCHAR(45) NOT NULL  AFTER `created` , 
+  ADD CONSTRAINT `fk_assurance_case_user`
+  FOREIGN KEY (`user_key` )
+  REFERENCES `assurenote`.`user` (`id_key` )
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION
+, ADD INDEX `fk_assurance_case_user_idx` (`user_key` ASC) 
+, DROP INDEX `fk_assurance_case_user_idx` ;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

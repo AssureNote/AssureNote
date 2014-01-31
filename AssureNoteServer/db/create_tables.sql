@@ -23,8 +23,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `assurenote`.`assurance_case` (
   `hash_key` VARCHAR(45) NOT NULL ,
-  `data` TEXT NOT NULL ,
-  `meta_data` TEXT NULL ,
+  `data` LONGTEXT NOT NULL ,
+  `meta_data` LONGTEXT NULL ,
   `created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ,
   `user_key` VARCHAR(45) NOT NULL ,
   PRIMARY KEY (`hash_key`) ,
