@@ -34,28 +34,75 @@ var AssureNote;
             this.App = App;
             this.Element = $("#history");
             this.Element.hide();
-            this.Element.click(function (Event) {
-            });
-            this.App.HistoryPanel = this; //TODO
+            this.App.HistoryPanel = this; //FIXME
+            this.Index = 0;
         }
         HistoryPanel.prototype.Show = function () {
-            var t = { Message: "hello", User: "who", DateTime: Date.now(), DateTimeString: Date.now().toString() };
-            $("#history_tmpl").tmpl([t]).appendTo(this.Element);
+            //var t = <any>{ Message: "hello", User: "who", DateTime: Date.now(), DateTimeString: Date.now().toString() };
+            this.Update();
             this.Element.show();
         };
 
         HistoryPanel.prototype.Hide = function () {
             this.Element.empty();
             this.Element.hide();
+            this.Index = this.App.MasterRecord.HistoryList.length - 1;
         };
 
-        HistoryPanel.prototype.OnActivate = function () {
+        HistoryPanel.prototype.DrawGSN = function (TopGoal) {
+            this.App.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoal, true));
+            this.App.PictgramPanel.FoldDeepSubGoals(this.App.PictgramPanel.MasterView);
+            this.App.PictgramPanel.Draw();
         };
 
-        HistoryPanel.prototype.OnDeactivate = function () {
+        HistoryPanel.prototype.UpdatePanelView = function () {
+            //this.Element.hide();
+            this.Element.empty();
+            var h = this.App.MasterRecord.HistoryList[this.Index];
+            var message = h.GetCommitMessage() || "(No Commit Message)";
+            var t = { Message: message, User: h.Author, DateTime: h.DateString };
+            $("#history_tmpl").tmpl([t]).appendTo(this.Element);
+            //this.Element.show();
         };
 
-        HistoryPanel.prototype.OnKeyDown = function (Event) {
+        HistoryPanel.prototype.Update = function () {
+            var _this = this;
+            this.UpdatePanelView();
+            $("#prev-revision").click(function () {
+                var length = _this.App.MasterRecord.HistoryList.length;
+                _this.Index--;
+                if (_this.Index < 0) {
+                    _this.Index = 0;
+                }
+                while (!_this.App.MasterRecord.HistoryList[_this.Index].IsCommitRevision) {
+                    if (_this.Index < 0) {
+                        _this.Index = 0;
+                        break;
+                    }
+                    _this.Index--;
+                }
+                var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
+                _this.DrawGSN(TopGoal);
+                _this.UpdatePanelView();
+            });
+
+            $("#next-revision").click(function () {
+                var length = _this.App.MasterRecord.HistoryList.length;
+                _this.Index++;
+                if (_this.Index >= length) {
+                    _this.Index = length - 1;
+                }
+                while (!_this.App.MasterRecord.HistoryList[_this.Index].IsCommitRevision) {
+                    _this.Index++;
+                    if (_this.Index >= length) {
+                        _this.Index = length - 1;
+                        break;
+                    }
+                }
+                var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
+                _this.DrawGSN(TopGoal);
+                _this.UpdatePanelView();
+            });
         };
         return HistoryPanel;
     })(AssureNote.Panel);
