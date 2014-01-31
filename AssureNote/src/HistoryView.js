@@ -30,17 +30,13 @@ var AssureNote;
     var HistoryPanel = (function (_super) {
         __extends(HistoryPanel, _super);
         function HistoryPanel(App) {
-            var _this = this;
             _super.call(this, App);
             this.App = App;
             this.Element = $("#history");
             this.Element.hide();
             this.Element.click(function (Event) {
-                _this.Activate();
             });
-            this.App.PictgramPanel.Viewport.EventMapLayer.addEventListener("pointerdown", function (e) {
-                _this.App.PictgramPanel.Activate();
-            });
+            this.App.HistoryPanel = this; //TODO
         }
         HistoryPanel.prototype.Show = function () {
             var t = { Message: "hello", User: "who", DateTime: Date.now(), DateTimeString: Date.now().toString() };
@@ -60,11 +56,6 @@ var AssureNote;
         };
 
         HistoryPanel.prototype.OnKeyDown = function (Event) {
-            switch (Event.keyCode) {
-                case 27:
-                    this.Hide();
-                    this.App.PictgramPanel.Activate();
-            }
         };
         return HistoryPanel;
     })(AssureNote.Panel);

@@ -44,6 +44,7 @@ module AssureNote {
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
+        HistoryPanel: HistoryPanel;
 
         TopMenu: TopMenuItem;
 

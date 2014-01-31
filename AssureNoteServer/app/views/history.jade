@@ -7,10 +7,10 @@
                     |${User} commited
                     abbr(title="${DateTimeString}") ${DateTime}
 
-            h4.list-group-item-heading(style="margin-top:10px")
-                big
-                    a#prev-revision(href='#')
-                        span.glyphicon.glyphicon-circle-arrow-left
-                    a#next-revision(href='#')
-                        span.glyphicon.glyphicon-circle-arrow-right
+            .list-group-item-heading(style="margin-top:10px")
+                .btn-group
+                    a.btn.btn-default#prev-revision(href='#')
+                        span.glyphicon.glyphicon-chevron-left
+                    a.btn.btn-default#next-revision(href='#')
+                        span.glyphicon.glyphicon-chevron-right
 #history(style="position: absolute; top: 60px; left: 10px; width: 250px;")

@@ -28,11 +28,8 @@ module AssureNote {
             this.Element = $("#history");
             this.Element.hide();
             this.Element.click((Event: JQueryEventObject) => {
-                this.Activate();
             });
-            this.App.PictgramPanel.Viewport.EventMapLayer.addEventListener("pointerdown", (e: PointerEvent) => {
-                this.App.PictgramPanel.Activate();
-            });
+            this.App.HistoryPanel = this; //TODO
         }
 
         Show(): void {
@@ -53,11 +50,6 @@ module AssureNote {
         }
 
         OnKeyDown(Event: KeyboardEvent): void {
-            switch (Event.keyCode) {
-                case 27: /*Esc*/
-                    this.Hide();
-                    this.App.PictgramPanel.Activate();
-            }
         }
 
     }
