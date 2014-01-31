@@ -165,6 +165,10 @@ class Lib {
 		self.remove(obj);
 	}
 	
+	static <T> void Array_remove(ArrayList<T> self, int i) {
+		self.remove(i);
+	}
+	
 	static boolean Object_equals(Object self, Object obj) {
 		return self.equals(obj);
 	}
@@ -338,9 +342,11 @@ class GSNHistory {
 	/*field*/String Date;
 	/*field*/String Process;
 	/*field*/GSNDoc Doc;
+	/*field*/boolean IsCommitRevision;
 
 	GSNHistory/*constructor*/(int Rev, String Author, String Role, String DateString, String Process, GSNDoc Doc) {
 		this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
+		this.IsCommitRevision = true;
 	}
 
 	/**
@@ -1810,6 +1816,7 @@ class GSNRecord {
 				this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
 			}
 		}
+		this.EditingDoc.DocHistory.IsCommitRevision = false;
 	}
 
 	/**
@@ -1954,7 +1961,19 @@ class GSNRecord {
 	 * @method Commit
 	 */
 	public void Commit() {
-		
+		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+		/*local*/int i = 0;
+		while (i < Lib.Array_size(this.HistoryList)) {
+			/*local*/GSNHistory History = Lib.Array_get(this.HistoryList, i);
+			if (History.IsCommitRevision) {
+				i++;
+				continue;
+			} else {
+				System.out.println(i);
+				Lib.Array_remove(this.HistoryList, i);
+				System.out.println(i);
+			}
+		}
 	}
 	
 	/**

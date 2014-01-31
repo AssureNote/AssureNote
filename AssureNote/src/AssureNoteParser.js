@@ -193,6 +193,7 @@ var AssureNote;
     var GSNHistory = (function () {
         function GSNHistory(Rev, Author, Role, DateString, Process, Doc) {
             this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
+            this.IsCommitRevision = true;
         }
         /**
         * @method toString
@@ -1658,6 +1659,7 @@ var AssureNote;
                     this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
                 }
             }
+            this.EditingDoc.DocHistory.IsCommitRevision = false;
         };
 
         /**
@@ -1798,6 +1800,25 @@ var AssureNote;
                 }
             }
             return null;
+        };
+
+        /**
+        * @method Commit
+        */
+        GSNRecord.prototype.Commit = function () {
+            this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+            var i = 0;
+            while (i < Lib.Array_size(this.HistoryList)) {
+                var History = Lib.Array_get(this.HistoryList, i);
+                if (History.IsCommitRevision) {
+                    i++;
+                    continue;
+                } else {
+                    console.log(i);
+                    Lib.Array_remove(this.HistoryList, i);
+                    console.log(i);
+                }
+            }
         };
 
         /**

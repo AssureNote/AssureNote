@@ -193,9 +193,11 @@ export class GSNHistory {
 	Date: string;
 	Process: string;
 	Doc: GSNDoc;
+	IsCommitRevision: boolean;
 
 	constructor(Rev: number, Author: string, Role: string, DateString: string, Process: string, Doc: GSNDoc) {
 		this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
+		this.IsCommitRevision = true;
 	}
 
 	/**
@@ -1660,6 +1662,7 @@ export class GSNRecord {
 				this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
 			}
 		}
+		this.EditingDoc.DocHistory.IsCommitRevision = false;
 	}
 
 	/**
@@ -1799,7 +1802,26 @@ export class GSNRecord {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * @method Commit
+	 */
+	public Commit(): void {
+		this.GetLatestDoc().DocHistory.IsCommitRevision = true;
+		var i: number = 0;
+		while (i < Lib.Array_size(this.HistoryList)) {
+			var History: GSNHistory = Lib.Array_get(this.HistoryList, i);
+			if (History.IsCommitRevision) {
+				i++;
+				continue;
+			} else {
+				console.log(i);
+				Lib.Array_remove(this.HistoryList, i);
+				console.log(i);
+			}
+		}
+	}
+	
 	/**
 	 * @method FormatRecord
 	 * @param {StringWriter} Writer
