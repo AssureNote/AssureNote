@@ -62,10 +62,10 @@ var AssureNote;
         LastModifiedPlugin.prototype.CreateTooltipContents = function (NodeView) {
             var res = [];
             var li = document.createElement('li');
-            li.innerText = NodeView.Model.Created.Author + ' created.';
+            li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b>';
             res.push(li);
             li = document.createElement('li');
-            li.innerText = NodeView.Model.LastModified.Author + ' last modified.';
+            li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b>';
             res.push(li);
 
             return res;
