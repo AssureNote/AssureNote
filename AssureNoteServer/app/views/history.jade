@@ -1,0 +1,16 @@
++template("history_tmpl")
+    .panel.panel-default.history-menu
+        .panel-body
+            h4.list-group-item-heading ${Message}
+            p.list-group-item-text
+                small ${User} commited
+                    br
+                    abbr(title="${DateTimeString}") ${DateTime}
+
+            .list-group-item-heading(style="margin-top:10px")
+                .btn-group
+                    a.btn.btn-default#prev-revision(href='#')
+                        span.glyphicon.glyphicon-chevron-left
+                    a.btn.btn-default#next-revision(href='#')
+                        span.glyphicon.glyphicon-chevron-right
+#history(style="position: absolute; top: 60px; left: 10px; width: 260px;")

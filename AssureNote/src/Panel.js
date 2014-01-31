@@ -257,6 +257,9 @@ var AssureNote;
                         this.Search.EndSearch();
                         Event.preventDefault();
                     }
+                    if (this.App.HistoryPanel) {
+                        this.App.HistoryPanel.Hide();
+                    }
                     break;
                 case 13:
                     if (this.Search.IsSearching()) {

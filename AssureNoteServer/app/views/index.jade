@@ -28,6 +28,7 @@ html
       #fixed-control-layer(style='top: 0px; left: 0px; width: 100%; height: 0px; position: absolute;')
         include topmenu
         input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')
+        include history
       #plugin-layer(style='width: 0px; height: 0px; position: absolute;')
         #editor-wrapper(style='border: 1px solid black')
           textarea#editor(placeholder='Type something...', style='display: none;')
@@ -110,6 +111,7 @@ html
     +js('/src/RecApi.js')
     +js('/src/Tooltip.js')
     +js('/src/UserList.js')
+    +js('/src/HistoryView.js')
     +js('/plugin/SingleNodeEditor/SingleNodeEditor.js')
     +js('/plugin/FullScreenEditor/FullScreenEditor.js')
     +js('/plugin/FoldingViewSwitch/FoldingViewSwitch.js')

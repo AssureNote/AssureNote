@@ -21,6 +21,9 @@ module.exports = function(grunt) {
             build: {
                 files: {
                     'index.html': './index.jade'
+                },
+                options: {
+                    pretty: true
                 }
             },
 

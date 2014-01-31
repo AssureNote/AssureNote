@@ -39,6 +39,18 @@
           </div>
         </div>
         <input id="command-line" type="text" style="width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large" class="form-control">
+        <script id="history_tmpl" type="text/x-jquery-tmpl">
+          <div class="panel panel-default history-menu">
+            <div class="panel-body">
+              <h4 class="list-group-item-heading">${Message}</h4>
+              <p class="list-group-item-text"><small>${User} commited<br><abbr title="${DateTimeString}">${DateTime}</abbr></small></p>
+              <div style="margin-top:10px" class="list-group-item-heading">
+                <div class="btn-group"><a id="prev-revision" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></a><a id="next-revision" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></a></div>
+              </div>
+            </div>
+          </div>
+        </script>
+        <div id="history" style="position: absolute; top: 60px; left: 10px; width: 260px;"></div>
       </div>
       <div id="plugin-layer" style="width: 0px; height: 0px; position: absolute;">
         <div id="editor-wrapper" style="border: 1px solid black">
@@ -143,6 +155,7 @@
     <script type="text/javascript" src="./src/RecApi.js"></script>
     <script type="text/javascript" src="./src/Tooltip.js"></script>
     <script type="text/javascript" src="./src/UserList.js"></script>
+    <script type="text/javascript" src="./src/HistoryView.js"></script>
     <script type="text/javascript" src="./plugin/SingleNodeEditor/SingleNodeEditor.js"></script>
     <script type="text/javascript" src="./plugin/FullScreenEditor/FullScreenEditor.js"></script>
     <script type="text/javascript" src="./plugin/FoldingViewSwitch/FoldingViewSwitch.js"></script>
