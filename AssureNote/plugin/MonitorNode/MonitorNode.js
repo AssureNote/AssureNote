@@ -156,7 +156,7 @@ var AssureNote;
             this.NodeCount = 0;
             this.IsRunning = false;
             this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/"); // Default REC
-            this.RedNodeMap = {};
+            this.NodeColorMap = {};
         }
         MonitorNodeManager.prototype.SetRecUrl = function (Url) {
             this.Rec = new AssureNote.RecApi(Url);
@@ -214,55 +214,66 @@ var AssureNote;
             this.App.PictgramPanel.Draw(Doc.TopNode.GetLabel());
         };
 
-        MonitorNodeManager.prototype.SucceedToPresumedNodeColor = function () {
+        MonitorNodeManager.prototype.CheckPresumedNodeColor = function () {
             var self = this;
             var LabelMap = this.App.MasterRecord.GetLatestDoc().GetLabelMap();
-            var TopGoalView = this.App.PictgramPanel.MasterView;
-            TopGoalView.TraverseNode(function (View) {
+            for (var Label in self.App.PictgramPanel.ViewMap) {
+                var View = self.App.PictgramPanel.ViewMap[Label];
                 var Model = View.Model;
                 if (Model.HasTag) {
-                    // Get label name
-                    var LabelName = null;
+                    // Get presumed node label name
+                    var PresumedNodeLabelName = null;
                     var TagValue = Model.GetTagMap().get("Presume");
                     if (TagValue != null) {
-                        LabelName = TagValue.replace(/\[|\]/g, "");
+                        PresumedNodeLabelName = TagValue.replace(/\[|\]/g, "");
                     }
 
-                    // Get label
-                    var Label = null;
-                    if (LabelName != null) {
-                        Label = LabelMap.get(LabelName);
+                    // Get presumed node label
+                    var PresumedNodeLabel = null;
+                    if (PresumedNodeLabelName != null) {
+                        PresumedNodeLabel = LabelMap.get(PresumedNodeLabelName);
                     }
-                    if (Label == null) {
-                        Label = LabelName;
+                    if (PresumedNodeLabel == null) {
+                        PresumedNodeLabel = PresumedNodeLabelName;
                     }
 
-                    // succeed to presumed node color
-                    var PresumedNodeIsRedNode = self.RedNodeMap[Label];
-                    if ((PresumedNodeIsRedNode != null) && PresumedNodeIsRedNode) {
-                        if (View.Model.IsContext()) {
+                    // Check presumed node colors
+                    var PresumedNodeIsColored = self.NodeColorMap[PresumedNodeLabel];
+                    if ((PresumedNodeIsColored != null) && PresumedNodeIsColored) {
+                        var TargetView = View;
+
+                        while (View != null) {
+                            self.NodeColorMap[View.Label] = AssureNote.ColorStyle.Danger;
                             View = View.Parent;
                         }
-                        View.TraverseNode(function (View) {
-                            self.RedNodeMap[View.Label] = true;
+
+                        if (TargetView.Model.IsContext()) {
+                            TargetView = TargetView.Parent;
+                        }
+
+                        // Change the color of nodes that are lower than 'TargetNode' to 'Useless'
+                        TargetView.ForEachVisibleChildren(function (ChildNodeView) {
+                            ChildNodeView.TraverseNode(function (SubNodeView) {
+                                self.NodeColorMap[SubNodeView.Label] = AssureNote.ColorStyle.Useless;
+                            });
                         });
                     }
                 }
-            });
+            }
         };
 
-        MonitorNodeManager.prototype.UpdateRedNodeMap = function () {
-            this.RedNodeMap = {};
+        MonitorNodeManager.prototype.UpdateNodeColorMap = function () {
+            this.NodeColorMap = {};
             for (var MNode in this.MonitorNodeMap) {
                 if (MNode.Status == false) {
                     var View = MNode.GetView();
                     while (View != null) {
-                        this.RedNodeMap[View.Label] = true;
+                        this.NodeColorMap[View.Label] = AssureNote.ColorStyle.Danger;
                         View = View.Parent;
                     }
                 }
             }
-            this.SucceedToPresumedNodeColor();
+            this.CheckPresumedNodeColor();
         };
 
         MonitorNodeManager.prototype.StartMonitoring = function (Interval) {
@@ -274,7 +285,7 @@ var AssureNote;
                 console.log("Monitoring...");
 
                 // Initialize red node map
-                self.RedNodeMap = {};
+                self.NodeColorMap = {};
 
                 // Update monitor nodes
                 var Doc = self.App.MasterRecord.GetLatestDoc();
@@ -310,14 +321,14 @@ var AssureNote;
                     if (MNode.Status == false) {
                         var View = MNode.GetView();
                         while (View != null) {
-                            self.RedNodeMap[View.Label] = true;
+                            self.NodeColorMap[View.Label] = AssureNote.ColorStyle.Danger;
                             View = View.Parent;
                         }
                     }
                 }
 
-                // Succeed to presumed node color
-                self.SucceedToPresumedNodeColor();
+                // Check presumed node colors
+                self.CheckPresumedNodeColor();
 
                 // Update view
                 self.InitializeView(Doc);
@@ -454,7 +465,7 @@ var AssureNote;
                         MNodeManager.StopMonitoring();
                     }
                 }
-                MNodeManager.UpdateRedNodeMap();
+                MNodeManager.UpdateNodeColorMap();
                 var Doc = this.App.MasterRecord.GetLatestDoc();
                 MNodeManager.InitializeView(Doc);
                 MNodeManager.UpdateView(Doc);
@@ -505,8 +516,8 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
         }
         MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
-            if (NodeView.Label in MNodeManager.RedNodeMap) {
-                NodeView.AddColorStyle(AssureNote.ColorStyle.Danger);
+            if (NodeView.Label in MNodeManager.NodeColorMap) {
+                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
             }
         };
 

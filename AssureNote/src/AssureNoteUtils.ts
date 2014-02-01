@@ -317,6 +317,7 @@ module AssureNote {
         static Danger: string = "assurenote-danger";
         static SingleEdit: string = "assurenote-singleedit";
         static Locked: string = "assurenote-locked";
+        static Useless: string = "assurenote-useless";
     }
 
     export class Rect {

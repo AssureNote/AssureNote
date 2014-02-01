@@ -139,6 +139,11 @@ h4 {
 	stroke: orange;
 }
 
+.assurenote-useless {
+    fill: #BCBEC0;
+    stroke: none;
+}
+
 #auto-expand-area {
     border: 2px solid red;
     width: 200px;

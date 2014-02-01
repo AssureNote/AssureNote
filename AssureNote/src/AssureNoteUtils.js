@@ -289,6 +289,7 @@ var AssureNote;
         ColorStyle.Danger = "assurenote-danger";
         ColorStyle.SingleEdit = "assurenote-singleedit";
         ColorStyle.Locked = "assurenote-locked";
+        ColorStyle.Useless = "assurenote-useless";
         return ColorStyle;
     })();
     AssureNote.ColorStyle = ColorStyle;
