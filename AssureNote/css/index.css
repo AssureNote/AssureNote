@@ -53,6 +53,7 @@ h4 {
 	position: absolute;
 	box-sizing: content-box;
     font-family: Arial, Meiryo;
+    word-wrap: break-word;
 }
 
 .node-variable {
@@ -116,12 +117,10 @@ h4 {
 	stroke-dasharray: 5px, 5px;
 }
 .assurenote-singleedit {
-	fill: #FFFFFF;
 	stroke: #5858FA;
 }
 
 .assurenote-locked {
-	file: #FFFFFF;
 	stroke: #F4FA58;
 }
 
