@@ -123,6 +123,10 @@ html
     +js('/plugin/MonitorNode/MonitorNode.js')
     +js('/plugin/VariableInterpolation/VariableInterpolation.js')
     +js('/javascripts/config.js')
+    script(type='text/javascript').
+      $(function() {
+        Config.RecURL = "#{RecURL}";
+      })
     script#default-case-ja(type='text/wgsn')
       | * G &2422f9c3
       | ゴール: ある性質が成り立つという主張

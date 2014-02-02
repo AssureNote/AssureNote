@@ -165,12 +165,18 @@ module AssureNote {
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new RecApi("http://localhost:3001/api/3.0/");   // Default REC
+
+            var RecURL = Config.RecURL;
+            if(RecURL == null || RecURL == "") {
+                RecURL = "http://localhost:3001/api/3.0/";   // Default REC
+            }
+            this.Rec = new RecApi(RecURL);
+
             this.NodeColorMap = {};
         }
 
-        SetRecUrl(Url: string): void {
-            this.Rec = new RecApi(Url);
+        SetRecURL(URL: string): void {
+            this.Rec = new RecApi(URL);
         }
 
         SetMonitorNode(MNode: MonitorNode): void {
@@ -510,7 +516,7 @@ module AssureNote {
 
         public Invoke(CommandName: string, Params: any[]): void {
             if(Params.length == 1) {
-                MNodeManager.SetRecUrl(Params[0]);
+                MNodeManager.SetRecURL(Params[0]);
             }
             else if(Params.length > 1) {
                 console.log("Too many parameter");

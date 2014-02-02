@@ -2,7 +2,7 @@
 
 module AssureNote {
 
-    function RemoteProcedureCall(Uri: string, Method: string, Params: any, ErrorCallback: (Request, Status, Error) => void): any {
+    function RemoteProcedureCall(URL: string, Method: string, Params: any, ErrorCallback: (Request, Status, Error) => void): any {
         var ReturnValue = null;
         var Command = {
             jsonrpc: "2.0",
@@ -13,7 +13,7 @@ module AssureNote {
 
         $.ajax({
             type: "POST",
-            url: Uri,
+            url: URL,
             async: false,
             data: Command,
             //dataType: "json",   // FIXME
@@ -34,7 +34,7 @@ module AssureNote {
 
     export class RecApi {
 
-        constructor(public Uri: string) {
+        constructor(public URL: string) {
         }
 
         GetLatestData(Location: string, Type: string, ErrorCallback: (Request, Status, Error) => void): any {
@@ -43,7 +43,7 @@ module AssureNote {
                 type: Type
             };
 
-            var Response = RemoteProcedureCall(this.Uri, "getLatestData", Params, ErrorCallback);
+            var Response = RemoteProcedureCall(this.URL, "getLatestData", Params, ErrorCallback);
 
             if(Response == null) {
                 return null;   // ajax error

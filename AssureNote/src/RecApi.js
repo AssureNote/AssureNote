@@ -1,7 +1,7 @@
 ///<reference path='../d.ts/jquery.d.ts'/>
 var AssureNote;
 (function (AssureNote) {
-    function RemoteProcedureCall(Uri, Method, Params, ErrorCallback) {
+    function RemoteProcedureCall(URL, Method, Params, ErrorCallback) {
         var ReturnValue = null;
         var Command = {
             jsonrpc: "2.0",
@@ -12,7 +12,7 @@ var AssureNote;
 
         $.ajax({
             type: "POST",
-            url: Uri,
+            url: URL,
             async: false,
             data: Command,
             //dataType: "json",   // FIXME
@@ -32,8 +32,8 @@ var AssureNote;
     }
 
     var RecApi = (function () {
-        function RecApi(Uri) {
-            this.Uri = Uri;
+        function RecApi(URL) {
+            this.URL = URL;
         }
         RecApi.prototype.GetLatestData = function (Location, Type, ErrorCallback) {
             var Params = {
@@ -41,7 +41,7 @@ var AssureNote;
                 type: Type
             };
 
-            var Response = RemoteProcedureCall(this.Uri, "getLatestData", Params, ErrorCallback);
+            var Response = RemoteProcedureCall(this.URL, "getLatestData", Params, ErrorCallback);
 
             if (Response == null) {
                 return null;

@@ -155,11 +155,17 @@ var AssureNote;
             this.MonitorNodeMap = {};
             this.NodeCount = 0;
             this.IsRunning = false;
-            this.Rec = new AssureNote.RecApi("http://localhost:3001/api/3.0/"); // Default REC
+
+            var RecURL = Config.RecURL;
+            if (RecURL == null || RecURL == "") {
+                RecURL = "http://localhost:3001/api/3.0/"; // Default REC
+            }
+            this.Rec = new AssureNote.RecApi(RecURL);
+
             this.NodeColorMap = {};
         }
-        MonitorNodeManager.prototype.SetRecUrl = function (Url) {
-            this.Rec = new AssureNote.RecApi(Url);
+        MonitorNodeManager.prototype.SetRecURL = function (URL) {
+            this.Rec = new AssureNote.RecApi(URL);
         };
 
         MonitorNodeManager.prototype.SetMonitorNode = function (MNode) {
@@ -494,7 +500,7 @@ var AssureNote;
 
         UseRecAtCommand.prototype.Invoke = function (CommandName, Params) {
             if (Params.length == 1) {
-                MNodeManager.SetRecUrl(Params[0]);
+                MNodeManager.SetRecURL(Params[0]);
             } else if (Params.length > 1) {
                 console.log("Too many parameter");
             } else {

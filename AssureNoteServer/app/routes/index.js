@@ -22,6 +22,7 @@ var getBasicParam = function (req, res) {
         auth.set('guest', 'Guest');
     }
     params.UserName = auth.getLoginName();
+    params.RecURL = CONFIG.rec.URL;
     setAnalyticsStatus(params);
     return params;
 };

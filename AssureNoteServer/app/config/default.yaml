@@ -5,6 +5,8 @@ mysql:
   user: 'assure'
   password: 'assure_test'
   database: 'assurenote'
+rec:
+  URL: 'http://localhost:3001/api/3.0/'
 translator:
   CLIENT_ID: ''
   CLIENT_SECRET: ''
