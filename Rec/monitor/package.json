@@ -1,0 +1,11 @@
+{
+  "name": "monitor",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node start.js"
+  },
+  "dependencies": {
+    "node-jquery": "0.1.0"
+  }
+}
