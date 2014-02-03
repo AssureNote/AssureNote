@@ -37,7 +37,7 @@ var AssureNote;
             this.App = App;
             this.Label = Label;
             this.Data = null;
-            this.Status = true;
+            this.PastStatus = [];
             this.PastLogs = [];
 
             var ThisModel = this.GetModel();
@@ -92,6 +92,28 @@ var AssureNote;
             return false;
         };
 
+        MonitorNode.prototype.GetLatestLog = function () {
+            return this.PastLogs[0];
+        };
+
+        MonitorNode.prototype.SetLatestLog = function (LatestLog) {
+            if (this.PastLogs.length > 10) {
+                this.PastLogs.pop();
+            }
+            this.PastLogs.unshift(LatestLog);
+        };
+
+        MonitorNode.prototype.GetLatestStatus = function () {
+            return this.PastStatus[0];
+        };
+
+        MonitorNode.prototype.SetLatestStatus = function (LatestStatus) {
+            if (this.PastStatus.length > 10) {
+                this.PastStatus.pop();
+            }
+            this.PastStatus.unshift(LatestStatus);
+        };
+
         MonitorNode.prototype.UpdateModel = function () {
             var Model = this.GetModel();
             if (Model.TagMap == null) {
@@ -125,22 +147,19 @@ var AssureNote;
             }
 
             // Don't update if latest log is same as past log
-            if (JSON.stringify(LatestLog) == JSON.stringify(this.PastLogs[0])) {
+            if (JSON.stringify(LatestLog) == JSON.stringify(this.GetLatestLog())) {
                 return;
             }
 
-            // Update status
+            // Check status
             this.Data = LatestLog.data;
             var Script = "var " + this.Type + "=" + this.Data + ";";
             Script += this.Condition + ";";
-            this.Status = eval(Script); // FIXME Don't use eval()
-            LatestLog.status = this.Status;
+            var LatestStatus = eval(Script);
 
-            // Update past logs
-            if (this.PastLogs.length > 10) {
-                this.PastLogs.pop();
-            }
-            this.PastLogs.unshift(LatestLog);
+            // Update past logs & status
+            this.SetLatestLog(LatestLog);
+            this.SetLatestStatus(LatestStatus);
 
             // Update model
             this.UpdateModel();
@@ -271,7 +290,7 @@ var AssureNote;
         MonitorNodeManager.prototype.UpdateNodeColorMap = function () {
             this.NodeColorMap = {};
             for (var MNode in this.MonitorNodeMap) {
-                if (MNode.Status == false) {
+                if (MNode.GetLatestStatus() == false) {
                     var View = MNode.GetView();
                     while (View != null) {
                         this.NodeColorMap[View.Label] = AssureNote.ColorStyle.Danger;
@@ -324,7 +343,7 @@ var AssureNote;
                     }
 
                     // Change node color recursively if node's status is 'false'
-                    if (MNode.Status == false) {
+                    if (MNode.GetLatestStatus() == false) {
                         var View = MNode.GetView();
                         while (View != null) {
                             self.NodeColorMap[View.Label] = AssureNote.ColorStyle.Danger;
@@ -554,7 +573,8 @@ var AssureNote;
 
             for (var i = 0; i < MNode.PastLogs.length; i++) {
                 var Log = MNode.PastLogs[i];
-                if (Log.status == true) {
+                var Status = MNode.PastStatus[i];
+                if (Status == true) {
                     TableInnerHTML += '<tr align="center">';
                 } else {
                     TableInnerHTML += '<tr align="center" bgcolor="#ffaa7d">';
