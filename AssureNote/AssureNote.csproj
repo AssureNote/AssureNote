@@ -27,32 +27,11 @@
     <Content Include="images\evidence.png" />
     <Content Include="images\goal.png" />
     <Content Include="images\logo.png" />
-    <Content Include="images\max.png" />
     <Content Include="images\monitor.png" />
     <Content Include="images\paste.png" />
     <Content Include="images\remove.png" />
     <Content Include="images\strategy.png" />
     <Content Include="index.html" />
-    <Content Include="lib\animate-custom.css" />
-    <Content Include="lib\ASNParser.js" />
-    <Content Include="lib\bootstrap\css\bootstrap-theme.min.css" />
-    <Content Include="lib\bootstrap\css\bootstrap.min.css" />
-    <Content Include="lib\bootstrap\css\non-responsive.css" />
-    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="lib\bootstrap\js\bootstrap.min.js" />
-    <Content Include="lib\codemirror.css" />
-    <Content Include="lib\codemirror.js" />
-    <Content Include="lib\FileSaver.js" />
-    <Content Include="lib\jquery.cookie.js" />
-    <Content Include="lib\jquery.jqdock.min.js" />
-    <Content Include="lib\jquery.min.js" />
-    <Content Include="lib\jquery.mousewheel.js" />
-    <Content Include="lib\jquery.svg.css" />
-    <Content Include="lib\jquery.svg.min.js" />
-    <Content Include="lib\jquery.tmpl.min.js" />
-    <Content Include="lib\notify.min.js" />
-    <Content Include="lib\pointer.min.js" />
-    <Content Include="lib\spin.min.js" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -98,9 +77,6 @@
     <TypeScriptCompile Include="src\XMIParser.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.woff" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
