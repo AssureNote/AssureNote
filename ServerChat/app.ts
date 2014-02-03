@@ -81,9 +81,11 @@ class AssureNoteServer {
             }
             this.UsersInfo.push(Info);
         });
+
         socket.on('sync', (data: {X: number; Y: number; Scale: number}) => {
             socket.broadcast.emit('sync', data);
         });
+
         socket.on('fold', (data: {IsFolded: boolean; UID: number}) => {
             socket.broadcast.emit('fold', data);
         });

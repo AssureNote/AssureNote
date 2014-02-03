@@ -28,6 +28,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 ///<reference path="./AssureNote.ts" />
+///<reference path="../d.ts/jquery_plugins.d.ts" />
 var AssureNote;
 (function (AssureNote) {
     var UserItem = (function () {
@@ -47,7 +48,6 @@ var AssureNote;
             _super.call(this, App);
             this.App = App;
             this.UserName = 'Guest';
-            this.UserInfo = [];
             this.UserList = [];
             $('.change-user').on('click', function (e) {
                 var Name = prompt('Enter the new user name', '');
@@ -66,14 +66,12 @@ var AssureNote;
             var Color = this.GetRandomColor();
             var IsEditMode = (Info.Mode == 0 /* Edit */) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode));
-            this.UserInfo.push({ "UserName": Info.User, "SID": Info.SID });
             this.Show();
         };
 
         UserList.prototype.RemoveUser = function (SID) {
-            for (var i = 0; i < this.UserInfo.length; i++) {
-                if (this.UserInfo[i]["SID"] == SID) {
-                    this.UserInfo.splice(i, 1);
+            for (var i = 0; i < this.UserList.length; i++) {
+                if (this.UserList[i]["SID"] == SID) {
                     this.UserList.splice(i, 1); //Index of UserInfo and UserList is same since push data in the same time
                 }
             }

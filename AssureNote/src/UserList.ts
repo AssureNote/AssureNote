@@ -23,6 +23,7 @@
 // **************************************************************************
 
 ///<reference path="./AssureNote.ts" />
+///<reference path="../d.ts/jquery_plugins.d.ts" />
 
 module AssureNote {
     export class UserItem {
@@ -31,12 +32,10 @@ module AssureNote {
 
     export class UserList extends Panel {
         UserName: string;
-        UserInfo: any[];
-        UserList: any[]; /* The list of other users */
+        UserList: UserItem[]; /* The list of other users */
         constructor(public App: AssureNoteApp) {
             super(App);
             this.UserName = 'Guest';
-            this.UserInfo = [];
             this.UserList = [];
             $('.change-user').on('click', (e: JQueryEventObject) => {
                 var Name = prompt('Enter the new user name', '');
@@ -48,21 +47,19 @@ module AssureNote {
 
         Show() {
             $('.user-name').text(this.App.GetUserName());
-            (<any>$('#user-list-tmpl')).tmpl(this.UserList).appendTo('#user-list');
+            $('#user-list-tmpl').tmpl(this.UserList).appendTo('#user-list');
         }
 
         AddUser(Info: {User: string; Mode: number; SID: string}) {
             var Color: string = this.GetRandomColor();
             var IsEditMode: boolean = (Info.Mode == AssureNoteMode.Edit) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode));
-            this.UserInfo.push({"UserName":Info.User, "SID": Info.SID});
             this.Show();
         }
 
         RemoveUser(SID: string) {
-            for (var i: number = 0; i < this.UserInfo.length; i++) {
-                if (this.UserInfo[i]["SID"] == SID) {
-                    this.UserInfo.splice(i, 1);
+            for (var i: number = 0; i < this.UserList.length; i++) {
+                if (this.UserList[i]["SID"] == SID) {
                     this.UserList.splice(i, 1);//Index of UserInfo and UserList is same since push data in the same time
                 }
             }

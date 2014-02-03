@@ -39,7 +39,8 @@
               <div id="user-list"><br></div>
             </div>
             <script id="user-list-tmpl" type="text/x-jquery-tmpl"><span type="text/x-jquery-tmpl" class="user-list"><span style="color: ${Color}">
-                  <div class="glyphicon glyphicon-user"></div>&nbsp; ${UserName} &nbsp; &nbsp;</span></span>
+                  <div class="glyphicon glyphicon-user">{{if IsEditMode == true}}</div><small style="vertical-align: super;" class="glyphicon glyphicon-pencil"></small>&nbsp;{{else}}{{/if}}
+                  ${UserName} &nbsp;</span></span>
             </script>
           </div>
         </div>
