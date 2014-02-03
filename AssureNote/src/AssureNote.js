@@ -21,6 +21,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+///<reference path='PictgramPanel.ts'/>
 ///<reference path='Socket.ts'/>
 ///<reference path='Command.ts'/>
 ///<reference path='TopMenu.ts'/>
