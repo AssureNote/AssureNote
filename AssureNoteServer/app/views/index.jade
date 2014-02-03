@@ -3,6 +3,7 @@ doctype html
 html
   head
     meta(charset="UTF-8")
+    meta(http-quiv="Expires", content="259200")
     // for mobile browser
     meta(name='viewport', content='initial-scale=1.0,width=device-width,user-scalable=no')
     title AssureNote
@@ -117,17 +118,17 @@ html
     +js('/src/Tooltip.js')
     +js('/src/UserList.js')
     +js('/src/HistoryView.js')
-    +js('/plugin/SingleNodeEditor/SingleNodeEditor.js')
-    +js('/plugin/FullScreenEditor/FullScreenEditor.js')
-    +js('/plugin/FoldingViewSwitch/FoldingViewSwitch.js')
-    +js('/plugin/MessageChat/MessageChat.js')
-    +js('/plugin/AddNode/AddNode.js')
-    +js('/plugin/RemoveNode/RemoveNode.js')
-    +js('/plugin/ToDo/ToDo.js')
-    +js('/plugin/LastModified/LastModified.js')
-    +js('/plugin/MonitorNode/MonitorNode.js')
-    +js('/plugin/VariableInterpolation/VariableInterpolation.js')
     +js('/javascripts/config.js')
+    +js_async('/plugin/SingleNodeEditor/SingleNodeEditor.js')
+    +js_async('/plugin/FullScreenEditor/FullScreenEditor.js')
+    +js_async('/plugin/FoldingViewSwitch/FoldingViewSwitch.js')
+    +js_async('/plugin/MessageChat/MessageChat.js')
+    +js_async('/plugin/AddNode/AddNode.js')
+    +js_async('/plugin/RemoveNode/RemoveNode.js')
+    +js_async('/plugin/ToDo/ToDo.js')
+    +js_async('/plugin/LastModified/LastModified.js')
+    +js_async('/plugin/MonitorNode/MonitorNode.js')
+    +js_async('/plugin/VariableInterpolation/VariableInterpolation.js')
     script(type='text/javascript').
       $(function() {
         Config.RecURL = "#{RecURL}";
