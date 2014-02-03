@@ -30,6 +30,7 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path="../../src/AssureNoteParser.ts" />
 ///<reference path="../../src/Plugin.ts" />
 ///<reference path="../../src/Editor.ts" />
+///<reference path="../../src/Command.ts" />
 var AssureNote;
 (function (AssureNote) {
     var FullScreenEditorCommand = (function (_super) {

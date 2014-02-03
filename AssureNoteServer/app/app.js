@@ -29,6 +29,7 @@ app.configure(function () {
     //	app.use(express.cookieSession());
     app.use(express.methodOverride());
     app.use(express.session());
+    app.use(express.compress());
     app.use(passport.passport.initialize());
     app.use(passport.passport.session());
 

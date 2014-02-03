@@ -61,6 +61,7 @@
     <TypeScriptCompile Include="src\ModeManager.ts" />
     <TypeScriptCompile Include="src\NodeMenu.ts" />
     <TypeScriptCompile Include="src\NodeView.ts" />
+    <TypeScriptCompile Include="src\PictgramPanel.ts" />
     <TypeScriptCompile Include="src\SearchNode.ts" />
     <TypeScriptCompile Include="src\Socket.ts" />
     <TypeScriptCompile Include="src\Tooltip.ts" />
