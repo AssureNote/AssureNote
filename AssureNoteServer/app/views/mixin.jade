@@ -1,5 +1,7 @@
 mixin js(path)
     script(type='text/javascript', src=basepath+path)
+mixin js_async(path)
+    script(type='text/javascript', src=basepath+path, async='async')
 mixin css(path)
     link(rel='stylesheet', href=basepath+path)
 mixin template(id)
