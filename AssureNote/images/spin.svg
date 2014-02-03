@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100px" height="100px" viewBox="0 0 100 100" version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <ellipse ry="8" rx="8" id="part" cy="0" cx="40" stroke-width="0" fill="#606060"/>
+ </defs>
+ <g transform="translate(50,50)">
+  <g>
+   <animateTransform
+      attributeName="transform" attributeType="XML"
+      type="rotate" values="0; 45; 90; 135; 180; 225; 270; 315;"
+      dur="1s" repeatCount="indefinite" calcMode="discrete"/>
+   <use xlink:href="#part" transform="rotate(-0)"   style="fill-opacity: 1.0"/>
+   <use xlink:href="#part" transform="rotate(-45)"  style="fill-opacity: 0.6"/>
+   <use xlink:href="#part" transform="rotate(-90)"  style="fill-opacity: 0.5"/>
+   <use xlink:href="#part" transform="rotate(-135)" style="fill-opacity: 0.4"/>
+   <use xlink:href="#part" transform="rotate(-180)" style="fill-opacity: 0.3"/>
+   <use xlink:href="#part" transform="rotate(-225)" style="fill-opacity: 0.2"/>
+   <use xlink:href="#part" transform="rotate(-270)" style="fill-opacity: 0.1"/>
+   <use xlink:href="#part" transform="rotate(-315)" style="fill-opacity: 0.0"/>
+  </g>
+ </g>
+</svg>

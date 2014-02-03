@@ -32,6 +32,8 @@ var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
+            this.LoadingIndicatorVisible = true;
+            this.LoadingIndicator = document.getElementById("loading-indicator");
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -79,6 +81,15 @@ var AssureNote;
             ]);
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
         }
+        AssureNoteApp.prototype.IsLoading = function () {
+            return this.LoadingIndicatorVisible;
+        };
+
+        AssureNoteApp.prototype.SetLoading = function (IsLoading) {
+            this.LoadingIndicatorVisible = IsLoading;
+            this.LoadingIndicator.style.display = IsLoading ? "" : "none";
+        };
+
         AssureNoteApp.prototype.RegistCommand = function (Command) {
             this.Commands.push(Command);
             var Names = Command.GetCommandLineNames();
@@ -120,6 +131,7 @@ var AssureNote;
 
         AssureNoteApp.prototype.LoadDefaultWGSN = function () {
             var _this = this;
+            this.SetLoading(true);
             if (window.location.pathname.match("/file/") != null) {
                 AssureNote.AssureNoteUtils.postJsonRPC("download", { fileId: window.location.pathname.replace(/\/.*\//, "") }, function (result) {
                     _this.LoadNewWGSN("hello.wgsn", result.content);
@@ -136,6 +148,7 @@ var AssureNote;
                     this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
                 }
             }
+            this.SetLoading(false);
         };
 
         AssureNoteApp.prototype.GetUserName = function () {
@@ -147,6 +160,7 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
+            this.SetLoading(true);
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
             this.MasterRecord = new AssureNote.GSNRecord();
@@ -188,6 +202,7 @@ var AssureNote;
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");
+            this.SetLoading(false);
         };
 
         AssureNoteApp.prototype.LoadFiles = function (Files) {

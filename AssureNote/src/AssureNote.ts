@@ -32,6 +32,7 @@
 declare function saveAs(data: Blob, filename: String): void;
 
 module AssureNote {
+
     export class AssureNoteApp {
         PluginManager: PluginManager;
         SocketManager: SocketManager;
@@ -51,6 +52,8 @@ module AssureNote {
         TopMenu: TopMenuItem;
 
         private UserName: string;
+        private LoadingIndicatorVisible = true;
+        private LoadingIndicator: HTMLImageElement = <HTMLImageElement>document.getElementById("loading-indicator");
 
         constructor() {
             this.Commands = [];
@@ -99,8 +102,15 @@ module AssureNote {
                 ])
             ]);
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
+        }
 
+        public IsLoading(): boolean {
+            return this.LoadingIndicatorVisible;
+        }
 
+        public SetLoading(IsLoading: boolean): void {
+            this.LoadingIndicatorVisible = IsLoading;
+            this.LoadingIndicator.style.display = IsLoading ? "" : "none";
         }
 
         public RegistCommand(Command: Command) {
@@ -143,6 +153,7 @@ module AssureNote {
         }
 
         LoadDefaultWGSN(): void {
+            this.SetLoading(true);
             if(window.location.pathname.match("/file/") != null) {
                 AssureNoteUtils.postJsonRPC("download",
                         {fileId: window.location.pathname.replace(/\/.*\//,"")},
@@ -162,6 +173,7 @@ module AssureNote {
                     this.LoadNewWGSN("hello.wgsn", $("#default-case-en").text());
                 }
             }
+            this.SetLoading(false);
         }
 
         GetUserName(): string {
@@ -173,6 +185,7 @@ module AssureNote {
         }
 
         LoadNewWGSN(Name: string, WGSN: string): void {
+            this.SetLoading(true);
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
             this.MasterRecord = new GSNRecord();
@@ -214,6 +227,7 @@ module AssureNote {
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");
+            this.SetLoading(false);
         }
 
         LoadFiles(Files: FileList): void {
