@@ -86,9 +86,11 @@ var AssureNoteServer = (function () {
             }
             _this.UsersInfo.push(Info);
         });
+
         socket.on('sync', function (data) {
             socket.broadcast.emit('sync', data);
         });
+
         socket.on('fold', function (data) {
             socket.broadcast.emit('fold', data);
         });

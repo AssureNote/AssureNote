@@ -27,7 +27,8 @@
 
 module AssureNote {
     export class UserItem {
-        constructor (public UserName: string, public Color: string, public IsEditMode: boolean) { }
+        constructor(public UserName: string, public Color: string, public IsEditMode: boolean, public SID: string) {
+        }
     }
 
     export class UserList extends Panel {
@@ -47,20 +48,21 @@ module AssureNote {
 
         Show() {
             $('.user-name').text(this.App.GetUserName());
-            $('#user-list-tmpl').tmpl(this.UserList).appendTo('#user-list');
+            $('#user-list-tmpl').tmpl(this.UserList).appendTo($('#user-list').empty());
         }
 
         AddUser(Info: {User: string; Mode: number; SID: string}) {
             var Color: string = this.GetRandomColor();
             var IsEditMode: boolean = (Info.Mode == AssureNoteMode.Edit) ? true : false;
-            this.UserList.push(new UserItem(Info.User, Color, IsEditMode));
+            this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));
             this.Show();
         }
 
         RemoveUser(SID: string) {
             for (var i: number = 0; i < this.UserList.length; i++) {
-                if (this.UserList[i]["SID"] == SID) {
+                if (this.UserList[i].SID == SID) {
                     this.UserList.splice(i, 1);//Index of UserInfo and UserList is same since push data in the same time
+                    break;
                 }
             }
             this.Show();

@@ -82,6 +82,7 @@ module AssureNote {
             this.socket.on('close', function(SID: string) {
                 self.UpdateView("");
                 self.UpdateWGSN();
+                console.log('close: ' + SID);
                 self.App.UserList.RemoveUser(SID);
             });
             this.socket.on('join', function (data) {
