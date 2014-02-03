@@ -3,11 +3,22 @@
 var socketio = require('socket.io');
 var parser = require('./AssureNoteParser');
 
+var UserStatus = (function () {
+    function UserStatus(User, Mode, SID) {
+        this.User = User;
+        this.Mode = Mode;
+        this.SID = SID;
+    }
+    return UserStatus;
+})();
+exports.UserStatus = UserStatus;
+
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
         var _this = this;
         this.room = 'room';
-        this.EditingNodes = [];
+        this.UsersInfo = [];
+        this.EditNodeInfo = [];
         this.WGSNName = null;
         this.MasterRecord = null;
         this.io = socketio.listen(3002);
@@ -22,24 +33,25 @@ var AssureNoteServer = (function () {
                 WGSN: _this.GetLatestWGSN()
             });
             socket.broadcast.emit('join', { id: socket.id, list: _this.GetUserList() });
-
             socket.on('disconnect', function () {
                 /* cast to any since d.ts does not support socket.leave */
                 socket.leave(_this.room);
 
                 console.log('id: ' + socket.id + ' leave');
                 console.log('close');
-                socket.broadcast.emit('leave', { id: socket.id, list: _this.GetUserList() });
-                if (_this.EditingNodes.length != 0) {
-                    for (var i = 0; i < _this.EditingNodes.length; i++) {
-                        if (_this.EditingNodes[i]["SID"] == socket.id) {
-                            socket.broadcast.emit('finishedit', { Label: _this.EditingNodes[i]['Label'], UID: _this.EditingNodes[i]['UID'] });
-                            socket.broadcast.emit('close', "Window Closed");
-                            _this.EditingNodes.splice(i, 1);
+                if (_this.EditNodeInfo.length != 0) {
+                    for (var i = 0; i < _this.EditNodeInfo.length; i++) {
+                        if (_this.EditNodeInfo[i]["SID"] == socket.id) {
+                            socket.broadcast.emit('finishedit', { Label: _this.EditNodeInfo[i]['Label'], UID: _this.EditNodeInfo[i]['UID'] });
+                            _this.EditNodeInfo.splice(i, 1);
                         }
                     }
-                } else {
-                    socket.broadcast.emit('close', "Window closed: " + socket.id);
+                }
+                socket.broadcast.emit('close', socket.id);
+                for (var i = 0; i < _this.UsersInfo.length; i++) {
+                    if (_this.UsersInfo[i]["SID"] == socket.id) {
+                        _this.UsersInfo.splice(i, 1);
+                    }
                 }
             });
         });
@@ -64,9 +76,19 @@ var AssureNoteServer = (function () {
             socket.broadcast.emit('update', data);
         });
 
+        socket.on('adduser', function (data) {
+            var Info = new UserStatus(data.User, data.Mode, socket.id);
+            socket.broadcast.emit('adduser', Info);
+            if (_this.UsersInfo.length != 0) {
+                for (var i = 0; i < _this.UsersInfo.length; i++) {
+                    socket.emit('adduser', _this.UsersInfo[i]);
+                }
+            }
+            _this.UsersInfo.push(Info);
+        });
+
         socket.on('sync', function (data) {
-            console.log('=================================syncfocus');
-            socket.broadcast.emit('syncfocus', data);
+            socket.broadcast.emit('sync', data);
         });
 
         socket.on('fold', function (data) {
@@ -75,23 +97,20 @@ var AssureNoteServer = (function () {
 
         socket.on('startedit', function (data) {
             var datas = {};
-            datas['Label'] = data.Label;
             datas['UID'] = data.UID;
             datas['IsRecursive'] = data.IsRecursive;
             datas['UserName'] = data.UserName;
-            datas['SID'] = socket.id;
-
-            //            console.log('data\'s socketID is ' + datas['SID']);
+            datas['SID'] = Number(socket.id);
             socket.broadcast.emit('startedit', datas);
-            _this.EditingNodes.push(datas);
-            console.log("this is editing list" + _this.EditingNodes);
+            _this.EditNodeInfo.push(datas);
+            console.log("this is editing list" + _this.EditNodeInfo);
         });
 
-        socket.on('finishedit', function (data) {
-            socket.broadcast.emit('finishedit', data);
-            for (var i = 0; i < _this.EditingNodes.length; i++) {
-                if (_this.EditingNodes[i]['Label'] == data.Label) {
-                    _this.EditingNodes.splice(i, 1);
+        socket.on('finishedit', function (UID) {
+            socket.broadcast.emit('finishedit', UID);
+            for (var i = 0; i < _this.EditNodeInfo.length; i++) {
+                if (_this.EditNodeInfo[i]['UID'] == UID) {
+                    _this.EditNodeInfo.splice(i, 1);
                 }
             }
         });

@@ -40,7 +40,6 @@ var AssureNote;
             this.DefaultChatServer = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
-            this.ClientsInfo = [];
             this.EditStatus = [];
             this.EditNodeInfo = [];
             if (!this.IsOperational()) {
@@ -79,10 +78,11 @@ var AssureNote;
                 self.App.ModeManager.Disable();
                 self.socket = null;
             });
-            this.socket.on('close', function (data) {
+            this.socket.on('close', function (SID) {
                 self.UpdateView("");
                 self.UpdateWGSN();
-                //                self.UpdateUserList();
+                console.log('close: ' + SID);
+                self.App.UserList.RemoveUser(SID);
             });
             this.socket.on('join', function (data) {
                 console.log('join');
@@ -103,6 +103,11 @@ var AssureNote;
                     self.App.LoadNewWGSN(data.name, data.WGSN);
                 }
             });
+
+            this.socket.on('adduser', function (data) {
+                self.App.UserList.AddUser(data);
+            });
+
             this.socket.on('fold', function (data) {
                 if (!self.ReceivedFoldEvent) {
                     self.ReceivedFoldEvent = true;
@@ -130,9 +135,9 @@ var AssureNote;
                 self.UpdateView("startedit");
                 self.AddUserNameOn(CurrentNodeView, { User: data.UserName, IsRecursive: data.IsRecursive });
             });
-            this.socket.on('finishedit', function (data) {
+            this.socket.on('finishedit', function (UID) {
                 console.log('finishedit');
-                self.DeleteID(data.UID);
+                self.DeleteID(UID);
                 self.UpdateView("finishedit");
                 console.log('here is ID array after delete = ' + self.EditNodeInfo);
             });
@@ -150,6 +155,7 @@ var AssureNote;
             }
             this.App.ModeManager.Enable();
             this.EnableListeners();
+            this.Emit('adduser', { User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode() });
             this.App.UserList.Show();
         };
 
