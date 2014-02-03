@@ -37,7 +37,7 @@ var AssureNote;
         function SocketManager(App) {
             var _this = this;
             this.App = App;
-            this.DefaultChatServer = Config.DefaultChatServer;
+            this.DefaultChatServer = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.ClientsInfo = [];

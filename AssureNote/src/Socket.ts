@@ -31,7 +31,7 @@ module AssureNote {
         constructor(public name: string, public WGSN: string) { }
     }
     export class SocketManager {
-        private DefaultChatServer: string = Config.DefaultChatServer;
+        private DefaultChatServer: string = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
         private socket: any;
         private handler: { [key: string]: (any) => void };
         private UseOnScrollEvent: boolean = true;

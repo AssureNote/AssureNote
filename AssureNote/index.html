@@ -33,10 +33,14 @@
             <div id="top-menu"></div>
             <div class="edit-mode clickable navbar-left"></div>
             <!--p.navbar-text#filename-view(style="margin-left: 10px;")-->
-            <div id="user-info">
+            <div id="user-info" class="text-right">
               <div class="glyphicon glyphicon-user"></div><span class="user-name">&nbsp; Guest </span><a class="btn clickable change-user">
                 <button class="btn btn-default btn-large"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Change User</button></a>
+              <div id="user-list"><br></div>
             </div>
+            <script id="user-list-tmpl" type="text/x-jquery-tmpl"><span type="text/x-jquery-tmpl" class="user-list"><span style="color: ${Color}">
+                  <div class="glyphicon glyphicon-user"></div>&nbsp; ${UserName} &nbsp; &nbsp;</span></span>
+            </script>
           </div>
         </div>
         <input id="command-line" type="text" style="width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large" class="form-control">
