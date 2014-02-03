@@ -38,6 +38,9 @@ module.exports = function(grunt) {
         exec: {
             typescript: {
                 cmd: 'tsc @compile_list --module "commonjs" --sourcemap'
+            },
+            typescript_release: {
+                cmd: 'tsc @compile_list --module "commonjs" --removeComments --out build/AssureNote.js'
             }
         },
 
@@ -62,6 +65,13 @@ module.exports = function(grunt) {
                     comments: true
                 }
             }
+        },
+        uglify: {
+            build: {
+                files: {
+                    'build/AssureNote.min.js': ['build/AssureNote.js']
+                }
+            }
         }
     });
 
@@ -70,7 +80,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-exec');
     grunt.loadNpmTasks('grunt-typescript');
     grunt.loadNpmTasks('grunt-open');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.registerTask('default', ['jade:build', 'exec:typescript']);
+    grunt.registerTask('release', ['jade:build', 'exec:typescript_release', 'uglify:build']);
     grunt.registerTask('test', ['typescript:spec_build', 'jade:spec_build', 'open:spec_chrome']);
 };

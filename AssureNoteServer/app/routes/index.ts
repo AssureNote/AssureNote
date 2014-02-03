@@ -24,6 +24,10 @@ var getBasicParam = function(req: any, res: any) {
     params.UserName = auth.getLoginName();
     params.RecURL = CONFIG.rec.URL;
     setAnalyticsStatus(params);
+
+    if(!CONFIG.compress_js) {
+        params.isDevelopment = true;
+    }
     return params;
 }
 

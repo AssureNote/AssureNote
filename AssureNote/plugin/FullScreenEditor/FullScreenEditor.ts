@@ -25,6 +25,7 @@
 ///<reference path="../../src/AssureNoteParser.ts" />
 ///<reference path="../../src/Plugin.ts" />
 ///<reference path="../../src/Editor.ts" />
+///<reference path="../../src/Command.ts" />
 
 module AssureNote {
     export class FullScreenEditorCommand extends Command {
