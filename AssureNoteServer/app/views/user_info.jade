@@ -24,5 +24,7 @@
 +template("user-list-tmpl")
   span.user-list(type="text/x-jquery-tmpl")
     span(style="color: ${Color}")
-      .glyphicon.glyphicon-user
-      | &nbsp; ${UserName} &nbsp; &nbsp;
+      .glyphicon.glyphicon-user{{if IsEditMode == true}}
+      small.glyphicon.glyphicon-pencil(style="vertical-align: super;")
+      |&nbsp;{{else}}{{/if}}
+      |${UserName} &nbsp;
