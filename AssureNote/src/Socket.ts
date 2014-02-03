@@ -151,6 +151,7 @@ module AssureNote {
             }
             this.App.ModeManager.Enable();
             this.EnableListeners();
+            this.App.UserList.Show();
         }
 
         DisConnect() {

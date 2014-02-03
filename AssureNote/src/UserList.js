@@ -48,6 +48,8 @@ var AssureNote;
         }
         UserList.prototype.Show = function () {
             $('.user-name').text(this.App.GetUserName());
+            var List = [];
+            $('#user-list-tmpl').tmpl(List).appendTo('#user-list');
         };
         return UserList;
     })(AssureNote.Panel);

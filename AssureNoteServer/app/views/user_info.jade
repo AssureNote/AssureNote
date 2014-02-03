@@ -1,4 +1,4 @@
-#user-info
+#user-info.text-right
   .glyphicon.glyphicon-user
   span.user-name &nbsp; #{UserName} 
   if !isLocal
@@ -17,3 +17,12 @@
       button.btn.btn-default.btn-large
         span.glyphicon.glyphicon-pencil
         | &nbsp; Change User
+
+  #user-list
+    br
+
++template("user-list-tmpl")
+  span.user-list(type="text/x-jquery-tmpl")
+    span(style="color: ${Color}")
+      .glyphicon.glyphicon-user
+      | &nbsp; ${UserName} &nbsp; &nbsp;

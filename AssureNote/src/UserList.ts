@@ -41,6 +41,8 @@ module AssureNote {
         }
         Show() {
             $('.user-name').text(this.App.GetUserName());
+            var List = []; // TODO: Apply Template. For example [{UserName: 'A', Color: 'Red'}]
+            (<any>$('#user-list-tmpl')).tmpl(List).appendTo('#user-list');
         }
     }
 }

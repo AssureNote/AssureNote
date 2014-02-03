@@ -150,6 +150,7 @@ var AssureNote;
             }
             this.App.ModeManager.Enable();
             this.EnableListeners();
+            this.App.UserList.Show();
         };
 
         SocketManager.prototype.DisConnect = function () {
