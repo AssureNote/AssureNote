@@ -37,7 +37,7 @@ var AssureNote;
         function SocketManager(App) {
             var _this = this;
             this.App = App;
-            this.DEFAULT_HOST = 'http://localhost:3002';
+            this.DefaultChatServer = Config.DefaultChatServer;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.ClientsInfo = [];
@@ -144,7 +144,7 @@ var AssureNote;
 
         SocketManager.prototype.Connect = function (host) {
             if (host == null || host == '') {
-                this.socket = io.connect(this.DEFAULT_HOST);
+                this.socket = io.connect(this.DefaultChatServer);
             } else {
                 this.socket = io.connect(host);
             }

@@ -7,6 +7,8 @@ mysql:
   database: 'assurenote'
 rec:
   URL: 'http://localhost:3001/api/3.0/'
+sync:
+  URL: 'http://localhost:3002'
 translator:
   CLIENT_ID: ''
   CLIENT_SECRET: ''

@@ -23,6 +23,7 @@ var getBasicParam = function (req, res) {
     }
     params.UserName = auth.getLoginName();
     params.RecURL = CONFIG.rec.URL;
+    params.DefaultChatServer = CONFIG.sync.URL;
     setAnalyticsStatus(params);
 
     if (!CONFIG.compress_js) {

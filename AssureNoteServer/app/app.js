@@ -18,34 +18,13 @@ app.configure(function () {
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
     app.use(express.favicon());
-
-    //var uploadDir = path.join(__dirname, CONFIG.ads.uploadPath);
-    //console.log(uploadDir);
-    //utilFs.mkdirpSync(uploadDir);
-    //app.use(express.bodyParser({uploadDir: uploadDir}));
     app.use(express.bodyParser());
     app.use(express.cookieParser(CONFIG.cookie.secret));
-
-    //	app.use(express.cookieSession());
     app.use(express.methodOverride());
     app.use(express.session());
     app.use(express.compress());
     app.use(passport.passport.initialize());
     app.use(passport.passport.session());
-
-    // app.use(function(req, res, next) {
-    //     console.log([
-    //       req.headers['x-forwarded-for'] || req.client.remoteAddress,
-    //       new Date().toLocaleString(),
-    //       req.method,
-    //       req.url,
-    //       res.statusCode,
-    //       req.headers.referer || '-',
-    //       // req.headers['user-agent'] || '-'
-    //       ].join('\t')
-    //     );
-    //     next();
-    // });
     app.use(app.router);
     app.use(express.static(path.join(__dirname, '../../AssureNote')));
 
@@ -65,16 +44,6 @@ app.configure('production', function () {
 app.post('/api/1.0', api.httpHandler);
 app.get('/', client.index);
 app.get('/file/:id', client.index);
-
-//app.get('/tag/:t', client.index);
-//app.get('/new/:projectId', client.newcase);
-//app.get('/project/new', client.newproject);
-//app.get('/project/:id/edit', client.newproject);
-//app.get('/case/:id', client.caseview);
-//app.get('/case/:id/history', client.historyList);
-//app.get('/case/:id/history/:history', client.history);
-//app.post('/export.*', client.exporter);
-//app.get('/case/:id/export/:type/node/:n', gts.exporter);
 app.get('/javascripts/config.js', js.config);
 
 app.get('/auth/twitter', passport.passport.authenticate('twitter'), function (req, res) {

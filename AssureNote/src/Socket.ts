@@ -31,7 +31,7 @@ module AssureNote {
         constructor(public name: string, public WGSN: string) { }
     }
     export class SocketManager {
-        private DEFAULT_HOST: string = 'http://localhost:3002';
+        private DefaultChatServer: string = Config.DefaultChatServer;
         private socket: any;
         private handler: { [key: string]: (any) => void };
         private UseOnScrollEvent: boolean = true;
@@ -145,7 +145,7 @@ module AssureNote {
 
         Connect(host: string) {
             if (host == null || host =='') {
-                this.socket = io.connect(this.DEFAULT_HOST);
+                this.socket = io.connect(this.DefaultChatServer);
             } else {
                 this.socket = io.connect(host);
             }
