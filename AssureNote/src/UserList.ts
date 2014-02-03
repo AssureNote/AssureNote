@@ -25,12 +25,18 @@
 ///<reference path="./AssureNote.ts" />
 
 module AssureNote {
+    export class UserItem {
+        constructor (public UserName: string, public Color: string, public IsEditMode: boolean) { }
+    }
+
     export class UserList extends Panel {
         UserName: string;
-        UserList: string[]; /* The list of other users */
+        UserInfo: any[];
+        UserList: any[]; /* The list of other users */
         constructor(public App: AssureNoteApp) {
             super(App);
             this.UserName = 'Guest';
+            this.UserInfo = [];
             this.UserList = [];
             $('.change-user').on('click', (e: JQueryEventObject) => {
                 var Name = prompt('Enter the new user name', '');
@@ -39,10 +45,36 @@ module AssureNote {
                 this.Show();
             });
         }
+
         Show() {
             $('.user-name').text(this.App.GetUserName());
-            var List = []; // TODO: Apply Template. For example [{UserName: 'A', Color: 'Red', IsEditMode: true}]
-            (<any>$('#user-list-tmpl')).tmpl(List).appendTo('#user-list');
+            (<any>$('#user-list-tmpl')).tmpl(this.UserList).appendTo('#user-list');
+        }
+
+        AddUser(Info: {User: string; Mode: number; SID: string}) {
+            var Color: string = this.GetRandomColor();
+            var IsEditMode: boolean = (Info.Mode == AssureNoteMode.Edit) ? true : false;
+            this.UserList.push(new UserItem(Info.User, Color, IsEditMode));
+            this.UserInfo.push({"UserName":Info.User, "SID": Info.SID});
+            this.Show();
+        }
+
+        RemoveUser(SID: string) {
+            for (var i: number = 0; i < this.UserInfo.length; i++) {
+                if (this.UserInfo[i]["SID"] == SID) {
+                    this.UserInfo.splice(i, 1);
+                    this.UserList.splice(i, 1);//Index of UserInfo and UserList is same since push data in the same time
+                }
+            }
+            this.Show();
+        }
+
+        GetRandomColor() : string {
+            var color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+            for (var i: number = color.length; i < 6; i++){
+                color = "0" + color;
+            }
+            return "#" + color;
         }
     }
 }

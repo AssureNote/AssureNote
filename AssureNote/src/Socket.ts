@@ -36,7 +36,6 @@ module AssureNote {
         private handler: { [key: string]: (any) => void };
         private UseOnScrollEvent: boolean = true;
         private ReceivedFoldEvent: boolean = false;
-        private ClientsInfo:  any[] = [];//Store UserName and Mode(View/Edit)
         private LatestNodeView: NodeView;
         private EditStatus :  any[] = [];
         private EditNodeInfo: any[] = [];
@@ -80,10 +79,10 @@ module AssureNote {
                 self.socket = null;
 
             });
-            this.socket.on('close', function(data) {
+            this.socket.on('close', function(SID: string) {
                 self.UpdateView("");
                 self.UpdateWGSN();
-//                self.UpdateUserList();
+                self.App.UserList.RemoveUser(SID);
             });
             this.socket.on('join', function (data) {
                 console.log('join');
@@ -104,6 +103,11 @@ module AssureNote {
                     self.App.LoadNewWGSN(data.name, data.WGSN);
                 }
             });
+
+            this.socket.on('adduser', function(data: {User: string; Mode: number; SID: string}) {
+                self.App.UserList.AddUser(data);
+            });
+
             this.socket.on('fold', function (data: {IsFolded: boolean; UID: number}) {
                 if (!self.ReceivedFoldEvent/* && (self.App.ModeManager.GetMode() == AssureNoteMode.View)*/) {
                     self.ReceivedFoldEvent = true;
@@ -123,7 +127,7 @@ module AssureNote {
                     self.UseOnScrollEvent = true;
 //                }
             });
-            this.socket.on('startedit', function(data : {Label: string; UID: number; IsRecursive: boolean; UserName: string; SID: number}) {
+            this.socket.on('startedit', function(data : {UID: number; IsRecursive: boolean; UserName: string; SID: number}) {
                 console.log('edit');
                 var CurrentNodeView: NodeView = self.App.PictgramPanel.GetNodeViewFromUID(data.UID);
                 self.EditNodeInfo.push(data);
@@ -131,9 +135,9 @@ module AssureNote {
                 self.UpdateView("startedit");
                 self.AddUserNameOn(CurrentNodeView, {User:data.UserName, IsRecursive:data.IsRecursive});
             });
-            this.socket.on('finishedit', function(data: {Label: string; UID: number}) {
+            this.socket.on('finishedit', function(UID: number) {
                 console.log('finishedit');
-                self.DeleteID(data.UID);
+                self.DeleteID(UID);
                 self.UpdateView("finishedit");
                 console.log('here is ID array after delete = ' + self.EditNodeInfo);
             });
@@ -151,6 +155,7 @@ module AssureNote {
             }
             this.App.ModeManager.Enable();
             this.EnableListeners();
+            this.Emit('adduser', {User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode()});
             this.App.UserList.Show();
         }
 
@@ -293,7 +298,7 @@ module AssureNote {
             }
         }
 
-        StartEdit(data: {Label: string; UID: number; IsRecursive: boolean; UserName: string}) {
+        StartEdit(data: {UID: number; IsRecursive: boolean; UserName: string}) {
             if(this.IsConnected()) {
                 this.Emit('startedit' ,data);
             }

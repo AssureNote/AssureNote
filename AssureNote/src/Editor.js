@@ -68,7 +68,7 @@ var AssureNote;
             this.Timeout = null;
             var Model = NodeView.Model;
             this.App.FullScreenEditorPanel.IsVisible = false;
-            this.App.SocketManager.StartEdit({ "Label": Model.GetLabel(), "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName() });
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName() });
 
             var Callback = function (event) {
                 _this.Element.blur();
@@ -115,7 +115,7 @@ var AssureNote;
             } else {
                 this.App.MasterRecord.DiscardEditor();
             }
-            this.App.SocketManager.Emit('finishedit', { "Label": OldNodeView.Model.GetLabel(), "UID": OldNodeView.Model.UID });
+            this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
 
             this.App.PictgramPanel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
