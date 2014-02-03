@@ -1,5 +1,7 @@
 var Config;
 (function (Config) {
-    Config.BASEPATH = ".";
+    if (!Config.BASEPATH) {
+        Config.BASEPATH = ".";
+    }
 })(Config || (Config = {}));
 //# sourceMappingURL=config.js.map
