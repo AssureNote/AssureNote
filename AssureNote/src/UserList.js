@@ -59,12 +59,18 @@ var AssureNote;
             });
         }
         UserList.prototype.Show = function () {
+            var found = false;
+            for (var i in this.UserList) {
+                if (this.UserList[i].IsEditMode) {
+                    found = true;
+                }
+            }
+            this.App.ModeManager.ReadOnly(found);
             $('.user-name').text(this.App.GetUserName());
             $('#user-list-tmpl').tmpl(this.UserList).appendTo($('#user-list').empty());
         };
 
         UserList.prototype.AddUser = function (Info) {
-            console.log(Info);
             var Color = this.GetRandomColor();
             var IsEditMode = (Info.Mode == 0 /* Edit */) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));

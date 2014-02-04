@@ -85,10 +85,6 @@ module AssureNote {
                 console.log('close: ' + SID);
                 self.App.UserList.RemoveUser(SID);
             });
-            this.socket.on('join', function (data) {
-                console.log('join');
-                console.log(data);
-            });
 
             this.socket.on('error', function (data) {
                 (<any>$).notify('Cannot establish connection or connection closed', 'error');
@@ -122,7 +118,6 @@ module AssureNote {
                 }
             });
             this.socket.on('update', function (data: {name: string; WGSN: string}) {
-                console.log('update');
                 self.App.LoadNewWGSN(data.name, data.WGSN);
             });
             this.socket.on('sync', function (data: {X: number; Y: number; Scale: number}) {

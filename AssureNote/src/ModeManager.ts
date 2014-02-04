@@ -57,6 +57,10 @@ module AssureNote {
             }
         }
 
+        ReadOnly(b: boolean) {
+            $('#mode-switch').bootstrapSwitch('setDisabled', b); 
+        }
+
         Disable(): void {
             $(this.WrapperElement.empty());
         }

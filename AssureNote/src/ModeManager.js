@@ -52,6 +52,10 @@ var AssureNote;
             }
         };
 
+        ModeManager.prototype.ReadOnly = function (b) {
+            $('#mode-switch').bootstrapSwitch('setDisabled', b);
+        };
+
         ModeManager.prototype.Disable = function () {
             $(this.WrapperElement.empty());
         };

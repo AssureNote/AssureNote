@@ -28,7 +28,6 @@ class AssureNoteServer {
                 name : this.WGSNName,
                 WGSN : this.GetLatestWGSN()
             });
-            socket.broadcast.emit('join', {id: socket.id, list: this.GetUserList()});
             socket.on('disconnect', () => {
                 /* cast to any since d.ts does not support socket.leave */
                 (<any>socket).leave(this.room);

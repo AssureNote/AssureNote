@@ -47,12 +47,18 @@ module AssureNote {
         }
 
         Show() {
+            var found: boolean = false;
+            for (var i in this.UserList) {
+                if (this.UserList[i].IsEditMode) {
+                    found = true;
+                }
+            }
+            this.App.ModeManager.ReadOnly(found);
             $('.user-name').text(this.App.GetUserName());
             $('#user-list-tmpl').tmpl(this.UserList).appendTo($('#user-list').empty());
         }
 
         AddUser(Info: { User: string; Mode: number; SID: string }) {
-            console.log(Info);
             var Color: string = this.GetRandomColor();
             var IsEditMode: boolean = (Info.Mode == AssureNoteMode.Edit) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));

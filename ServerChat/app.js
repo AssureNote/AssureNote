@@ -32,7 +32,6 @@ var AssureNoteServer = (function () {
                 name: _this.WGSNName,
                 WGSN: _this.GetLatestWGSN()
             });
-            socket.broadcast.emit('join', { id: socket.id, list: _this.GetUserList() });
             socket.on('disconnect', function () {
                 /* cast to any since d.ts does not support socket.leave */
                 socket.leave(_this.room);

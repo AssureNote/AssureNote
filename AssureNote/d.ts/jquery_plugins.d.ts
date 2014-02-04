@@ -49,4 +49,5 @@ interface JQueryTmplItem
 
 interface JQuery {
     bootstrapSwitch(type?: string, value?: string): JQuery;
+    bootstrapSwitch(type?: string, value?: boolean): JQuery;
 }
