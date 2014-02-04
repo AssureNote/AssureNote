@@ -86,9 +86,10 @@ var AssureNote;
                 return null;
             }
             return new AssureNote.NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor", function (event, TargetView) {
-                var Writer = new AssureNote.StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer, true);
-                _this.AssureNoteApp.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
+                var Command = _this.AssureNoteApp.FindCommandByCommandLineName("edit");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label]);
+                }
             });
         };
 

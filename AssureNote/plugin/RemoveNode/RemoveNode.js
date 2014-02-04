@@ -98,29 +98,13 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new RemoveCommand(this.AssureNoteApp));
         }
         RemoveNodePlugin.prototype.CreateMenuBarButton = function (View) {
+            var _this = this;
             var App = this.AssureNoteApp;
             return new AssureNote.NodeMenuItem("remove-id", "/images/remove.png", "remove", function (event, TargetView) {
-                var Node = TargetView.Model;
-                var Parent = Node.ParentNode;
-                if (Parent.SubNodeList == null) {
-                    App.DebugP("Node not Found");
-                    return;
+                var Command = _this.AssureNoteApp.FindCommandByCommandLineName("remove");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label]);
                 }
-                for (var i = 0; i < Parent.SubNodeList.length; i++) {
-                    var it = Parent.SubNodeList[i];
-                    if (Node == it) {
-                        Parent.SubNodeList.splice(i, 1);
-                    }
-                }
-
-                RemoveCommand.RemoveDescendantsRecursive(Node);
-
-                var TopGoal = App.MasterRecord.GetLatestDoc().TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(App.PictgramPanel.ViewMap);
-                App.PictgramPanel.InitializeView(NewNodeView);
-                App.PictgramPanel.Draw(TopGoal.GetLabel());
-                App.SocketManager.UpdateWGSN();
             });
         };
         return RemoveNodePlugin;

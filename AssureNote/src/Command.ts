@@ -39,6 +39,10 @@ module AssureNote {
         public GetHelpHTML(): string {
             return "<code>" + this.GetCommandLineNames().pop() + "</code>";
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return false;
+        }
     }
 
     export class CommandMissingCommand extends Command {
@@ -46,7 +50,10 @@ module AssureNote {
             super(App);
         }
 
-        public Invoke(CommandName: string,Params: any[]) {
+        public Invoke(CommandName: string, Params: any[]) {
+            if (CommandName == null) {
+                return;
+            }
             var Label = CommandName.toUpperCase();
             if (this.App.PictgramPanel.ViewMap == null) {
                 this.App.DebugP("Jump is diabled.");
@@ -96,6 +103,9 @@ module AssureNote {
             return "<code>save [name]</code><br>Save editing GSN."
         }
 
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class SaveWGSNCommand extends Command {
@@ -116,6 +126,10 @@ module AssureNote {
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Filename);
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 
@@ -208,6 +222,10 @@ module AssureNote {
             DummyNode.appendChild(DCaseArgumentXML);
             return '<?xml version="1.0" encoding="UTF-8"?>\n' + DummyNode.innerHTML.replace(/>/g, ">\n").replace(/&amp;#x/g, "&#x");
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class SaveSVGCommand extends Command {
@@ -279,6 +297,10 @@ module AssureNote {
             var doc = header + $dummydiv.html();
             $svg.empty().remove();
             return doc;
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 
@@ -454,6 +476,10 @@ module AssureNote {
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
             $("#help-modal .modal-body").css({ "overflow-y": "scroll", "height": this.App.PictgramPanel.Viewport.GetPageHeight() * 0.6 });
             (<any>$("#help-modal")).modal();
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 

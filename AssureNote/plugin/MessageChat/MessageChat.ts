@@ -43,6 +43,10 @@ module AssureNote {
                 (<any>$).notify(Params.join(' '), 'info');
             }
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class ConnectCommand extends Command {

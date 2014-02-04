@@ -44,6 +44,10 @@ var AssureNote;
         Command.prototype.GetHelpHTML = function () {
             return "<code>" + this.GetCommandLineNames().pop() + "</code>";
         };
+
+        Command.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
         return Command;
     })();
     AssureNote.Command = Command;
@@ -54,6 +58,9 @@ var AssureNote;
             _super.call(this, App);
         }
         CommandMissingCommand.prototype.Invoke = function (CommandName, Params) {
+            if (CommandName == null) {
+                return;
+            }
             var Label = CommandName.toUpperCase();
             if (this.App.PictgramPanel.ViewMap == null) {
                 this.App.DebugP("Jump is diabled.");
@@ -104,6 +111,10 @@ var AssureNote;
         SaveCommand.prototype.GetHelpHTML = function () {
             return "<code>save [name]</code><br>Save editing GSN.";
         };
+
+        SaveCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SaveCommand;
     })(Command);
     AssureNote.SaveCommand = SaveCommand;
@@ -127,6 +138,10 @@ var AssureNote;
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Filename);
+        };
+
+        SaveWGSNCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SaveWGSNCommand;
     })(Command);
@@ -222,6 +237,10 @@ var AssureNote;
             DummyNode.appendChild(DCaseArgumentXML);
             return '<?xml version="1.0" encoding="UTF-8"?>\n' + DummyNode.innerHTML.replace(/>/g, ">\n").replace(/&amp;#x/g, "&#x");
         };
+
+        SaveDCaseCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SaveDCaseCommand;
     })(Command);
     AssureNote.SaveDCaseCommand = SaveDCaseCommand;
@@ -291,6 +310,10 @@ var AssureNote;
             var doc = header + $dummydiv.html();
             $svg.empty().remove();
             return doc;
+        };
+
+        SaveSVGCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SaveSVGCommand;
     })(Command);
@@ -484,6 +507,10 @@ var AssureNote;
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
             $("#help-modal .modal-body").css({ "overflow-y": "scroll", "height": this.App.PictgramPanel.Viewport.GetPageHeight() * 0.6 });
             $("#help-modal").modal();
+        };
+
+        HelpCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return HelpCommand;
     })(Command);

@@ -26,45 +26,75 @@
 ///<reference path="../../src/Plugin.ts" />
 
 module AssureNote {
+
+    export class AddNodeCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["addnode", "add-node"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>add-node node type</code><br>Add new node."
+        }
+
+        private Text2NodeTypeMap: any = { "goal": GSNType.Goal, "strategy": GSNType.Strategy, "context": GSNType.Context, "evidence": GSNType.Evidence };
+
+        public Invoke(CommandName: string, Params: any[]): void {
+            var Type: GSNType = this.Text2NodeTypeMap[(<string>Params[1]).toLowerCase()];
+            var TargetView = this.App.PictgramPanel.ViewMap[Params[0]];
+            if (TargetView == null) {
+                this.App.DebugP("Node not Found");
+                return;
+            }
+            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
+            var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
+            new GSNNode(Node.BaseDoc, Node, Type, null, AssureNoteUtils.GenerateUID(), null);
+            var Doc = this.App.MasterRecord.EditingDoc;
+            Doc.RenumberAll();
+            var TopGoal = Doc.TopNode;
+            var NewNodeView: NodeView = new NodeView(TopGoal, true);
+            NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
+            this.App.PictgramPanel.InitializeView(NewNodeView);
+            this.App.PictgramPanel.Draw(TopGoal.GetLabel());
+            this.App.SocketManager.UpdateWGSN();
+            this.App.MasterRecord.CloseEditor();
+        }
+    }
+
     export class AddNodePlugin extends Plugin {
 
         constructor(public AssureNoteApp: AssureNoteApp) {
             super();
             this.SetHasMenuBarButton(true);
-            //this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
         }
 
-        CreateCallback(Type: GSNType): (Event, NodeView) => void {
+        CreateCallback(Type: string): (Event, NodeView) => void {
             return (event: Event, TargetView: NodeView) => {
-                this.AssureNoteApp.MasterRecord.OpenEditor(this.AssureNoteApp.GetUserName(), "todo", null, "test");
-                var Node = this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
-                new GSNNode(Node.BaseDoc, Node, Type, null, AssureNoteUtils.GenerateUID(), null);
-                var Doc = this.AssureNoteApp.MasterRecord.EditingDoc;
-                Doc.RenumberAll();
-                var TopGoal = Doc.TopNode;
-                var NewNodeView: NodeView = new NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(this.AssureNoteApp.PictgramPanel.ViewMap);
-                this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-                this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
-                this.AssureNoteApp.SocketManager.UpdateWGSN();
-                this.AssureNoteApp.MasterRecord.CloseEditor();
+                var Command = this.AssureNoteApp.FindCommandByCommandLineName("add-node");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label, Type]);
+                }
             };
         }
 
         CreateGoalMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(GSNType.Goal));
+            return new NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback("goal"));
         }
 
         CreateContextMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(GSNType.Context));
+            return new NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback("context"));
         }
 
         CreateStrategyMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(GSNType.Strategy));
+            return new NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback("strategy"));
         }
 
         CreateEvidenceMenu(View: NodeView): NodeMenuItem {
-            return new NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(GSNType.Evidence));
+            return new NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback("evidence"));
         }
 
         CreateMenuBarButtons(View: NodeView): NodeMenuItem[]{

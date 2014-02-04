@@ -75,9 +75,10 @@ module AssureNote {
             }
             return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
                 (event: Event, TargetView: NodeView) => {
-                    var Writer = new StringWriter();
-                    TargetView.Model.FormatSubNode(1, Writer, true);
-                    this.AssureNoteApp.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
+                    var Command = this.AssureNoteApp.FindCommandByCommandLineName("edit");
+                    if (Command) {
+                        Command.Invoke(null, [TargetView.Label]);
+                    }
             });
         }
 

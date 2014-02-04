@@ -51,6 +51,10 @@ var AssureNote;
                 $.notify(Params.join(' '), 'info');
             }
         };
+
+        MessageCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return MessageCommand;
     })(AssureNote.Command);
     AssureNote.MessageCommand = MessageCommand;

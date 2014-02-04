@@ -117,7 +117,11 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
-            return this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
+            var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
+            if (this.ModeManager.GetMode() == 1 /* View */ && !Command.CanUseOnViewOnlyMode()) {
+                return this.DefaultCommand;
+            }
+            return Command;
         };
 
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {

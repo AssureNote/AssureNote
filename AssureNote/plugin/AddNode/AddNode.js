@@ -31,46 +31,76 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path="../../src/Plugin.ts" />
 var AssureNote;
 (function (AssureNote) {
+    var AddNodeCommand = (function (_super) {
+        __extends(AddNodeCommand, _super);
+        function AddNodeCommand(App) {
+            _super.call(this, App);
+            this.Text2NodeTypeMap = { "goal": 0 /* Goal */, "strategy": 2 /* Strategy */, "context": 1 /* Context */, "evidence": 3 /* Evidence */ };
+        }
+        AddNodeCommand.prototype.GetCommandLineNames = function () {
+            return ["addnode", "add-node"];
+        };
+
+        AddNodeCommand.prototype.GetHelpHTML = function () {
+            return "<code>add-node node type</code><br>Add new node.";
+        };
+
+        AddNodeCommand.prototype.Invoke = function (CommandName, Params) {
+            var Type = this.Text2NodeTypeMap[Params[1].toLowerCase()];
+            var TargetView = this.App.PictgramPanel.ViewMap[Params[0]];
+            if (TargetView == null) {
+                this.App.DebugP("Node not Found");
+                return;
+            }
+            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
+            var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
+            new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
+            var Doc = this.App.MasterRecord.EditingDoc;
+            Doc.RenumberAll();
+            var TopGoal = Doc.TopNode;
+            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+            NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
+            this.App.PictgramPanel.InitializeView(NewNodeView);
+            this.App.PictgramPanel.Draw(TopGoal.GetLabel());
+            this.App.SocketManager.UpdateWGSN();
+            this.App.MasterRecord.CloseEditor();
+        };
+        return AddNodeCommand;
+    })(AssureNote.Command);
+    AssureNote.AddNodeCommand = AddNodeCommand;
+
     var AddNodePlugin = (function (_super) {
         __extends(AddNodePlugin, _super);
         function AddNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             this.SetHasMenuBarButton(true);
-            //this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
         }
         AddNodePlugin.prototype.CreateCallback = function (Type) {
             var _this = this;
             return function (event, TargetView) {
-                _this.AssureNoteApp.MasterRecord.OpenEditor(_this.AssureNoteApp.GetUserName(), "todo", null, "test");
-                var Node = _this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
-                new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
-                var Doc = _this.AssureNoteApp.MasterRecord.EditingDoc;
-                Doc.RenumberAll();
-                var TopGoal = Doc.TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(_this.AssureNoteApp.PictgramPanel.ViewMap);
-                _this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-                _this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
-                _this.AssureNoteApp.SocketManager.UpdateWGSN();
-                _this.AssureNoteApp.MasterRecord.CloseEditor();
+                var Command = _this.AssureNoteApp.FindCommandByCommandLineName("add-node");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label, Type]);
+                }
             };
         };
 
         AddNodePlugin.prototype.CreateGoalMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(0 /* Goal */));
+            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback("goal"));
         };
 
         AddNodePlugin.prototype.CreateContextMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(1 /* Context */));
+            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback("context"));
         };
 
         AddNodePlugin.prototype.CreateStrategyMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(2 /* Strategy */));
+            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback("strategy"));
         };
 
         AddNodePlugin.prototype.CreateEvidenceMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(3 /* Evidence */));
+            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback("evidence"));
         };
 
         AddNodePlugin.prototype.CreateMenuBarButtons = function (View) {

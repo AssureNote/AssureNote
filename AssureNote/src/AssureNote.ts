@@ -140,7 +140,11 @@ module AssureNote {
         }
 
         FindCommandByCommandLineName(Name: string): Command {
-            return this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
+            var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
+            if (this.ModeManager.GetMode() == AssureNoteMode.View && !Command.CanUseOnViewOnlyMode()) {
+                return this.DefaultCommand;
+            }
+            return Command;
         }
 
         ExecCommand(ParsedCommand: CommandParser): void {
