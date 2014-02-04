@@ -419,9 +419,7 @@ var AssureNote;
         PictgramPanel.prototype.Clear = function () {
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
-            for (var i = this.ContentLayer.childNodes.length - 1; i >= 0; i--) {
-                this.ContentLayer.removeChild(this.ContentLayer.childNodes[i]);
-            }
+            this.ContentLayer.innerHTML = "";
             for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
                 this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
             }

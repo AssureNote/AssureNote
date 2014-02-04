@@ -216,12 +216,13 @@ var AssureNote;
                 return;
             }
             var UpdateSubNode = function (SubNode, P1, P2) {
-                if (!PositionBaseNode && SubNode.Shape.WillFadein()) {
-                    PositionBaseNode = _this;
+                var Base = PositionBaseNode;
+                if (!Base && SubNode.Shape.WillFadein()) {
+                    Base = _this;
                 }
-                if (PositionBaseNode) {
-                    SubNode.Shape.SetFadeinBasePosition(PositionBaseNode.Shape.GetGXCache(), PositionBaseNode.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(Duration, PositionBaseNode);
+                if (Base && Duration > 0) {
+                    SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
+                    SubNode.UpdateDocumentPosition(Duration, Base);
                 } else {
                     SubNode.UpdateDocumentPosition(Duration);
                 }

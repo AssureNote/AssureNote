@@ -228,12 +228,13 @@ module AssureNote {
                 return
             }
             var UpdateSubNode = (SubNode: NodeView, P1: Point, P2: Point) => {
-                if (!PositionBaseNode && SubNode.Shape.WillFadein()) {
-                    PositionBaseNode = this;
+                var Base = PositionBaseNode;
+                if (!Base && SubNode.Shape.WillFadein()) {
+                    Base = this;
                 }
-                if (PositionBaseNode) {
-                    SubNode.Shape.SetFadeinBasePosition(PositionBaseNode.Shape.GetGXCache(), PositionBaseNode.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(Duration, PositionBaseNode);
+                if (Base && Duration > 0) {
+                    SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
+                    SubNode.UpdateDocumentPosition(Duration, Base);
                 } else {
                     SubNode.UpdateDocumentPosition(Duration);
                 }

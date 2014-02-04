@@ -314,7 +314,6 @@ module AssureNote {
         ClearAnimationCache(): void {
             this.GX = null;
             this.GY = null;
-            this.willFadein = true;
         }
 
         PrerenderSVGContent(manager: PluginManager): void {

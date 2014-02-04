@@ -309,7 +309,6 @@ var AssureNote;
         GSNShape.prototype.ClearAnimationCache = function () {
             this.GX = null;
             this.GY = null;
-            this.willFadein = true;
         };
 
         GSNShape.prototype.PrerenderSVGContent = function (manager) {
