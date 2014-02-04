@@ -27,6 +27,8 @@
 module AssureNote {
 
     export class NodeMenuItem {
+        public IsEnableOnViewOnlyMode; boolean = false;
+
         constructor(public ElementId: string, public ImagePath: string, public Title: string, public EventHandler: (event: Event, NodeView: NodeView) => void) {
         }
 
@@ -49,11 +51,17 @@ module AssureNote {
             this.IsEnable = false;
         }
 
-        private CreateButtons(Contents: NodeMenuItem[]): void {
+        private CreateButtons(Contents: NodeMenuItem[]): number {
+            var Count = 0;
             for (var i = 0; i < Contents.length; i++) {
                 var Button = Contents[i];
+                if (this.App.ModeManager.GetMode() == AssureNoteMode.View && !Button.IsEnableOnViewOnlyMode) {
+                    continue;
+                }
                 Button.EnableEventHandler(this);
+                Count++;
             }
+            return Count;
         }
 
         Create(CurrentView: NodeView, ControlLayer: HTMLDivElement, Contents: NodeMenuItem[]): void {
@@ -62,27 +70,28 @@ module AssureNote {
             $('#menu').remove();
             this.Menu = $('<div id="menu" style="display: none;"></div>');
             this.Menu.appendTo(ControlLayer);
-            this.CreateButtons(Contents);
+            var EnableButtonCount = this.CreateButtons(Contents);
+            if (EnableButtonCount > 0) {
+                var refresh = () => {
+                    AssureNoteApp.Assert(this.CurrentView != null);
+                    var Node = this.CurrentView;
+                    var Top = Node.GetGY() + Node.Shape.GetNodeHeight() + 5;
+                    var Left = Node.GetGX() + (Node.Shape.GetNodeWidth() - this.Menu.width()) / 2;
+                    this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
+                };
 
-            var refresh = () => {
-                AssureNoteApp.Assert(this.CurrentView != null);
-                var Node = this.CurrentView;
-                var Top = Node.GetGY() + Node.Shape.GetNodeHeight() + 5;
-                var Left = Node.GetGX() + (Node.Shape.GetNodeWidth() - this.Menu.width()) / 2;
-                this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
-            };
-
-            (<any>this.Menu).jqDock({
-                align: 'bottom',
-                idle: 1500,
-                size: 45,
-                distance: 60,
-                labels: 'tc',
-                duration: 200,
-                fadeIn: 200,
-                source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
-                onReady: refresh,
-            });
+                (<any>this.Menu).jqDock({
+                    align: 'bottom',
+                    idle: 1500,
+                    size: 45,
+                    distance: 60,
+                    labels: 'tc',
+                    duration: 200,
+                    fadeIn: 200,
+                    source: function () { return this.src.replace(/(jpg|gif)$/, 'png'); },
+                    onReady: refresh,
+                });
+            }
         }
 
         Remove(): void {

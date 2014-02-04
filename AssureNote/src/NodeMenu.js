@@ -36,6 +36,7 @@ var AssureNote;
             this.ImagePath = ImagePath;
             this.Title = Title;
             this.EventHandler = EventHandler;
+            this.boolean = false;
         }
         NodeMenuItem.prototype.EnableEventHandler = function (MenuBar) {
             var _this = this;
@@ -57,10 +58,16 @@ var AssureNote;
             this.IsEnable = false;
         }
         NodeMenu.prototype.CreateButtons = function (Contents) {
+            var Count = 0;
             for (var i = 0; i < Contents.length; i++) {
                 var Button = Contents[i];
+                if (this.App.ModeManager.GetMode() == 1 /* View */ && !Button.IsEnableOnViewOnlyMode) {
+                    continue;
+                }
                 Button.EnableEventHandler(this);
+                Count++;
             }
+            return Count;
         };
 
         NodeMenu.prototype.Create = function (CurrentView, ControlLayer, Contents) {
@@ -70,29 +77,30 @@ var AssureNote;
             $('#menu').remove();
             this.Menu = $('<div id="menu" style="display: none;"></div>');
             this.Menu.appendTo(ControlLayer);
-            this.CreateButtons(Contents);
+            var EnableButtonCount = this.CreateButtons(Contents);
+            if (EnableButtonCount > 0) {
+                var refresh = function () {
+                    AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);
+                    var Node = _this.CurrentView;
+                    var Top = Node.GetGY() + Node.Shape.GetNodeHeight() + 5;
+                    var Left = Node.GetGX() + (Node.Shape.GetNodeWidth() - _this.Menu.width()) / 2;
+                    _this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
+                };
 
-            var refresh = function () {
-                AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);
-                var Node = _this.CurrentView;
-                var Top = Node.GetGY() + Node.Shape.GetNodeHeight() + 5;
-                var Left = Node.GetGX() + (Node.Shape.GetNodeWidth() - _this.Menu.width()) / 2;
-                _this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
-            };
-
-            this.Menu.jqDock({
-                align: 'bottom',
-                idle: 1500,
-                size: 45,
-                distance: 60,
-                labels: 'tc',
-                duration: 200,
-                fadeIn: 200,
-                source: function () {
-                    return this.src.replace(/(jpg|gif)$/, 'png');
-                },
-                onReady: refresh
-            });
+                this.Menu.jqDock({
+                    align: 'bottom',
+                    idle: 1500,
+                    size: 45,
+                    distance: 60,
+                    labels: 'tc',
+                    duration: 200,
+                    fadeIn: 200,
+                    source: function () {
+                        return this.src.replace(/(jpg|gif)$/, 'png');
+                    },
+                    onReady: refresh
+                });
+            }
         };
 
         NodeMenu.prototype.Remove = function () {
