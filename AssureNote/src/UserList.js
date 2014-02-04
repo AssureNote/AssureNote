@@ -64,6 +64,7 @@ var AssureNote;
         };
 
         UserList.prototype.AddUser = function (Info) {
+            console.log(Info);
             var Color = this.GetRandomColor();
             var IsEditMode = (Info.Mode == 0 /* Edit */) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));

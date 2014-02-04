@@ -32,7 +32,9 @@ var AssureNote;
             this.Input = document.createElement('input');
             this.Input.id = 'mode-switch';
             this.Input.setAttribute('type', 'checkbox');
-            this.Input.setAttribute('checked', '');
+            if (Mode == 0 /* Edit */) {
+                this.Input.setAttribute('checked', '');
+            }
             this.Input.setAttribute('data-on-label', 'Edit');
             this.Input.setAttribute('data-off-label', 'View');
             //$(input).appendTo(this.WrapperElement);
@@ -43,6 +45,11 @@ var AssureNote;
 
         ModeManager.prototype.SetMode = function (Mode) {
             this.Mode = Mode;
+            if (Mode == 0 /* Edit */) {
+                this.Input.setAttribute('checked', '');
+            } else {
+                this.Input.removeAttribute('checked');
+            }
         };
 
         ModeManager.prototype.Disable = function () {

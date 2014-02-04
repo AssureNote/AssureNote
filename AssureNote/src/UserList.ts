@@ -51,7 +51,8 @@ module AssureNote {
             $('#user-list-tmpl').tmpl(this.UserList).appendTo($('#user-list').empty());
         }
 
-        AddUser(Info: {User: string; Mode: number; SID: string}) {
+        AddUser(Info: { User: string; Mode: number; SID: string }) {
+            console.log(Info);
             var Color: string = this.GetRandomColor();
             var IsEditMode: boolean = (Info.Mode == AssureNoteMode.Edit) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));

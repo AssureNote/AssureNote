@@ -35,7 +35,9 @@ module AssureNote {
             this.Input = document.createElement('input');
             this.Input.id = 'mode-switch';
             this.Input.setAttribute('type', 'checkbox');
-            this.Input.setAttribute('checked', '');
+            if (Mode == AssureNoteMode.Edit) {
+                this.Input.setAttribute('checked', '');
+            }
             this.Input.setAttribute('data-on-label', 'Edit');
             this.Input.setAttribute('data-off-label', 'View');
 
@@ -48,6 +50,11 @@ module AssureNote {
 
         SetMode(Mode: AssureNoteMode): void {
             this.Mode = Mode;
+            if (Mode == AssureNoteMode.Edit) {
+                this.Input.setAttribute('checked', '');
+            } else {
+                this.Input.removeAttribute('checked');
+            }
         }
 
         Disable(): void {

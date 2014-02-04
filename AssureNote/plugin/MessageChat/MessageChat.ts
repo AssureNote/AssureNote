@@ -64,9 +64,14 @@ module AssureNote {
                 this.App.DebugP('Invalid parameter: ' + Params);
                 return;
             }
+            this.App.ModeManager.SetMode(AssureNoteMode.View);
             if (this.App.SocketManager.IsOperational()) {
                 this.App.SocketManager.Connect(Params[0]);
             }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 

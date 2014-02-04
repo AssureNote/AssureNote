@@ -78,9 +78,14 @@ var AssureNote;
                 this.App.DebugP('Invalid parameter: ' + Params);
                 return;
             }
+            this.App.ModeManager.SetMode(1 /* View */);
             if (this.App.SocketManager.IsOperational()) {
                 this.App.SocketManager.Connect(Params[0]);
             }
+        };
+
+        ConnectCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ConnectCommand;
     })(AssureNote.Command);
