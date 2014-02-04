@@ -30,15 +30,18 @@ module AssureNote {
     export class WGSNSocket {
         constructor(public name: string, public WGSN: string) { }
     }
+
+    export class EditNodeStatus {
+        constructor(public UserName: string, public UID: number, public IsRecursive: boolean, public SID: string) { }
+
+    }
     export class SocketManager {
         private DefaultChatServer: string = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
         private socket: any;
         private handler: { [key: string]: (any) => void };
         private UseOnScrollEvent: boolean = true;
         private ReceivedFoldEvent: boolean = false;
-        private LatestNodeView: NodeView;
-        private EditStatus :  any[] = [];
-        private EditNodeInfo: any[] = [];
+        private EditNodeInfo: EditNodeStatus[] = [];
 
         constructor(public App: AssureNoteApp) {
             if (!this.IsOperational()) {
@@ -46,7 +49,7 @@ module AssureNote {
             }
 
             App.PictgramPanel.Viewport.OnScroll = (Viewport: ViewportManager) => {
-                if (this.IsConnected() && this.UseOnScrollEvent/* && (this.App.ModeManager.GetMode() == AssureNoteMode.Edit)*/) {
+                if (this.IsConnected() && this.UseOnScrollEvent && (this.App.ModeManager.GetMode() != AssureNoteMode.View)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
                     var Y = Viewport.GetCameraGY();
@@ -127,7 +130,7 @@ module AssureNote {
                     self.UseOnScrollEvent = true;
 //                }
             });
-            this.socket.on('startedit', function(data : {UID: number; IsRecursive: boolean; UserName: string; SID: number}) {
+            this.socket.on('startedit', function(data : {UserName: string; UID: number; IsRecursive: boolean; SID: string}) {
                 console.log('edit');
                 var CurrentNodeView: NodeView = self.App.PictgramPanel.GetNodeViewFromUID(data.UID);
                 self.EditNodeInfo.push(data);
@@ -137,8 +140,16 @@ module AssureNote {
             });
             this.socket.on('finishedit', function(UID: number) {
                 console.log('finishedit');
-                self.DeleteID(UID);
-                self.UpdateView("finishedit");
+                var Length;
+                self.DeleteEditInfo(UID);
+                if ((Length = self.EditNodeInfo.length) != 0) {
+                    var LatestView: NodeView = self.App.PictgramPanel.GetNodeViewFromUID(self.EditNodeInfo[Length -1].UID);
+                    self.UpdateFlags(LatestView);
+                    self.UpdateView("anotheredit");
+                    self.AddUserNameOn(LatestView, {User:self.EditNodeInfo[Length - 1].UserName, IsRecursive:self.EditNodeInfo[Length - 1].IsRecursive});
+                } else {
+                    self.UpdateView("finishedit");
+                }
                 console.log('here is ID array after delete = ' + self.EditNodeInfo);
             });
 
@@ -174,9 +185,9 @@ module AssureNote {
             return io != null && io.connect != null;
         }
 
-        DeleteID(UID:number) {
+        DeleteEditInfo(UID:number) {
             for (var i:number = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     this.EditNodeInfo.splice(i, 1);
                     return;
                 }
@@ -214,7 +225,7 @@ module AssureNote {
             NodeView.Status = EditStatus.Locked;
             this.UpdateParentStatus(NodeView);
             if (NodeView.Children == null && NodeView.Left == null && NodeView.Right == null) return;
-            if (this.EditNodeInfo[this.EditNodeInfo.length - 1]["IsRecursive"]) {
+            if (this.EditNodeInfo[this.EditNodeInfo.length - 1].IsRecursive) {
                 this.UpdateChildStatus(NodeView);
             }
         }
@@ -254,14 +265,14 @@ module AssureNote {
 
             if (this.EditNodeInfo.length == 0) return true;
             for (var i:number = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     return false;
                 }
             }
 
             while (CurrentView != null) {
                 for (var i:number = 0; i < this.EditNodeInfo.length; i++) {
-                    if (this.EditNodeInfo[i]["IsRecursive"] && this.EditNodeInfo[i]["UID"] == CurrentView.Model.UID) {
+                    if (this.EditNodeInfo[i].IsRecursive && this.EditNodeInfo[i].UID == CurrentView.Model.UID) {
                         return false;
                     }
                 }
