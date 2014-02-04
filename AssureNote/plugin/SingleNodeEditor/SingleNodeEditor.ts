@@ -68,6 +68,8 @@ module AssureNote {
                 var Scale = this.App.PictgramPanel.Viewport.GetCameraScale();
                 if (Scale < 1.0) {
                     CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "scale(" + (1 / Scale) + ")";
+                } else {
+                    CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "";
                 }
                 this.App.SingleNodeEditorPanel.UpdateCSS(CSS);
                 this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
