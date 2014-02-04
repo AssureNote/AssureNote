@@ -114,12 +114,14 @@ module AssureNote {
             this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
 
-            this.App.PictgramPanel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.ContentLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+            var Panel = this.App.PictgramPanel;
 
-            this.App.PictgramPanel.Activate();
+            Panel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
+            Panel.ContentLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+            Panel.EventMapLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
+            Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+
+            Panel.Activate();
             return null;
         }
 

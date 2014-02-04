@@ -182,9 +182,11 @@ var AssureNote;
         };
 
         NodeView.prototype.SaveFlags = function (OldViewMap) {
-            if (OldViewMap[this.Model.GetLabel()]) {
-                this.IsFolded = OldViewMap[this.Model.GetLabel()].IsFolded;
-                this.Status = OldViewMap[this.Model.GetLabel()].Status;
+            var OldView = OldViewMap[this.Model.GetLabel()];
+            if (OldView) {
+                this.IsFolded = OldView.IsFolded;
+                this.Status = OldView.Status;
+                this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
             }
 
             for (var i = 0; this.Children && i < this.Children.length; i++) {

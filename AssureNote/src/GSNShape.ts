@@ -450,6 +450,14 @@ module AssureNote {
             }
         }
 
+        GetColorStyle(): string[] {
+            return this.ColorStyles;
+        }
+
+        SetColorStyle(Styles: string[]): void {
+            this.ColorStyles = Styles;
+        }
+
         ClearColorStyle(): void {
             this.ColorStyles = [ColorStyle.Default];
             if (this.ShapeGroup) {

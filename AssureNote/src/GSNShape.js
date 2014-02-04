@@ -441,6 +441,14 @@ var AssureNote;
             }
         };
 
+        GSNShape.prototype.GetColorStyle = function () {
+            return this.ColorStyles;
+        };
+
+        GSNShape.prototype.SetColorStyle = function (Styles) {
+            this.ColorStyles = Styles;
+        };
+
         GSNShape.prototype.ClearColorStyle = function () {
             this.ColorStyles = [AssureNote.ColorStyle.Default];
             if (this.ShapeGroup) {

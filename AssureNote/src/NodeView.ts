@@ -42,7 +42,6 @@ module AssureNote {
         NodeDoc: string;
         RelativeX: number = 0; // relative x from parent node
         RelativeY: number = 0; // relative y from parent node
-        Color: ColorStyle;
         Parent: NodeView;
         Left: NodeView[] = null;
         Right: NodeView[] = null;
@@ -195,9 +194,11 @@ module AssureNote {
         }
 
         SaveFlags(OldViewMap: { [index: string]: NodeView }): void {
-            if (OldViewMap[this.Model.GetLabel()]) {
-                this.IsFolded = OldViewMap[this.Model.GetLabel()].IsFolded;
-                this.Status   = OldViewMap[this.Model.GetLabel()].Status;
+            var OldView = OldViewMap[this.Model.GetLabel()];
+            if (OldView) {
+                this.IsFolded = OldView.IsFolded;
+                this.Status = OldView.Status;
+                this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
             }
 
             for (var i = 0; this.Children && i < this.Children.length; i++) {
