@@ -67,6 +67,7 @@ var AssureNote;
                 }
                 var value = data[0].value;
                 _this.SetMode((value) ? 0 /* Edit */ : 1 /* View */);
+                _this.App.SocketManager.UpdateEditMode(_this.Mode);
             });
         };
         return ModeManager;

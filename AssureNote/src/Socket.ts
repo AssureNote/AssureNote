@@ -109,6 +109,10 @@ module AssureNote {
                 self.App.UserList.AddUser(data);
             });
 
+            this.socket.on('updateeditmode', function (data: { User: string; Mode: number; SID: string }) {
+                self.App.UserList.UpdateEditMode(data);
+            });
+
             this.socket.on('fold', function (data: {IsFolded: boolean; UID: number}) {
                 if (!self.ReceivedFoldEvent/* && (self.App.ModeManager.GetMode() == AssureNoteMode.View)*/) {
                     self.ReceivedFoldEvent = true;
@@ -320,6 +324,10 @@ module AssureNote {
             this.App.MasterRecord.FormatRecord(Writer);
             var WGSN: string = Writer.toString();
             this.Emit('update', new WGSNSocket(this.App.WGSNName, WGSN));
+        }
+
+        UpdateEditMode(Mode: AssureNoteMode) {
+            this.Emit('updateeditmode', { User: this.App.GetUserName(), Mode: Mode });
         }
     }
 }

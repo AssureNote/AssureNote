@@ -87,6 +87,17 @@ var AssureNoteServer = (function () {
             _this.UsersInfo.push(Info);
         });
 
+        socket.on('updateeditmode', function (data) {
+            var Info = new UserStatus(data.User, data.Mode, socket.id);
+            socket.broadcast.emit('updateeditmode', Info);
+            for (var i = 0; i < _this.UsersInfo.length; i++) {
+                if (socket.id == _this.UsersInfo[i].SID) {
+                    _this.UsersInfo[i].Mode = data.Mode;
+                }
+            }
+            _this.UsersInfo.push(Info);
+        });
+
         socket.on('sync', function (data) {
             socket.broadcast.emit('sync', data);
         });

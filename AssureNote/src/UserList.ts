@@ -59,6 +59,16 @@ module AssureNote {
             this.Show();
         }
 
+        UpdateEditMode(Info: { User: string; Mode: number; SID: string }) {
+            for (var i in this.UserList) {
+                if (this.UserList[i].SID == Info.SID) {
+                    var UserItem: UserItem = this.UserList[i];
+                    UserItem.IsEditMode = (Info.Mode == AssureNoteMode.Edit);
+                }
+            }
+            this.Show();
+        }
+
         RemoveUser(SID: string) {
             for (var i: number = 0; i < this.UserList.length; i++) {
                 if (this.UserList[i].SID == SID) {

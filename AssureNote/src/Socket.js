@@ -108,6 +108,10 @@ var AssureNote;
                 self.App.UserList.AddUser(data);
             });
 
+            this.socket.on('updateeditmode', function (data) {
+                self.App.UserList.UpdateEditMode(data);
+            });
+
             this.socket.on('fold', function (data) {
                 if (!self.ReceivedFoldEvent) {
                     self.ReceivedFoldEvent = true;
@@ -326,6 +330,10 @@ var AssureNote;
             this.App.MasterRecord.FormatRecord(Writer);
             var WGSN = Writer.toString();
             this.Emit('update', new WGSNSocket(this.App.WGSNName, WGSN));
+        };
+
+        SocketManager.prototype.UpdateEditMode = function (Mode) {
+            this.Emit('updateeditmode', { User: this.App.GetUserName(), Mode: Mode });
         };
         return SocketManager;
     })();

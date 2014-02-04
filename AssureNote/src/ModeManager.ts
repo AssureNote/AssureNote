@@ -68,6 +68,7 @@ module AssureNote {
                 .on('switch-change', (e, ...data) => {
                     var value = data[0].value;
                     this.SetMode((value) ? AssureNoteMode.Edit : AssureNoteMode.View);
+                    this.App.SocketManager.UpdateEditMode(this.Mode);
                 });
         }
     }

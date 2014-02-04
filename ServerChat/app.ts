@@ -82,6 +82,17 @@ class AssureNoteServer {
             this.UsersInfo.push(Info);
         });
 
+        socket.on('updateeditmode', (data: {User: string; Mode: number}) => {
+            var Info: UserStatus = new UserStatus(data.User, data.Mode, socket.id);
+            socket.broadcast.emit('updateeditmode', Info);
+            for (var i: number = 0; i < this.UsersInfo.length; i++) {
+                if (socket.id == this.UsersInfo[i].SID) {
+                    this.UsersInfo[i].Mode = data.Mode;
+                }
+            }
+            this.UsersInfo.push(Info);
+        });
+
         socket.on('sync', (data: {X: number; Y: number; Scale: number}) => {
             socket.broadcast.emit('sync', data);
         });

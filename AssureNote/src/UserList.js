@@ -71,6 +71,16 @@ var AssureNote;
             this.Show();
         };
 
+        UserList.prototype.UpdateEditMode = function (Info) {
+            for (var i in this.UserList) {
+                if (this.UserList[i].SID == Info.SID) {
+                    var UserItem = this.UserList[i];
+                    UserItem.IsEditMode = (Info.Mode == 0 /* Edit */);
+                }
+            }
+            this.Show();
+        };
+
         UserList.prototype.RemoveUser = function (SID) {
             for (var i = 0; i < this.UserList.length; i++) {
                 if (this.UserList[i].SID == SID) {
