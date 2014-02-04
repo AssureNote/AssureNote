@@ -279,6 +279,40 @@ var AssureNote;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
+    var AnimationFrameTask = (function () {
+        function AnimationFrameTask() {
+        }
+        AnimationFrameTask.prototype.Start = function (Duration, Callback) {
+            var _this = this;
+            this.Cancel();
+            var LastTime = AssureNoteUtils.GetTime();
+            var StartTime = LastTime;
+
+            var Update = function () {
+                var CurrentTime = AssureNoteUtils.GetTime();
+                var DeltaT = CurrentTime - LastTime;
+                if (CurrentTime - StartTime < Duration) {
+                    _this.TimerHandle = AssureNoteUtils.RequestAnimationFrame(Update);
+                } else {
+                    DeltaT = Duration - (LastTime - StartTime);
+                    _this.TimerHandle = 0;
+                }
+                Callback(DeltaT, CurrentTime, StartTime);
+                LastTime = CurrentTime;
+            };
+            Update();
+        };
+
+        AnimationFrameTask.prototype.Cancel = function () {
+            if (this.TimerHandle) {
+                AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);
+                this.TimerHandle = 0;
+            }
+        };
+        return AnimationFrameTask;
+    })();
+    AssureNote.AnimationFrameTask = AnimationFrameTask;
+
     var ColorStyle = (function () {
         function ColorStyle() {
         }

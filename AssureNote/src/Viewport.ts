@@ -407,7 +407,7 @@ module AssureNote {
             return this.GetPageHeight() * 0.5;
         }
 
-        private AnimationFrameTimerHandle: number = 0;
+        private CameraMoveTask = new AssureNote.AnimationFrameTask();
 
         /**
             Move camera position relatively and change scale.
@@ -450,27 +450,10 @@ module AssureNote {
                 return;
             }
 
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
-
-            var lastTime: number = performance.now();
-            var startTime = lastTime;
-
-            var update: any = () => {
-                var currentTime: number = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
-                var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(lastTime - startTime);
+            this.CameraMoveTask.Start(Duration, (deltaT: number, currentTime: number, startTime: number) => {
+                var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(currentTime - deltaT - startTime);
                 this.MoveCamera(VX * deltaT, VY * deltaT, DeltaS);
-                lastTime = currentTime;
-            }
-            update();
+            })
         }
 
         private UpdatePageRect(): void {

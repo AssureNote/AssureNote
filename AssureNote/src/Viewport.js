@@ -204,7 +204,7 @@ var AssureNote;
             this.PageWidth = window.innerWidth;
             this.PageHeight = window.innerHeight;
             this.IsPointerEnabled = true;
-            this.AnimationFrameTimerHandle = 0;
+            this.CameraMoveTask = new AssureNote.AnimationFrameTask();
             this.IsEventMapUpper = false;
             window.addEventListener("resize", function (e) {
                 _this.UpdatePageRect();
@@ -465,27 +465,10 @@ var AssureNote;
                 return;
             }
 
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
-
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
-                var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(lastTime - startTime);
+            this.CameraMoveTask.Start(Duration, function (deltaT, currentTime, startTime) {
+                var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(currentTime - deltaT - startTime);
                 _this.MoveCamera(VX * deltaT, VY * deltaT, DeltaS);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
         ViewportManager.prototype.UpdatePageRect = function () {

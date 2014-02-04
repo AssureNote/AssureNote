@@ -221,34 +221,18 @@ module AssureNote {
             this.ShapeGroup.style.opacity = Opacity.toString();
         }
 
-        private AnimationFrameTimerHandle: number = 0;
-        private AnimationFrameTimerHandle2: number = 0;
+        private FadeinTask = new AssureNote.AnimationFrameTask();
+        private ShapeMoveTask = new AssureNote.AnimationFrameTask();
+        private ArrowMoveTask = new AssureNote.AnimationFrameTask();
 
         private Fadein(Duration: number): void {
-            if (this.AnimationFrameTimerHandle2) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle2);
-                this.AnimationFrameTimerHandle2 = 0;
-            }
-            var lastTime: number = performance.now();
-            var startTime = lastTime;
-
             var V = 1 / Duration;
             var Opacity = 0;
-
-            var update: any = () => {
-                var currentTime: number = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    this.AnimationFrameTimerHandle2 = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            this.FadeinTask.Start(Duration, (deltaT: number) => {
                 Opacity += V * deltaT;
                 this.SetOpacity(Opacity);
                 this.SetArrowOpacity(Opacity);
-                lastTime = currentTime;
-            }
-            update();
+            });
         }
 
         public MoveTo(x: number, y: number, Duration: number): void {
@@ -266,30 +250,11 @@ module AssureNote {
                 }
             }
 
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
-            var lastTime: number = performance.now();
-            var startTime = lastTime;
-
             var VX = (x - this.GX) / Duration;
             var VY = (y - this.GY) / Duration;
-
-            this.SetOpacity(1);
-
-            var update: any = () => {
-                var currentTime: number = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            this.ShapeMoveTask.Start(Duration, (deltaT: number) => {
                 this.SetPosition(this.GX + VX * deltaT, this.GY + VY * deltaT);
-                lastTime = currentTime;
-            }
-            update();
+            });
         }
 
         SetFadeinBasePosition(StartGX: number, StartGY: number): void {
@@ -323,8 +288,6 @@ module AssureNote {
             this.ArrowPath = GSNShape.CreateArrowPath();
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         }
-
-        private ArrowAnimationFrameTimerHandle: number = 0;
 
         private ArrowP1: Point;
         private ArrowP2: Point;
@@ -374,24 +337,7 @@ module AssureNote {
             var P2VX = (P2.X - this.ArrowP2.X) / Duration;
             var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
 
-            if (this.ArrowAnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.ArrowAnimationFrameTimerHandle);
-                this.ArrowAnimationFrameTimerHandle = 0;
-            }
-            var lastTime: number = performance.now();
-            var startTime = lastTime;
-            
-            this.SetArrowOpacity(1);
-
-            var update: any = () => {
-                var currentTime: number = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    this.ArrowAnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    this.ArrowAnimationFrameTimerHandle = 0;
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            this.ArrowMoveTask.Start(Duration, (deltaT: number) => {
                 var CurrentP1 = this.ArrowP1.Clone();
                 var CurrentP2 = this.ArrowP2.Clone();
                 CurrentP1.X += P1VX * deltaT;
@@ -399,9 +345,7 @@ module AssureNote {
                 CurrentP2.X += P2VX * deltaT;
                 CurrentP2.Y += P2VY * deltaT;
                 this.SetArrowPosition(CurrentP1, CurrentP2, Dir);
-                lastTime = currentTime;
-            }
-            update();
+            });
         }
 
         SetArrowColorWhite(IsWhite: boolean) {

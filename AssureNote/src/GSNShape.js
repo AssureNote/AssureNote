@@ -45,9 +45,9 @@ var AssureNote;
             this.willFadein = false;
             this.GX = null;
             this.GY = null;
-            this.AnimationFrameTimerHandle = 0;
-            this.AnimationFrameTimerHandle2 = 0;
-            this.ArrowAnimationFrameTimerHandle = 0;
+            this.FadeinTask = new AssureNote.AnimationFrameTask();
+            this.ShapeMoveTask = new AssureNote.AnimationFrameTask();
+            this.ArrowMoveTask = new AssureNote.AnimationFrameTask();
             this.Content = null;
             this.NodeWidth = 250;
             this.NodeHeight = 0;
@@ -219,30 +219,13 @@ var AssureNote;
 
         GSNShape.prototype.Fadein = function (Duration) {
             var _this = this;
-            if (this.AnimationFrameTimerHandle2) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle2);
-                this.AnimationFrameTimerHandle2 = 0;
-            }
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
             var V = 1 / Duration;
             var Opacity = 0;
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.AnimationFrameTimerHandle2 = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            this.FadeinTask.Start(Duration, function (deltaT) {
                 Opacity += V * deltaT;
                 _this.SetOpacity(Opacity);
                 _this.SetArrowOpacity(Opacity);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
         GSNShape.prototype.MoveTo = function (x, y, Duration) {
@@ -261,30 +244,11 @@ var AssureNote;
                 }
             }
 
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
             var VX = (x - this.GX) / Duration;
             var VY = (y - this.GY) / Duration;
-
-            this.SetOpacity(1);
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            this.ShapeMoveTask.Start(Duration, function (deltaT) {
                 _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
         GSNShape.prototype.SetFadeinBasePosition = function (StartGX, StartGY) {
@@ -365,24 +329,7 @@ var AssureNote;
             var P2VX = (P2.X - this.ArrowP2.X) / Duration;
             var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
 
-            if (this.ArrowAnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.ArrowAnimationFrameTimerHandle);
-                this.ArrowAnimationFrameTimerHandle = 0;
-            }
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
-            this.SetArrowOpacity(1);
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.ArrowAnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    _this.ArrowAnimationFrameTimerHandle = 0;
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            this.ArrowMoveTask.Start(Duration, function (deltaT) {
                 var CurrentP1 = _this.ArrowP1.Clone();
                 var CurrentP2 = _this.ArrowP2.Clone();
                 CurrentP1.X += P1VX * deltaT;
@@ -390,9 +337,7 @@ var AssureNote;
                 CurrentP2.X += P2VX * deltaT;
                 CurrentP2.Y += P2VY * deltaT;
                 _this.SetArrowPosition(CurrentP1, CurrentP2, Dir);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
         GSNShape.prototype.SetArrowColorWhite = function (IsWhite) {

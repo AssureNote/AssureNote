@@ -309,6 +309,40 @@ module AssureNote {
         }
     }
 
+    export class AnimationFrameTask {
+        private TimerHandle: number;
+
+        Start(Duration: number, Callback: (DeltaT: number) => void): void;
+        Start(Duration: number, Callback: (DeltaT: number, CurrentTime: number, StartTime: number) => void): void;
+        Start(Duration: number, Callback: () => void): void;
+        Start(Duration: number, Callback: Function): void {
+            this.Cancel();
+            var LastTime: number = AssureNoteUtils.GetTime();
+            var StartTime: number = LastTime;
+
+            var Update: any = () => {
+                var CurrentTime: number = AssureNoteUtils.GetTime();
+                var DeltaT = CurrentTime - LastTime;
+                if (CurrentTime - StartTime < Duration) {
+                    this.TimerHandle = AssureNoteUtils.RequestAnimationFrame(Update);
+                } else {
+                    DeltaT = Duration - (LastTime - StartTime);
+                    this.TimerHandle = 0;
+                }
+                Callback(DeltaT, CurrentTime, StartTime);
+                LastTime = CurrentTime;
+            }
+            Update();
+        }
+
+        Cancel(): void {
+            if (this.TimerHandle) {
+                AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);
+                this.TimerHandle = 0;
+            }
+        }
+    }
+
     export class ColorStyle {
         static Default: string = "assurenote-default";
         static Highlight: string = "assurenote-default-highlight";
