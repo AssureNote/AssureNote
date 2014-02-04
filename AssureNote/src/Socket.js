@@ -33,6 +33,17 @@ var AssureNote;
         return WGSNSocket;
     })();
     AssureNote.WGSNSocket = WGSNSocket;
+
+    var EditNodeStatus = (function () {
+        function EditNodeStatus(UserName, UID, IsRecursive, SID) {
+            this.UserName = UserName;
+            this.UID = UID;
+            this.IsRecursive = IsRecursive;
+            this.SID = SID;
+        }
+        return EditNodeStatus;
+    })();
+    AssureNote.EditNodeStatus = EditNodeStatus;
     var SocketManager = (function () {
         function SocketManager(App) {
             var _this = this;
@@ -40,7 +51,6 @@ var AssureNote;
             this.DefaultChatServer = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
-            this.EditStatus = [];
             this.EditNodeInfo = [];
             if (!this.IsOperational()) {
                 App.DebugP('socket.io not found');
@@ -136,8 +146,16 @@ var AssureNote;
             });
             this.socket.on('finishedit', function (UID) {
                 console.log('finishedit');
-                self.DeleteID(UID);
-                self.UpdateView("finishedit");
+                var Length;
+                self.DeleteEditInfo(UID);
+                if ((Length = self.EditNodeInfo.length) != 0) {
+                    var LatestView = self.App.PictgramPanel.GetNodeViewFromUID(self.EditNodeInfo[Length - 1].UID);
+                    self.UpdateFlags(LatestView);
+                    self.UpdateView("anotheredit");
+                    self.AddUserNameOn(LatestView, { User: self.EditNodeInfo[Length - 1].UserName, IsRecursive: self.EditNodeInfo[Length - 1].IsRecursive });
+                } else {
+                    self.UpdateView("finishedit");
+                }
                 console.log('here is ID array after delete = ' + self.EditNodeInfo);
             });
 
@@ -173,9 +191,9 @@ var AssureNote;
             return io != null && io.connect != null;
         };
 
-        SocketManager.prototype.DeleteID = function (UID) {
+        SocketManager.prototype.DeleteEditInfo = function (UID) {
             for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     this.EditNodeInfo.splice(i, 1);
                     return;
                 }
@@ -215,7 +233,7 @@ var AssureNote;
             this.UpdateParentStatus(NodeView);
             if (NodeView.Children == null && NodeView.Left == null && NodeView.Right == null)
                 return;
-            if (this.EditNodeInfo[this.EditNodeInfo.length - 1]["IsRecursive"]) {
+            if (this.EditNodeInfo[this.EditNodeInfo.length - 1].IsRecursive) {
                 this.UpdateChildStatus(NodeView);
             }
         };
@@ -256,14 +274,14 @@ var AssureNote;
             if (this.EditNodeInfo.length == 0)
                 return true;
             for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     return false;
                 }
             }
 
             while (CurrentView != null) {
                 for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                    if (this.EditNodeInfo[i]["IsRecursive"] && this.EditNodeInfo[i]["UID"] == CurrentView.Model.UID) {
+                    if (this.EditNodeInfo[i].IsRecursive && this.EditNodeInfo[i].UID == CurrentView.Model.UID) {
                         return false;
                     }
                 }
