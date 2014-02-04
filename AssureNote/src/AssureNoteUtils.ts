@@ -335,6 +335,16 @@ module AssureNote {
             Update();
         }
 
+        StartMany(Duration: number, Callbacks: Function[]): void {
+            if (Callbacks && Callbacks.length > 0) {
+                this.Start(Duration, (DeltaT: number, CurrentTime: number, StartTime: number) => {
+                    for (var i = 0; i < Callbacks.length; ++i) {
+                        Callbacks[i](DeltaT, CurrentTime, StartTime);
+                    }
+                });
+            }
+        }
+
         Cancel(): void {
             if (this.TimerHandle) {
                 AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);

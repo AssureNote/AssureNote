@@ -43,11 +43,13 @@ var AssureNote;
     */
     var PictgramPanel = (function (_super) {
         __extends(PictgramPanel, _super);
-        // We do not use FocusedView but FocusedLabel to make it modular.
         function PictgramPanel(App) {
             var _this = this;
             _super.call(this, App);
             this.App = App;
+            // We do not use FocusedView but FocusedLabel to make it modular.
+            this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
+            this.FoldingAnimationCallbacks = [];
             this.SVGLayer = document.getElementById("svg-layer");
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
@@ -408,8 +410,10 @@ var AssureNote;
             this.SVGLayer.style.display = "none";
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
 
-            TargetView.UpdateDocumentPosition(Duration);
+            TargetView.UpdateDocumentPosition(this.FoldingAnimationCallbacks, Duration);
             TargetView.ClearAnimationCache();
+            this.FoldingAnimationTask.StartMany(Duration, this.FoldingAnimationCallbacks);
+            this.FoldingAnimationCallbacks = [];
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";

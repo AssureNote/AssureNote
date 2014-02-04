@@ -45,9 +45,6 @@ var AssureNote;
             this.willFadein = false;
             this.GX = null;
             this.GY = null;
-            this.FadeinTask = new AssureNote.AnimationFrameTask();
-            this.ShapeMoveTask = new AssureNote.AnimationFrameTask();
-            this.ArrowMoveTask = new AssureNote.AnimationFrameTask();
             this.Content = null;
             this.NodeWidth = 250;
             this.NodeHeight = 0;
@@ -217,18 +214,18 @@ var AssureNote;
             this.ShapeGroup.style.opacity = Opacity.toString();
         };
 
-        GSNShape.prototype.Fadein = function (Duration) {
+        GSNShape.prototype.Fadein = function (AnimationCallbacks, Duration) {
             var _this = this;
             var V = 1 / Duration;
             var Opacity = 0;
-            this.FadeinTask.Start(Duration, function (deltaT) {
+            AnimationCallbacks.push(function (deltaT) {
                 Opacity += V * deltaT;
                 _this.SetOpacity(Opacity);
                 _this.SetArrowOpacity(Opacity);
             });
         };
 
-        GSNShape.prototype.MoveTo = function (x, y, Duration) {
+        GSNShape.prototype.MoveTo = function (AnimationCallbacks, x, y, Duration) {
             var _this = this;
             if (Duration <= 0) {
                 this.SetPosition(x, y);
@@ -236,7 +233,7 @@ var AssureNote;
             }
 
             if (this.WillFadein()) {
-                this.Fadein(Duration);
+                this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GX == null || this.GY == null) {
                     this.SetPosition(x, y);
@@ -246,7 +243,8 @@ var AssureNote;
 
             var VX = (x - this.GX) / Duration;
             var VY = (y - this.GY) / Duration;
-            this.ShapeMoveTask.Start(Duration, function (deltaT) {
+
+            AnimationCallbacks.push(function (deltaT) {
                 _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
             });
         };
@@ -317,7 +315,7 @@ var AssureNote;
             this.ArrowPath.style.opacity = Opacity.toString();
         };
 
-        GSNShape.prototype.MoveArrowTo = function (P1, P2, Dir, Duration) {
+        GSNShape.prototype.MoveArrowTo = function (AnimationCallbacks, P1, P2, Dir, Duration) {
             var _this = this;
             if (Duration <= 0) {
                 this.SetArrowPosition(P1, P2, Dir);
@@ -329,7 +327,7 @@ var AssureNote;
             var P2VX = (P2.X - this.ArrowP2.X) / Duration;
             var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
 
-            this.ArrowMoveTask.Start(Duration, function (deltaT) {
+            AnimationCallbacks.push(function (deltaT) {
                 var CurrentP1 = _this.ArrowP1.Clone();
                 var CurrentP2 = _this.ArrowP2.Clone();
                 CurrentP1.X += P1VX * deltaT;

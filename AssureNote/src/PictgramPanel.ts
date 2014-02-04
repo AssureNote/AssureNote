@@ -56,6 +56,9 @@ module AssureNote {
         private FocusedLabel: string;// A label pointed out or clicked.
         // We do not use FocusedView but FocusedLabel to make it modular.
 
+        private FoldingAnimationTask = new AssureNote.AnimationFrameTask();
+        private FoldingAnimationCallbacks: Function[] = [];
+        
         constructor(public App: AssureNoteApp) {
             super(App);
             this.SVGLayer = <SVGGElement>(<Element>document.getElementById("svg-layer"));
@@ -425,8 +428,10 @@ module AssureNote {
             this.SVGLayer.style.display = "none";
             NodeView.SetGlobalPositionCacheEnabled(true);
 
-            TargetView.UpdateDocumentPosition(Duration);
+            TargetView.UpdateDocumentPosition(this.FoldingAnimationCallbacks, Duration);
             TargetView.ClearAnimationCache();
+            this.FoldingAnimationTask.StartMany(Duration, this.FoldingAnimationCallbacks);
+            this.FoldingAnimationCallbacks = [];
 
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";

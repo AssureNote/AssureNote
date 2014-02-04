@@ -221,28 +221,24 @@ module AssureNote {
             this.ShapeGroup.style.opacity = Opacity.toString();
         }
 
-        private FadeinTask = new AssureNote.AnimationFrameTask();
-        private ShapeMoveTask = new AssureNote.AnimationFrameTask();
-        private ArrowMoveTask = new AssureNote.AnimationFrameTask();
-
-        private Fadein(Duration: number): void {
+        private Fadein(AnimationCallbacks: Function[], Duration: number): void {
             var V = 1 / Duration;
             var Opacity = 0;
-            this.FadeinTask.Start(Duration, (deltaT: number) => {
+            AnimationCallbacks.push((deltaT: number) => {
                 Opacity += V * deltaT;
                 this.SetOpacity(Opacity);
                 this.SetArrowOpacity(Opacity);
             });
         }
 
-        public MoveTo(x: number, y: number, Duration: number): void {
+        public MoveTo(AnimationCallbacks: Function[], x: number, y: number, Duration: number): void {
             if (Duration <= 0) {
                 this.SetPosition(x, y);
                 return;
             }
 
             if (this.WillFadein()) {
-                this.Fadein(Duration);
+                this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GX == null || this.GY == null) {
                     this.SetPosition(x, y);
@@ -252,7 +248,8 @@ module AssureNote {
 
             var VX = (x - this.GX) / Duration;
             var VY = (y - this.GY) / Duration;
-            this.ShapeMoveTask.Start(Duration, (deltaT: number) => {
+            
+            AnimationCallbacks.push((deltaT: number) => {
                 this.SetPosition(this.GX + VX * deltaT, this.GY + VY * deltaT);
             });
         }
@@ -326,7 +323,7 @@ module AssureNote {
             this.ArrowPath.style.opacity = Opacity.toString();
         }
 
-        MoveArrowTo(P1: Point, P2: Point, Dir: Direction, Duration: number) {
+        MoveArrowTo(AnimationCallbacks: Function[], P1: Point, P2: Point, Dir: Direction, Duration: number) {
             if (Duration <= 0) {
                 this.SetArrowPosition(P1, P2, Dir);
                 return;
@@ -337,7 +334,7 @@ module AssureNote {
             var P2VX = (P2.X - this.ArrowP2.X) / Duration;
             var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
 
-            this.ArrowMoveTask.Start(Duration, (deltaT: number) => {
+            AnimationCallbacks.push((deltaT: number) => {
                 var CurrentP1 = this.ArrowP1.Clone();
                 var CurrentP2 = this.ArrowP2.Clone();
                 CurrentP1.X += P1VX * deltaT;

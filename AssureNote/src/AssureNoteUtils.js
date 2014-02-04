@@ -303,6 +303,16 @@ var AssureNote;
             Update();
         };
 
+        AnimationFrameTask.prototype.StartMany = function (Duration, Callbacks) {
+            if (Callbacks && Callbacks.length > 0) {
+                this.Start(Duration, function (DeltaT, CurrentTime, StartTime) {
+                    for (var i = 0; i < Callbacks.length; ++i) {
+                        Callbacks[i](DeltaT, CurrentTime, StartTime);
+                    }
+                });
+            }
+        };
+
         AnimationFrameTask.prototype.Cancel = function () {
             if (this.TimerHandle) {
                 AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);
