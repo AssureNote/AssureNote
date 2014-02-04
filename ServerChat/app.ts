@@ -93,7 +93,6 @@ class AssureNoteServer {
                     this.UsersInfo[i].Mode = data.Mode;
                 }
             }
-            this.UsersInfo.push(Info);
         });
 
         socket.on('sync', (data: {X: number; Y: number; Scale: number}) => {

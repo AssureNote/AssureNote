@@ -105,7 +105,6 @@ var AssureNoteServer = (function () {
                     _this.UsersInfo[i].Mode = data.Mode;
                 }
             }
-            _this.UsersInfo.push(Info);
         });
 
         socket.on('sync', function (data) {
