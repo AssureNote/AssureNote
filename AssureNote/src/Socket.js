@@ -47,7 +47,7 @@ var AssureNote;
             }
 
             App.PictgramPanel.Viewport.OnScroll = function (Viewport) {
-                if (_this.IsConnected() && _this.UseOnScrollEvent) {
+                if (_this.IsConnected() && _this.UseOnScrollEvent && (_this.App.ModeManager.GetMode() != 1 /* View */)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
                     var Y = Viewport.GetCameraGY();

@@ -46,7 +46,7 @@ module AssureNote {
             }
 
             App.PictgramPanel.Viewport.OnScroll = (Viewport: ViewportManager) => {
-                if (this.IsConnected() && this.UseOnScrollEvent/* && (this.App.ModeManager.GetMode() == AssureNoteMode.Edit)*/) {
+                if (this.IsConnected() && this.UseOnScrollEvent && (this.App.ModeManager.GetMode() != AssureNoteMode.View)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
                     var Y = Viewport.GetCameraGY();
