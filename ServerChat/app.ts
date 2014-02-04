@@ -8,11 +8,15 @@ export class UserStatus {
     constructor (public User: string, public Mode: number, public SID: string) { }
 }
 
+export class EditNodeStatus {
+    constructor (public UserName: string, public UID: number, public IsRecursive: boolean, public SID: string) { }
+}
+
 class AssureNoteServer {
     io: SocketManager;
     room: string = 'room';
-    UsersInfo: any[] = [];
-    EditNodeInfo: any[] = [];
+    UsersInfo: UserStatus[] = [];
+    EditNodeInfo: EditNodeStatus[] = [];
     WGSNName: string = null;
     MasterRecord: parser.GSNRecord = null;
 
@@ -36,15 +40,15 @@ class AssureNoteServer {
                 console.log('close');
                 if (this.EditNodeInfo.length != 0) {
                     for (var i:number = 0; i < this.EditNodeInfo.length; i++) {
-                        if (this.EditNodeInfo[i]["SID"] == socket.id) {
-                            socket.broadcast.emit('finishedit', {Label:this.EditNodeInfo[i]['Label'], UID:this.EditNodeInfo[i]['UID']});
+                        if (this.EditNodeInfo[i].SID == socket.id) {
+                            socket.broadcast.emit('finishedit', {UID:this.EditNodeInfo[i].UID});
                             this.EditNodeInfo.splice(i, 1);
                         }
                     }
                 }
                 socket.broadcast.emit('close', socket.id);
                 for (var i: number = 0; i< this.UsersInfo.length; i++){
-                    if (this.UsersInfo[i]["SID"] == socket.id) {
+                    if (this.UsersInfo[i].SID == socket.id) {
                         this.UsersInfo.splice(i, 1);
                     }
                 }
@@ -101,11 +105,7 @@ class AssureNoteServer {
         });
 
         socket.on('startedit', (data: {UID: number; IsRecursive: boolean; UserName: string}) => {
-            var datas = {};
-            datas['UID']    = data.UID;
-            datas['IsRecursive'] = data.IsRecursive;
-            datas['UserName']    = data.UserName;
-            datas['SID']    = Number(socket.id);
+            var datas = new EditNodeStatus(data.UserName, data.UID, data.IsRecursive, socket.id);
             socket.broadcast.emit('startedit', datas);
             this.EditNodeInfo.push(datas);
             console.log("this is editing list" + this.EditNodeInfo);
@@ -114,7 +114,7 @@ class AssureNoteServer {
         socket.on('finishedit', (UID: number) => {
             socket.broadcast.emit('finishedit', UID);
             for (var i: number = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]['UID'] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     this.EditNodeInfo.splice(i, 1);
                 }
             }

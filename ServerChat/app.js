@@ -13,6 +13,17 @@ var UserStatus = (function () {
 })();
 exports.UserStatus = UserStatus;
 
+var EditNodeStatus = (function () {
+    function EditNodeStatus(UserName, UID, IsRecursive, SID) {
+        this.UserName = UserName;
+        this.UID = UID;
+        this.IsRecursive = IsRecursive;
+        this.SID = SID;
+    }
+    return EditNodeStatus;
+})();
+exports.EditNodeStatus = EditNodeStatus;
+
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
         var _this = this;
@@ -40,15 +51,15 @@ var AssureNoteServer = (function () {
                 console.log('close');
                 if (_this.EditNodeInfo.length != 0) {
                     for (var i = 0; i < _this.EditNodeInfo.length; i++) {
-                        if (_this.EditNodeInfo[i]["SID"] == socket.id) {
-                            socket.broadcast.emit('finishedit', { Label: _this.EditNodeInfo[i]['Label'], UID: _this.EditNodeInfo[i]['UID'] });
+                        if (_this.EditNodeInfo[i].SID == socket.id) {
+                            socket.broadcast.emit('finishedit', { UID: _this.EditNodeInfo[i].UID });
                             _this.EditNodeInfo.splice(i, 1);
                         }
                     }
                 }
                 socket.broadcast.emit('close', socket.id);
                 for (var i = 0; i < _this.UsersInfo.length; i++) {
-                    if (_this.UsersInfo[i]["SID"] == socket.id) {
+                    if (_this.UsersInfo[i].SID == socket.id) {
                         _this.UsersInfo.splice(i, 1);
                     }
                 }
@@ -106,11 +117,7 @@ var AssureNoteServer = (function () {
         });
 
         socket.on('startedit', function (data) {
-            var datas = {};
-            datas['UID'] = data.UID;
-            datas['IsRecursive'] = data.IsRecursive;
-            datas['UserName'] = data.UserName;
-            datas['SID'] = Number(socket.id);
+            var datas = new EditNodeStatus(data.UserName, data.UID, data.IsRecursive, socket.id);
             socket.broadcast.emit('startedit', datas);
             _this.EditNodeInfo.push(datas);
             console.log("this is editing list" + _this.EditNodeInfo);
@@ -119,7 +126,7 @@ var AssureNoteServer = (function () {
         socket.on('finishedit', function (UID) {
             socket.broadcast.emit('finishedit', UID);
             for (var i = 0; i < _this.EditNodeInfo.length; i++) {
-                if (_this.EditNodeInfo[i]['UID'] == UID) {
+                if (_this.EditNodeInfo[i].UID == UID) {
                     _this.EditNodeInfo.splice(i, 1);
                 }
             }
