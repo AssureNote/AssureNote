@@ -254,7 +254,7 @@ var AssureNote;
         };
 
         ViewportManager.LimitScale = function (Scale) {
-            return Math.max(0.02, Math.min(20.0, Scale));
+            return Math.max(0.2, Math.min(20.0, Scale));
         };
 
         /**

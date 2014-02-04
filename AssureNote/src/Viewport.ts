@@ -240,7 +240,7 @@ module AssureNote {
         }
 
         private static LimitScale(Scale: number): number {
-            return Math.max(0.02, Math.min(20.0, Scale));
+            return Math.max(0.2, Math.min(20.0, Scale));
         }
 
         /**
