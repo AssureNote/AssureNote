@@ -57,19 +57,24 @@ var AssureNote;
             if (NodeView != null) {
                 var Writer = new AssureNote.StringWriter();
                 NodeView.Model.FormatSubNode(1, Writer, false);
-                var Top = this.App.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
-                var Left = this.App.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
+                var Top = NodeView.GetGY();
+                var Left = NodeView.GetGX();
                 var Width = NodeView.GetShape().GetNodeWidth();
-                var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
+                var Height = Math.max(50, NodeView.GetShape().GetNodeHeight());
                 var StrokeWidth = Number($(NodeView.Shape.ShapeGroup).css('stroke-width').charAt(0));
-                this.App.SingleNodeEditorPanel.UpdateCSS({
+                var CSS = {
                     position: "fixed",
                     top: Top - (StrokeWidth / 2) + "px",
                     left: Left - (StrokeWidth / 2) + "px",
                     width: Width + StrokeWidth + "px",
                     height: Height + StrokeWidth + "px",
                     background: "rgba(255, 255, 255, 1.00)"
-                });
+                };
+                var Scale = this.App.PictgramPanel.Viewport.GetCameraScale();
+                if (Scale < 1.0) {
+                    CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "scale(" + (1 / Scale) + ")";
+                }
+                this.App.SingleNodeEditorPanel.UpdateCSS(CSS);
                 this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
             } else {
                 this.App.DebugP(Label + " not found.");

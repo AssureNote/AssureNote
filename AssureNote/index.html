@@ -26,7 +26,11 @@
       </svg>
       <div id="eventmap-layer" style="top: 0px; left: 0px; width: 100%; height: 100%;position: absolute;" touch-action="none"></div>
       <div id="content-layer" style="top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;"></div>
-      <div id="control-layer" style="top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;"></div>
+      <div id="control-layer" style="top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;">
+        <div id="singlenode-editor-wrapper" style="border: 1px solid black">
+          <textarea id="singlenode-editor" placeholder="Type something..." style="display: none;"></textarea>
+        </div>
+      </div>
       <div id="fixed-control-layer" style="top: 0px; left: 0px; width: 100%; height: 0px; position: absolute;">
         <div class="navbar navbar-default logo-offset nonclickable">
           <div class="navbar-collapse"><a href="#" class="logo-fixed"><img id="logo" src="./images/logo.png" alt="AssureNote"></a>
@@ -61,9 +65,6 @@
       <div id="plugin-layer" style="width: 0px; height: 0px; position: absolute;">
         <div id="editor-wrapper" style="border: 1px solid black">
           <textarea id="editor" placeholder="Type something..." style="display: none;"></textarea>
-        </div>
-        <div id="singlenode-editor-wrapper" style="border: 1px solid black">
-          <textarea id="singlenode-editor" placeholder="Type something..." style="display: none;"></textarea>
         </div>
         <!-- Help Modal-->
         <div id="help-modal" tabindex="-1" role="dialog" aria-labelledby="help-modal-label" aria-hidden="true" class="modal fade">

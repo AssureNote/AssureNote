@@ -27,6 +27,8 @@ html
       #eventmap-layer(style='top: 0px; left: 0px; width: 100%; height: 100%;position: absolute;', touch-action='none')
       #content-layer(style='top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;')
       #control-layer(style='top: 0px; left: 0px; width: 0px; height: 0px; position: absolute;')
+        #singlenode-editor-wrapper(style='border: 1px solid black')
+          textarea#singlenode-editor(placeholder='Type something...', style='display: none;')
       #fixed-control-layer(style='top: 0px; left: 0px; width: 100%; height: 0px; position: absolute;')
         include topmenu
         input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')
@@ -34,8 +36,6 @@ html
       #plugin-layer(style='width: 0px; height: 0px; position: absolute;')
         #editor-wrapper(style='border: 1px solid black')
           textarea#editor(placeholder='Type something...', style='display: none;')
-        #singlenode-editor-wrapper(style='border: 1px solid black')
-          textarea#singlenode-editor(placeholder='Type something...', style='display: none;')
         // Help Modal
         #help-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='help-modal-label', aria-hidden='true')
           .modal-dialog
