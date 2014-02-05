@@ -35,6 +35,11 @@ module AssureNote {
         constructor(public UserName: string, public UID: number, public IsRecursive: boolean, public SID: string) { }
 
     }
+
+    export class FocusedLabels {
+        constructor(public SID: string, public Label: string) { }
+
+    }
     export class SocketManager {
         private DefaultChatServer: string = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
         private socket: any;
@@ -42,6 +47,7 @@ module AssureNote {
         private UseOnScrollEvent: boolean = true;
         private ReceivedFoldEvent: boolean = false;
         private EditNodeInfo: EditNodeStatus[] = [];
+        private FocusedLabels: FocusedLabels[] = [];
 
         constructor(public App: AssureNoteApp) {
             if (!this.IsOperational()) {
@@ -106,6 +112,28 @@ module AssureNote {
 
             this.socket.on('adduser', function(data: {User: string; Mode: number; SID: string}) {
                 self.App.UserList.AddUser(data);
+            });
+
+            this.socket.on('focusednode', function(data: {SID: string; Label: string}) {
+                var FocusedView: NodeView = self.App.PictgramPanel.ViewMap[data.Label];
+                var OldView: NodeView;
+                var OldLabel: string;
+                if (self.FocusedLabels.length != 0) {
+                    for (var i in self.FocusedLabels) {
+                        if ((self.FocusedLabels[i].SID) == data.SID) {
+                            OldLabel = self.FocusedLabels[i].Label;
+                            OldView  = self.App.PictgramPanel.ViewMap[OldLabel];
+                            self.FocusedLabels.splice(i, 1);
+                            self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
+                            break;
+                        }
+                    }
+                }
+
+                if (FocusedView != null) {
+                    self.App.UserList.AddFocusedUserColor(data.SID, FocusedView);
+                }
+                self.FocusedLabels.push(data);
             });
 
             this.socket.on('updateeditmode', function (data: { User: string; Mode: number; SID: string }) {
@@ -235,9 +263,9 @@ module AssureNote {
         UpdateView(Method: string) {
             var NewNodeView: NodeView = new NodeView(this.App.MasterRecord.GetLatestDoc().TopNode, true);
             NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-            if (Method == "finishedit") {
-                this.SetDefaultFlags(NewNodeView);
-            }
+//            if (Method == "finishedit") {
+//                this.SetDefaultFlags(NewNodeView);
+//            }
             this.App.PictgramPanel.InitializeView(NewNodeView);
             this.App.PictgramPanel.Draw(this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel());
         }

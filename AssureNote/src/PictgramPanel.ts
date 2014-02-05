@@ -200,6 +200,7 @@ module AssureNote {
         }
 
         OnKeyDown(Event: KeyboardEvent): void {
+            var Label: string;
             var handled = true;
             switch (Event.keyCode) {
                 case 58: /*: in Firefox*/
@@ -219,6 +220,8 @@ module AssureNote {
                     if (this.App.HistoryPanel) {
                         this.App.HistoryPanel.Hide();
                     }
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     break;
                 case 13: /*Enter*/
                     if (this.Search.IsSearching()) {
@@ -229,25 +232,35 @@ module AssureNote {
                 case 72: /*h*/
                 case 37: /*left*/
                     this.NavigateLeft();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 74: /*j*/
                 case 40: /*down*/
                     this.NavigateDown();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 75: /*k*/
                 case 38: /*up*/
                     this.NavigateUp();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 76: /*l*/
                 case 39: /*right*/
                     this.NavigateRight();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 36: /*home*/
                     this.NavigateHome();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 70: /*f*/

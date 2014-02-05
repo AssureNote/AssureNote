@@ -104,6 +104,23 @@ var AssureNote;
             }
             return "#" + color;
         };
+
+        UserList.prototype.AddFocusedUserColor = function (SID, View) {
+            var Color;
+            var ClassName = SID + "-focused";
+            for (var i = 0; i < this.UserList.length; i++) {
+                if (this.UserList[i].SID == SID) {
+                    Color = this.UserList[i].Color;
+                }
+            }
+            View.Shape.AddColorStyle(ClassName);
+            $("." + SID + "-focused").css({ stroke: Color });
+        };
+
+        UserList.prototype.RemoveFocusedUserColor = function (SID, OldView) {
+            var ClassName = SID + "-focused";
+            OldView.Shape.RemoveColorStyle(ClassName);
+        };
         return UserList;
     })(AssureNote.Panel);
     AssureNote.UserList = UserList;

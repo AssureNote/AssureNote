@@ -187,6 +187,7 @@ var AssureNote;
             };
         }
         PictgramPanel.prototype.OnKeyDown = function (Event) {
+            var Label;
             var handled = true;
             switch (Event.keyCode) {
                 case 58:
@@ -206,6 +207,8 @@ var AssureNote;
                     if (this.App.HistoryPanel) {
                         this.App.HistoryPanel.Hide();
                     }
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     break;
                 case 13:
                     if (this.Search.IsSearching()) {
@@ -216,25 +219,35 @@ var AssureNote;
                 case 72:
                 case 37:
                     this.NavigateLeft();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 74:
                 case 40:
                     this.NavigateDown();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 75:
                 case 38:
                     this.NavigateUp();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 76:
                 case 39:
                     this.NavigateRight();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 36:
                     this.NavigateHome();
+                    Label = this.GetFocusedLabel();
+                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 70:

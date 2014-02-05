@@ -92,5 +92,22 @@ module AssureNote {
             }
             return "#" + color;
         }
+
+        AddFocusedUserColor(SID:string, View: NodeView) {
+            var Color: string;
+            var ClassName: string = SID + "-focused";
+            for (var i: number = 0; i < this.UserList.length; i++) {
+                if (this.UserList[i].SID == SID) {
+                    Color = this.UserList[i].Color;
+                }
+            }
+            View.Shape.AddColorStyle(ClassName);
+            $("."+SID+"-focused").css({stroke:Color});
+        }
+
+        RemoveFocusedUserColor(SID: string, OldView: NodeView) {
+            var ClassName: string = SID + "-focused";
+            OldView.Shape.RemoveColorStyle(ClassName);
+        }
     }
 }
