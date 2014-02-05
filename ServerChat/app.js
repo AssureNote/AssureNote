@@ -87,8 +87,8 @@ var AssureNoteServer = (function () {
 
         socket.on('adduser', function (data) {
             var Info = new UserStatus(data.User, data.Mode, socket.id);
-            socket.broadcast.emit('adduser', Info);
             if (_this.UsersInfo.length != 0) {
+                socket.broadcast.emit('adduser', Info);
                 for (var i = 0; i < _this.UsersInfo.length; i++) {
                     socket.emit('adduser', _this.UsersInfo[i]);
                 }
