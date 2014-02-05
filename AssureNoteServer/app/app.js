@@ -1,12 +1,13 @@
 ///<reference path='DefinitelyTyped/node/node.d.ts'/>
 ///<reference path='DefinitelyTyped/express/express.d.ts'/>
-var http = require('http');
 var express = require('express');
 var api = require('./routes/api');
-var client = require('./routes/index');
-var js = require('./routes/javascript');
-var passport = require('./routes/passport');
+
+//import js      = require('./routes/javascript');
 var path = require('path');
+var http = require('http');
+var client = require('./routes/index');
+var passport = require('./routes/passport');
 var constant = require('./constant');
 var CONFIG = require('config');
 
@@ -44,8 +45,8 @@ app.configure('production', function () {
 app.post('/api/1.0', api.httpHandler);
 app.get('/', client.index);
 app.get('/file/:id', client.index);
-app.get('/javascripts/config.js', js.config);
 
+//app.get('/javascripts/config.js', js.config);
 app.get('/auth/twitter', passport.passport.authenticate('twitter'), function (req, res) {
 });
 app.get('/auth/twitter/callback', passport.passport.authenticate('twitter', { failureRedirect: '/' }), passport.login);

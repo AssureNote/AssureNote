@@ -21,7 +21,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
-///<reference path='../javascripts/config.ts'/>
+///<reference path='../d.ts/config.d.ts'/>
 
 module AssureNote {
     export module AssureNoteUtils {
