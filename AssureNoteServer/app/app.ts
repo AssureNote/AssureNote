@@ -1,15 +1,15 @@
 ///<reference path='DefinitelyTyped/node/node.d.ts'/>
 ///<reference path='DefinitelyTyped/express/express.d.ts'/>
 
-var http       = require('http');
 import express = require('express');
-import api        = require('./routes/api');
+import api     = require('./routes/api');
+import js      = require('./routes/javascript');
+import path    = require('path');
+var http       = require('http');
 var client     = require('./routes/index');
-import js         = require('./routes/javascript');
 var passport   = require('./routes/passport');
-import path       = require('path');
 var constant   = require('./constant');
-var CONFIG = require('config');
+var CONFIG     = require('config');
 
 var app = exports.app = express();
 
