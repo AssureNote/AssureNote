@@ -28,6 +28,7 @@
 ///<reference path='UserList.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
 ///<reference path='HistoryView.ts'/>
+///<reference path='../d.ts/config.d.ts'/>
 
 var AssureNote;
 (function (AssureNote) {

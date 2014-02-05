@@ -1,9 +1,3 @@
-var Config;
-(function (Config) {
-    if (!Config.BASEPATH) {
-        Config.BASEPATH = ".";
-    }
-})(Config || (Config = {}));
 var AssureNote;
 (function (AssureNote) {
     (function (AssureNoteUtils) {
@@ -256,6 +250,50 @@ var AssureNote;
         AssureNoteUtils.GetTime = GetTime;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
+
+    var AnimationFrameTask = (function () {
+        function AnimationFrameTask() {
+        }
+        AnimationFrameTask.prototype.Start = function (Duration, Callback) {
+            var _this = this;
+            this.Cancel();
+            var LastTime = AssureNoteUtils.GetTime();
+            var StartTime = LastTime;
+
+            var Update = function () {
+                var CurrentTime = AssureNoteUtils.GetTime();
+                var DeltaT = CurrentTime - LastTime;
+                if (CurrentTime - StartTime < Duration) {
+                    _this.TimerHandle = AssureNoteUtils.RequestAnimationFrame(Update);
+                } else {
+                    DeltaT = Duration - (LastTime - StartTime);
+                    _this.TimerHandle = 0;
+                }
+                Callback(DeltaT, CurrentTime, StartTime);
+                LastTime = CurrentTime;
+            };
+            Update();
+        };
+
+        AnimationFrameTask.prototype.StartMany = function (Duration, Callbacks) {
+            if (Callbacks && Callbacks.length > 0) {
+                this.Start(Duration, function (DeltaT, CurrentTime, StartTime) {
+                    for (var i = 0; i < Callbacks.length; ++i) {
+                        Callbacks[i](DeltaT, CurrentTime, StartTime);
+                    }
+                });
+            }
+        };
+
+        AnimationFrameTask.prototype.Cancel = function () {
+            if (this.TimerHandle) {
+                AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);
+                this.TimerHandle = 0;
+            }
+        };
+        return AnimationFrameTask;
+    })();
+    AssureNote.AnimationFrameTask = AnimationFrameTask;
 
     var ColorStyle = (function () {
         function ColorStyle() {
@@ -2808,6 +2846,7 @@ var AssureNote;
             this.ImagePath = ImagePath;
             this.Title = Title;
             this.EventHandler = EventHandler;
+            this.boolean = false;
         }
         NodeMenuItem.prototype.EnableEventHandler = function (MenuBar) {
             var _this = this;
@@ -2829,10 +2868,16 @@ var AssureNote;
             this.IsEnable = false;
         }
         NodeMenu.prototype.CreateButtons = function (Contents) {
+            var Count = 0;
             for (var i = 0; i < Contents.length; i++) {
                 var Button = Contents[i];
+                if (this.App.ModeManager.GetMode() == 1 /* View */ && !Button.IsEnableOnViewOnlyMode) {
+                    continue;
+                }
                 Button.EnableEventHandler(this);
+                Count++;
             }
+            return Count;
         };
 
         NodeMenu.prototype.Create = function (CurrentView, ControlLayer, Contents) {
@@ -2842,29 +2887,30 @@ var AssureNote;
             $('#menu').remove();
             this.Menu = $('<div id="menu" style="display: none;"></div>');
             this.Menu.appendTo(ControlLayer);
-            this.CreateButtons(Contents);
+            var EnableButtonCount = this.CreateButtons(Contents);
+            if (EnableButtonCount > 0) {
+                var refresh = function () {
+                    AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);
+                    var Node = _this.CurrentView;
+                    var Top = Node.GetGY() + Node.Shape.GetNodeHeight() + 5;
+                    var Left = Node.GetGX() + (Node.Shape.GetNodeWidth() - _this.Menu.width()) / 2;
+                    _this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
+                };
 
-            var refresh = function () {
-                AssureNote.AssureNoteApp.Assert(_this.CurrentView != null);
-                var Node = _this.CurrentView;
-                var Top = Node.GetGY() + Node.Shape.GetNodeHeight() + 5;
-                var Left = Node.GetGX() + (Node.Shape.GetNodeWidth() - _this.Menu.width()) / 2;
-                _this.Menu.css({ position: 'absolute', top: Top, left: Left, display: 'block', opacity: 0 });
-            };
-
-            this.Menu.jqDock({
-                align: 'bottom',
-                idle: 1500,
-                size: 45,
-                distance: 60,
-                labels: 'tc',
-                duration: 200,
-                fadeIn: 200,
-                source: function () {
-                    return this.src.replace(/(jpg|gif)$/, 'png');
-                },
-                onReady: refresh
-            });
+                this.Menu.jqDock({
+                    align: 'bottom',
+                    idle: 1500,
+                    size: 45,
+                    distance: 60,
+                    labels: 'tc',
+                    duration: 200,
+                    fadeIn: 200,
+                    source: function () {
+                        return this.src.replace(/(jpg|gif)$/, 'png');
+                    },
+                    onReady: refresh
+                });
+            }
         };
 
         NodeMenu.prototype.Remove = function () {
@@ -3070,7 +3116,7 @@ var AssureNote;
             this.Timeout = null;
             var Model = NodeView.Model;
             this.App.FullScreenEditorPanel.IsVisible = false;
-            this.App.SocketManager.StartEdit({ "Label": Model.GetLabel(), "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName() });
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName() });
 
             var Callback = function (event) {
                 _this.Element.blur();
@@ -3117,15 +3163,17 @@ var AssureNote;
             } else {
                 this.App.MasterRecord.DiscardEditor();
             }
-            this.App.SocketManager.Emit('finishedit', { "Label": OldNodeView.Model.GetLabel(), "UID": OldNodeView.Model.UID });
+            this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
 
-            this.App.PictgramPanel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.ContentLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+            var Panel = this.App.PictgramPanel;
 
-            this.App.PictgramPanel.Activate();
+            Panel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
+            Panel.ContentLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+            Panel.EventMapLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
+            Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
+
+            Panel.Activate();
             return null;
         };
 
@@ -3178,6 +3226,10 @@ var AssureNote;
         Command.prototype.GetHelpHTML = function () {
             return "<code>" + this.GetCommandLineNames().pop() + "</code>";
         };
+
+        Command.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
         return Command;
     })();
     AssureNote.Command = Command;
@@ -3188,6 +3240,9 @@ var AssureNote;
             _super.call(this, App);
         }
         CommandMissingCommand.prototype.Invoke = function (CommandName, Params) {
+            if (CommandName == null) {
+                return;
+            }
             var Label = CommandName.toUpperCase();
             if (this.App.PictgramPanel.ViewMap == null) {
                 this.App.DebugP("Jump is diabled.");
@@ -3238,6 +3293,10 @@ var AssureNote;
         SaveCommand.prototype.GetHelpHTML = function () {
             return "<code>save [name]</code><br>Save editing GSN.";
         };
+
+        SaveCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SaveCommand;
     })(Command);
     AssureNote.SaveCommand = SaveCommand;
@@ -3261,6 +3320,10 @@ var AssureNote;
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             AssureNote.AssureNoteUtils.SaveAs(Writer.toString(), Filename);
+        };
+
+        SaveWGSNCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SaveWGSNCommand;
     })(Command);
@@ -3356,6 +3419,10 @@ var AssureNote;
             DummyNode.appendChild(DCaseArgumentXML);
             return '<?xml version="1.0" encoding="UTF-8"?>\n' + DummyNode.innerHTML.replace(/>/g, ">\n").replace(/&amp;#x/g, "&#x");
         };
+
+        SaveDCaseCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SaveDCaseCommand;
     })(Command);
     AssureNote.SaveDCaseCommand = SaveDCaseCommand;
@@ -3425,6 +3492,10 @@ var AssureNote;
             var doc = header + $dummydiv.html();
             $svg.empty().remove();
             return doc;
+        };
+
+        SaveSVGCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SaveSVGCommand;
     })(Command);
@@ -3619,6 +3690,10 @@ var AssureNote;
             $("#help-modal .modal-body").css({ "overflow-y": "scroll", "height": this.App.PictgramPanel.Viewport.GetPageHeight() * 0.6 });
             $("#help-modal").modal();
         };
+
+        HelpCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return HelpCommand;
     })(Command);
     AssureNote.HelpCommand = HelpCommand;
@@ -3702,9 +3777,10 @@ var AssureNote;
                 return null;
             }
             return new AssureNote.NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor", function (event, TargetView) {
-                var Writer = new AssureNote.StringWriter();
-                TargetView.Model.FormatSubNode(1, Writer, true);
-                _this.AssureNoteApp.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
+                var Command = _this.AssureNoteApp.FindCommandByCommandLineName("edit");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label]);
+                }
             });
         };
 
@@ -3766,19 +3842,26 @@ var AssureNote;
             if (NodeView != null) {
                 var Writer = new AssureNote.StringWriter();
                 NodeView.Model.FormatSubNode(1, Writer, false);
-                var Top = this.App.PictgramPanel.Viewport.PageYFromGY(NodeView.GetGY());
-                var Left = this.App.PictgramPanel.Viewport.PageXFromGX(NodeView.GetGX());
+                var Top = NodeView.GetGY();
+                var Left = NodeView.GetGX();
                 var Width = NodeView.GetShape().GetNodeWidth();
-                var Height = Math.max(100, NodeView.GetShape().GetNodeHeight());
+                var Height = Math.max(50, NodeView.GetShape().GetNodeHeight());
                 var StrokeWidth = Number($(NodeView.Shape.ShapeGroup).css('stroke-width').charAt(0));
-                this.App.SingleNodeEditorPanel.UpdateCSS({
+                var CSS = {
                     position: "fixed",
                     top: Top - (StrokeWidth / 2) + "px",
                     left: Left - (StrokeWidth / 2) + "px",
                     width: Width + StrokeWidth + "px",
                     height: Height + StrokeWidth + "px",
                     background: "rgba(255, 255, 255, 1.00)"
-                });
+                };
+                var Scale = this.App.PictgramPanel.Viewport.GetCameraScale();
+                if (Scale < 1.0) {
+                    CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "scale(" + (1 / Scale) + ")";
+                } else {
+                    CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "";
+                }
+                this.App.SingleNodeEditorPanel.UpdateCSS(CSS);
                 this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
             } else {
                 this.App.DebugP(Label + " not found.");
@@ -4005,6 +4088,8 @@ var AssureNote;
             var _this = this;
             _super.call(this, App);
             this.App = App;
+            this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
+            this.FoldingAnimationCallbacks = [];
             this.SVGLayer = document.getElementById("svg-layer");
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
@@ -4344,8 +4429,10 @@ var AssureNote;
             this.SVGLayer.style.display = "none";
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
 
-            TargetView.UpdateDocumentPosition(Duration);
+            TargetView.UpdateDocumentPosition(this.FoldingAnimationCallbacks, Duration);
             TargetView.ClearAnimationCache();
+            this.FoldingAnimationTask.StartMany(Duration, this.FoldingAnimationCallbacks);
+            this.FoldingAnimationCallbacks = [];
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
@@ -4355,9 +4442,7 @@ var AssureNote;
         PictgramPanel.prototype.Clear = function () {
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
-            for (var i = this.ContentLayer.childNodes.length - 1; i >= 0; i--) {
-                this.ContentLayer.removeChild(this.ContentLayer.childNodes[i]);
-            }
+            this.ContentLayer.innerHTML = "";
             for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
                 this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
             }
@@ -4422,7 +4507,6 @@ var AssureNote;
             this.DefaultChatServer = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
-            this.ClientsInfo = [];
             this.EditStatus = [];
             this.EditNodeInfo = [];
             if (!this.IsOperational()) {
@@ -4461,13 +4545,11 @@ var AssureNote;
                 self.App.ModeManager.Disable();
                 self.socket = null;
             });
-            this.socket.on('close', function (data) {
+            this.socket.on('close', function (SID) {
                 self.UpdateView("");
                 self.UpdateWGSN();
-            });
-            this.socket.on('join', function (data) {
-                console.log('join');
-                console.log(data);
+                console.log('close: ' + SID);
+                self.App.UserList.RemoveUser(SID);
             });
 
             this.socket.on('error', function (data) {
@@ -4483,6 +4565,15 @@ var AssureNote;
                     self.App.LoadNewWGSN(data.name, data.WGSN);
                 }
             });
+
+            this.socket.on('adduser', function (data) {
+                self.App.UserList.AddUser(data);
+            });
+
+            this.socket.on('updateeditmode', function (data) {
+                self.App.UserList.UpdateEditMode(data);
+            });
+
             this.socket.on('fold', function (data) {
                 if (!self.ReceivedFoldEvent) {
                     self.ReceivedFoldEvent = true;
@@ -4492,7 +4583,6 @@ var AssureNote;
                 }
             });
             this.socket.on('update', function (data) {
-                console.log('update');
                 self.App.LoadNewWGSN(data.name, data.WGSN);
             });
             this.socket.on('sync', function (data) {
@@ -4508,9 +4598,9 @@ var AssureNote;
                 self.UpdateView("startedit");
                 self.AddUserNameOn(CurrentNodeView, { User: data.UserName, IsRecursive: data.IsRecursive });
             });
-            this.socket.on('finishedit', function (data) {
+            this.socket.on('finishedit', function (UID) {
                 console.log('finishedit');
-                self.DeleteID(data.UID);
+                self.DeleteID(UID);
                 self.UpdateView("finishedit");
                 console.log('here is ID array after delete = ' + self.EditNodeInfo);
             });
@@ -4528,6 +4618,7 @@ var AssureNote;
             }
             this.App.ModeManager.Enable();
             this.EnableListeners();
+            this.Emit('adduser', { User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode() });
             this.App.UserList.Show();
         };
 
@@ -4696,6 +4787,10 @@ var AssureNote;
             this.App.MasterRecord.FormatRecord(Writer);
             var WGSN = Writer.toString();
             this.Emit('update', new WGSNSocket(this.App.WGSNName, WGSN));
+        };
+
+        SocketManager.prototype.UpdateEditMode = function (Mode) {
+            this.Emit('updateeditmode', { User: this.App.GetUserName(), Mode: Mode });
         };
         return SocketManager;
     })();
@@ -5087,6 +5182,17 @@ var AssureNote;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
+    var UserItem = (function () {
+        function UserItem(UserName, Color, IsEditMode, SID) {
+            this.UserName = UserName;
+            this.Color = Color;
+            this.IsEditMode = IsEditMode;
+            this.SID = SID;
+        }
+        return UserItem;
+    })();
+    AssureNote.UserItem = UserItem;
+
     var UserList = (function (_super) {
         __extends(UserList, _super);
         function UserList(App) {
@@ -5104,9 +5210,50 @@ var AssureNote;
             });
         }
         UserList.prototype.Show = function () {
+            var found = false;
+            for (var i in this.UserList) {
+                if (this.UserList[i].IsEditMode) {
+                    found = true;
+                }
+            }
+            this.App.ModeManager.ReadOnly(found);
             $('.user-name').text(this.App.GetUserName());
-            var List = [];
-            $('#user-list-tmpl').tmpl(List).appendTo('#user-list');
+            $('#user-list-tmpl').tmpl(this.UserList).appendTo($('#user-list').empty());
+        };
+
+        UserList.prototype.AddUser = function (Info) {
+            var Color = this.GetRandomColor();
+            var IsEditMode = (Info.Mode == 0 /* Edit */) ? true : false;
+            this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));
+            this.Show();
+        };
+
+        UserList.prototype.UpdateEditMode = function (Info) {
+            for (var i in this.UserList) {
+                if (this.UserList[i].SID == Info.SID) {
+                    var UserItem = this.UserList[i];
+                    UserItem.IsEditMode = (Info.Mode == 0 /* Edit */);
+                }
+            }
+            this.Show();
+        };
+
+        UserList.prototype.RemoveUser = function (SID) {
+            for (var i = 0; i < this.UserList.length; i++) {
+                if (this.UserList[i].SID == SID) {
+                    this.UserList.splice(i, 1);
+                    break;
+                }
+            }
+            this.Show();
+        };
+
+        UserList.prototype.GetRandomColor = function () {
+            var color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+            for (var i = color.length; i < 6; i++) {
+                color = "0" + color;
+            }
+            return "#" + color;
         };
         return UserList;
     })(AssureNote.Panel);
@@ -5398,7 +5545,11 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
-            return this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
+            var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
+            if (this.ModeManager.GetMode() == 1 /* View */ && !Command.CanUseOnViewOnlyMode()) {
+                return this.DefaultCommand;
+            }
+            return Command;
         };
 
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
@@ -5681,7 +5832,7 @@ var AssureNote;
             this.PageWidth = window.innerWidth;
             this.PageHeight = window.innerHeight;
             this.IsPointerEnabled = true;
-            this.AnimationFrameTimerHandle = 0;
+            this.CameraMoveTask = new AssureNote.AnimationFrameTask();
             this.IsEventMapUpper = false;
             window.addEventListener("resize", function (e) {
                 _this.UpdatePageRect();
@@ -5725,7 +5876,7 @@ var AssureNote;
         };
 
         ViewportManager.LimitScale = function (Scale) {
-            return Math.max(0.02, Math.min(20.0, Scale));
+            return Math.max(0.2, Math.min(20.0, Scale));
         };
 
         ViewportManager.prototype.SetCameraScale = function (Scale) {
@@ -5856,27 +6007,10 @@ var AssureNote;
                 return;
             }
 
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
-
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
-                var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(lastTime - startTime);
+            this.CameraMoveTask.Start(Duration, function (deltaT, currentTime, startTime) {
+                var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(currentTime - deltaT - startTime);
                 _this.MoveCamera(VX * deltaT, VY * deltaT, DeltaS);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
         ViewportManager.prototype.UpdatePageRect = function () {
@@ -6037,6 +6171,10 @@ var AssureNote;
                 $.notify(Params.join(' '), 'info');
             }
         };
+
+        MessageCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return MessageCommand;
     })(AssureNote.Command);
     AssureNote.MessageCommand = MessageCommand;
@@ -6060,9 +6198,14 @@ var AssureNote;
                 this.App.DebugP('Invalid parameter: ' + Params);
                 return;
             }
+            this.App.ModeManager.SetMode(1 /* View */);
             if (this.App.SocketManager.IsOperational()) {
                 this.App.SocketManager.Connect(Params[0]);
             }
+        };
+
+        ConnectCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ConnectCommand;
     })(AssureNote.Command);
@@ -6378,9 +6521,11 @@ var AssureNote;
         };
 
         NodeView.prototype.SaveFlags = function (OldViewMap) {
-            if (OldViewMap[this.Model.GetLabel()]) {
-                this.IsFolded = OldViewMap[this.Model.GetLabel()].IsFolded;
-                this.Status = OldViewMap[this.Model.GetLabel()].Status;
+            var OldView = OldViewMap[this.Model.GetLabel()];
+            if (OldView) {
+                this.IsFolded = OldView.IsFolded;
+                this.Status = OldView.Status;
+                this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
             }
 
             for (var i = 0; this.Children && i < this.Children.length; i++) {
@@ -6401,47 +6546,44 @@ var AssureNote;
             return P;
         };
 
-        NodeView.prototype.MoveArrowTo = function (P1, P2, Dir, Duration) {
-            this.Shape.MoveArrowTo(P1, P2, Dir, Duration || 0);
-        };
-
-        NodeView.prototype.UpdateDocumentPosition = function (Duration, PositionBaseNode) {
+        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, PositionBaseNode) {
             var _this = this;
             Duration = Duration || 0;
             if (!this.IsVisible) {
                 return;
             }
             var UpdateSubNode = function (SubNode, P1, P2) {
-                if (!PositionBaseNode && SubNode.Shape.WillFadein()) {
-                    PositionBaseNode = _this;
+                var Base = PositionBaseNode;
+                if (!Base && SubNode.Shape.WillFadein()) {
+                    Base = _this;
                 }
-                if (PositionBaseNode) {
-                    SubNode.Shape.SetFadeinBasePosition(PositionBaseNode.Shape.GetGXCache(), PositionBaseNode.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(Duration, PositionBaseNode);
+                if (Base && Duration > 0) {
+                    SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, Base);
                 } else {
-                    SubNode.UpdateDocumentPosition(Duration);
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration);
                 }
             };
 
             var GlobalPosition = this.GetGlobalPosition();
-            this.Shape.MoveTo(GlobalPosition.X, GlobalPosition.Y, Duration);
+            this.Shape.MoveTo(AnimationCallbacks, GlobalPosition.X, GlobalPosition.Y, Duration);
             var P1 = this.GetConnectorPosition(3 /* Bottom */, GlobalPosition);
             this.ForEachVisibleChildren(function (SubNode) {
                 var P2 = SubNode.GetConnectorPosition(1 /* Top */, SubNode.GetGlobalPosition());
                 UpdateSubNode(SubNode, P1, P2);
-                SubNode.MoveArrowTo(P1, P2, 3 /* Bottom */, Duration);
+                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 3 /* Bottom */, Duration);
             });
             P1 = this.GetConnectorPosition(2 /* Right */, GlobalPosition);
             this.ForEachVisibleRightNodes(function (SubNode) {
                 var P2 = SubNode.GetConnectorPosition(0 /* Left */, SubNode.GetGlobalPosition());
                 UpdateSubNode(SubNode, P1, P2);
-                SubNode.MoveArrowTo(P1, P2, 2 /* Right */, Duration);
+                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 2 /* Right */, Duration);
             });
             P1 = this.GetConnectorPosition(0 /* Left */, GlobalPosition);
             this.ForEachVisibleLeftNodes(function (SubNode) {
                 var P2 = SubNode.GetConnectorPosition(2 /* Right */, SubNode.GetGlobalPosition());
                 UpdateSubNode(SubNode, P1, P2);
-                SubNode.MoveArrowTo(P1, P2, 0 /* Left */, Duration);
+                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 0 /* Left */, Duration);
             });
         };
 
@@ -6561,9 +6703,6 @@ var AssureNote;
             this.willFadein = false;
             this.GX = null;
             this.GY = null;
-            this.AnimationFrameTimerHandle = 0;
-            this.AnimationFrameTimerHandle2 = 0;
-            this.ArrowAnimationFrameTimerHandle = 0;
             this.Content = null;
             this.NodeWidth = 250;
             this.NodeHeight = 0;
@@ -6733,35 +6872,18 @@ var AssureNote;
             this.ShapeGroup.style.opacity = Opacity.toString();
         };
 
-        GSNShape.prototype.Fadein = function (Duration) {
+        GSNShape.prototype.Fadein = function (AnimationCallbacks, Duration) {
             var _this = this;
-            if (this.AnimationFrameTimerHandle2) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle2);
-                this.AnimationFrameTimerHandle2 = 0;
-            }
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
             var V = 1 / Duration;
             var Opacity = 0;
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.AnimationFrameTimerHandle2 = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            AnimationCallbacks.push(function (deltaT) {
                 Opacity += V * deltaT;
                 _this.SetOpacity(Opacity);
                 _this.SetArrowOpacity(Opacity);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
-        GSNShape.prototype.MoveTo = function (x, y, Duration) {
+        GSNShape.prototype.MoveTo = function (AnimationCallbacks, x, y, Duration) {
             var _this = this;
             if (Duration <= 0) {
                 this.SetPosition(x, y);
@@ -6769,7 +6891,7 @@ var AssureNote;
             }
 
             if (this.WillFadein()) {
-                this.Fadein(Duration);
+                this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GX == null || this.GY == null) {
                     this.SetPosition(x, y);
@@ -6777,30 +6899,12 @@ var AssureNote;
                 }
             }
 
-            if (this.AnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.AnimationFrameTimerHandle);
-                this.AnimationFrameTimerHandle = 0;
-            }
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
             var VX = (x - this.GX) / Duration;
             var VY = (y - this.GY) / Duration;
 
-            this.SetOpacity(1);
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.AnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            AnimationCallbacks.push(function (deltaT) {
                 _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
         GSNShape.prototype.SetFadeinBasePosition = function (StartGX, StartGY) {
@@ -6825,7 +6929,6 @@ var AssureNote;
         GSNShape.prototype.ClearAnimationCache = function () {
             this.GX = null;
             this.GY = null;
-            this.willFadein = true;
         };
 
         GSNShape.prototype.PrerenderSVGContent = function (manager) {
@@ -6870,7 +6973,7 @@ var AssureNote;
             this.ArrowPath.style.opacity = Opacity.toString();
         };
 
-        GSNShape.prototype.MoveArrowTo = function (P1, P2, Dir, Duration) {
+        GSNShape.prototype.MoveArrowTo = function (AnimationCallbacks, P1, P2, Dir, Duration) {
             var _this = this;
             if (Duration <= 0) {
                 this.SetArrowPosition(P1, P2, Dir);
@@ -6882,24 +6985,7 @@ var AssureNote;
             var P2VX = (P2.X - this.ArrowP2.X) / Duration;
             var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
 
-            if (this.ArrowAnimationFrameTimerHandle) {
-                cancelAnimationFrame(this.ArrowAnimationFrameTimerHandle);
-                this.ArrowAnimationFrameTimerHandle = 0;
-            }
-            var lastTime = performance.now();
-            var startTime = lastTime;
-
-            this.SetArrowOpacity(1);
-
-            var update = function () {
-                var currentTime = performance.now();
-                var deltaT = currentTime - lastTime;
-                if (currentTime - startTime < Duration) {
-                    _this.ArrowAnimationFrameTimerHandle = requestAnimationFrame(update);
-                } else {
-                    _this.ArrowAnimationFrameTimerHandle = 0;
-                    deltaT = Duration - (lastTime - startTime);
-                }
+            AnimationCallbacks.push(function (deltaT) {
                 var CurrentP1 = _this.ArrowP1.Clone();
                 var CurrentP2 = _this.ArrowP2.Clone();
                 CurrentP1.X += P1VX * deltaT;
@@ -6907,9 +6993,7 @@ var AssureNote;
                 CurrentP2.X += P2VX * deltaT;
                 CurrentP2.Y += P2VY * deltaT;
                 _this.SetArrowPosition(CurrentP1, CurrentP2, Dir);
-                lastTime = currentTime;
-            };
-            update();
+            });
         };
 
         GSNShape.prototype.SetArrowColorWhite = function (IsWhite) {
@@ -6956,6 +7040,14 @@ var AssureNote;
                     this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
                 }
             }
+        };
+
+        GSNShape.prototype.GetColorStyle = function () {
+            return this.ColorStyles;
+        };
+
+        GSNShape.prototype.SetColorStyle = function (Styles) {
+            this.ColorStyles = Styles;
         };
 
         GSNShape.prototype.ClearColorStyle = function () {
@@ -7109,7 +7201,9 @@ var AssureNote;
             this.Input = document.createElement('input');
             this.Input.id = 'mode-switch';
             this.Input.setAttribute('type', 'checkbox');
-            this.Input.setAttribute('checked', '');
+            if (Mode == 0 /* Edit */) {
+                this.Input.setAttribute('checked', '');
+            }
             this.Input.setAttribute('data-on-label', 'Edit');
             this.Input.setAttribute('data-off-label', 'View');
         }
@@ -7119,6 +7213,15 @@ var AssureNote;
 
         ModeManager.prototype.SetMode = function (Mode) {
             this.Mode = Mode;
+            if (Mode == 0 /* Edit */) {
+                this.Input.setAttribute('checked', '');
+            } else {
+                this.Input.removeAttribute('checked');
+            }
+        };
+
+        ModeManager.prototype.ReadOnly = function (b) {
+            $('#mode-switch').bootstrapSwitch('setDisabled', b);
         };
 
         ModeManager.prototype.Disable = function () {
@@ -7136,6 +7239,7 @@ var AssureNote;
                 }
                 var value = data[0].value;
                 _this.SetMode((value) ? 0 /* Edit */ : 1 /* View */);
+                _this.App.SocketManager.UpdateEditMode(_this.Mode);
             });
         };
         return ModeManager;
@@ -7410,29 +7514,13 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new RemoveCommand(this.AssureNoteApp));
         }
         RemoveNodePlugin.prototype.CreateMenuBarButton = function (View) {
+            var _this = this;
             var App = this.AssureNoteApp;
             return new AssureNote.NodeMenuItem("remove-id", "/images/remove.png", "remove", function (event, TargetView) {
-                var Node = TargetView.Model;
-                var Parent = Node.ParentNode;
-                if (Parent.SubNodeList == null) {
-                    App.DebugP("Node not Found");
-                    return;
+                var Command = _this.AssureNoteApp.FindCommandByCommandLineName("remove");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label]);
                 }
-                for (var i = 0; i < Parent.SubNodeList.length; i++) {
-                    var it = Parent.SubNodeList[i];
-                    if (Node == it) {
-                        Parent.SubNodeList.splice(i, 1);
-                    }
-                }
-
-                RemoveCommand.RemoveDescendantsRecursive(Node);
-
-                var TopGoal = App.MasterRecord.GetLatestDoc().TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(App.PictgramPanel.ViewMap);
-                App.PictgramPanel.InitializeView(NewNodeView);
-                App.PictgramPanel.Draw(TopGoal.GetLabel());
-                App.SocketManager.UpdateWGSN();
             });
         };
         return RemoveNodePlugin;
@@ -7446,45 +7534,76 @@ AssureNote.OnLoadPlugin(function (App) {
 });
 var AssureNote;
 (function (AssureNote) {
+    var AddNodeCommand = (function (_super) {
+        __extends(AddNodeCommand, _super);
+        function AddNodeCommand(App) {
+            _super.call(this, App);
+            this.Text2NodeTypeMap = { "goal": 0 /* Goal */, "strategy": 2 /* Strategy */, "context": 1 /* Context */, "evidence": 3 /* Evidence */ };
+        }
+        AddNodeCommand.prototype.GetCommandLineNames = function () {
+            return ["addnode", "add-node"];
+        };
+
+        AddNodeCommand.prototype.GetHelpHTML = function () {
+            return "<code>add-node node type</code><br>Add new node.";
+        };
+
+        AddNodeCommand.prototype.Invoke = function (CommandName, Params) {
+            var Type = this.Text2NodeTypeMap[Params[1].toLowerCase()];
+            var TargetView = this.App.PictgramPanel.ViewMap[Params[0]];
+            if (TargetView == null) {
+                this.App.DebugP("Node not Found");
+                return;
+            }
+            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
+            var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
+            new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
+            var Doc = this.App.MasterRecord.EditingDoc;
+            Doc.RenumberAll();
+            var TopGoal = Doc.TopNode;
+            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+            NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
+            this.App.PictgramPanel.InitializeView(NewNodeView);
+            this.App.PictgramPanel.Draw(TopGoal.GetLabel());
+            this.App.SocketManager.UpdateWGSN();
+            this.App.MasterRecord.CloseEditor();
+        };
+        return AddNodeCommand;
+    })(AssureNote.Command);
+    AssureNote.AddNodeCommand = AddNodeCommand;
+
     var AddNodePlugin = (function (_super) {
         __extends(AddNodePlugin, _super);
         function AddNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             this.SetHasMenuBarButton(true);
+            this.AssureNoteApp.RegistCommand(new AddNodeCommand(this.AssureNoteApp));
         }
         AddNodePlugin.prototype.CreateCallback = function (Type) {
             var _this = this;
             return function (event, TargetView) {
-                _this.AssureNoteApp.MasterRecord.OpenEditor(_this.AssureNoteApp.GetUserName(), "todo", null, "test");
-                var Node = _this.AssureNoteApp.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
-                new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
-                var Doc = _this.AssureNoteApp.MasterRecord.EditingDoc;
-                Doc.RenumberAll();
-                var TopGoal = Doc.TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(_this.AssureNoteApp.PictgramPanel.ViewMap);
-                _this.AssureNoteApp.PictgramPanel.InitializeView(NewNodeView);
-                _this.AssureNoteApp.PictgramPanel.Draw(TopGoal.GetLabel());
-                _this.AssureNoteApp.SocketManager.UpdateWGSN();
-                _this.AssureNoteApp.MasterRecord.CloseEditor();
+                var Command = _this.AssureNoteApp.FindCommandByCommandLineName("add-node");
+                if (Command) {
+                    Command.Invoke(null, [TargetView.Label, Type]);
+                }
             };
         };
 
         AddNodePlugin.prototype.CreateGoalMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback(0 /* Goal */));
+            return new AssureNote.NodeMenuItem("add-goal", "/images/goal.png", "goal", this.CreateCallback("goal"));
         };
 
         AddNodePlugin.prototype.CreateContextMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback(1 /* Context */));
+            return new AssureNote.NodeMenuItem("add-context", "/images/context.png", "context", this.CreateCallback("context"));
         };
 
         AddNodePlugin.prototype.CreateStrategyMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback(2 /* Strategy */));
+            return new AssureNote.NodeMenuItem("add-strategy", "/images/strategy.png", "strategy", this.CreateCallback("strategy"));
         };
 
         AddNodePlugin.prototype.CreateEvidenceMenu = function (View) {
-            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback(3 /* Evidence */));
+            return new AssureNote.NodeMenuItem("add-evidence", "/images/evidence.png", "evidence", this.CreateCallback("evidence"));
         };
 
         AddNodePlugin.prototype.CreateMenuBarButtons = function (View) {

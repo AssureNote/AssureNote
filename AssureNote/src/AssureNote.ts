@@ -29,6 +29,7 @@
 ///<reference path='UserList.ts'/>
 ///<reference path='DCaseModelXMLParser.ts'/>
 ///<reference path='HistoryView.ts'/>
+///<reference path='../d.ts/config.d.ts'/>
 
 declare function saveAs(data: Blob, filename: String): void;
 

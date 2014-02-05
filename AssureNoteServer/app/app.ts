@@ -3,7 +3,7 @@
 
 import express = require('express');
 import api     = require('./routes/api');
-import js      = require('./routes/javascript');
+//import js      = require('./routes/javascript');
 import path    = require('path');
 var http       = require('http');
 var client     = require('./routes/index');
@@ -45,7 +45,7 @@ app.configure('production', function() {
 app.post('/api/1.0', api.httpHandler);
 app.get('/', client.index);
 app.get('/file/:id', client.index);
-app.get('/javascripts/config.js', js.config);
+//app.get('/javascripts/config.js', js.config);
 
 app.get('/auth/twitter',
   passport.passport.authenticate('twitter'),

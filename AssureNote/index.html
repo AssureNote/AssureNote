@@ -42,9 +42,9 @@
                 <button class="btn btn-default btn-large"><span class="glyphicon glyphicon-pencil"></span>&nbsp; Change User</button></a>
               <div id="user-list"><br></div>
             </div>
-            <script id="user-list-tmpl" type="text/x-jquery-tmpl"><span type="text/x-jquery-tmpl" class="user-list"><span style="color: ${Color}">
-                  <div class="glyphicon glyphicon-user">{{if IsEditMode == true}}</div><small style="vertical-align: super;" class="glyphicon glyphicon-pencil"></small>&nbsp;{{else}}{{/if}}
-                  ${UserName} &nbsp;</span></span>
+            <script id="user-list-tmpl" type="text/x-jquery-tmpl"><span style="color: ${Color}">
+                <div class="glyphicon glyphicon-user"></div>{{if IsEditMode == true}}<small style="vertical-align: super;" class="glyphicon glyphicon-pencil"></small>&nbsp;{{else}}{{/if}}
+                ${UserName} &nbsp;</span>
             </script>
           </div>
         </div>
@@ -168,11 +168,12 @@
     <script type="text/javascript" src="./src/Tooltip.js"></script>
     <script type="text/javascript" src="./src/UserList.js"></script>
     <script type="text/javascript" src="./src/HistoryView.js"></script>
-    <script type="text/javascript" src="./javascripts/config.js"></script>
     <script type="text/javascript">
+      var Config = {};
       $(function() {
         Config.RecURL = "";
         Config.DefaultChatServer = "";
+        Config.BASEPATH = ".";
       })
     </script>
     <script type="text/javascript" src="./plugin/SingleNodeEditor/SingleNodeEditor.js" async="async"></script>
