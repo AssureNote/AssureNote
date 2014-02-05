@@ -4500,6 +4500,17 @@ var AssureNote;
         return WGSNSocket;
     })();
     AssureNote.WGSNSocket = WGSNSocket;
+
+    var EditNodeStatus = (function () {
+        function EditNodeStatus(UserName, UID, IsRecursive, SID) {
+            this.UserName = UserName;
+            this.UID = UID;
+            this.IsRecursive = IsRecursive;
+            this.SID = SID;
+        }
+        return EditNodeStatus;
+    })();
+    AssureNote.EditNodeStatus = EditNodeStatus;
     var SocketManager = (function () {
         function SocketManager(App) {
             var _this = this;
@@ -4507,14 +4518,13 @@ var AssureNote;
             this.DefaultChatServer = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
-            this.EditStatus = [];
             this.EditNodeInfo = [];
             if (!this.IsOperational()) {
                 App.DebugP('socket.io not found');
             }
 
             App.PictgramPanel.Viewport.OnScroll = function (Viewport) {
-                if (_this.IsConnected() && _this.UseOnScrollEvent) {
+                if (_this.IsConnected() && _this.UseOnScrollEvent && (_this.App.ModeManager.GetMode() != 1 /* View */)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
                     var Y = Viewport.GetCameraGY();
@@ -4600,8 +4610,16 @@ var AssureNote;
             });
             this.socket.on('finishedit', function (UID) {
                 console.log('finishedit');
-                self.DeleteID(UID);
-                self.UpdateView("finishedit");
+                var Length;
+                self.DeleteEditInfo(UID);
+                if ((Length = self.EditNodeInfo.length) != 0) {
+                    var LatestView = self.App.PictgramPanel.GetNodeViewFromUID(self.EditNodeInfo[Length - 1].UID);
+                    self.UpdateFlags(LatestView);
+                    self.UpdateView("anotheredit");
+                    self.AddUserNameOn(LatestView, { User: self.EditNodeInfo[Length - 1].UserName, IsRecursive: self.EditNodeInfo[Length - 1].IsRecursive });
+                } else {
+                    self.UpdateView("finishedit");
+                }
                 console.log('here is ID array after delete = ' + self.EditNodeInfo);
             });
 
@@ -4611,15 +4629,17 @@ var AssureNote;
         };
 
         SocketManager.prototype.Connect = function (host) {
-            if (host == null || host == '') {
-                this.socket = io.connect(this.DefaultChatServer);
-            } else {
-                this.socket = io.connect(host);
+            if (!this.IsConnected()) {
+                if (host == null || host == '') {
+                    this.socket = io.connect(this.DefaultChatServer);
+                } else {
+                    this.socket = io.connect(host);
+                }
+                this.App.ModeManager.Enable();
+                this.EnableListeners();
+                this.App.UserList.Show();
+                this.Emit("adduser", { User: this.App.GetUserName(), MODE: this.App.ModeManager.GetMode() });
             }
-            this.App.ModeManager.Enable();
-            this.EnableListeners();
-            this.Emit('adduser', { User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode() });
-            this.App.UserList.Show();
         };
 
         SocketManager.prototype.DisConnect = function () {
@@ -4635,9 +4655,9 @@ var AssureNote;
             return io != null && io.connect != null;
         };
 
-        SocketManager.prototype.DeleteID = function (UID) {
+        SocketManager.prototype.DeleteEditInfo = function (UID) {
             for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     this.EditNodeInfo.splice(i, 1);
                     return;
                 }
@@ -4677,7 +4697,7 @@ var AssureNote;
             this.UpdateParentStatus(NodeView);
             if (NodeView.Children == null && NodeView.Left == null && NodeView.Right == null)
                 return;
-            if (this.EditNodeInfo[this.EditNodeInfo.length - 1]["IsRecursive"]) {
+            if (this.EditNodeInfo[this.EditNodeInfo.length - 1].IsRecursive) {
                 this.UpdateChildStatus(NodeView);
             }
         };
@@ -4718,14 +4738,14 @@ var AssureNote;
             if (this.EditNodeInfo.length == 0)
                 return true;
             for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     return false;
                 }
             }
 
             while (CurrentView != null) {
                 for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                    if (this.EditNodeInfo[i]["IsRecursive"] && this.EditNodeInfo[i]["UID"] == CurrentView.Model.UID) {
+                    if (this.EditNodeInfo[i].IsRecursive && this.EditNodeInfo[i].UID == CurrentView.Model.UID) {
                         return false;
                     }
                 }
@@ -6223,6 +6243,8 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
         MessageChatPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.SingleEdit);
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Locked);
             switch (NodeView.Status) {
                 case 1 /* SingleEditable */:
                     NodeView.AddColorStyle(AssureNote.ColorStyle.SingleEdit);
@@ -8202,6 +8224,9 @@ var AssureNote;
             var li = document.createElement('li');
             li.innerHTML = '<b>Monitor</b> is running on <b>' + MNode.Location + '<br><br></b>';
             ReturnValue.push(li);
+            li.innerHTML = '<b>Monitor</b> is certificated by <b>' + MNode.GetLatestLog().authid + '<br><br></b>';
+
+            li = document.createElement('li');
 
             li = document.createElement('li');
             var table = document.createElement('table');

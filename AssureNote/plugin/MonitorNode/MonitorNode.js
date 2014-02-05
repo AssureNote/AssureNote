@@ -557,6 +557,9 @@ var AssureNote;
             var li = document.createElement('li');
             li.innerHTML = '<b>Monitor</b> is running on <b>' + MNode.Location + '<br><br></b>';
             ReturnValue.push(li);
+            li.innerHTML = '<b>Monitor</b> is certificated by <b>' + MNode.GetLatestLog().authid + '<br><br></b>';
+
+            li = document.createElement('li');
 
             li = document.createElement('li');
             var table = document.createElement('table');
