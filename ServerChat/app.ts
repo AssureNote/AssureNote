@@ -24,7 +24,7 @@ class AssureNoteServer {
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', (socket: Socket) => {
             this.EnableListeners(socket);
-            socket.join(this.room);
+            socket.join(this.room, null);
             console.log('id: ' + socket.id + ' connected');
             socket.emit('init', {
                 id   : socket.id,
@@ -33,8 +33,7 @@ class AssureNoteServer {
                 WGSN : this.GetLatestWGSN()
             });
             socket.on('disconnect', () => {
-                /* cast to any since d.ts does not support socket.leave */
-                (<any>socket).leave(this.room);
+                socket.leave(this.room, null);
 
                 console.log('id: ' + socket.id + ' leave');
                 console.log('close');
