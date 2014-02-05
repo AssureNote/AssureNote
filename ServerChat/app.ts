@@ -75,8 +75,8 @@ class AssureNoteServer {
 
         socket.on('adduser', (data: {User: string; Mode: number}) => {
             var Info: UserStatus = new UserStatus(data.User, data.Mode, socket.id);
-            socket.broadcast.emit('adduser', Info);
             if (this.UsersInfo.length != 0) {
+                socket.broadcast.emit('adduser', Info);
                 for (var i:number = 0; i< this.UsersInfo.length; i++) {
                     socket.emit('adduser', this.UsersInfo[i]);
                 }

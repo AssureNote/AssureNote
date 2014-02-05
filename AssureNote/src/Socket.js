@@ -165,15 +165,17 @@ var AssureNote;
         };
 
         SocketManager.prototype.Connect = function (host) {
-            if (host == null || host == '') {
-                this.socket = io.connect(this.DefaultChatServer);
-            } else {
-                this.socket = io.connect(host);
+            if (!this.IsConnected()) {
+                if (host == null || host == '') {
+                    this.socket = io.connect(this.DefaultChatServer);
+                } else {
+                    this.socket = io.connect(host);
+                }
+                this.App.ModeManager.Enable();
+                this.EnableListeners();
+                this.App.UserList.Show();
+                this.Emit("adduser", { User: this.App.GetUserName(), MODE: this.App.ModeManager.GetMode() });
             }
-            this.App.ModeManager.Enable();
-            this.EnableListeners();
-            this.Emit('adduser', { User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode() });
-            this.App.UserList.Show();
         };
 
         SocketManager.prototype.DisConnect = function () {
