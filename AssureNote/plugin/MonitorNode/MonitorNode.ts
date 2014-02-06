@@ -551,6 +551,82 @@ module AssureNote {
 
     }
 
+    export class ShowMonitorListCommand extends Command {
+
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+            var Modal = $('\
+<div id="monitorlist-modal" tabindex="-1" role="dialog" aria-labelledby="monitorlist-modal-label" aria-hidden="true" class="modal fade">\n\
+  <div class="modal-dialog">\n\
+    <div class="modal-content">\n\
+      <div class="modal-header">\n\
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>\n\
+        <h4 id="monitorlist-modal-label" class="modal-title">Active Monitor List</h4>\n\
+      </div>\n\
+      <div id="monitorlist-modal-body" class="modal-body">\n\
+      </div>\n\
+      <div class="modal-footer">\n\
+        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>\n\
+      </div>\n\
+    </div>\n\
+  </div>\n\
+</div>\n\
+            ');
+            $('#plugin-layer').append(Modal);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["show-monitorlist"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>show-monitorlist</code><br>Show list of monitors.";
+        }
+
+        private UpdateMonitorList(): void {
+            var ModalBody = $("#monitorlist-modal-body")[0];
+
+            var Table = document.createElement('table');
+            Table.setAttribute('border', '4');
+            Table.setAttribute('width', '90%');
+            Table.setAttribute('align', 'center');
+
+            var TableInnerHTML = '';
+            TableInnerHTML += '<tr align="center" bgcolor="#cccccc">'
+            TableInnerHTML += '<th>Label</th>'
+            TableInnerHTML += '<th>Type</th>'
+            TableInnerHTML += '<th>Location</th>'
+            TableInnerHTML += '<th>AuthID</th>'
+            TableInnerHTML += '<th>Last Update</th>'
+            TableInnerHTML += '</tr>'
+
+            for(var Label in MNodeManager.MonitorNodeMap) {
+                var MNode = MNodeManager.MonitorNodeMap[Label];
+                if(MNode.GetLatestStatus() == true) {
+                    TableInnerHTML += '<tr align="center">'
+                }
+                else {
+                    TableInnerHTML += '<tr align="center" bgcolor="#ffaa7d">'
+                }
+                TableInnerHTML += '<td>'+MNode.Label+'</td>';
+                TableInnerHTML += '<td>'+MNode.Type+'</td>';
+                TableInnerHTML += '<td>'+MNode.Location+'</td>';
+                TableInnerHTML += '<td>'+MNode.GetLatestLog().authid+'</td>';
+                TableInnerHTML += '<td>'+MNode.GetLatestLog().timestamp+'</td>';
+                TableInnerHTML += '</tr>'
+            }
+
+            Table.innerHTML = TableInnerHTML;
+            ModalBody.innerHTML = Table.outerHTML;
+        }
+
+        public Invoke(CommandName: string, Params: any[]): void {
+            this.UpdateMonitorList();
+            (<any>$('#monitorlist-modal')).modal();
+        }
+
+    }
+
     export class SetMonitorMenuItem extends TopMenuItem {
 
         GetIconName(): string {
@@ -598,6 +674,7 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
             this.AssureNoteApp.TopMenu.AppendSubMenu(
                 new SubMenuItem("Monitor", "eye-open", [
                     new SetMonitorMenuItem()
@@ -645,22 +722,30 @@ module AssureNote {
             var MNode = MNodeManager.MonitorNodeMap[NodeView.Label];
 
             var ReturnValue: HTMLLIElement[] = [];
-            var li = document.createElement('li');
-            li.innerHTML = '<b>Monitor</b> is running on <b>'+MNode.Location+'<br><br></b>';
-            ReturnValue.push(li);
-            li.innerHTML = '<b>Monitor</b> is certificated by <b>'+MNode.GetLatestLog().authid+'<br><br></b>';
+            var Li = document.createElement('li');
+            Li.innerHTML = '<b>Monitor</b> is running on <b>'+MNode.Location+'<br></b>';
+            ReturnValue.push(Li);
 
-            li = document.createElement('li');
+            var LatestLog = MNode.GetLatestLog();
+            if(LatestLog != null) {
+                Li = document.createElement('li');
+                Li.innerHTML = '<b>Monitor</b> is certificated by <b>'+MNode.GetLatestLog().authid+'<br></b>';
+                ReturnValue.push(Li);
+            }
 
-            li = document.createElement('li');
-            var table = document.createElement('table');
-            table.setAttribute('border', '4');
-            table.setAttribute('width', '250');
-            table.setAttribute('align', 'center');
+            Li = document.createElement('li');
+            Li.innerHTML = '<hr>';
+            ReturnValue.push(Li);
+
+            Li = document.createElement('li');
+            var Table = document.createElement('table');
+            Table.setAttribute('border', '4');
+            Table.setAttribute('width', '250');
+            Table.setAttribute('align', 'center');
 
             var TableInnerHTML = '';
             TableInnerHTML += '<caption>REC Logs</caption>';
-            TableInnerHTML += '<tr bgcolor="#cccccc">'
+            TableInnerHTML += '<tr align="center" bgcolor="#cccccc">'
             TableInnerHTML += '<th>Timestamp</th>'
             TableInnerHTML += '<th>'+MNode.Type+'</th>'
             TableInnerHTML += '</tr>'
@@ -679,9 +764,9 @@ module AssureNote {
                 TableInnerHTML += '</tr>'
             }
 
-            table.innerHTML = TableInnerHTML;
-            li.innerHTML = table.outerHTML;
-            ReturnValue.push(li);
+            Table.innerHTML = TableInnerHTML;
+            Li.innerHTML = Table.outerHTML;
+            ReturnValue.push(Li);
             return ReturnValue;
         }
 
