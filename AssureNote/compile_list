@@ -16,6 +16,7 @@ src/Plugin.ts
 src/SearchNode.ts
 src/Socket.ts
 src/Tooltip.ts
+src/TopMenu.ts
 src/UserList.ts
 src/Viewport.ts
 src/RecApi.ts

@@ -349,7 +349,7 @@ var AssureNote;
         SaveAsSVGMenuItem.prototype.Invoke = function (App) {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
                 var CommitCommand = App.FindCommandByCommandLineName("commit");
-                Command.Invoke(null, ["Save"]);
+                CommitCommand.Invoke(null, ["Save"]);
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             var Command = App.FindCommandByCommandLineName("save-as-svg");
