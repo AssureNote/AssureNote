@@ -276,6 +276,16 @@ var AssureNote;
             return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
         }
         AssureNoteUtils.GetTime = GetTime;
+
+        /**
+        Define new color style.
+        @param {string} StyleName Style name. The name can be used as a parameter for NodeView#Addd/RemoveColorStyle
+        @param {Object} StyleDef jQuery.css style definition. ex) { fill: #FFFFFF, stroke: #000000 }
+        */
+        function DefineColorStyle(StyleName, StyleDef) {
+            $("<style>").html("." + StyleName + " { " + $("span").css(StyleDef).attr("style") + " }").appendTo("head");
+        }
+        AssureNoteUtils.DefineColorStyle = DefineColorStyle;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
