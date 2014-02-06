@@ -307,6 +307,15 @@ module AssureNote {
         export function GetTime(): number {
             return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
         }
+
+        /**
+        Define new color style.
+        @param {string} StyleName Style name. The name can be used as a parameter for NodeView#Addd/RemoveColorStyle
+        @param {Object} StyleDef jQuery.css style definition. ex) { fill: #FFFFFF, stroke: #000000 }
+        */
+        export function DefineColorStyle(StyleName: string, StyleDef: Object): void {
+            $("<style>").html("." + StyleName + " { " + $("span").css(StyleDef).attr("style") + " }").appendTo("head");
+        }
     }
 
     export class AnimationFrameTask {

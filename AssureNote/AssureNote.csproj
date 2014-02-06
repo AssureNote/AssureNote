@@ -41,7 +41,6 @@
     <TypeScriptCompile Include="d.ts\jquery_plugins.d.ts" />
     <TypeScriptCompile Include="d.ts\pointer.d.ts" />
     <TypeScriptCompile Include="index.ts" />
-    <TypeScriptCompile Include="javascripts\config.ts" />
     <TypeScriptCompile Include="plugin\AddNode\AddNode.ts" />
     <TypeScriptCompile Include="plugin\FoldingViewSwitch\FoldingViewSwitch.ts" />
     <TypeScriptCompile Include="plugin\LastModified\LastModified.ts" />
