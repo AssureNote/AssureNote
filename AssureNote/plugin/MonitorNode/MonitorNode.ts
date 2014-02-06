@@ -558,6 +558,8 @@ module AssureNote {
         }
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
+            NodeView.RemoveColorStyle(ColorStyle.Danger);
+            NodeView.RemoveColorStyle(ColorStyle.Useless);
             if(NodeView.Label in MNodeManager.NodeColorMap) {
                 NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
             }

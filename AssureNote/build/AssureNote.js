@@ -6342,6 +6342,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         ToDoPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.ToDo);
             var TagMap = NodeView.Model.GetTagMap();
             if (!TagMap)
                 return;
@@ -8208,6 +8209,8 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
         }
         MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Danger);
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Useless);
             if (NodeView.Label in MNodeManager.NodeColorMap) {
                 NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
             }
