@@ -101,10 +101,13 @@ var AssureNote;
         };
 
         UserList.prototype.GetRandomColor = function () {
-            var color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
-            for (var i = color.length; i < 6; i++) {
-                color = "0" + color;
-            }
+            var color;
+            do {
+                color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+                for (var i = color.length; i < 6; i++) {
+                    color = "0" + color;
+                }
+            } while(color == "000000" || color == "FFFFFF");
             return "#" + color;
         };
 
