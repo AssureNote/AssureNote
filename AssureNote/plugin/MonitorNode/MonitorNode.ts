@@ -436,6 +436,10 @@ module AssureNote {
                         this.App.DebugP("Node not found");
                         return;
                     }
+                    if(!View.Model.IsEvidence()) {
+                        this.App.DebugP("This node is not a monitor");
+                        return;
+                    }
 
                     var MNode = new MonitorNode(this.App, Label);
                     if(!MNode.IsValid()) {
@@ -552,17 +556,42 @@ module AssureNote {
         constructor(public AssureNoteApp: AssureNoteApp) {
             super();
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
+            this.SetHasMenuBarButton(true);
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
         }
 
-        RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
-            NodeView.RemoveColorStyle(ColorStyle.Danger);
-            NodeView.RemoveColorStyle(ColorStyle.Useless);
-            if(NodeView.Label in MNodeManager.NodeColorMap) {
-                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+        CreateMenuBarButton(View: NodeView): NodeMenuItem {
+            if(!View.Model.IsEvidence()) {
+                return null;
             }
+
+            var App = this.AssureNoteApp;
+            var MNode = new MonitorNode(App, View.Label);
+
+            // If it is 'MonitorNode'
+            if(MNode.IsValid) {
+                // If it has been already set as 'MonitorNode'
+                if(MNode.Label in MNodeManager.MonitorNodeMap) {
+                    return new NodeMenuItem("unset-monitor", "/images/monitor.png", "unset\ monitor", (event: Event, TargetView: NodeView) => {
+                        var Command = App.FindCommandByCommandLineName("unset-monitor");
+                        if(Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                }
+                else {
+                    return new NodeMenuItem("set-monitor", "/images/monitor.png", "set\ monitor", (event: Event, TargetView: NodeView) => {
+                        var Command = App.FindCommandByCommandLineName("set-monitor");
+                        if(Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                }
+            }
+
+            return null;
         }
 
         CreateTooltipContents(NodeView: NodeView): HTMLLIElement[]{
@@ -611,6 +640,14 @@ module AssureNote {
             li.innerHTML = table.outerHTML;
             ReturnValue.push(li);
             return ReturnValue;
+        }
+
+        RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
+            NodeView.RemoveColorStyle(ColorStyle.Danger);
+            NodeView.RemoveColorStyle(ColorStyle.Useless);
+            if(NodeView.Label in MNodeManager.NodeColorMap) {
+                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+            }
         }
 
     }
