@@ -534,6 +534,45 @@ var AssureNote;
     })(AssureNote.Command);
     AssureNote.UseRecAtCommand = UseRecAtCommand;
 
+    var SetMonitorMenuItem = (function (_super) {
+        __extends(SetMonitorMenuItem, _super);
+        function SetMonitorMenuItem() {
+            _super.apply(this, arguments);
+        }
+        SetMonitorMenuItem.prototype.GetIconName = function () {
+            if (MNodeManager.IsRunning) {
+                return "minus";
+            } else {
+                return "plus";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.GetDisplayName = function () {
+            if (MNodeManager.IsRunning) {
+                return "Unset";
+            } else {
+                return "Set";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.Invoke = function (App) {
+            if (MNodeManager.IsRunning) {
+                var Command = App.FindCommandByCommandLineName("unset-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            } else {
+                var Command = App.FindCommandByCommandLineName("set-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            }
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        };
+        return SetMonitorMenuItem;
+    })(AssureNote.TopMenuItem);
+    AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
+
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
@@ -544,6 +583,9 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
+                new SetMonitorMenuItem()
+            ]));
         }
         MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
             if (!View.Model.IsEvidence()) {

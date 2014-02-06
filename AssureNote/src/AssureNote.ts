@@ -51,7 +51,7 @@ module AssureNote {
         UserList: UserList;
         HistoryPanel: HistoryPanel;
 
-        TopMenu: TopMenuItem;
+        TopMenu: TopMenuTopItem;
 
         private UserName: string;
         private LoadingIndicatorVisible = true;
@@ -83,11 +83,13 @@ module AssureNote {
             this.RegistCommand(new UploadCommand(this));
             this.RegistCommand(new HistoryCommand(this));
 
+            this.TopMenu = new TopMenuTopItem([]);
+
             this.PluginManager.LoadPlugin();
             this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
             this.UserList = new UserList(this);
 
-            this.TopMenu = new TopMenuTopItem([
+            this.TopMenu.AppendSubMenu(
                 new SubMenuItem("File", "file", [
                     new NewMenuItem(),
                     new OpenMenuItem(),
@@ -102,7 +104,7 @@ module AssureNote {
                     new HelpMenuItem(),
                     new AboutMenuItem()
                 ])
-            ]);
+            );
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
         }
 

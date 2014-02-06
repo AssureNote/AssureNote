@@ -164,6 +164,10 @@ var AssureNote;
             _super.call(this);
             this.SubMenuList = SubMenuList;
         }
+        TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
+            this.SubMenuList.unshift(SubMenu);
+        };
+
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
             for (var i = 0; i < this.SubMenuList.length; i++) {
                 this.SubMenuList[i].Render(App, Target, true);

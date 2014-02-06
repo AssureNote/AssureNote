@@ -551,6 +551,44 @@ module AssureNote {
 
     }
 
+    export class SetMonitorMenuItem extends TopMenuItem {
+
+        GetIconName(): string {
+            if(MNodeManager.IsRunning) {
+                return "minus";
+            }
+            else {
+                return "plus";
+            }
+        }
+
+        GetDisplayName(): string {
+            if(MNodeManager.IsRunning) {
+                return "Unset";
+            }
+            else {
+                return "Set";
+            }
+        }
+
+        Invoke(App: AssureNoteApp): void {
+            if(MNodeManager.IsRunning) {
+                var Command = App.FindCommandByCommandLineName("unset-monitor");
+                if(Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            }
+            else {
+                var Command = App.FindCommandByCommandLineName("set-monitor");
+                if(Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            }
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        }
+
+    }
+
     export class MonitorNodePlugin extends Plugin {
 
         constructor(public AssureNoteApp: AssureNoteApp) {
@@ -560,6 +598,11 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
+            this.AssureNoteApp.TopMenu.AppendSubMenu(
+                new SubMenuItem("Monitor", "eye-open", [
+                    new SetMonitorMenuItem()
+                ])
+            );
         }
 
         CreateMenuBarButton(View: NodeView): NodeMenuItem {

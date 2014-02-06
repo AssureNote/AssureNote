@@ -4944,6 +4944,10 @@ var AssureNote;
             _super.call(this);
             this.SubMenuList = SubMenuList;
         }
+        TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
+            this.SubMenuList.unshift(SubMenu);
+        };
+
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
             for (var i = 0; i < this.SubMenuList.length; i++) {
                 this.SubMenuList[i].Render(App, Target, true);
@@ -5418,7 +5422,7 @@ var AssureNote;
             this.Element.empty();
             var h = this.App.MasterRecord.HistoryList[this.Index];
             var message = h.GetCommitMessage() || "(No Commit Message)";
-            var t = { Message: message, User: h.Author, DateTime: h.DateString };
+            var t = { Message: message, User: h.Author, DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString) };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
 
             if (this.Index == 0) {
@@ -5509,26 +5513,26 @@ var AssureNote;
             this.RegistCommand(new AssureNote.UploadCommand(this));
             this.RegistCommand(new AssureNote.HistoryCommand(this));
 
+            this.TopMenu = new AssureNote.TopMenuTopItem([]);
+
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu = new AssureNote.TopMenuTopItem([
-                new AssureNote.SubMenuItem("File", "file", [
-                    new AssureNote.NewMenuItem(),
-                    new AssureNote.OpenMenuItem(),
-                    new AssureNote.UploadMenuItem(),
-                    new AssureNote.SaveMenuItem(),
-                    new AssureNote.SubMenuItem("Save As", "floppy-save", [
-                        new AssureNote.SaveAsWGSNMenuItem(),
-                        new AssureNote.SaveAsDCaseMenuItem(),
-                        new AssureNote.SaveAsSVGMenuItem()
-                    ]),
-                    new AssureNote.DividerMenuItem(),
-                    new AssureNote.HelpMenuItem(),
-                    new AssureNote.AboutMenuItem()
-                ])
-            ]);
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
+                new AssureNote.NewMenuItem(),
+                new AssureNote.OpenMenuItem(),
+                new AssureNote.UploadMenuItem(),
+                new AssureNote.SaveMenuItem(),
+                new AssureNote.SubMenuItem("Save As", "floppy-save", [
+                    new AssureNote.SaveAsWGSNMenuItem(),
+                    new AssureNote.SaveAsDCaseMenuItem(),
+                    new AssureNote.SaveAsSVGMenuItem()
+                ]),
+                new AssureNote.DividerMenuItem(),
+                new AssureNote.HelpMenuItem(),
+                new AssureNote.AboutMenuItem()
+            ]));
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
         }
         AssureNoteApp.prototype.IsLoading = function () {
@@ -8095,6 +8099,10 @@ var AssureNote;
                         this.App.DebugP("Node not found");
                         return;
                     }
+                    if (!View.Model.IsEvidence()) {
+                        this.App.DebugP("This node is not a monitor");
+                        return;
+                    }
 
                     var MNode = new MonitorNode(this.App, Label);
                     if (!MNode.IsValid()) {
@@ -8198,22 +8206,86 @@ var AssureNote;
     })(AssureNote.Command);
     AssureNote.UseRecAtCommand = UseRecAtCommand;
 
+    var SetMonitorMenuItem = (function (_super) {
+        __extends(SetMonitorMenuItem, _super);
+        function SetMonitorMenuItem() {
+            _super.apply(this, arguments);
+        }
+        SetMonitorMenuItem.prototype.GetIconName = function () {
+            if (MNodeManager.IsRunning) {
+                return "minus";
+            } else {
+                return "plus";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.GetDisplayName = function () {
+            if (MNodeManager.IsRunning) {
+                return "Unset";
+            } else {
+                return "Set";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.Invoke = function (App) {
+            if (MNodeManager.IsRunning) {
+                var Command = App.FindCommandByCommandLineName("unset-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            } else {
+                var Command = App.FindCommandByCommandLineName("set-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            }
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        };
+        return SetMonitorMenuItem;
+    })(AssureNote.TopMenuItem);
+    AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
+
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
+            this.SetHasMenuBarButton(true);
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
+                new SetMonitorMenuItem()
+            ]));
         }
-        MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
-            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Danger);
-            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Useless);
-            if (NodeView.Label in MNodeManager.NodeColorMap) {
-                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+        MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
+            if (!View.Model.IsEvidence()) {
+                return null;
             }
+
+            var App = this.AssureNoteApp;
+            var MNode = new MonitorNode(App, View.Label);
+
+            if (MNode.IsValid) {
+                if (MNode.Label in MNodeManager.MonitorNodeMap) {
+                    return new AssureNote.NodeMenuItem("unset-monitor", "/images/monitor.png", "unset\ monitor", function (event, TargetView) {
+                        var Command = App.FindCommandByCommandLineName("unset-monitor");
+                        if (Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                } else {
+                    return new AssureNote.NodeMenuItem("set-monitor", "/images/monitor.png", "set\ monitor", function (event, TargetView) {
+                        var Command = App.FindCommandByCommandLineName("set-monitor");
+                        if (Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                }
+            }
+
+            return null;
         };
 
         MonitorNodePlugin.prototype.CreateTooltipContents = function (NodeView) {
@@ -8261,6 +8333,14 @@ var AssureNote;
             li.innerHTML = table.outerHTML;
             ReturnValue.push(li);
             return ReturnValue;
+        };
+
+        MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Danger);
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Useless);
+            if (NodeView.Label in MNodeManager.NodeColorMap) {
+                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+            }
         };
         return MonitorNodePlugin;
     })(AssureNote.Plugin);
