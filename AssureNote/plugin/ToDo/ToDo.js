@@ -39,6 +39,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         ToDoPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.ToDo);
             var TagMap = NodeView.Model.GetTagMap();
             if (!TagMap)
                 return;

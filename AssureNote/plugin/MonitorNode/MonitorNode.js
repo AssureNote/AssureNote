@@ -425,6 +425,10 @@ var AssureNote;
                         this.App.DebugP("Node not found");
                         return;
                     }
+                    if (!View.Model.IsEvidence()) {
+                        this.App.DebugP("This node is not a monitor");
+                        return;
+                    }
 
                     var MNode = new MonitorNode(this.App, Label);
                     if (!MNode.IsValid()) {
@@ -530,20 +534,88 @@ var AssureNote;
     })(AssureNote.Command);
     AssureNote.UseRecAtCommand = UseRecAtCommand;
 
+    var SetMonitorMenuItem = (function (_super) {
+        __extends(SetMonitorMenuItem, _super);
+        function SetMonitorMenuItem() {
+            _super.apply(this, arguments);
+        }
+        SetMonitorMenuItem.prototype.GetIconName = function () {
+            if (MNodeManager.IsRunning) {
+                return "minus";
+            } else {
+                return "plus";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.GetDisplayName = function () {
+            if (MNodeManager.IsRunning) {
+                return "Unset";
+            } else {
+                return "Set";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.Invoke = function (App) {
+            if (MNodeManager.IsRunning) {
+                var Command = App.FindCommandByCommandLineName("unset-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            } else {
+                var Command = App.FindCommandByCommandLineName("set-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            }
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        };
+        return SetMonitorMenuItem;
+    })(AssureNote.TopMenuItem);
+    AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
+
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
+            this.SetHasMenuBarButton(true);
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
+                new SetMonitorMenuItem()
+            ]));
         }
-        MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
-            if (NodeView.Label in MNodeManager.NodeColorMap) {
-                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+        MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
+            if (!View.Model.IsEvidence()) {
+                return null;
             }
+
+            var App = this.AssureNoteApp;
+            var MNode = new MonitorNode(App, View.Label);
+
+            // If it is 'MonitorNode'
+            if (MNode.IsValid) {
+                // If it has been already set as 'MonitorNode'
+                if (MNode.Label in MNodeManager.MonitorNodeMap) {
+                    return new AssureNote.NodeMenuItem("unset-monitor", "/images/monitor.png", "unset\ monitor", function (event, TargetView) {
+                        var Command = App.FindCommandByCommandLineName("unset-monitor");
+                        if (Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                } else {
+                    return new AssureNote.NodeMenuItem("set-monitor", "/images/monitor.png", "set\ monitor", function (event, TargetView) {
+                        var Command = App.FindCommandByCommandLineName("set-monitor");
+                        if (Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                }
+            }
+
+            return null;
         };
 
         MonitorNodePlugin.prototype.CreateTooltipContents = function (NodeView) {
@@ -557,6 +629,9 @@ var AssureNote;
             var li = document.createElement('li');
             li.innerHTML = '<b>Monitor</b> is running on <b>' + MNode.Location + '<br><br></b>';
             ReturnValue.push(li);
+            li.innerHTML = '<b>Monitor</b> is certificated by <b>' + MNode.GetLatestLog().authid + '<br><br></b>';
+
+            li = document.createElement('li');
 
             li = document.createElement('li');
             var table = document.createElement('table');
@@ -588,6 +663,14 @@ var AssureNote;
             li.innerHTML = table.outerHTML;
             ReturnValue.push(li);
             return ReturnValue;
+        };
+
+        MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Danger);
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Useless);
+            if (NodeView.Label in MNodeManager.NodeColorMap) {
+                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+            }
         };
         return MonitorNodePlugin;
     })(AssureNote.Plugin);

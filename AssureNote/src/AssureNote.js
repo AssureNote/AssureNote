@@ -61,26 +61,26 @@ var AssureNote;
             this.RegistCommand(new AssureNote.UploadCommand(this));
             this.RegistCommand(new AssureNote.HistoryCommand(this));
 
+            this.TopMenu = new AssureNote.TopMenuTopItem([]);
+
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu = new AssureNote.TopMenuTopItem([
-                new AssureNote.SubMenuItem("File", "file", [
-                    new AssureNote.NewMenuItem(),
-                    new AssureNote.OpenMenuItem(),
-                    new AssureNote.UploadMenuItem(),
-                    new AssureNote.SaveMenuItem(),
-                    new AssureNote.SubMenuItem("Save As", "floppy-save", [
-                        new AssureNote.SaveAsWGSNMenuItem(),
-                        new AssureNote.SaveAsDCaseMenuItem(),
-                        new AssureNote.SaveAsSVGMenuItem()
-                    ]),
-                    new AssureNote.DividerMenuItem(),
-                    new AssureNote.HelpMenuItem(),
-                    new AssureNote.AboutMenuItem()
-                ])
-            ]);
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
+                new AssureNote.NewMenuItem(),
+                new AssureNote.OpenMenuItem(),
+                new AssureNote.UploadMenuItem(),
+                new AssureNote.SaveMenuItem(),
+                new AssureNote.SubMenuItem("Save As", "floppy-save", [
+                    new AssureNote.SaveAsWGSNMenuItem(),
+                    new AssureNote.SaveAsDCaseMenuItem(),
+                    new AssureNote.SaveAsSVGMenuItem()
+                ]),
+                new AssureNote.DividerMenuItem(),
+                new AssureNote.HelpMenuItem(),
+                new AssureNote.AboutMenuItem()
+            ]));
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
         }
         AssureNoteApp.prototype.IsLoading = function () {

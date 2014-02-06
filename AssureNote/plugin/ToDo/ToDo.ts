@@ -33,6 +33,7 @@ module AssureNote {
         }
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
+            NodeView.RemoveColorStyle(ColorStyle.ToDo);
             var TagMap: HashMap<string, string> = NodeView.Model.GetTagMap();
             if (!TagMap) return;
             if (TagMap.get('TODO') || TagMap.get('TODO') == '') {

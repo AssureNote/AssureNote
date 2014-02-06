@@ -145,9 +145,15 @@ module AssureNote {
     }
 
     export class TopMenuTopItem extends TopMenuItem {
+
         constructor(public SubMenuList: TopMenuItem[]) {
             super();
         }
+
+        AppendSubMenu(SubMenu: TopMenuItem) {
+            this.SubMenuList.unshift(SubMenu);
+        }
+
         Render(App: AssureNoteApp, Target: Element, IsTopLevel: boolean): void {
             for (var i = 0; i < this.SubMenuList.length; i++) {
                 this.SubMenuList[i].Render(App, Target, true);

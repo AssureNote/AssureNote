@@ -4500,6 +4500,17 @@ var AssureNote;
         return WGSNSocket;
     })();
     AssureNote.WGSNSocket = WGSNSocket;
+
+    var EditNodeStatus = (function () {
+        function EditNodeStatus(UserName, UID, IsRecursive, SID) {
+            this.UserName = UserName;
+            this.UID = UID;
+            this.IsRecursive = IsRecursive;
+            this.SID = SID;
+        }
+        return EditNodeStatus;
+    })();
+    AssureNote.EditNodeStatus = EditNodeStatus;
     var SocketManager = (function () {
         function SocketManager(App) {
             var _this = this;
@@ -4507,14 +4518,13 @@ var AssureNote;
             this.DefaultChatServer = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
-            this.EditStatus = [];
             this.EditNodeInfo = [];
             if (!this.IsOperational()) {
                 App.DebugP('socket.io not found');
             }
 
             App.PictgramPanel.Viewport.OnScroll = function (Viewport) {
-                if (_this.IsConnected() && _this.UseOnScrollEvent) {
+                if (_this.IsConnected() && _this.UseOnScrollEvent && (_this.App.ModeManager.GetMode() != 1 /* View */)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
                     var Y = Viewport.GetCameraGY();
@@ -4600,8 +4610,16 @@ var AssureNote;
             });
             this.socket.on('finishedit', function (UID) {
                 console.log('finishedit');
-                self.DeleteID(UID);
-                self.UpdateView("finishedit");
+                var Length;
+                self.DeleteEditInfo(UID);
+                if ((Length = self.EditNodeInfo.length) != 0) {
+                    var LatestView = self.App.PictgramPanel.GetNodeViewFromUID(self.EditNodeInfo[Length - 1].UID);
+                    self.UpdateFlags(LatestView);
+                    self.UpdateView("anotheredit");
+                    self.AddUserNameOn(LatestView, { User: self.EditNodeInfo[Length - 1].UserName, IsRecursive: self.EditNodeInfo[Length - 1].IsRecursive });
+                } else {
+                    self.UpdateView("finishedit");
+                }
                 console.log('here is ID array after delete = ' + self.EditNodeInfo);
             });
 
@@ -4611,15 +4629,17 @@ var AssureNote;
         };
 
         SocketManager.prototype.Connect = function (host) {
-            if (host == null || host == '') {
-                this.socket = io.connect(this.DefaultChatServer);
-            } else {
-                this.socket = io.connect(host);
+            if (!this.IsConnected()) {
+                if (host == null || host == '') {
+                    this.socket = io.connect(this.DefaultChatServer);
+                } else {
+                    this.socket = io.connect(host);
+                }
+                this.App.ModeManager.Enable();
+                this.EnableListeners();
+                this.App.UserList.Show();
+                this.Emit("adduser", { User: this.App.GetUserName(), MODE: this.App.ModeManager.GetMode() });
             }
-            this.App.ModeManager.Enable();
-            this.EnableListeners();
-            this.Emit('adduser', { User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode() });
-            this.App.UserList.Show();
         };
 
         SocketManager.prototype.DisConnect = function () {
@@ -4635,9 +4655,9 @@ var AssureNote;
             return io != null && io.connect != null;
         };
 
-        SocketManager.prototype.DeleteID = function (UID) {
+        SocketManager.prototype.DeleteEditInfo = function (UID) {
             for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     this.EditNodeInfo.splice(i, 1);
                     return;
                 }
@@ -4677,7 +4697,7 @@ var AssureNote;
             this.UpdateParentStatus(NodeView);
             if (NodeView.Children == null && NodeView.Left == null && NodeView.Right == null)
                 return;
-            if (this.EditNodeInfo[this.EditNodeInfo.length - 1]["IsRecursive"]) {
+            if (this.EditNodeInfo[this.EditNodeInfo.length - 1].IsRecursive) {
                 this.UpdateChildStatus(NodeView);
             }
         };
@@ -4718,14 +4738,14 @@ var AssureNote;
             if (this.EditNodeInfo.length == 0)
                 return true;
             for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                if (this.EditNodeInfo[i]["UID"] == UID) {
+                if (this.EditNodeInfo[i].UID == UID) {
                     return false;
                 }
             }
 
             while (CurrentView != null) {
                 for (var i = 0; i < this.EditNodeInfo.length; i++) {
-                    if (this.EditNodeInfo[i]["IsRecursive"] && this.EditNodeInfo[i]["UID"] == CurrentView.Model.UID) {
+                    if (this.EditNodeInfo[i].IsRecursive && this.EditNodeInfo[i].UID == CurrentView.Model.UID) {
                         return false;
                     }
                 }
@@ -4924,6 +4944,10 @@ var AssureNote;
             _super.call(this);
             this.SubMenuList = SubMenuList;
         }
+        TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
+            this.SubMenuList.unshift(SubMenu);
+        };
+
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
             for (var i = 0; i < this.SubMenuList.length; i++) {
                 this.SubMenuList[i].Render(App, Target, true);
@@ -5398,7 +5422,7 @@ var AssureNote;
             this.Element.empty();
             var h = this.App.MasterRecord.HistoryList[this.Index];
             var message = h.GetCommitMessage() || "(No Commit Message)";
-            var t = { Message: message, User: h.Author, DateTime: h.DateString };
+            var t = { Message: message, User: h.Author, DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString) };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
 
             if (this.Index == 0) {
@@ -5489,26 +5513,26 @@ var AssureNote;
             this.RegistCommand(new AssureNote.UploadCommand(this));
             this.RegistCommand(new AssureNote.HistoryCommand(this));
 
+            this.TopMenu = new AssureNote.TopMenuTopItem([]);
+
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu = new AssureNote.TopMenuTopItem([
-                new AssureNote.SubMenuItem("File", "file", [
-                    new AssureNote.NewMenuItem(),
-                    new AssureNote.OpenMenuItem(),
-                    new AssureNote.UploadMenuItem(),
-                    new AssureNote.SaveMenuItem(),
-                    new AssureNote.SubMenuItem("Save As", "floppy-save", [
-                        new AssureNote.SaveAsWGSNMenuItem(),
-                        new AssureNote.SaveAsDCaseMenuItem(),
-                        new AssureNote.SaveAsSVGMenuItem()
-                    ]),
-                    new AssureNote.DividerMenuItem(),
-                    new AssureNote.HelpMenuItem(),
-                    new AssureNote.AboutMenuItem()
-                ])
-            ]);
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
+                new AssureNote.NewMenuItem(),
+                new AssureNote.OpenMenuItem(),
+                new AssureNote.UploadMenuItem(),
+                new AssureNote.SaveMenuItem(),
+                new AssureNote.SubMenuItem("Save As", "floppy-save", [
+                    new AssureNote.SaveAsWGSNMenuItem(),
+                    new AssureNote.SaveAsDCaseMenuItem(),
+                    new AssureNote.SaveAsSVGMenuItem()
+                ]),
+                new AssureNote.DividerMenuItem(),
+                new AssureNote.HelpMenuItem(),
+                new AssureNote.AboutMenuItem()
+            ]));
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
         }
         AssureNoteApp.prototype.IsLoading = function () {
@@ -6223,6 +6247,8 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new MessageCommand(this.AssureNoteApp));
         }
         MessageChatPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.SingleEdit);
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Locked);
             switch (NodeView.Status) {
                 case 1 /* SingleEditable */:
                     NodeView.AddColorStyle(AssureNote.ColorStyle.SingleEdit);
@@ -6320,6 +6346,7 @@ var AssureNote;
             this.AssureNoteApp = AssureNoteApp;
         }
         ToDoPlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.ToDo);
             var TagMap = NodeView.Model.GetTagMap();
             if (!TagMap)
                 return;
@@ -8072,6 +8099,10 @@ var AssureNote;
                         this.App.DebugP("Node not found");
                         return;
                     }
+                    if (!View.Model.IsEvidence()) {
+                        this.App.DebugP("This node is not a monitor");
+                        return;
+                    }
 
                     var MNode = new MonitorNode(this.App, Label);
                     if (!MNode.IsValid()) {
@@ -8175,20 +8206,86 @@ var AssureNote;
     })(AssureNote.Command);
     AssureNote.UseRecAtCommand = UseRecAtCommand;
 
+    var SetMonitorMenuItem = (function (_super) {
+        __extends(SetMonitorMenuItem, _super);
+        function SetMonitorMenuItem() {
+            _super.apply(this, arguments);
+        }
+        SetMonitorMenuItem.prototype.GetIconName = function () {
+            if (MNodeManager.IsRunning) {
+                return "minus";
+            } else {
+                return "plus";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.GetDisplayName = function () {
+            if (MNodeManager.IsRunning) {
+                return "Unset";
+            } else {
+                return "Set";
+            }
+        };
+
+        SetMonitorMenuItem.prototype.Invoke = function (App) {
+            if (MNodeManager.IsRunning) {
+                var Command = App.FindCommandByCommandLineName("unset-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            } else {
+                var Command = App.FindCommandByCommandLineName("set-monitor");
+                if (Command != null) {
+                    Command.Invoke(null, ["all"]);
+                }
+            }
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        };
+        return SetMonitorMenuItem;
+    })(AssureNote.TopMenuItem);
+    AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
+
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
             _super.call(this);
             this.AssureNoteApp = AssureNoteApp;
             MNodeManager = new MonitorNodeManager(this.AssureNoteApp);
+            this.SetHasMenuBarButton(true);
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
+                new SetMonitorMenuItem()
+            ]));
         }
-        MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
-            if (NodeView.Label in MNodeManager.NodeColorMap) {
-                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+        MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
+            if (!View.Model.IsEvidence()) {
+                return null;
             }
+
+            var App = this.AssureNoteApp;
+            var MNode = new MonitorNode(App, View.Label);
+
+            if (MNode.IsValid) {
+                if (MNode.Label in MNodeManager.MonitorNodeMap) {
+                    return new AssureNote.NodeMenuItem("unset-monitor", "/images/monitor.png", "unset\ monitor", function (event, TargetView) {
+                        var Command = App.FindCommandByCommandLineName("unset-monitor");
+                        if (Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                } else {
+                    return new AssureNote.NodeMenuItem("set-monitor", "/images/monitor.png", "set\ monitor", function (event, TargetView) {
+                        var Command = App.FindCommandByCommandLineName("set-monitor");
+                        if (Command != null) {
+                            Command.Invoke(null, [TargetView.Label]);
+                        }
+                    });
+                }
+            }
+
+            return null;
         };
 
         MonitorNodePlugin.prototype.CreateTooltipContents = function (NodeView) {
@@ -8202,6 +8299,9 @@ var AssureNote;
             var li = document.createElement('li');
             li.innerHTML = '<b>Monitor</b> is running on <b>' + MNode.Location + '<br><br></b>';
             ReturnValue.push(li);
+            li.innerHTML = '<b>Monitor</b> is certificated by <b>' + MNode.GetLatestLog().authid + '<br><br></b>';
+
+            li = document.createElement('li');
 
             li = document.createElement('li');
             var table = document.createElement('table');
@@ -8233,6 +8333,14 @@ var AssureNote;
             li.innerHTML = table.outerHTML;
             ReturnValue.push(li);
             return ReturnValue;
+        };
+
+        MonitorNodePlugin.prototype.RenderSVG = function (ShapeGroup, NodeView) {
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Danger);
+            NodeView.RemoveColorStyle(AssureNote.ColorStyle.Useless);
+            if (NodeView.Label in MNodeManager.NodeColorMap) {
+                NodeView.AddColorStyle(MNodeManager.NodeColorMap[NodeView.Label]);
+            }
         };
         return MonitorNodePlugin;
     })(AssureNote.Plugin);
