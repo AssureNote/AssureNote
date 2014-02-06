@@ -75,6 +75,9 @@ var AssureNote;
             var IsEditMode = (Info.Mode == 0 /* Edit */) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));
             this.Show();
+            var StyleName = "highlight-" + Info.SID;
+            var ColorInfo = { stroke: Color };
+            AssureNote.AssureNoteUtils.DefineColorStyle(StyleName, ColorInfo);
         };
 
         UserList.prototype.UpdateEditMode = function (Info) {
@@ -98,11 +101,24 @@ var AssureNote;
         };
 
         UserList.prototype.GetRandomColor = function () {
-            var color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
-            for (var i = color.length; i < 6; i++) {
-                color = "0" + color;
-            }
+            var color;
+            do {
+                color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+                for (var i = color.length; i < 6; i++) {
+                    color = "0" + color;
+                }
+            } while(color == "000000" || color == "FFFFFF");
             return "#" + color;
+        };
+
+        UserList.prototype.AddFocusedUserColor = function (SID, View) {
+            var StyleName = "highlight-" + SID;
+            View.Shape.AddColorStyle(StyleName);
+        };
+
+        UserList.prototype.RemoveFocusedUserColor = function (SID, View) {
+            var StyleName = "highlight-" + SID;
+            View.Shape.RemoveColorStyle(StyleName);
         };
         return UserList;
     })(AssureNote.Panel);

@@ -63,6 +63,9 @@ module AssureNote {
             var IsEditMode: boolean = (Info.Mode == AssureNoteMode.Edit) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));
             this.Show();
+            var StyleName: string = "highlight-" + Info.SID;
+            var ColorInfo: any = {stroke:Color};
+            AssureNoteUtils.DefineColorStyle(StyleName, ColorInfo);
         }
 
         UpdateEditMode(Info: { User: string; Mode: number; SID: string }) {
@@ -86,11 +89,24 @@ module AssureNote {
         }
 
         GetRandomColor() : string {
-            var color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
-            for (var i: number = color.length; i < 6; i++){
-                color = "0" + color;
-            }
+            var color :string;
+            do {
+                color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+                for (var i: number = color.length; i < 6; i++){
+                    color = "0" + color;
+                }
+            } while (color == "000000" || color == "FFFFFF");
             return "#" + color;
+        }
+
+        AddFocusedUserColor(SID:string, View: NodeView) {
+            var StyleName: string = "highlight-" + SID;
+            View.Shape.AddColorStyle(StyleName);
+        }
+
+        RemoveFocusedUserColor(SID: string, View: NodeView) {
+            var StyleName: string = "highlight-" + SID;
+            View.Shape.RemoveColorStyle(StyleName);
         }
     }
 }

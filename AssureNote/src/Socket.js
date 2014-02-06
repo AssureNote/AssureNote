@@ -44,6 +44,15 @@ var AssureNote;
         return EditNodeStatus;
     })();
     AssureNote.EditNodeStatus = EditNodeStatus;
+
+    var FocusedLabels = (function () {
+        function FocusedLabels(SID, Label) {
+            this.SID = SID;
+            this.Label = Label;
+        }
+        return FocusedLabels;
+    })();
+    AssureNote.FocusedLabels = FocusedLabels;
     var SocketManager = (function () {
         function SocketManager(App) {
             var _this = this;
@@ -52,6 +61,7 @@ var AssureNote;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.EditNodeInfo = [];
+            this.FocusedLabels = [];
             if (!this.IsOperational()) {
                 App.DebugP('socket.io not found');
             }
@@ -112,6 +122,28 @@ var AssureNote;
 
             this.socket.on('adduser', function (data) {
                 self.App.UserList.AddUser(data);
+            });
+
+            this.socket.on('focusednode', function (data) {
+                var OldView;
+                var OldLabel;
+                if (data.Label == null || self.FocusedLabels.length != 0) {
+                    for (var i in self.FocusedLabels) {
+                        if (self.FocusedLabels[i].SID == data.SID) {
+                            OldLabel = self.FocusedLabels[i].Label;
+                            OldView = self.App.PictgramPanel.ViewMap[OldLabel];
+                            self.FocusedLabels.splice(i, 1);
+                            self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
+                            break;
+                        }
+                    }
+                }
+
+                if (data.Label != null) {
+                    var FocusedView = self.App.PictgramPanel.ViewMap[data.Label];
+                    self.App.UserList.AddFocusedUserColor(data.SID, FocusedView);
+                    self.FocusedLabels.push(data);
+                }
             });
 
             this.socket.on('updateeditmode', function (data) {

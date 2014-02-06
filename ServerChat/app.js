@@ -24,6 +24,15 @@ var EditNodeStatus = (function () {
 })();
 exports.EditNodeStatus = EditNodeStatus;
 
+var FocusedInfo = (function () {
+    function FocusedInfo(SID, Label) {
+        this.SID = SID;
+        this.Label = Label;
+    }
+    return FocusedInfo;
+})();
+exports.FocusedInfo = FocusedInfo;
+
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
         var _this = this;
@@ -94,6 +103,11 @@ var AssureNoteServer = (function () {
                 }
             }
             _this.UsersInfo.push(Info);
+        });
+
+        socket.on('focusednode', function (Label) {
+            var FocusInfo = new FocusedInfo(socket.id, Label);
+            socket.broadcast.emit('focusednode', FocusInfo);
         });
 
         socket.on('updateeditmode', function (data) {

@@ -12,6 +12,10 @@ export class EditNodeStatus {
     constructor (public UserName: string, public UID: number, public IsRecursive: boolean, public SID: string) { }
 }
 
+export class FocusedInfo {
+    constructor (public SID: string, public Label: string) { }
+}
+
 class AssureNoteServer {
     io: SocketManager;
     room: string = 'room';
@@ -82,6 +86,11 @@ class AssureNoteServer {
                 }
             }
             this.UsersInfo.push(Info);
+        });
+
+        socket.on('focusednode', (Label: string) => {
+            var FocusInfo: FocusedInfo = new FocusedInfo(socket.id, Label);
+            socket.broadcast.emit('focusednode', FocusInfo);
         });
 
         socket.on('updateeditmode', (data: {User: string; Mode: number}) => {

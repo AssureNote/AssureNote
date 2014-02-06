@@ -76,6 +76,8 @@ module AssureNote {
                 this.App.DebugP("click:" + Label);
                 if (this.IsActive()) {
                     this.ChangeFocusedLabel(Label);
+                } else {
+                    this.App.SocketManager.Emit("focusednode", Label);
                 }
                 if (this.ContextMenu.IsEnable) {
                     this.ContextMenu.Remove();
@@ -200,6 +202,7 @@ module AssureNote {
         }
 
         OnKeyDown(Event: KeyboardEvent): void {
+            var Label: string;
             var handled = true;
             switch (Event.keyCode) {
                 case 58: /*: in Firefox*/
@@ -379,6 +382,7 @@ module AssureNote {
            @param {string} Label If label is null, there is no focused label.
         */
         ChangeFocusedLabel(Label: string): void {
+            this.App.SocketManager.Emit("focusednode", Label);
             AssureNoteUtils.UpdateHash(Label);
             if (this.ContextMenu.IsEnable) {
                 this.ContextMenu.Remove();

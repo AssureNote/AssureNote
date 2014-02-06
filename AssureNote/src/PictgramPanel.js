@@ -65,6 +65,8 @@ var AssureNote;
                 _this.App.DebugP("click:" + Label);
                 if (_this.IsActive()) {
                     _this.ChangeFocusedLabel(Label);
+                } else {
+                    _this.App.SocketManager.Emit("focusednode", Label);
                 }
                 if (_this.ContextMenu.IsEnable) {
                     _this.ContextMenu.Remove();
@@ -187,6 +189,7 @@ var AssureNote;
             };
         }
         PictgramPanel.prototype.OnKeyDown = function (Event) {
+            var Label;
             var handled = true;
             switch (Event.keyCode) {
                 case 58:
@@ -362,6 +365,7 @@ var AssureNote;
         @param {string} Label If label is null, there is no focused label.
         */
         PictgramPanel.prototype.ChangeFocusedLabel = function (Label) {
+            this.App.SocketManager.Emit("focusednode", Label);
             AssureNote.AssureNoteUtils.UpdateHash(Label);
             if (this.ContextMenu.IsEnable) {
                 this.ContextMenu.Remove();
