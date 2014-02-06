@@ -248,6 +248,11 @@ var AssureNote;
             return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
         }
         AssureNoteUtils.GetTime = GetTime;
+
+        function DefineColorStyle(StyleName, StyleDef) {
+            $("<style>").html("." + StyleName + " { " + $("span").css(StyleDef).attr("style") + " }").appendTo("head");
+        }
+        AssureNoteUtils.DefineColorStyle = DefineColorStyle;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
@@ -5129,7 +5134,7 @@ var AssureNote;
         SaveAsSVGMenuItem.prototype.Invoke = function (App) {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
                 var CommitCommand = App.FindCommandByCommandLineName("commit");
-                Command.Invoke(null, ["Save"]);
+                CommitCommand.Invoke(null, ["Save"]);
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             var Command = App.FindCommandByCommandLineName("save-as-svg");
