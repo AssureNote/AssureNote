@@ -115,12 +115,11 @@ module AssureNote {
             });
 
             this.socket.on('focusednode', function(data: {SID: string; Label: string}) {
-                var FocusedView: NodeView = self.App.PictgramPanel.ViewMap[data.Label];
-                var OldView: NodeView;
+                var OldView : NodeView;
                 var OldLabel: string;
-                if (self.FocusedLabels.length != 0) {
+                if (data.Label == null || self.FocusedLabels.length != 0) {
                     for (var i in self.FocusedLabels) {
-                        if ((self.FocusedLabels[i].SID) == data.SID) {
+                        if (self.FocusedLabels[i].SID == data.SID) {
                             OldLabel = self.FocusedLabels[i].Label;
                             OldView  = self.App.PictgramPanel.ViewMap[OldLabel];
                             self.FocusedLabels.splice(i, 1);
@@ -130,10 +129,11 @@ module AssureNote {
                     }
                 }
 
-                if (FocusedView != null) {
+                if (data.Label != null) {
+                    var FocusedView: NodeView = self.App.PictgramPanel.ViewMap[data.Label];
                     self.App.UserList.AddFocusedUserColor(data.SID, FocusedView);
+                    self.FocusedLabels.push(data);
                 }
-                self.FocusedLabels.push(data);
             });
 
             this.socket.on('updateeditmode', function (data: { User: string; Mode: number; SID: string }) {
@@ -263,9 +263,9 @@ module AssureNote {
         UpdateView(Method: string) {
             var NewNodeView: NodeView = new NodeView(this.App.MasterRecord.GetLatestDoc().TopNode, true);
             NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-//            if (Method == "finishedit") {
-//                this.SetDefaultFlags(NewNodeView);
-//            }
+            if (Method == "finishedit") {
+                this.SetDefaultFlags(NewNodeView);
+            }
             this.App.PictgramPanel.InitializeView(NewNodeView);
             this.App.PictgramPanel.Draw(this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel());
         }

@@ -76,6 +76,8 @@ module AssureNote {
                 this.App.DebugP("click:" + Label);
                 if (this.IsActive()) {
                     this.ChangeFocusedLabel(Label);
+                } else {
+                    this.App.SocketManager.Emit("focusednode", Label);
                 }
                 if (this.ContextMenu.IsEnable) {
                     this.ContextMenu.Remove();
@@ -220,8 +222,6 @@ module AssureNote {
                     if (this.App.HistoryPanel) {
                         this.App.HistoryPanel.Hide();
                     }
-                    Label = this.GetFocusedLabel();
-                    this.App.SocketManager.Emit("focusednode", Label);
                     break;
                 case 13: /*Enter*/
                     if (this.Search.IsSearching()) {
@@ -232,35 +232,25 @@ module AssureNote {
                 case 72: /*h*/
                 case 37: /*left*/
                     this.NavigateLeft();
-                    Label = this.GetFocusedLabel();
-                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 74: /*j*/
                 case 40: /*down*/
                     this.NavigateDown();
-                    Label = this.GetFocusedLabel();
-                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 75: /*k*/
                 case 38: /*up*/
                     this.NavigateUp();
-                    Label = this.GetFocusedLabel();
-                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 76: /*l*/
                 case 39: /*right*/
                     this.NavigateRight();
-                    Label = this.GetFocusedLabel();
-                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 36: /*home*/
                     this.NavigateHome();
-                    Label = this.GetFocusedLabel();
-                    this.App.SocketManager.Emit("focusednode", Label);
                     Event.preventDefault();
                     break;
                 case 70: /*f*/
@@ -392,6 +382,7 @@ module AssureNote {
            @param {string} Label If label is null, there is no focused label.
         */
         ChangeFocusedLabel(Label: string): void {
+            this.App.SocketManager.Emit("focusednode", Label);
             AssureNoteUtils.UpdateHash(Label);
             if (this.ContextMenu.IsEnable) {
                 this.ContextMenu.Remove();
