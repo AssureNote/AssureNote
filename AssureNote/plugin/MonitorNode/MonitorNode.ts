@@ -551,9 +551,9 @@ module AssureNote {
 
     }
 
-    export class ShowMonitorListCommand extends Command {
+    export class MonitorListPanel extends Panel {
 
-        constructor(App: AssureNote.AssureNoteApp) {
+        constructor(App: AssureNoteApp) {
             super(App);
             var Modal = $('\
 <div id="monitorlist-modal" tabindex="-1" role="dialog" aria-labelledby="monitorlist-modal-label" aria-hidden="true" class="modal fade">\n\
@@ -573,14 +573,10 @@ module AssureNote {
 </div>\n\
             ');
             $('#plugin-layer').append(Modal);
-        }
 
-        public GetCommandLineNames(): string[] {
-            return ["show-monitorlist"];
-        }
-
-        public GetHelpHTML(): string {
-            return "<code>show-monitorlist</code><br>Show list of monitors.";
+            $('#monitorlist-modal').on('hidden.bs.modal', function() {
+                App.PictgramPanel.Activate();
+            });
         }
 
         private UpdateMonitorList(): void {
@@ -602,7 +598,8 @@ module AssureNote {
 
             for(var Label in MNodeManager.MonitorNodeMap) {
                 var MNode = MNodeManager.MonitorNodeMap[Label];
-                if(MNode.GetLatestStatus() == true) {
+                var LatestStatus;
+                if(LatestStatus == null || LatestStatus == true) {
                     TableInnerHTML += '<tr align="center">'
                 }
                 else {
@@ -611,8 +608,15 @@ module AssureNote {
                 TableInnerHTML += '<td>'+MNode.Label+'</td>';
                 TableInnerHTML += '<td>'+MNode.Type+'</td>';
                 TableInnerHTML += '<td>'+MNode.Location+'</td>';
-                TableInnerHTML += '<td>'+MNode.GetLatestLog().authid+'</td>';
-                TableInnerHTML += '<td>'+MNode.GetLatestLog().timestamp+'</td>';
+                var LatestLog = MNode.GetLatestLog();
+                if(LatestLog != null) {
+                    TableInnerHTML += '<td>'+LatestLog.authid+'</td>';
+                    TableInnerHTML += '<td>'+LatestLog.timestamp+'</td>';
+                }
+                else {
+                    TableInnerHTML += '<td>N/A</td>';
+                    TableInnerHTML += '<td>N/A</td>';
+                }
                 TableInnerHTML += '</tr>'
             }
 
@@ -620,9 +624,32 @@ module AssureNote {
             ModalBody.innerHTML = Table.outerHTML;
         }
 
-        public Invoke(CommandName: string, Params: any[]): void {
+        OnActivate(): void {
             this.UpdateMonitorList();
             (<any>$('#monitorlist-modal')).modal();
+        }
+
+    }
+
+    export class ShowMonitorListCommand extends Command {
+
+        MonitorListPanel: MonitorListPanel;
+
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+            this.MonitorListPanel = new MonitorListPanel(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["show-monitorlist"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>show-monitorlist</code><br>Show list of monitors.";
+        }
+
+        public Invoke(CommandName: string, Params: any[]): void {
+            this.MonitorListPanel.Activate();
         }
 
     }
@@ -665,6 +692,23 @@ module AssureNote {
 
     }
 
+    export class ShowMonitorListMenuItem extends TopMenuItem {
+
+        GetIconName(): string {
+            return "th-list";
+        }
+
+        GetDisplayName(): string {
+            return "Show monitors";
+        }
+
+        Invoke(App: AssureNoteApp): void {
+            var Command = App.FindCommandByCommandLineName("show-monitorlist");
+            Command.Invoke(null, []);
+        }
+
+    }
+
     export class MonitorNodePlugin extends Plugin {
 
         constructor(public AssureNoteApp: AssureNoteApp) {
@@ -677,7 +721,8 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
             this.AssureNoteApp.TopMenu.AppendSubMenu(
                 new SubMenuItem("Monitor", "eye-open", [
-                    new SetMonitorMenuItem()
+                    new SetMonitorMenuItem(),
+                    new ShowMonitorListMenuItem()
                 ])
             );
         }

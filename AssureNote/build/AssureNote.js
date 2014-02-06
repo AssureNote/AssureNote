@@ -4110,6 +4110,8 @@ var AssureNote;
                 _this.App.DebugP("click:" + Label);
                 if (_this.IsActive()) {
                     _this.ChangeFocusedLabel(Label);
+                } else {
+                    _this.App.SocketManager.Emit("focusednode", Label);
                 }
                 if (_this.ContextMenu.IsEnable) {
                     _this.ContextMenu.Remove();
@@ -4229,6 +4231,7 @@ var AssureNote;
             };
         }
         PictgramPanel.prototype.OnKeyDown = function (Event) {
+            var Label;
             var handled = true;
             switch (Event.keyCode) {
                 case 58:
@@ -4386,6 +4389,7 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.ChangeFocusedLabel = function (Label) {
+            this.App.SocketManager.Emit("focusednode", Label);
             AssureNote.AssureNoteUtils.UpdateHash(Label);
             if (this.ContextMenu.IsEnable) {
                 this.ContextMenu.Remove();
@@ -4516,6 +4520,15 @@ var AssureNote;
         return EditNodeStatus;
     })();
     AssureNote.EditNodeStatus = EditNodeStatus;
+
+    var FocusedLabels = (function () {
+        function FocusedLabels(SID, Label) {
+            this.SID = SID;
+            this.Label = Label;
+        }
+        return FocusedLabels;
+    })();
+    AssureNote.FocusedLabels = FocusedLabels;
     var SocketManager = (function () {
         function SocketManager(App) {
             var _this = this;
@@ -4524,6 +4537,7 @@ var AssureNote;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.EditNodeInfo = [];
+            this.FocusedLabels = [];
             if (!this.IsOperational()) {
                 App.DebugP('socket.io not found');
             }
@@ -4583,6 +4597,28 @@ var AssureNote;
 
             this.socket.on('adduser', function (data) {
                 self.App.UserList.AddUser(data);
+            });
+
+            this.socket.on('focusednode', function (data) {
+                var OldView;
+                var OldLabel;
+                if (data.Label == null || self.FocusedLabels.length != 0) {
+                    for (var i in self.FocusedLabels) {
+                        if (self.FocusedLabels[i].SID == data.SID) {
+                            OldLabel = self.FocusedLabels[i].Label;
+                            OldView = self.App.PictgramPanel.ViewMap[OldLabel];
+                            self.FocusedLabels.splice(i, 1);
+                            self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
+                            break;
+                        }
+                    }
+                }
+
+                if (data.Label != null) {
+                    var FocusedView = self.App.PictgramPanel.ViewMap[data.Label];
+                    self.App.UserList.AddFocusedUserColor(data.SID, FocusedView);
+                    self.FocusedLabels.push(data);
+                }
             });
 
             this.socket.on('updateeditmode', function (data) {
@@ -5255,6 +5291,9 @@ var AssureNote;
             var IsEditMode = (Info.Mode == 0 /* Edit */) ? true : false;
             this.UserList.push(new UserItem(Info.User, Color, IsEditMode, Info.SID));
             this.Show();
+            var StyleName = "highlight-" + Info.SID;
+            var ColorInfo = { stroke: Color };
+            AssureNote.AssureNoteUtils.DefineColorStyle(StyleName, ColorInfo);
         };
 
         UserList.prototype.UpdateEditMode = function (Info) {
@@ -5278,11 +5317,24 @@ var AssureNote;
         };
 
         UserList.prototype.GetRandomColor = function () {
-            var color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
-            for (var i = color.length; i < 6; i++) {
-                color = "0" + color;
-            }
+            var color;
+            do {
+                color = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+                for (var i = color.length; i < 6; i++) {
+                    color = "0" + color;
+                }
+            } while(color == "000000" || color == "FFFFFF");
             return "#" + color;
+        };
+
+        UserList.prototype.AddFocusedUserColor = function (SID, View) {
+            var StyleName = "highlight-" + SID;
+            View.Shape.AddColorStyle(StyleName);
+        };
+
+        UserList.prototype.RemoveFocusedUserColor = function (SID, View) {
+            var StyleName = "highlight-" + SID;
+            View.Shape.RemoveColorStyle(StyleName);
         };
         return UserList;
     })(AssureNote.Panel);
@@ -8211,6 +8263,105 @@ var AssureNote;
     })(AssureNote.Command);
     AssureNote.UseRecAtCommand = UseRecAtCommand;
 
+    var MonitorListPanel = (function (_super) {
+        __extends(MonitorListPanel, _super);
+        function MonitorListPanel(App) {
+            _super.call(this, App);
+            var Modal = $('\
+<div id="monitorlist-modal" tabindex="-1" role="dialog" aria-labelledby="monitorlist-modal-label" aria-hidden="true" class="modal fade">\n\
+  <div class="modal-dialog">\n\
+    <div class="modal-content">\n\
+      <div class="modal-header">\n\
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>\n\
+        <h4 id="monitorlist-modal-label" class="modal-title">Active Monitor List</h4>\n\
+      </div>\n\
+      <div id="monitorlist-modal-body" class="modal-body">\n\
+      </div>\n\
+      <div class="modal-footer">\n\
+        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>\n\
+      </div>\n\
+    </div>\n\
+  </div>\n\
+</div>\n\
+            ');
+            $('#plugin-layer').append(Modal);
+
+            $('#monitorlist-modal').on('hidden.bs.modal', function () {
+                App.PictgramPanel.Activate();
+            });
+        }
+        MonitorListPanel.prototype.UpdateMonitorList = function () {
+            var ModalBody = $("#monitorlist-modal-body")[0];
+
+            var Table = document.createElement('table');
+            Table.setAttribute('border', '4');
+            Table.setAttribute('width', '90%');
+            Table.setAttribute('align', 'center');
+
+            var TableInnerHTML = '';
+            TableInnerHTML += '<tr align="center" bgcolor="#cccccc">';
+            TableInnerHTML += '<th>Label</th>';
+            TableInnerHTML += '<th>Type</th>';
+            TableInnerHTML += '<th>Location</th>';
+            TableInnerHTML += '<th>AuthID</th>';
+            TableInnerHTML += '<th>Last Update</th>';
+            TableInnerHTML += '</tr>';
+
+            for (var Label in MNodeManager.MonitorNodeMap) {
+                var MNode = MNodeManager.MonitorNodeMap[Label];
+                var LatestStatus;
+                if (LatestStatus == null || LatestStatus == true) {
+                    TableInnerHTML += '<tr align="center">';
+                } else {
+                    TableInnerHTML += '<tr align="center" bgcolor="#ffaa7d">';
+                }
+                TableInnerHTML += '<td>' + MNode.Label + '</td>';
+                TableInnerHTML += '<td>' + MNode.Type + '</td>';
+                TableInnerHTML += '<td>' + MNode.Location + '</td>';
+                var LatestLog = MNode.GetLatestLog();
+                if (LatestLog != null) {
+                    TableInnerHTML += '<td>' + LatestLog.authid + '</td>';
+                    TableInnerHTML += '<td>' + LatestLog.timestamp + '</td>';
+                } else {
+                    TableInnerHTML += '<td>N/A</td>';
+                    TableInnerHTML += '<td>N/A</td>';
+                }
+                TableInnerHTML += '</tr>';
+            }
+
+            Table.innerHTML = TableInnerHTML;
+            ModalBody.innerHTML = Table.outerHTML;
+        };
+
+        MonitorListPanel.prototype.OnActivate = function () {
+            this.UpdateMonitorList();
+            $('#monitorlist-modal').modal();
+        };
+        return MonitorListPanel;
+    })(AssureNote.Panel);
+    AssureNote.MonitorListPanel = MonitorListPanel;
+
+    var ShowMonitorListCommand = (function (_super) {
+        __extends(ShowMonitorListCommand, _super);
+        function ShowMonitorListCommand(App) {
+            _super.call(this, App);
+            this.MonitorListPanel = new MonitorListPanel(App);
+        }
+        ShowMonitorListCommand.prototype.GetCommandLineNames = function () {
+            return ["show-monitorlist"];
+        };
+
+        ShowMonitorListCommand.prototype.GetHelpHTML = function () {
+            return "<code>show-monitorlist</code><br>Show list of monitors.";
+        };
+
+        ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
+            this.MonitorListPanel.Activate();
+        };
+        return ShowMonitorListCommand;
+    })(AssureNote.Command);
+    AssureNote.ShowMonitorListCommand = ShowMonitorListCommand;
+
     var SetMonitorMenuItem = (function (_super) {
         __extends(SetMonitorMenuItem, _super);
         function SetMonitorMenuItem() {
@@ -8250,6 +8401,27 @@ var AssureNote;
     })(AssureNote.TopMenuItem);
     AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
 
+    var ShowMonitorListMenuItem = (function (_super) {
+        __extends(ShowMonitorListMenuItem, _super);
+        function ShowMonitorListMenuItem() {
+            _super.apply(this, arguments);
+        }
+        ShowMonitorListMenuItem.prototype.GetIconName = function () {
+            return "th-list";
+        };
+
+        ShowMonitorListMenuItem.prototype.GetDisplayName = function () {
+            return "Show monitors";
+        };
+
+        ShowMonitorListMenuItem.prototype.Invoke = function (App) {
+            var Command = App.FindCommandByCommandLineName("show-monitorlist");
+            Command.Invoke(null, []);
+        };
+        return ShowMonitorListMenuItem;
+    })(AssureNote.TopMenuItem);
+    AssureNote.ShowMonitorListMenuItem = ShowMonitorListMenuItem;
+
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
@@ -8260,8 +8432,10 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new SetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
+            this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
             this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
-                new SetMonitorMenuItem()
+                new SetMonitorMenuItem(),
+                new ShowMonitorListMenuItem()
             ]));
         }
         MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
@@ -8301,22 +8475,30 @@ var AssureNote;
             var MNode = MNodeManager.MonitorNodeMap[NodeView.Label];
 
             var ReturnValue = [];
-            var li = document.createElement('li');
-            li.innerHTML = '<b>Monitor</b> is running on <b>' + MNode.Location + '<br><br></b>';
-            ReturnValue.push(li);
-            li.innerHTML = '<b>Monitor</b> is certificated by <b>' + MNode.GetLatestLog().authid + '<br><br></b>';
+            var Li = document.createElement('li');
+            Li.innerHTML = '<b>Monitor</b> is running on <b>' + MNode.Location + '<br></b>';
+            ReturnValue.push(Li);
 
-            li = document.createElement('li');
+            var LatestLog = MNode.GetLatestLog();
+            if (LatestLog != null) {
+                Li = document.createElement('li');
+                Li.innerHTML = '<b>Monitor</b> is certificated by <b>' + MNode.GetLatestLog().authid + '<br></b>';
+                ReturnValue.push(Li);
+            }
 
-            li = document.createElement('li');
-            var table = document.createElement('table');
-            table.setAttribute('border', '4');
-            table.setAttribute('width', '250');
-            table.setAttribute('align', 'center');
+            Li = document.createElement('li');
+            Li.innerHTML = '<hr>';
+            ReturnValue.push(Li);
+
+            Li = document.createElement('li');
+            var Table = document.createElement('table');
+            Table.setAttribute('border', '4');
+            Table.setAttribute('width', '250');
+            Table.setAttribute('align', 'center');
 
             var TableInnerHTML = '';
             TableInnerHTML += '<caption>REC Logs</caption>';
-            TableInnerHTML += '<tr bgcolor="#cccccc">';
+            TableInnerHTML += '<tr align="center" bgcolor="#cccccc">';
             TableInnerHTML += '<th>Timestamp</th>';
             TableInnerHTML += '<th>' + MNode.Type + '</th>';
             TableInnerHTML += '</tr>';
@@ -8334,9 +8516,9 @@ var AssureNote;
                 TableInnerHTML += '</tr>';
             }
 
-            table.innerHTML = TableInnerHTML;
-            li.innerHTML = table.outerHTML;
-            ReturnValue.push(li);
+            Table.innerHTML = TableInnerHTML;
+            Li.innerHTML = Table.outerHTML;
+            ReturnValue.push(Li);
             return ReturnValue;
         };
 

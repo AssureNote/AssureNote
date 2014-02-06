@@ -534,9 +534,9 @@ var AssureNote;
     })(AssureNote.Command);
     AssureNote.UseRecAtCommand = UseRecAtCommand;
 
-    var ShowMonitorListCommand = (function (_super) {
-        __extends(ShowMonitorListCommand, _super);
-        function ShowMonitorListCommand(App) {
+    var MonitorListPanel = (function (_super) {
+        __extends(MonitorListPanel, _super);
+        function MonitorListPanel(App) {
             _super.call(this, App);
             var Modal = $('\
 <div id="monitorlist-modal" tabindex="-1" role="dialog" aria-labelledby="monitorlist-modal-label" aria-hidden="true" class="modal fade">\n\
@@ -556,16 +556,12 @@ var AssureNote;
 </div>\n\
             ');
             $('#plugin-layer').append(Modal);
+
+            $('#monitorlist-modal').on('hidden.bs.modal', function () {
+                App.PictgramPanel.Activate();
+            });
         }
-        ShowMonitorListCommand.prototype.GetCommandLineNames = function () {
-            return ["show-monitorlist"];
-        };
-
-        ShowMonitorListCommand.prototype.GetHelpHTML = function () {
-            return "<code>show-monitorlist</code><br>Show list of monitors.";
-        };
-
-        ShowMonitorListCommand.prototype.UpdateMonitorList = function () {
+        MonitorListPanel.prototype.UpdateMonitorList = function () {
             var ModalBody = $("#monitorlist-modal-body")[0];
 
             var Table = document.createElement('table');
@@ -584,7 +580,8 @@ var AssureNote;
 
             for (var Label in MNodeManager.MonitorNodeMap) {
                 var MNode = MNodeManager.MonitorNodeMap[Label];
-                if (MNode.GetLatestStatus() == true) {
+                var LatestStatus;
+                if (LatestStatus == null || LatestStatus == true) {
                     TableInnerHTML += '<tr align="center">';
                 } else {
                     TableInnerHTML += '<tr align="center" bgcolor="#ffaa7d">';
@@ -592,8 +589,14 @@ var AssureNote;
                 TableInnerHTML += '<td>' + MNode.Label + '</td>';
                 TableInnerHTML += '<td>' + MNode.Type + '</td>';
                 TableInnerHTML += '<td>' + MNode.Location + '</td>';
-                TableInnerHTML += '<td>' + MNode.GetLatestLog().authid + '</td>';
-                TableInnerHTML += '<td>' + MNode.GetLatestLog().timestamp + '</td>';
+                var LatestLog = MNode.GetLatestLog();
+                if (LatestLog != null) {
+                    TableInnerHTML += '<td>' + LatestLog.authid + '</td>';
+                    TableInnerHTML += '<td>' + LatestLog.timestamp + '</td>';
+                } else {
+                    TableInnerHTML += '<td>N/A</td>';
+                    TableInnerHTML += '<td>N/A</td>';
+                }
                 TableInnerHTML += '</tr>';
             }
 
@@ -601,9 +604,30 @@ var AssureNote;
             ModalBody.innerHTML = Table.outerHTML;
         };
 
-        ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
+        MonitorListPanel.prototype.OnActivate = function () {
             this.UpdateMonitorList();
             $('#monitorlist-modal').modal();
+        };
+        return MonitorListPanel;
+    })(AssureNote.Panel);
+    AssureNote.MonitorListPanel = MonitorListPanel;
+
+    var ShowMonitorListCommand = (function (_super) {
+        __extends(ShowMonitorListCommand, _super);
+        function ShowMonitorListCommand(App) {
+            _super.call(this, App);
+            this.MonitorListPanel = new MonitorListPanel(App);
+        }
+        ShowMonitorListCommand.prototype.GetCommandLineNames = function () {
+            return ["show-monitorlist"];
+        };
+
+        ShowMonitorListCommand.prototype.GetHelpHTML = function () {
+            return "<code>show-monitorlist</code><br>Show list of monitors.";
+        };
+
+        ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
+            this.MonitorListPanel.Activate();
         };
         return ShowMonitorListCommand;
     })(AssureNote.Command);
@@ -648,6 +672,27 @@ var AssureNote;
     })(AssureNote.TopMenuItem);
     AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
 
+    var ShowMonitorListMenuItem = (function (_super) {
+        __extends(ShowMonitorListMenuItem, _super);
+        function ShowMonitorListMenuItem() {
+            _super.apply(this, arguments);
+        }
+        ShowMonitorListMenuItem.prototype.GetIconName = function () {
+            return "th-list";
+        };
+
+        ShowMonitorListMenuItem.prototype.GetDisplayName = function () {
+            return "Show monitors";
+        };
+
+        ShowMonitorListMenuItem.prototype.Invoke = function (App) {
+            var Command = App.FindCommandByCommandLineName("show-monitorlist");
+            Command.Invoke(null, []);
+        };
+        return ShowMonitorListMenuItem;
+    })(AssureNote.TopMenuItem);
+    AssureNote.ShowMonitorListMenuItem = ShowMonitorListMenuItem;
+
     var MonitorNodePlugin = (function (_super) {
         __extends(MonitorNodePlugin, _super);
         function MonitorNodePlugin(AssureNoteApp) {
@@ -660,7 +705,8 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
             this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
-                new SetMonitorMenuItem()
+                new SetMonitorMenuItem(),
+                new ShowMonitorListMenuItem()
             ]));
         }
         MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
