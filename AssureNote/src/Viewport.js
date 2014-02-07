@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -114,19 +114,35 @@ var AssureNote;
             var _this = this;
             switch (e.type) {
                 case "pointerdown":
-                    this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                    if (e.pointerType == "mouse" && e.button != 0) {
+                        return;
+                    }
+                    if (!this.Pointers[e.pointerId]) {
+                        this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        //Log(e);
+                    }
                     break;
+                case "pointerout":
+                case "pointerleave":
+                case "pointercancel":
                 case "pointerup":
                     if (!this.Pointers[e.pointerId]) {
                         return;
                     }
                     delete this.Pointers[e.pointerId];
+                    e.preventDefault();
+                    e.stopPropagation();
+
                     break;
                 case "pointermove":
                     if (!this.Pointers[e.pointerId]) {
                         return;
                     }
                     this.Pointers[e.pointerId].SetPosition(e.clientX, e.clientY);
+                    e.preventDefault();
+                    e.stopPropagation();
                     break;
                 default:
                     return;
@@ -222,6 +238,9 @@ var AssureNote;
             this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
             this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
             this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointerout", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointerleave", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointercancel", OnPointer, false);
 
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
