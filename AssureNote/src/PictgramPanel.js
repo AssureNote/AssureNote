@@ -152,10 +152,10 @@ var AssureNote;
                 e.stopPropagation();
                 e.preventDefault();
             };
-            this.EventMapLayer.addEventListener("dragenter", DragHandler);
-            this.EventMapLayer.addEventListener("dragover", DragHandler);
-            this.EventMapLayer.addEventListener("dragleave", DragHandler);
-            this.EventMapLayer.addEventListener("drop", function (event) {
+            document.addEventListener("dragenter", DragHandler);
+            document.addEventListener("dragover", DragHandler);
+            document.addEventListener("dragleave", DragHandler);
+            document.addEventListener("drop", function (event) {
                 event.stopPropagation();
                 event.preventDefault();
                 if (_this.IsActive()) {

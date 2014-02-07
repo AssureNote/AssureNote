@@ -163,10 +163,10 @@ module AssureNote {
                 e.stopPropagation();
                 e.preventDefault();
             };
-            this.EventMapLayer.addEventListener("dragenter", DragHandler);
-            this.EventMapLayer.addEventListener("dragover", DragHandler);
-            this.EventMapLayer.addEventListener("dragleave", DragHandler);
-            this.EventMapLayer.addEventListener("drop", (event: DragEvent) => {
+            document.addEventListener("dragenter", DragHandler);
+            document.addEventListener("dragover", DragHandler);
+            document.addEventListener("dragleave", DragHandler);
+            document.addEventListener("drop", (event: DragEvent) => {
                 event.stopPropagation();
                 event.preventDefault();
                 if (this.IsActive()) {
