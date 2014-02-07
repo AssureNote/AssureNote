@@ -69,18 +69,29 @@ var AssureNote;
         };
 
         ConnectCommand.prototype.GetHelpHTML = function () {
-            return "<code>connect [uri]</code><br>Connect to the chat server.";
+            return "<code>connect [room?] [uri?]</code><br>Connect to the chat server.";
         };
 
         ConnectCommand.prototype.Invoke = function (CommandName, Params) {
-            console.log(Params);
-            if (Params.length > 1) {
+            if (Params.length > 2) {
                 this.App.DebugP('Invalid parameter: ' + Params);
                 return;
             }
+            var room = null;
+            var url = null;
+            if (Params.length == 2) {
+                room = Params[0];
+                url = Params[1];
+            } else if (Params.length == 1) {
+                if (AssureNote.AssureNoteUtils.isValidURL(Params[0])) {
+                    url = Params[0];
+                } else {
+                    room = Params[0];
+                }
+            }
             this.App.ModeManager.SetMode(1 /* View */);
             if (this.App.SocketManager.IsOperational()) {
-                this.App.SocketManager.Connect(Params[0]);
+                this.App.SocketManager.Connect(room, url);
             }
         };
 

@@ -196,7 +196,7 @@ var AssureNote;
             }
         };
 
-        SocketManager.prototype.Connect = function (host) {
+        SocketManager.prototype.Connect = function (room, host) {
             if (!this.IsConnected()) {
                 if (host == null || host == '') {
                     this.socket = io.connect(this.DefaultChatServer);
@@ -206,7 +206,7 @@ var AssureNote;
                 this.App.ModeManager.Enable();
                 this.EnableListeners();
                 this.App.UserList.Show();
-                this.Emit("adduser", { User: this.App.GetUserName(), MODE: this.App.ModeManager.GetMode() });
+                this.Emit("adduser", { User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode(), Room: room });
             }
         };
 

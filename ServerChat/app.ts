@@ -28,7 +28,6 @@ class AssureNoteServer {
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', (socket: Socket) => {
             this.EnableListeners(socket);
-            socket.join(this.room, null);
             console.log('id: ' + socket.id + ' connected');
             socket.emit('init', {
                 id   : socket.id,
@@ -77,7 +76,13 @@ class AssureNoteServer {
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('adduser', (data: {User: string; Mode: number}) => {
+        socket.on('adduser', (data: {User: string; Mode: number; Room: string}) => {
+            console.log(data);
+            if (data.Room != null) {
+                socket.join(data.Room, null);
+            } else {
+                socket.join(this.room, null);
+            }
             var Info: UserStatus = new UserStatus(data.User, data.Mode, socket.id);
             if (this.UsersInfo.length != 0) {
                 socket.broadcast.emit('adduser', Info);

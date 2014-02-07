@@ -44,7 +44,6 @@ var AssureNoteServer = (function () {
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
             _this.EnableListeners(socket);
-            socket.join(_this.room, null);
             console.log('id: ' + socket.id + ' connected');
             socket.emit('init', {
                 id: socket.id,
@@ -95,6 +94,12 @@ var AssureNoteServer = (function () {
         });
 
         socket.on('adduser', function (data) {
+            console.log(data);
+            if (data.Room != null) {
+                socket.join(data.Room, null);
+            } else {
+                socket.join(_this.room, null);
+            }
             var Info = new UserStatus(data.User, data.Mode, socket.id);
             if (_this.UsersInfo.length != 0) {
                 socket.broadcast.emit('adduser', Info);
