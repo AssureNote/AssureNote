@@ -8319,7 +8319,7 @@ var AssureNote;
             var ModalBody = $("#monitorlist-modal-body")[0];
 
             var Table = document.createElement('table');
-            Table.setAttribute('border', '4');
+            Table.className = 'table table-bordered';
             Table.setAttribute('width', '90%');
             Table.setAttribute('align', 'center');
 
