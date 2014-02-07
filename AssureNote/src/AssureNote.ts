@@ -217,7 +217,7 @@ module AssureNote {
             this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.MasterView);
             this.PictgramPanel.Draw();
 
-            if (location.hash != null) {
+            if (location.hash != "") {
                 var label = location.hash.substring(1);
                 var NodeView: AssureNote.NodeView = this.PictgramPanel.ViewMap[label];
                 if (NodeView) {
@@ -228,10 +228,12 @@ module AssureNote {
                     }
                     this.PictgramPanel.Draw();
                     this.PictgramPanel.ChangeFocusedLabel(label);
-                    this.PictgramPanel.Viewport.SetCamera(NodeView.GetGX(), NodeView.GetGY(), 1);
+                    console.log(NodeView.GetCenterGX());
+                    this.PictgramPanel.Viewport.SetCamera(NodeView.GetCenterGX(), NodeView.GetCenterGY(), 1);
                 }
             } else {
                 var TopGoal = this.PictgramPanel.MasterView;
+                console.log("else " + TopGoal.GetGX());
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");
