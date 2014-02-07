@@ -46,7 +46,7 @@ module AssureNote {
         private Dx: number = 0;
         private Dy: number = 0;
         private MainPointerID: number = null;
-        private Pointers: Pointer[] = [];
+        private Pointers: { [index: number]: Pointer } = [];
 
         private timer: number = 0;
         private ANIMATE_THRESHOLD: number = 5;
@@ -113,21 +113,41 @@ module AssureNote {
         OnEndDrag: (Viewport: ViewportManager) => void;
 
         OnPointerEvent(e: PointerEvent, Screen: ViewportManager) {
+            //var Log = (e: PointerEvent) => {
+            //    console.log("pointer#" + e.pointerId + " " + e.type.substr(7));
+            //    console.log("#pointers " + Object.keys(this.Pointers).length)
+            //}
             switch (e.type) {
                 case "pointerdown":
-                    this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                    if (e.pointerType == "mouse" && e.button != 0) {
+                        return;
+                    }
+                    if (!this.Pointers[e.pointerId]) {
+                        this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        //Log(e);
+                    }
                     break;
+                case "pointerout":
+                case "pointerleave":
+                case "pointercancel":
                 case "pointerup":
                     if (!this.Pointers[e.pointerId]) {
                         return
                     }
                     delete this.Pointers[e.pointerId];
+                    e.preventDefault();
+                    e.stopPropagation();
+                    //Log(e);
                     break;
                 case "pointermove":
                     if (!this.Pointers[e.pointerId]) {
                         return
                     }
                     this.Pointers[e.pointerId].SetPosition(e.clientX, e.clientY);
+                    e.preventDefault();
+                    e.stopPropagation();
                     break;
                 default:
                     return;
@@ -226,6 +246,9 @@ module AssureNote {
             this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
             this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
             this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointerout", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointerleave", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointercancel", OnPointer, false);
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
             $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { if (this.IsPointerEnabled) { this.ScrollManager.OnMouseWheel(e, this); } });
