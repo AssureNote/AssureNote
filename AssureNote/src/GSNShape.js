@@ -52,14 +52,6 @@ var AssureNote;
             this.TreeBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
         }
         GSNShape.CreateArrowPath = function () {
-            if (!GSNShape.ArrowPathMaster) {
-                GSNShape.ArrowPathMaster = AssureNote.AssureNoteUtils.CreateSVGElement("path");
-                GSNShape.ArrowPathMaster.setAttribute("marker-end", "url(#Triangle-black)");
-                GSNShape.ArrowPathMaster.setAttribute("fill", "none");
-                GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
-                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-            }
             return GSNShape.ArrowPathMaster.cloneNode();
         };
 
@@ -278,12 +270,14 @@ var AssureNote;
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             this.ArrowPath = GSNShape.CreateArrowPath();
+            this.ArrowStart = this.ArrowPath.pathSegList.getItem(0);
+            this.ArrowCurve = this.ArrowPath.pathSegList.getItem(1);
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         };
 
         GSNShape.prototype.SetArrowPosition = function (P1, P2, Dir) {
-            var start = this.ArrowPath.pathSegList.getItem(0);
-            var curve = this.ArrowPath.pathSegList.getItem(1);
+            var start = this.ArrowStart;
+            var curve = this.ArrowCurve;
             start.x = P1.X;
             start.y = P1.Y;
             curve.x = P2.X;
@@ -391,6 +385,9 @@ var AssureNote;
 
         GSNShape.prototype.SetColorStyle = function (Styles) {
             this.ColorStyles = Styles;
+            if (this.ColorStyles.indexOf(AssureNote.ColorStyle.Default) < 0) {
+                this.ColorStyles.push(AssureNote.ColorStyle.Default);
+            }
         };
 
         GSNShape.prototype.ClearColorStyle = function () {
@@ -399,7 +396,14 @@ var AssureNote;
                 this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             }
         };
-        GSNShape.ArrowPathMaster = null;
+        GSNShape.ArrowPathMaster = (function () {
+            var Master = AssureNote.AssureNoteUtils.CreateSVGElement("path");
+            Master.setAttribute("marker-end", "url(#Triangle-black)");
+            Master.setAttribute("fill", "none");
+            Master.setAttribute("stroke", "gray");
+            Master.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+            return Master;
+        })();
         return GSNShape;
     })();
     AssureNote.GSNShape = GSNShape;
@@ -414,15 +418,10 @@ var AssureNote;
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
-                this.ModuleRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-                this.ModuleRect.setAttribute("width", "80px");
-                this.ModuleRect.setAttribute("height", "13px");
-                this.ModuleRect.setAttribute("y", "-13px");
-                this.ShapeGroup.appendChild(this.ModuleRect);
+                this.ShapeGroup.appendChild(GSNGoalShape.ModuleSymbolMaster.cloneNode());
             }
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
-                this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
-                this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
+                this.UndevelopedSymbol = GSNGoalShape.UndevelopedSymbolMaster.cloneNode();
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
         };
@@ -441,6 +440,19 @@ var AssureNote;
         GSNGoalShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-goal";
         };
+        GSNGoalShape.ModuleSymbolMaster = (function () {
+            var Master = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
+            Master.setAttribute("width", "80px");
+            Master.setAttribute("height", "13px");
+            Master.setAttribute("y", "-13px");
+            return Master;
+        })();
+
+        GSNGoalShape.UndevelopedSymbolMaster = (function () {
+            var Master = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
+            Master.setAttribute("points", "0 -20 -20 0 0 20 20 0");
+            return Master;
+        })();
         return GSNGoalShape;
     })(GSNShape);
     AssureNote.GSNGoalShape = GSNGoalShape;

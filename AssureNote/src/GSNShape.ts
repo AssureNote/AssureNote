@@ -44,7 +44,15 @@ module AssureNote {
         private NodeHeight: number;
         private HeadBoundingBox: Rect; // Head is the node and Left and Right.
         private TreeBoundingBox: Rect; // Tree is Head and Children
-        private static ArrowPathMaster: SVGPathElement = null;
+
+        private static ArrowPathMaster: SVGPathElement = (() => {
+            var Master = AssureNoteUtils.CreateSVGElement("path");
+            Master.setAttribute("marker-end", "url(#Triangle-black)");
+            Master.setAttribute("fill", "none");
+            Master.setAttribute("stroke", "gray");
+            Master.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+            return Master;
+        })();
 
         constructor(public NodeView: NodeView) {
             this.Content = null;
@@ -55,14 +63,6 @@ module AssureNote {
         }
 
         private static CreateArrowPath(): SVGPathElement {
-            if (!GSNShape.ArrowPathMaster) {
-                GSNShape.ArrowPathMaster = AssureNoteUtils.CreateSVGElement("path");
-                GSNShape.ArrowPathMaster.setAttribute("marker-end", "url(#Triangle-black)");
-                GSNShape.ArrowPathMaster.setAttribute("fill", "none");
-                GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
-                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-            }
             return <SVGPathElement>GSNShape.ArrowPathMaster.cloneNode();
         }
 
@@ -278,11 +278,16 @@ module AssureNote {
             this.GY = null;
         }
 
+        private ArrowStart: SVGPathSegMovetoAbs;
+        private ArrowCurve: SVGPathSegCurvetoCubicAbs;
+
         PrerenderSVGContent(manager: PluginManager): void {
             this.ShapeGroup = AssureNoteUtils.CreateSVGElement("g");
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             this.ArrowPath = GSNShape.CreateArrowPath();
+            this.ArrowStart = <SVGPathSegMovetoAbs>this.ArrowPath.pathSegList.getItem(0);
+            this.ArrowCurve = <SVGPathSegCurvetoCubicAbs>this.ArrowPath.pathSegList.getItem(1);
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         }
 
@@ -290,8 +295,8 @@ module AssureNote {
         private ArrowP2: Point;
 
         SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
-            var start = <SVGPathSegMovetoAbs>this.ArrowPath.pathSegList.getItem(0);
-            var curve = <SVGPathSegCurvetoCubicAbs>this.ArrowPath.pathSegList.getItem(1);
+            var start = this.ArrowStart;
+            var curve = this.ArrowCurve;
             start.x = P1.X;
             start.y = P1.Y;
             curve.x = P2.X;
@@ -398,6 +403,9 @@ module AssureNote {
 
         SetColorStyle(Styles: string[]): void {
             this.ColorStyles = Styles;
+            if (this.ColorStyles.indexOf(ColorStyle.Default) < 0) {
+                this.ColorStyles.push(ColorStyle.Default);
+            }
         }
 
         ClearColorStyle(): void {
@@ -413,20 +421,30 @@ module AssureNote {
         ModuleRect: SVGRectElement;
         UndevelopedSymbol: SVGPolygonElement;
 
+        private static ModuleSymbolMaster: SVGRectElement = (() => {
+            var Master = AssureNoteUtils.CreateSVGElement("rect");
+            Master.setAttribute("width", "80px");
+            Master.setAttribute("height", "13px");
+            Master.setAttribute("y", "-13px");
+            return Master;
+        })();
+
+        private static UndevelopedSymbolMaster: SVGPolygonElement = (() => {
+            var Master = AssureNoteUtils.CreateSVGElement("polygon");
+            Master.setAttribute("points", "0 -20 -20 0 0 20 20 0");
+            return Master;
+        })();
+
+
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
-                this.ModuleRect = AssureNoteUtils.CreateSVGElement("rect");
-                this.ModuleRect.setAttribute("width", "80px");
-                this.ModuleRect.setAttribute("height", "13px");
-                this.ModuleRect.setAttribute("y", "-13px");
-                this.ShapeGroup.appendChild(this.ModuleRect);
+                this.ShapeGroup.appendChild(GSNGoalShape.ModuleSymbolMaster.cloneNode());
             }
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
-                this.UndevelopedSymbol = AssureNoteUtils.CreateSVGElement("polygon");
-                this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
+                this.UndevelopedSymbol = <SVGPolygonElement>GSNGoalShape.UndevelopedSymbolMaster.cloneNode();
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
         }
