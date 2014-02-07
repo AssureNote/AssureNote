@@ -274,6 +274,20 @@ module AssureNote {
                     }
                     Event.preventDefault();
                     break;
+                case 187: /*+*/
+                    var Command = this.App.FindCommandByCommandLineName("set-scale");
+                    if (Command && Event.shiftKey) {
+                        Command.Invoke(null, [this.Viewport.GetCameraScale() + 0.1]);
+                    }
+                    Event.preventDefault();
+                    break;
+                case 189: /*-*/
+                    var Command = this.App.FindCommandByCommandLineName("set-scale");
+                    if (Command && Event.shiftKey) {
+                        Command.Invoke(null, [this.Viewport.GetCameraScale() - 0.1]);
+                    }
+                    Event.preventDefault();
+                    break;
                 default:
                     handled = false;
                     break;
