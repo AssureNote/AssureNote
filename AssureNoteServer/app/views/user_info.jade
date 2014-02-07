@@ -24,7 +24,7 @@
 +template("user-list-tmpl")
   span(style="color: ${Color}")
     .glyphicon.glyphicon-user
-    {{if IsEditMode == true}}
+    |{{if IsEditMode == true}}
     small.glyphicon.glyphicon-pencil(style="vertical-align: super;")
     |&nbsp;{{else}}{{/if}}
     |${UserName} &nbsp;

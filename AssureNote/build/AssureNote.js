@@ -4193,17 +4193,22 @@ var AssureNote;
             var DragHandler = function (e) {
                 e.stopPropagation();
                 e.preventDefault();
+                if (_this.IsActive()) {
+                    event.dataTransfer.dropEffect = "move";
+                } else {
+                    event.dataTransfer.dropEffect = "none";
+                }
             };
-            this.EventMapLayer.addEventListener("dragenter", DragHandler);
-            this.EventMapLayer.addEventListener("dragover", DragHandler);
-            this.EventMapLayer.addEventListener("dragleave", DragHandler);
-            this.EventMapLayer.addEventListener("drop", function (event) {
+            document.addEventListener("dragenter", DragHandler, true);
+            document.addEventListener("dragover", DragHandler, true);
+            document.addEventListener("dragleave", DragHandler, true);
+            document.addEventListener("drop", function (event) {
                 event.stopPropagation();
                 event.preventDefault();
                 if (_this.IsActive()) {
                     _this.App.LoadFiles(event.dataTransfer.files);
                 }
-            });
+            }, true);
 
             this.Viewport.ScrollManager.OnDragged = function (Viewport) {
                 if (!_this.MasterView) {
@@ -5697,7 +5702,7 @@ var AssureNote;
             this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.MasterView);
             this.PictgramPanel.Draw();
 
-            if (location.hash != null) {
+            if (location.hash != "") {
                 var label = location.hash.substring(1);
                 var NodeView = this.PictgramPanel.ViewMap[label];
                 if (NodeView) {
@@ -5708,10 +5713,12 @@ var AssureNote;
                     }
                     this.PictgramPanel.Draw();
                     this.PictgramPanel.ChangeFocusedLabel(label);
-                    this.PictgramPanel.Viewport.SetCamera(NodeView.GetGX(), NodeView.GetGY(), 1);
+                    console.log(NodeView.GetCenterGX());
+                    this.PictgramPanel.Viewport.SetCamera(NodeView.GetCenterGX(), NodeView.GetCenterGY(), 1);
                 }
             } else {
                 var TopGoal = this.PictgramPanel.MasterView;
+                console.log("else " + TopGoal.GetGX());
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");
@@ -5826,19 +5833,34 @@ var AssureNote;
             var _this = this;
             switch (e.type) {
                 case "pointerdown":
-                    this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                    if (e.pointerType == "mouse" && e.button != 0) {
+                        return;
+                    }
+                    if (!this.Pointers[e.pointerId]) {
+                        this.Pointers[e.pointerId] = new Pointer(e.clientX, e.clientY, e.pointerId);
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                     break;
+                case "pointerout":
+                case "pointerleave":
+                case "pointercancel":
                 case "pointerup":
                     if (!this.Pointers[e.pointerId]) {
                         return;
                     }
                     delete this.Pointers[e.pointerId];
+                    e.preventDefault();
+                    e.stopPropagation();
+
                     break;
                 case "pointermove":
                     if (!this.Pointers[e.pointerId]) {
                         return;
                     }
                     this.Pointers[e.pointerId].SetPosition(e.clientX, e.clientY);
+                    e.preventDefault();
+                    e.stopPropagation();
                     break;
                 default:
                     return;
@@ -5931,6 +5953,9 @@ var AssureNote;
             this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
             this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
             this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointerout", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointerleave", OnPointer, false);
+            this.EventMapLayer.addEventListener("pointercancel", OnPointer, false);
 
             $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
                 if (_this.IsPointerEnabled) {

@@ -201,7 +201,7 @@ var AssureNote;
                     }
                     this.PictgramPanel.Draw();
                     this.PictgramPanel.ChangeFocusedLabel(label);
-                    console.log(NodeView.GetGX());
+                    console.log(NodeView.GetCenterGX());
                     this.PictgramPanel.Viewport.SetCamera(NodeView.GetCenterGX(), NodeView.GetCenterGY(), 1);
                 }
             } else {
