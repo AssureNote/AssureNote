@@ -49,7 +49,6 @@ var AssureNote;
             this.App = App;
             // We do not use FocusedView but FocusedLabel to make it modular.
             this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
-            this.FoldingAnimationCallbacks = [];
             this.SVGLayer = document.getElementById("svg-layer");
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
@@ -417,12 +416,15 @@ var AssureNote;
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
-            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
 
-            TargetView.UpdateDocumentPosition(this.FoldingAnimationCallbacks, Duration);
+            this.FoldingAnimationTask.Cancel(true);
+
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
+            var FoldingAnimationCallbacks = [];
+
+            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration);
             TargetView.ClearAnimationCache();
-            this.FoldingAnimationTask.StartMany(Duration, this.FoldingAnimationCallbacks);
-            this.FoldingAnimationCallbacks = [];
+            this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
             var Shape = TargetView.GetShape();
             this.Viewport.CameraLimitRect = new AssureNote.Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
@@ -433,13 +435,11 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Clear = function () {
-            this.ContentLayer.style.display = "none";
-            this.SVGLayer.style.display = "none";
             this.ContentLayer.innerHTML = "";
+            this.SVGLayer.style.display = "none";
             for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
                 this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
             }
-            this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
         };
 

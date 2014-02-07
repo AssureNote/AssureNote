@@ -311,26 +311,31 @@ module AssureNote {
 
     export class AnimationFrameTask {
         private TimerHandle: number;
+        private Callback: Function;
+        private LastTime: number;
+        private StartTime: number;
+        private EndTime: number;
 
         Start(Duration: number, Callback: (DeltaT: number) => void): void;
         Start(Duration: number, Callback: (DeltaT: number, CurrentTime: number, StartTime: number) => void): void;
         Start(Duration: number, Callback: () => void): void;
         Start(Duration: number, Callback: Function): void {
             this.Cancel();
-            var LastTime: number = AssureNoteUtils.GetTime();
-            var StartTime: number = LastTime;
+            this.LastTime = this.StartTime = AssureNoteUtils.GetTime();
+            this.EndTime = this.StartTime + Duration;
+            this.Callback = Callback;
 
             var Update: any = () => {
                 var CurrentTime: number = AssureNoteUtils.GetTime();
-                var DeltaT = CurrentTime - LastTime;
-                if (CurrentTime - StartTime < Duration) {
+                var DeltaT = CurrentTime - this.LastTime;
+                if (CurrentTime < this.EndTime) {
                     this.TimerHandle = AssureNoteUtils.RequestAnimationFrame(Update);
                 } else {
-                    DeltaT = Duration - (LastTime - StartTime);
+                    DeltaT = this.EndTime - this.LastTime;
                     this.TimerHandle = 0;
                 }
-                Callback(DeltaT, CurrentTime, StartTime);
-                LastTime = CurrentTime;
+                this.Callback(DeltaT, CurrentTime, this.StartTime);
+                this.LastTime = CurrentTime;
             }
             Update();
         }
@@ -345,10 +350,18 @@ module AssureNote {
             }
         }
 
-        Cancel(): void {
+        IsRunning(): boolean {
+            return this.TimerHandle != 0;
+        }
+
+        Cancel(RunToEnd?: boolean): void {
             if (this.TimerHandle) {
                 AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);
                 this.TimerHandle = 0;
+                if (RunToEnd) {
+                    var DeltaT = this.EndTime - this.LastTime;
+                    this.Callback(DeltaT, this.EndTime, this.StartTime);
+                }
             }
         }
     }

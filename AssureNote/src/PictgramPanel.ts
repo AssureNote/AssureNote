@@ -57,7 +57,6 @@ module AssureNote {
         // We do not use FocusedView but FocusedLabel to make it modular.
 
         private FoldingAnimationTask = new AssureNote.AnimationFrameTask();
-        private FoldingAnimationCallbacks: Function[] = [];
         
         constructor(public App: AssureNoteApp) {
             super(App);
@@ -425,7 +424,6 @@ module AssureNote {
         }
 
         Draw(Label?: string, Duration?: number): void {
-
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
@@ -435,12 +433,15 @@ module AssureNote {
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
-            NodeView.SetGlobalPositionCacheEnabled(true);
 
-            TargetView.UpdateDocumentPosition(this.FoldingAnimationCallbacks, Duration);
+            this.FoldingAnimationTask.Cancel(true);
+
+            NodeView.SetGlobalPositionCacheEnabled(true);
+            var FoldingAnimationCallbacks = [];
+
+            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration);
             TargetView.ClearAnimationCache();
-            this.FoldingAnimationTask.StartMany(Duration, this.FoldingAnimationCallbacks);
-            this.FoldingAnimationCallbacks = [];
+            this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
             var Shape = TargetView.GetShape();
             this.Viewport.CameraLimitRect = new Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
@@ -451,13 +452,11 @@ module AssureNote {
         }
 
         private Clear(): void {
-            this.ContentLayer.style.display = "none";
-            this.SVGLayer.style.display = "none";
             this.ContentLayer.innerHTML = "";
+            this.SVGLayer.style.display = "none";
             for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
                 this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
             }
-            this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
         }
 

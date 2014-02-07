@@ -327,9 +327,10 @@ var AssureNote;
             var P2VX = (P2.X - this.ArrowP2.X) / Duration;
             var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
 
+            var CurrentP1 = this.ArrowP1.Clone();
+            var CurrentP2 = this.ArrowP2.Clone();
+
             AnimationCallbacks.push(function (deltaT) {
-                var CurrentP1 = _this.ArrowP1.Clone();
-                var CurrentP2 = _this.ArrowP2.Clone();
                 CurrentP1.X += P1VX * deltaT;
                 CurrentP1.Y += P1VY * deltaT;
                 CurrentP2.X += P2VX * deltaT;

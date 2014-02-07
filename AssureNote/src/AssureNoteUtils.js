@@ -292,20 +292,21 @@ var AssureNote;
         AnimationFrameTask.prototype.Start = function (Duration, Callback) {
             var _this = this;
             this.Cancel();
-            var LastTime = AssureNoteUtils.GetTime();
-            var StartTime = LastTime;
+            this.LastTime = this.StartTime = AssureNoteUtils.GetTime();
+            this.EndTime = this.StartTime + Duration;
+            this.Callback = Callback;
 
             var Update = function () {
                 var CurrentTime = AssureNoteUtils.GetTime();
-                var DeltaT = CurrentTime - LastTime;
-                if (CurrentTime - StartTime < Duration) {
+                var DeltaT = CurrentTime - _this.LastTime;
+                if (CurrentTime < _this.EndTime) {
                     _this.TimerHandle = AssureNoteUtils.RequestAnimationFrame(Update);
                 } else {
-                    DeltaT = Duration - (LastTime - StartTime);
+                    DeltaT = _this.EndTime - _this.LastTime;
                     _this.TimerHandle = 0;
                 }
-                Callback(DeltaT, CurrentTime, StartTime);
-                LastTime = CurrentTime;
+                _this.Callback(DeltaT, CurrentTime, _this.StartTime);
+                _this.LastTime = CurrentTime;
             };
             Update();
         };
@@ -320,10 +321,18 @@ var AssureNote;
             }
         };
 
-        AnimationFrameTask.prototype.Cancel = function () {
+        AnimationFrameTask.prototype.IsRunning = function () {
+            return this.TimerHandle != 0;
+        };
+
+        AnimationFrameTask.prototype.Cancel = function (RunToEnd) {
             if (this.TimerHandle) {
                 AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);
                 this.TimerHandle = 0;
+                if (RunToEnd) {
+                    var DeltaT = this.EndTime - this.LastTime;
+                    this.Callback(DeltaT, this.EndTime, this.StartTime);
+                }
             }
         };
         return AnimationFrameTask;
