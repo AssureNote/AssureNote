@@ -539,5 +539,36 @@ var AssureNote;
         return UploadCommand;
     })(Command);
     AssureNote.UploadCommand = UploadCommand;
+
+    var SetGuestUserNameCommand = (function (_super) {
+        __extends(SetGuestUserNameCommand, _super);
+        function SetGuestUserNameCommand(App) {
+            _super.call(this, App);
+        }
+        SetGuestUserNameCommand.prototype.GetCommandLineNames = function () {
+            return ["set-user", "setuser"];
+        };
+
+        SetGuestUserNameCommand.prototype.Invoke = function (CommandName, Params) {
+            var Name = Params[0];
+            if (!Name || Name == '') {
+                Name = prompt('Enter the new name for guest', '');
+            }
+            if (!Name || Name == '') {
+                Name = 'Guest';
+            }
+            this.App.SetUserName(Name);
+        };
+
+        SetGuestUserNameCommand.prototype.GetHelpHTML = function () {
+            return "<code>set-user [name]</code><br>Rename guest user.";
+        };
+
+        SetGuestUserNameCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
+        return SetGuestUserNameCommand;
+    })(Command);
+    AssureNote.SetGuestUserNameCommand = SetGuestUserNameCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

@@ -45,18 +45,10 @@ var AssureNote;
     var UserList = (function (_super) {
         __extends(UserList, _super);
         function UserList(App) {
-            var _this = this;
             _super.call(this, App);
             this.App = App;
             this.UserName = 'Guest';
             this.UserList = [];
-            $('.change-user').on('click', function (e) {
-                var Name = prompt('Enter the new user name', '');
-                if (Name == '')
-                    Name = 'Guest';
-                _this.App.SetUserName(Name);
-                _this.Show();
-            });
         }
         UserList.prototype.Show = function () {
             var found = false;

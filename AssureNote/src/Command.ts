@@ -505,4 +505,32 @@ module AssureNote {
         }
     }
 
+    export class SetGuestUserNameCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["set-user", "setuser"];
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var Name = Params[0];
+            if (!Name || Name == '') {
+                Name = prompt('Enter the new name for guest', '');
+            }
+            if (!Name || Name == '') {
+                Name = 'Guest';
+            }
+            this.App.SetUserName(Name);
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>set-user [name]</code><br>Rename guest user."
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
+    }
 }

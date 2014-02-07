@@ -82,6 +82,7 @@ module AssureNote {
             this.RegistCommand(new HelpCommand(this));
             this.RegistCommand(new UploadCommand(this));
             this.RegistCommand(new HistoryCommand(this));
+            this.RegistCommand(new SetGuestUserNameCommand(this));
 
             this.TopMenu = new TopMenuTopItem([]);
 

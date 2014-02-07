@@ -38,12 +38,6 @@ module AssureNote {
             super(App);
             this.UserName = 'Guest';
             this.UserList = [];
-            $('.change-user').on('click', (e: JQueryEventObject) => {
-                var Name = prompt('Enter the new user name', '');
-                if (Name == '') Name = 'Guest';
-                this.App.SetUserName(Name);
-                this.Show();
-            });
         }
 
         Show() {

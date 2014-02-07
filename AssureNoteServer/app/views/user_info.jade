@@ -3,21 +3,17 @@
   span.user-name &nbsp; #{UserName} 
   if !isLocal
     if(UserName != "Guest")
-      a.btn.clickable(href='#{basepath}/logout')
-        button.btn.btn-default.btn-large
-          span.glyphicon.glyphicon-log-out
-          | &nbsp; Logout
+      button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/logout')
+        span.glyphicon.glyphicon-log-out
+        | &nbsp; Logout
     else
-      a.btn.clickable(href='#{basepath}/auth/github')
-        button.btn.btn-default.btn-large
-          span.glyphicon.glyphicon-log-out
-          | &nbsp; Login
+      button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/auth/github')
+        span.glyphicon.glyphicon-log-in
+        | &nbsp; Login
   else
-    a.btn.clickable.change-user
-      button.btn.btn-default.btn-large
-        span.glyphicon.glyphicon-pencil
-        | &nbsp; Change User
-
+    button.btn.btn-default.navbar-btn.clickable.disable(disabled)
+      span.glyphicon.glyphicon-log-in
+      | &nbsp; Login
   #user-list
     br
 
