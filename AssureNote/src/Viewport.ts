@@ -220,6 +220,7 @@ module AssureNote {
         private CameraCenterPageY: number;
         public IsPointerEnabled: boolean = true;
         public OnScroll: (Viewport: ViewportManager) => void;
+        public CameraLimitRect: Rect;
 
         private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
             Element.style["transformOrigin"] = Value;
@@ -283,15 +284,27 @@ module AssureNote {
             return this.CameraCenterPageY - this.CameraGY * this.Scale;
         }
 
+        private LimitCameraPosition(): void {
+            var R = this.CameraLimitRect;
+            if (R) {
+                if (this.CameraGX < R.X) this.CameraGX = R.X;
+                if (this.CameraGY < R.Y) this.CameraGY = R.Y;
+                if (this.CameraGX > R.X + R.Width) this.CameraGX = R.X + R.Width;
+                if (this.CameraGY > R.Y + R.Height) this.CameraGY = R.Y + R.Height;
+            }
+        }
+
         private SetOffset(PageX: number, PageY: number): void {
             this.CameraGX = (this.CameraCenterPageX - PageX) / this.Scale;
             this.CameraGY = (this.CameraCenterPageY - PageY) / this.Scale;
+            this.LimitCameraPosition();
             this.UpdateAttr();
         }
 
         AddOffset(PageX: number, PageY: number): void {
             this.CameraGX -= PageX / this.Scale;
             this.CameraGY -= PageY / this.Scale;
+            this.LimitCameraPosition();
             this.UpdateAttr();
         }
 
@@ -467,7 +480,7 @@ module AssureNote {
             var S0 = this.GetCameraScale();
             var ScaleRate = Scale / S0;
             var DInv = 1 / Duration;
-            var ScaleFunction = (t: number) => { return S0 * Math.pow(ScaleRate, t * DInv); }
+            var ScaleFunction = (t: number) => S0 * Math.pow(ScaleRate, t * DInv);
 
             if (VY == 0 && VX == 0 && (Scale == S0)) {
                 return;

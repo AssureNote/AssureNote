@@ -36,7 +36,7 @@ var AssureNote;
                 Panel.ActivePanel = this;
                 document.addEventListener("keydown", function (Event) {
                     Panel.ActivePanel.OnKeyDown(Event);
-                });
+                }, true);
                 Panel.Initialized = true;
             }
         }

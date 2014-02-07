@@ -256,26 +256,23 @@ var AssureNote;
         })();
         AssureNoteUtils.UserAgant = UserAgant;
 
-        function RequestAnimationFrame(Callback) {
-            if (UserAgant.IsAnimationFrameEnabled()) {
-                return window.requestAnimationFrame(Callback);
-            }
-            return window.setTimeout(Callback, 16.7);
-        }
-        AssureNoteUtils.RequestAnimationFrame = RequestAnimationFrame;
+        AssureNoteUtils.RequestAnimationFrame = UserAgant.IsAnimationFrameEnabled() ? (function (c) {
+            return requestAnimationFrame(c);
+        }) : (function (c) {
+            return setTimeout(c, 16.7);
+        });
 
-        function CancelAnimationFrame(Handle) {
-            if (UserAgant.IsAnimationFrameEnabled()) {
-                return window.cancelAnimationFrame(Handle);
-            }
-            return window.clearTimeout(Handle);
-        }
-        AssureNoteUtils.CancelAnimationFrame = CancelAnimationFrame;
+        AssureNoteUtils.CancelAnimationFrame = UserAgant.IsAnimationFrameEnabled() ? (function (h) {
+            return cancelAnimationFrame(h);
+        }) : (function (h) {
+            return clearTimeout(h);
+        });
 
-        function GetTime() {
-            return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
-        }
-        AssureNoteUtils.GetTime = GetTime;
+        AssureNoteUtils.GetTime = UserAgant.IsPerformanceEnabled() ? (function () {
+            return performance.now();
+        }) : (function () {
+            return Date.now();
+        });
 
         /**
         Define new color style.

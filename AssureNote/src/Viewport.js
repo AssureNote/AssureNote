@@ -293,15 +293,31 @@ var AssureNote;
             return this.CameraCenterPageY - this.CameraGY * this.Scale;
         };
 
+        ViewportManager.prototype.LimitCameraPosition = function () {
+            var R = this.CameraLimitRect;
+            if (R) {
+                if (this.CameraGX < R.X)
+                    this.CameraGX = R.X;
+                if (this.CameraGY < R.Y)
+                    this.CameraGY = R.Y;
+                if (this.CameraGX > R.X + R.Width)
+                    this.CameraGX = R.X + R.Width;
+                if (this.CameraGY > R.Y + R.Height)
+                    this.CameraGY = R.Y + R.Height;
+            }
+        };
+
         ViewportManager.prototype.SetOffset = function (PageX, PageY) {
             this.CameraGX = (this.CameraCenterPageX - PageX) / this.Scale;
             this.CameraGY = (this.CameraCenterPageY - PageY) / this.Scale;
+            this.LimitCameraPosition();
             this.UpdateAttr();
         };
 
         ViewportManager.prototype.AddOffset = function (PageX, PageY) {
             this.CameraGX -= PageX / this.Scale;
             this.CameraGY -= PageY / this.Scale;
+            this.LimitCameraPosition();
             this.UpdateAttr();
         };
 

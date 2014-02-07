@@ -290,23 +290,14 @@ module AssureNote {
             }
         }
 
-        export function RequestAnimationFrame(Callback: FrameRequestCallback): number {
-            if (UserAgant.IsAnimationFrameEnabled()) {
-                return window.requestAnimationFrame(Callback);
-            }
-            return window.setTimeout(Callback, 16.7);
-        }
+        export var RequestAnimationFrame: (Callback: FrameRequestCallback) => number
+            = UserAgant.IsAnimationFrameEnabled() ? ((c) => requestAnimationFrame(c)) : ((c) => setTimeout(c, 16.7));
 
-        export function CancelAnimationFrame(Handle: number): void {
-            if (UserAgant.IsAnimationFrameEnabled()) {
-                return window.cancelAnimationFrame(Handle);
-            }
-            return window.clearTimeout(Handle);
-        }
+        export var CancelAnimationFrame: (Handle: number) => void
+            = UserAgant.IsAnimationFrameEnabled() ? ((h) => cancelAnimationFrame(h)) : ((h) => clearTimeout(h));
 
-        export function GetTime(): number {
-            return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
-        }
+        export var GetTime: () => number
+            = UserAgant.IsPerformanceEnabled() ? (() => performance.now()) : (() => Date.now());
 
         /**
         Define new color style.

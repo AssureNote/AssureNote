@@ -44,7 +44,7 @@ module AssureNote {
                 Panel.ActivePanel = this;
                 document.addEventListener("keydown", (Event: KeyboardEvent) => {
                     Panel.ActivePanel.OnKeyDown(Event);
-                });
+                }, true);
                 Panel.Initialized = true;
             }
         }

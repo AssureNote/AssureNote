@@ -442,6 +442,9 @@ module AssureNote {
             this.FoldingAnimationTask.StartMany(Duration, this.FoldingAnimationCallbacks);
             this.FoldingAnimationCallbacks = [];
 
+            var Shape = TargetView.GetShape();
+            this.Viewport.CameraLimitRect = new Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
+
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
