@@ -580,7 +580,7 @@ var AssureNote;
 
             for (var Label in MNodeManager.MonitorNodeMap) {
                 var MNode = MNodeManager.MonitorNodeMap[Label];
-                var LatestStatus;
+                var LatestStatus = MNode.GetLatestStatus();
                 if (LatestStatus == null || LatestStatus == true) {
                     TableInnerHTML += '<tr align="center">';
                 } else {
