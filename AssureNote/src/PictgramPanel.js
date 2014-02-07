@@ -151,17 +151,22 @@ var AssureNote;
             var DragHandler = function (e) {
                 e.stopPropagation();
                 e.preventDefault();
+                if (_this.IsActive()) {
+                    event.dataTransfer.dropEffect = "move";
+                } else {
+                    event.dataTransfer.dropEffect = "none";
+                }
             };
-            document.addEventListener("dragenter", DragHandler);
-            document.addEventListener("dragover", DragHandler);
-            document.addEventListener("dragleave", DragHandler);
+            document.addEventListener("dragenter", DragHandler, true);
+            document.addEventListener("dragover", DragHandler, true);
+            document.addEventListener("dragleave", DragHandler, true);
             document.addEventListener("drop", function (event) {
                 event.stopPropagation();
                 event.preventDefault();
                 if (_this.IsActive()) {
                     _this.App.LoadFiles(event.dataTransfer.files);
                 }
-            });
+            }, true);
 
             this.Viewport.ScrollManager.OnDragged = function (Viewport) {
                 if (!_this.MasterView) {

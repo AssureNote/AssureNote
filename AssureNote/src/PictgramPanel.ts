@@ -162,17 +162,22 @@ module AssureNote {
             var DragHandler = (e) => {
                 e.stopPropagation();
                 e.preventDefault();
+                if (this.IsActive()) {
+                    event.dataTransfer.dropEffect = "move";
+                } else {
+                    event.dataTransfer.dropEffect = "none";
+                }
             };
-            document.addEventListener("dragenter", DragHandler);
-            document.addEventListener("dragover", DragHandler);
-            document.addEventListener("dragleave", DragHandler);
+            document.addEventListener("dragenter", DragHandler, true);
+            document.addEventListener("dragover", DragHandler, true);
+            document.addEventListener("dragleave", DragHandler, true);
             document.addEventListener("drop", (event: DragEvent) => {
                 event.stopPropagation();
                 event.preventDefault();
                 if (this.IsActive()) {
                     this.App.LoadFiles(event.dataTransfer.files);
                 }
-            });
+            }, true);
 
             this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
                 if (!this.MasterView) {
