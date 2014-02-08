@@ -146,7 +146,7 @@ module AssureNote {
         constructor(App: AssureNoteApp) {
             var TextArea = <HTMLTextAreaElement>document.getElementById('editor');
             var Wrapper = document.getElementById('editor-wrapper');
-            super(App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
+            super(App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true, extraKeys: { "Shift-Space": "autocomplete" } }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
         }
     }
 }

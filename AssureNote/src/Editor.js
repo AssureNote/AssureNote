@@ -156,7 +156,7 @@ var AssureNote;
         function WGSNEditorPanel(App) {
             var TextArea = document.getElementById('editor');
             var Wrapper = document.getElementById('editor-wrapper');
-            _super.call(this, App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
+            _super.call(this, App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true, extraKeys: { "Shift-Space": "autocomplete" } }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
         }
         return WGSNEditorPanel;
     })(CodeMirrorEditorPanel);
