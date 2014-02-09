@@ -75,6 +75,10 @@ var AssureNote;
                 $("#next-revision").addClass("disabled");
             }
 
+            $("#history-panel-close").click(function () {
+                _this.Hide();
+            });
+
             $("#prev-revision").click(function () {
                 var length = _this.App.MasterRecord.HistoryList.length;
                 var OldIndex = _this.Index;

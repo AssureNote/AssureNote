@@ -69,6 +69,10 @@ module AssureNote {
                 $("#next-revision").addClass("disabled");
             }
 
+            $("#history-panel-close").click(()=>{
+                this.Hide();
+            });
+
             $("#prev-revision")
                 .click(() => {
                 var length = this.App.MasterRecord.HistoryList.length;

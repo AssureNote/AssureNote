@@ -174,3 +174,7 @@ h4 {
 .nonclickable .clickable {
 	pointer-events: initial;
 }
+
+a.panel-close {
+  color: #000;
+}

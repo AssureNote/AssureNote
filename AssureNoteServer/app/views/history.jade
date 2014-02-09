@@ -1,6 +1,8 @@
 +template("history_tmpl")
     .panel.panel-default.history-menu
         .panel-body
+            a.panel-close#history-panel-close(style="position: absolute; top: -11px; right: -11px;", href="#")
+              span.glyphicon.glyphicon-remove-circle(style="font-size: 24px;")
             h4.list-group-item-heading ${Message}
             p.list-group-item-text
                 small ${User} commited &nbsp;
