@@ -335,4 +335,17 @@ module AssureNote {
             (<any>$('#about-modal')).modal();
         }
     }
+
+    export class ShowHistoryPanelItem extends TopMenuItem {
+        GetIconName(): string {
+            return "time";
+        }
+        GetDisplayName(): string {
+            return "Show history panel";
+        }
+        Invoke(App: AssureNoteApp): void {
+            var Command = App.FindCommandByCommandLineName("history");
+            Command.Invoke(null, []);
+        }
+    }
 }

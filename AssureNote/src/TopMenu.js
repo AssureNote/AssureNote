@@ -423,5 +423,24 @@ var AssureNote;
         return AboutMenuItem;
     })(TopMenuItem);
     AssureNote.AboutMenuItem = AboutMenuItem;
+
+    var ShowHistoryPanelItem = (function (_super) {
+        __extends(ShowHistoryPanelItem, _super);
+        function ShowHistoryPanelItem() {
+            _super.apply(this, arguments);
+        }
+        ShowHistoryPanelItem.prototype.GetIconName = function () {
+            return "time";
+        };
+        ShowHistoryPanelItem.prototype.GetDisplayName = function () {
+            return "Show history panel";
+        };
+        ShowHistoryPanelItem.prototype.Invoke = function (App) {
+            var Command = App.FindCommandByCommandLineName("history");
+            Command.Invoke(null, []);
+        };
+        return ShowHistoryPanelItem;
+    })(TopMenuItem);
+    AssureNote.ShowHistoryPanelItem = ShowHistoryPanelItem;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=TopMenu.js.map
