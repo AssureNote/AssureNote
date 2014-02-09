@@ -58,7 +58,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetColorCommand(this));
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
             this.RegistCommand(new AssureNote.HelpCommand(this));
-            this.RegistCommand(new AssureNote.ShareCommand(this));
+            this.RegistCommand(new AssureNote.UploadCommand(this));
             this.RegistCommand(new AssureNote.HistoryCommand(this));
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
 

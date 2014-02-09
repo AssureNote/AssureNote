@@ -516,38 +516,29 @@ var AssureNote;
     })(Command);
     AssureNote.HelpCommand = HelpCommand;
 
-    var ShareCommand = (function (_super) {
-        __extends(ShareCommand, _super);
-        function ShareCommand(App) {
+    var UploadCommand = (function (_super) {
+        __extends(UploadCommand, _super);
+        function UploadCommand(App) {
             _super.call(this, App);
         }
-        ShareCommand.prototype.GetCommandLineNames = function () {
+        UploadCommand.prototype.GetCommandLineNames = function () {
             return ["share"];
         };
 
-        ShareCommand.prototype.GetHelpHTML = function () {
-            return "<code>share</code><br>Share editing GSN to the server(online version only).";
+        UploadCommand.prototype.GetHelpHTML = function () {
+            return "<code>share</code><br>Upload editing GSN to the server(online version only).";
         };
 
-        ShareCommand.prototype.Invoke = function (CommandName, Params) {
-            var _this = this;
+        UploadCommand.prototype.Invoke = function (CommandName, Params) {
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
-            this.App.SetLoading(true);
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {
-                _this.App.SetLoading(false);
-                if (history.pushState) {
-                    history.pushState({}, "", Config.BASEPATH + "/file/" + result.fileId);
-                } else {
-                    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
-                }
-            }, function () {
-                _this.App.SetLoading(false);
+                window.location.href = Config.BASEPATH + "/file/" + result.fileId;
             });
         };
-        return ShareCommand;
+        return UploadCommand;
     })(Command);
-    AssureNote.ShareCommand = ShareCommand;
+    AssureNote.UploadCommand = UploadCommand;
 
     var SetGuestUserNameCommand = (function (_super) {
         __extends(SetGuestUserNameCommand, _super);
