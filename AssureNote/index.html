@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./lib/bootstrap-switch/bootstrap-switch.min.css"/>
     <link rel="stylesheet" href="./lib//animate-custom.min.css"/>
     <link rel="stylesheet" href="./lib/codemirror/codemirror.min.css"/>
+    <link rel="stylesheet" href="./lib/codemirror/show-hint.css"/>
     <link rel="stylesheet" href="./css/dcase-node.css"/>
     <link rel="stylesheet" href="./css/sidemenu.css"/>
     <link rel="stylesheet" href="./css/historymenu.css"/>
@@ -53,8 +54,8 @@
           <div class="panel panel-default history-menu">
             <div class="panel-body">
               <h4 class="list-group-item-heading">${Message}</h4>
-              <p class="list-group-item-text"><small>${User} commited<br><abbr title="${DateTimeString}">${DateTime}</abbr></small></p>
-              <div style="margin-top:10px" class="list-group-item-heading">
+              <p class="list-group-item-text"><small>${User} commited &nbsp;<abbr title="${DateTimeString}">${DateTime}</abbr></small></p>
+              <div style="padding-top: 10px" class="list-group-item-text">
                 <div class="btn-group"><a id="prev-revision" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></a><a id="next-revision" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></a></div>
               </div>
             </div>
@@ -138,7 +139,10 @@
     <script type="text/javascript" src="./lib/jquery.mousewheel.min.js"></script>
     <script type="text/javascript" src="./lib/pointerevents.min.js"></script>
     <script type="text/javascript" src="./lib/codemirror/codemirror.min.js"></script>
+    <script type="text/javascript" src="./lib/codemirror/show-hint.min.js"></script>
     <script type="text/javascript" src="./lib/codemirror/highlight/wgsn.min.js"></script>
+    <script type="text/javascript" src="./lib/codemirror/autocomplete/wgsn-hint.min.js"></script>
+    <script type="text/javascript" src="./lib/codemirror/autocomplete/wgsn.min.js"></script>
     <script type="text/javascript" src="./lib/FileSaver.min.js"></script>
     <script type="text/javascript" src="./lib/notify.min.js"></script>
     <script type="text/javascript" src="./lib/bootstrap/js/bootstrap.min.js"></script>
