@@ -483,7 +483,7 @@ module AssureNote {
         }
     }
 
-    export class UploadCommand extends Command {
+    export class ShareCommand extends Command {
         constructor(App: AssureNote.AssureNoteApp) {
             super(App);
         }
@@ -493,14 +493,22 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>share</code><br>Upload editing GSN to the server(online version only)."
+            return "<code>share</code><br>Share editing GSN to the server(online version only)."
         }
 
         public Invoke(CommandName: string, Params: any[]) {
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
+            this.App.SetLoading(true);
             AssureNoteUtils.postJsonRPC("upload", {content: Writer.toString()}, (result: any) => {
-                window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                this.App.SetLoading(false);
+                if(history.pushState) {
+                    history.pushState({fileId: result.fileId}, "", Config.BASEPATH + "/file/" + result.fileId);
+                } else {
+                    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                }
+            }, ()=> {
+                this.App.SetLoading(false);
             });
         }
     }

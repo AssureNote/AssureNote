@@ -178,6 +178,12 @@ module AssureNote {
                 }
             }, true);
 
+            if(history.pushState) {
+                window.addEventListener('popstate', (event: Event) => {
+                    this.App.LoadDefaultWGSN();
+                });
+            }
+
             this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
                 if (!this.MasterView) {
                     return;

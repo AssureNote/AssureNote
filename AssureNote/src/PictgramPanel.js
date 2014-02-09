@@ -167,6 +167,12 @@ var AssureNote;
                 }
             }, true);
 
+            if (history.pushState) {
+                window.addEventListener('popstate', function (event) {
+                    _this.App.LoadDefaultWGSN();
+                });
+            }
+
             this.Viewport.ScrollManager.OnDragged = function (Viewport) {
                 if (!_this.MasterView) {
                     return;

@@ -80,7 +80,7 @@ module AssureNote {
             this.RegistCommand(new SetColorCommand(this));
             this.RegistCommand(new SetScaleCommand(this));
             this.RegistCommand(new HelpCommand(this));
-            this.RegistCommand(new UploadCommand(this));
+            this.RegistCommand(new ShareCommand(this));
             this.RegistCommand(new HistoryCommand(this));
             this.RegistCommand(new SetGuestUserNameCommand(this));
 
