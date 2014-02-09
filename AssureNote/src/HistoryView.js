@@ -59,7 +59,12 @@ var AssureNote;
             this.Element.empty();
             var h = this.App.MasterRecord.HistoryList[this.Index];
             var message = h.GetCommitMessage() || "(No Commit Message)";
-            var t = { Message: message, User: h.Author, DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString) };
+            var t = {
+                Message: message,
+                User: h.Author,
+                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString),
+                Count: h.Doc.GetNodeCount()
+            };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
 
             if (this.Index == 0) {
