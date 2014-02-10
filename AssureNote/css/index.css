@@ -32,6 +32,10 @@ body {
 	border-radius: 5px;
 }
 
+.tooltip-inner {
+	text-align: right !important;
+}
+
 .logo-offset {
     left : 180px;
 }

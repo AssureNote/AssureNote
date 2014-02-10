@@ -1483,6 +1483,14 @@ class GSNNode {
 		return res;
 	}
 
+	int GetNodeCountTypeOf(GSNType type) {
+		/*local*/int res = this.NodeType == type? 1: 0;
+		for(/*local*/int i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCountTypeOf(type);
+		}
+		return res;
+	}
+
 }
 
 /**
@@ -1660,6 +1668,15 @@ class GSNDoc {
 	 */
 	int GetNodeCount() {
 		return this.TopNode.GetNodeCount();
+	}
+
+	/**
+	 * @method GetNodeCountTypeOf
+	 * @param {GSNType} type
+	 * @return {Number}
+	 */
+	int GetNodeCountTypeOf(GSNType type) {
+		return this.TopNode.GetNodeCountTypeOf(type);
 	}
 
 	/**

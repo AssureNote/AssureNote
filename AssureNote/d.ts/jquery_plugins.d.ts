@@ -23,6 +23,7 @@ interface JQuery
     tmpl(data?:any,options?:any): JQuery;
     tmplItem(): JQueryTmplItem;
     template(name?:string): ()=>any;
+    tooltip(options: any): void;
 }
 
 interface JQueryStatic

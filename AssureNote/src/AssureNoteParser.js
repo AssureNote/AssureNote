@@ -1335,6 +1335,14 @@ var AssureNote;
             }
             return res;
         };
+
+        GSNNode.prototype.GetNodeCountTypeOf = function (type) {
+            var res = this.NodeType == type ? 1 : 0;
+            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+                res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCountTypeOf(type);
+            }
+            return res;
+        };
         return GSNNode;
     })();
     AssureNote.GSNNode = GSNNode;
@@ -1506,6 +1514,15 @@ var AssureNote;
         */
         GSNDoc.prototype.GetNodeCount = function () {
             return this.TopNode.GetNodeCount();
+        };
+
+        /**
+        * @method GetNodeCountTypeOf
+        * @param {GSNType} type
+        * @return {Number}
+        */
+        GSNDoc.prototype.GetNodeCountTypeOf = function (type) {
+            return this.TopNode.GetNodeCountTypeOf(type);
         };
 
         /**

@@ -1330,6 +1330,14 @@ export class GSNNode {
 		return res;
 	}
 
+	GetNodeCountTypeOf(type: GSNType): number {
+		var res: number = this.NodeType == type? 1: 0;
+		for(var i: number = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+			res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCountTypeOf(type);
+		}
+		return res;
+	}
+
 }
 
 /**
@@ -1506,6 +1514,15 @@ export class GSNDoc {
 	 */
 	GetNodeCount(): number {
 		return this.TopNode.GetNodeCount();
+	}
+
+	/**
+	 * @method GetNodeCountTypeOf
+	 * @param {GSNType} type
+	 * @return {Number}
+	 */
+	GetNodeCountTypeOf(type: GSNType): number {
+		return this.TopNode.GetNodeCountTypeOf(type);
 	}
 
 	/**

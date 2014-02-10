@@ -1,3 +1,4 @@
+///< reference path="../d.ts/jquery_plugins.d.ts" />
 module AssureNote {
 
     export class HistoryCommand extends Command {
@@ -57,9 +58,25 @@ module AssureNote {
                 Message: message,
                 User: h.Author,
                 DateTime: AssureNoteUtils.FormatDate(h.DateString),
-                Count: h.Doc.GetNodeCount()
+                DateTimeString: new Date(h.DateString).toLocaleString(),
+                Count: {
+                    All: h.Doc.GetNodeCount(),
+                    Goal:     h.Doc.GetNodeCountTypeOf(GSNType.Goal),
+                    Evidence: h.Doc.GetNodeCountTypeOf(GSNType.Evidence),
+                    Context:  h.Doc.GetNodeCountTypeOf(GSNType.Context),
+                    Strategy: h.Doc.GetNodeCountTypeOf(GSNType.Strategy)
+                }
             };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
+            $("#history-panel-date").tooltip({});
+            $("#history-panel-count").tooltip({
+                html: true,
+                title: 
+                      "Goal: " + t.Count.Goal + ""
+                    + "<br>Evidence: " + t.Count.Evidence + ""
+                    + "<br>Context: "  + t.Count.Context  + ""
+                    + "<br>Strategy: " + t.Count.Strategy + ""
+            });
 
             if (this.Index == 0) {
                 $("#prev-revision").addClass("disabled");

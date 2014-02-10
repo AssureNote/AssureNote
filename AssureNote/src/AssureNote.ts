@@ -239,7 +239,6 @@ module AssureNote {
                 }
             } else {
                 var TopGoal = this.PictgramPanel.MasterView;
-                console.log("else " + TopGoal.GetGX());
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");

@@ -4,6 +4,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+///< reference path="../d.ts/jquery_plugins.d.ts" />
 var AssureNote;
 (function (AssureNote) {
     var HistoryCommand = (function (_super) {
@@ -63,9 +64,22 @@ var AssureNote;
                 Message: message,
                 User: h.Author,
                 DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString),
-                Count: h.Doc.GetNodeCount()
+                DateTimeString: new Date(h.DateString).toLocaleString(),
+                Count: {
+                    All: h.Doc.GetNodeCount(),
+                    Goal: h.Doc.GetNodeCountTypeOf(0 /* Goal */),
+                    Evidence: h.Doc.GetNodeCountTypeOf(3 /* Evidence */),
+                    Context: h.Doc.GetNodeCountTypeOf(1 /* Context */),
+                    Strategy: h.Doc.GetNodeCountTypeOf(2 /* Strategy */)
+                }
             };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
+            $("#history-panel-date").tooltip({});
+            $("#history-panel-count").tooltip({
+                html: true,
+                title: "Goal: " + t.Count.Goal + "" + "<br>Evidence: " + t.Count.Evidence + "" + "<br>Context: " + t.Count.Context + "" + "<br>Strategy: " + t.Count.Strategy + ""
+            });
+            $(".tooltip-inner").css({ "text-align": "right" });
 
             if (this.Index == 0) {
                 $("#prev-revision").addClass("disabled");
