@@ -535,12 +535,13 @@ var AssureNote;
             this.App.MasterRecord.FormatRecord(Writer);
             this.App.SetLoading(true);
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {
-                _this.App.SetLoading(false);
-                if (history.pushState) {
-                    history.pushState({ fileId: result.fileId }, "", Config.BASEPATH + "/file/" + result.fileId);
-                } else {
-                    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
-                }
+                window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                //this.App.SetLoading(false);
+                //if(history.pushState) {
+                //    history.pushState({fileId: result.fileId}, "", Config.BASEPATH + "/file/" + result.fileId);
+                //} else {
+                //    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                //}
             }, function () {
                 _this.App.SetLoading(false);
             });
