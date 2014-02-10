@@ -26,104 +26,94 @@
 
 module AssureNote {
 
-    export class Search {
-
-        private SearchWord: string;
+    export class VisitableNodeList {
         private NodeIndex: number;
-        private HitNodes: GSNNode[];
-        private Searching: boolean;
+        private NodeList: GSNNode[];
+        private Visiting: boolean;
+        private ColorStyle: string;
+        private Panel: PictgramPanel;
 
-        constructor(public AssureNoteApp: AssureNoteApp) {
-            this.SearchWord = "";
+        constructor(Panel: PictgramPanel) {
             this.NodeIndex = 0;
-            this.HitNodes = [];
-            this.Searching = false;
+            this.NodeList = [];
+            this.Visiting = false;
+            this.ColorStyle = ColorStyle.Searched;
+            this.Panel = Panel;
         }
 
-        Search(TargetView: NodeView, SearchWord: string): void {
-            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.SearchWord = SearchWord;
-
-            if (this.SearchWord == "") {
-                return;
+        StartVisit(NodeList: GSNNode[]): void {
+            if (this.IsVisiting()) {
+                this.FinishVisit();
             }
-            this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
-            this.AssureNoteApp.DebugP(<any>this.HitNodes);
-
-            if (this.HitNodes.length == 0) {
-                this.SearchWord = "";
-                return;
+            this.NodeList = NodeList;
+            if (this.NodeList.length > 0) {
+                this.Visiting = true;
+                this.UnfoldAllFoundNode();
+                this.AddColorToAllHitNodes(this.ColorStyle);
+                this.Panel.FocusAndMoveToNode(this.NodeList[0].GetLabel());
             }
-
-            this.Searching = true;
-            this.UnfoldAllFoundNode(ViewMap);
-            this.AddColorToAllHitNodes(ViewMap, ColorStyle.Searched);
-            this.AssureNoteApp.PictgramPanel.FocusAndMoveToNode(this.HitNodes[0].GetLabel());
         }
 
-        SearchNext(TargetView: NodeView, IsReversed: boolean): void {
-            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            if (this.HitNodes.length == 1) {
-                return;
+        VisitNext(IsReversed: boolean): void {
+            if (this.IsVisiting() && this.NodeList.length > 1) {
+                var Length = this.NodeList.length;
+                this.NodeIndex = (Length + this.NodeIndex + (IsReversed ? -1 : 1)) % Length;
+                this.Panel.FocusAndMoveToNode(this.NodeList[this.NodeIndex].GetLabel());
             }
-
-            if (!IsReversed) {
-                this.NodeIndex++;
-                if (this.NodeIndex >= this.HitNodes.length) {
-                    this.NodeIndex = 0;
-                }
-            } else {
-                this.NodeIndex--;
-                if (this.NodeIndex < 0) {
-                    this.NodeIndex = this.HitNodes.length - 1;
-                }
-            }
-
-            this.AssureNoteApp.PictgramPanel.FocusAndMoveToNode(this.HitNodes[this.NodeIndex].GetLabel());
         }
 
-        private UnfoldAllFoundNode(ViewMap: { [index: string]: NodeView }): void {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        private UnfoldAllFoundNode(): void {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 while (Node != null) {
                     Node.IsFolded = false;
                     Node = Node.Parent;
                 }
             }
-            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
+            this.Panel.Draw(this.Panel.MasterView.Label, 300);
         }
 
-        IsSearching(): boolean {
-            return this.Searching;
+        IsVisiting(): boolean {
+            return this.Visiting;
         }
 
-        EndSearch(): void {
-            this.RemoveColorFromAllHitNodes(this.AssureNoteApp.PictgramPanel.ViewMap, ColorStyle.Searched);
-            this.HitNodes = [];
+        FinishVisit(): void {
+            this.RemoveColorFromAllHitNodes(this.ColorStyle);
+            this.NodeList = [];
             this.NodeIndex = 0;
-            this.SearchWord = "";
-            this.Searching = false;
+            this.Visiting = false;
         }
 
-        private AddColorToAllHitNodes(ViewMap: { [index: string]: NodeView }, ColorStyle: string): void {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        private AddColorToAllHitNodes(ColorStyle: string): void {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 if (Node != null) {
                     Node.GetShape().AddColorStyle(ColorStyle);
                 }
             }
         }
 
-        private RemoveColorFromAllHitNodes(ViewMap: { [index: string]: NodeView }, ColorStyle: string): void {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        private RemoveColorFromAllHitNodes(ColorStyle: string): void {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 if (Node != null) {
                     Node.GetShape().RemoveColorStyle(ColorStyle);
                 }
             }
         }
+    }
 
+    export class SearchResultNodeList extends VisitableNodeList {
+
+        constructor(Panel: PictgramPanel) {
+            super(Panel);
+        }
+
+        Search(TargetView: NodeView, SearchWord: string): void {
+            this.StartVisit(TargetView.Model.SearchNode(SearchWord));
+        }
     }
 }

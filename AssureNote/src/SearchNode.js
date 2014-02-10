@@ -21,103 +21,100 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 ///<reference path='./AssureNoteParser.ts'/>
 var AssureNote;
 (function (AssureNote) {
-    var Search = (function () {
-        function Search(AssureNoteApp) {
-            this.AssureNoteApp = AssureNoteApp;
-            this.SearchWord = "";
+    var VisitableNodeList = (function () {
+        function VisitableNodeList(Panel) {
             this.NodeIndex = 0;
-            this.HitNodes = [];
-            this.Searching = false;
+            this.NodeList = [];
+            this.Visiting = false;
+            this.ColorStyle = AssureNote.ColorStyle.Searched;
+            this.Panel = Panel;
         }
-        Search.prototype.Search = function (TargetView, SearchWord) {
-            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.SearchWord = SearchWord;
-
-            if (this.SearchWord == "") {
-                return;
+        VisitableNodeList.prototype.StartVisit = function (NodeList) {
+            if (this.IsVisiting()) {
+                this.FinishVisit();
             }
-            this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
-            this.AssureNoteApp.DebugP(this.HitNodes);
-
-            if (this.HitNodes.length == 0) {
-                this.SearchWord = "";
-                return;
+            this.NodeList = NodeList;
+            if (this.NodeList.length > 0) {
+                this.Visiting = true;
+                this.UnfoldAllFoundNode();
+                this.AddColorToAllHitNodes(this.ColorStyle);
+                this.Panel.FocusAndMoveToNode(this.NodeList[0].GetLabel());
             }
-
-            this.Searching = true;
-            this.UnfoldAllFoundNode(ViewMap);
-            this.AddColorToAllHitNodes(ViewMap, AssureNote.ColorStyle.Searched);
-            this.AssureNoteApp.PictgramPanel.FocusAndMoveToNode(this.HitNodes[0].GetLabel());
         };
 
-        Search.prototype.SearchNext = function (TargetView, IsReversed) {
-            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            if (this.HitNodes.length == 1) {
-                return;
+        VisitableNodeList.prototype.VisitNext = function (IsReversed) {
+            if (this.IsVisiting() && this.NodeList.length > 1) {
+                var Length = this.NodeList.length;
+                this.NodeIndex = (Length + this.NodeIndex + (IsReversed ? -1 : 1)) % Length;
+                this.Panel.FocusAndMoveToNode(this.NodeList[this.NodeIndex].GetLabel());
             }
-
-            if (!IsReversed) {
-                this.NodeIndex++;
-                if (this.NodeIndex >= this.HitNodes.length) {
-                    this.NodeIndex = 0;
-                }
-            } else {
-                this.NodeIndex--;
-                if (this.NodeIndex < 0) {
-                    this.NodeIndex = this.HitNodes.length - 1;
-                }
-            }
-
-            this.AssureNoteApp.PictgramPanel.FocusAndMoveToNode(this.HitNodes[this.NodeIndex].GetLabel());
         };
 
-        Search.prototype.UnfoldAllFoundNode = function (ViewMap) {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        VisitableNodeList.prototype.UnfoldAllFoundNode = function () {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 while (Node != null) {
                     Node.IsFolded = false;
                     Node = Node.Parent;
                 }
             }
-            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
+            this.Panel.Draw(this.Panel.MasterView.Label, 300);
         };
 
-        Search.prototype.IsSearching = function () {
-            return this.Searching;
+        VisitableNodeList.prototype.IsVisiting = function () {
+            return this.Visiting;
         };
 
-        Search.prototype.EndSearch = function () {
-            this.RemoveColorFromAllHitNodes(this.AssureNoteApp.PictgramPanel.ViewMap, AssureNote.ColorStyle.Searched);
-            this.HitNodes = [];
+        VisitableNodeList.prototype.FinishVisit = function () {
+            this.RemoveColorFromAllHitNodes(this.ColorStyle);
+            this.NodeList = [];
             this.NodeIndex = 0;
-            this.SearchWord = "";
-            this.Searching = false;
+            this.Visiting = false;
         };
 
-        Search.prototype.AddColorToAllHitNodes = function (ViewMap, ColorStyle) {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        VisitableNodeList.prototype.AddColorToAllHitNodes = function (ColorStyle) {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 if (Node != null) {
                     Node.GetShape().AddColorStyle(ColorStyle);
                 }
             }
         };
 
-        Search.prototype.RemoveColorFromAllHitNodes = function (ViewMap, ColorStyle) {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        VisitableNodeList.prototype.RemoveColorFromAllHitNodes = function (ColorStyle) {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 if (Node != null) {
                     Node.GetShape().RemoveColorStyle(ColorStyle);
                 }
             }
         };
-        return Search;
+        return VisitableNodeList;
     })();
-    AssureNote.Search = Search;
+    AssureNote.VisitableNodeList = VisitableNodeList;
+
+    var SearchResultNodeList = (function (_super) {
+        __extends(SearchResultNodeList, _super);
+        function SearchResultNodeList(Panel) {
+            _super.call(this, Panel);
+        }
+        SearchResultNodeList.prototype.Search = function (TargetView, SearchWord) {
+            this.StartVisit(TargetView.Model.SearchNode(SearchWord));
+        };
+        return SearchResultNodeList;
+    })(VisitableNodeList);
+    AssureNote.SearchResultNodeList = SearchResultNodeList;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=SearchNode.js.map

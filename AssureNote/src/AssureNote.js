@@ -36,6 +36,7 @@ var AssureNote;
         function AssureNoteApp() {
             this.LoadingIndicatorVisible = true;
             this.LoadingIndicator = document.getElementById("loading-indicator");
+            AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
 
