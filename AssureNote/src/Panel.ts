@@ -33,9 +33,13 @@ module AssureNote {
     export class Panel {
         private static ActivePanel: Panel;
         private static Initialized: boolean = false;
-
+        /**
+            @deprecated
+        */
         IsVisible = false;
-
+        /**
+            @deprecated
+        */
         IsEnable: boolean;
         public App: AssureNoteApp;
         constructor(App: AssureNoteApp) {
@@ -62,13 +66,22 @@ module AssureNote {
         OnDeactivate(): void {
         }
 
+        /**
+            @deprecated
+        */
         Remove(): void {
         }
 
+        /**
+            @deprecated
+        */
         Show(): void {
             this.IsEnable = true;
         }
 
+        /**
+            @deprecated
+        */
         Hide(): void {
             this.IsVisible = false;
         }

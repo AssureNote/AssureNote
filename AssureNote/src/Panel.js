@@ -30,6 +30,9 @@ var AssureNote;
     */
     var Panel = (function () {
         function Panel(App) {
+            /**
+            @deprecated
+            */
             this.IsVisible = false;
             this.App = App;
             if (!Panel.Initialized) {
@@ -53,13 +56,22 @@ var AssureNote;
         Panel.prototype.OnDeactivate = function () {
         };
 
+        /**
+        @deprecated
+        */
         Panel.prototype.Remove = function () {
         };
 
+        /**
+        @deprecated
+        */
         Panel.prototype.Show = function () {
             this.IsEnable = true;
         };
 
+        /**
+        @deprecated
+        */
         Panel.prototype.Hide = function () {
             this.IsVisible = false;
         };
