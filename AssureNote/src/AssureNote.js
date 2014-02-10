@@ -69,7 +69,7 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "history", [
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
                 new AssureNote.ShowHistoryPanelItem()
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [

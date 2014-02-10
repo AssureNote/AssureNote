@@ -94,7 +94,7 @@ module AssureNote {
             this.UserList = new UserList(this);
 
             this.TopMenu.AppendSubMenu(
-                new SubMenuItem("History", "history", [
+                new SubMenuItem("History", "time", [
                     new ShowHistoryPanelItem()
                 ])
             );
