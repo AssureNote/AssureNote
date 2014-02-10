@@ -36,6 +36,8 @@ declare function saveAs(data: Blob, filename: String): void;
 module AssureNote {
 
     export class AssureNoteApp {
+        static Current: AssureNoteApp;
+
         PluginManager: PluginManager;
         SocketManager: SocketManager;
         ModeManager: ModeManager;
@@ -58,6 +60,7 @@ module AssureNote {
         private LoadingIndicator: HTMLImageElement = <HTMLImageElement>document.getElementById("loading-indicator");
 
         constructor() {
+            AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -91,7 +94,7 @@ module AssureNote {
             this.UserList = new UserList(this);
 
             this.TopMenu.AppendSubMenu(
-                new SubMenuItem("History", "history", [
+                new SubMenuItem("History", "time", [
                     new ShowHistoryPanelItem()
                 ])
             );

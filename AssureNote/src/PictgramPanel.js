@@ -121,7 +121,7 @@ var AssureNote;
             });
 
             this.CmdLine = new AssureNote.CommandLine(App);
-            this.Search = new AssureNote.Search(App);
+            this.Search = new AssureNote.SearchResultNodeList(this);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", function (event) {
@@ -205,14 +205,14 @@ var AssureNote;
                 case 186:
                 case 191:
                 case 219:
-                    if (this.Search.IsSearching()) {
-                        this.Search.EndSearch();
+                    if (this.Search.IsVisiting()) {
+                        this.Search.FinishVisit();
                     }
                     this.CmdLine.Activate();
                     break;
                 case 27:
-                    if (this.Search.IsSearching()) {
-                        this.Search.EndSearch();
+                    if (this.Search.IsVisiting()) {
+                        this.Search.FinishVisit();
                         Event.preventDefault();
                     }
                     if (this.App.HistoryPanel) {
@@ -220,8 +220,8 @@ var AssureNote;
                     }
                     break;
                 case 13:
-                    if (this.Search.IsSearching()) {
-                        this.Search.SearchNext(this.MasterView, event.shiftKey);
+                    if (this.Search.IsVisiting()) {
+                        this.Search.VisitNext(event.shiftKey);
                         Event.preventDefault();
                     }
                     break;

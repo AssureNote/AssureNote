@@ -36,6 +36,7 @@ var AssureNote;
         function AssureNoteApp() {
             this.LoadingIndicatorVisible = true;
             this.LoadingIndicator = document.getElementById("loading-indicator");
+            AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -68,7 +69,7 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "history", [
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
                 new AssureNote.ShowHistoryPanelItem()
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [

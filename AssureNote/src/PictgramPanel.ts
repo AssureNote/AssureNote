@@ -48,7 +48,7 @@ module AssureNote {
         ViewMap: { [index: string]: NodeView };
         MasterView: NodeView;
         CmdLine: CommandLine;
-        Search: Search;
+        Search: SearchResultNodeList;
         ContextMenu: NodeMenu;
         NodeTooltip: Tooltip;
 
@@ -132,7 +132,7 @@ module AssureNote {
             });
 
             this.CmdLine = new CommandLine(App);
-            this.Search = new Search(App);
+            this.Search = new SearchResultNodeList(this);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", (event: MouseEvent) => {
@@ -219,14 +219,14 @@ module AssureNote {
                 case 186: /*:*/
                 case 191: /*/*/
                 case 219: /*@*/
-                    if (this.Search.IsSearching()) {
-                        this.Search.EndSearch();
+                    if (this.Search.IsVisiting()) {
+                        this.Search.FinishVisit();
                     }
                     this.CmdLine.Activate();
                     break;
                 case 27: /*Esc*/
-                    if (this.Search.IsSearching()) {
-                        this.Search.EndSearch();
+                    if (this.Search.IsVisiting()) {
+                        this.Search.FinishVisit();
                         Event.preventDefault();
                     }
                     if (this.App.HistoryPanel) {
@@ -234,8 +234,8 @@ module AssureNote {
                     }
                     break;
                 case 13: /*Enter*/
-                    if (this.Search.IsSearching()) {
-                        this.Search.SearchNext(this.MasterView, event.shiftKey);
+                    if (this.Search.IsVisiting()) {
+                        this.Search.VisitNext(event.shiftKey);
                         Event.preventDefault();
                     }
                     break;
