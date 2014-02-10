@@ -228,26 +228,23 @@ var AssureNote;
         })();
         AssureNoteUtils.UserAgant = UserAgant;
 
-        function RequestAnimationFrame(Callback) {
-            if (UserAgant.IsAnimationFrameEnabled()) {
-                return window.requestAnimationFrame(Callback);
-            }
-            return window.setTimeout(Callback, 16.7);
-        }
-        AssureNoteUtils.RequestAnimationFrame = RequestAnimationFrame;
+        AssureNoteUtils.RequestAnimationFrame = UserAgant.IsAnimationFrameEnabled() ? (function (c) {
+            return requestAnimationFrame(c);
+        }) : (function (c) {
+            return setTimeout(c, 16.7);
+        });
 
-        function CancelAnimationFrame(Handle) {
-            if (UserAgant.IsAnimationFrameEnabled()) {
-                return window.cancelAnimationFrame(Handle);
-            }
-            return window.clearTimeout(Handle);
-        }
-        AssureNoteUtils.CancelAnimationFrame = CancelAnimationFrame;
+        AssureNoteUtils.CancelAnimationFrame = UserAgant.IsAnimationFrameEnabled() ? (function (h) {
+            return cancelAnimationFrame(h);
+        }) : (function (h) {
+            return clearTimeout(h);
+        });
 
-        function GetTime() {
-            return UserAgant.IsPerformanceEnabled() ? window.performance.now() : Date.now();
-        }
-        AssureNoteUtils.GetTime = GetTime;
+        AssureNoteUtils.GetTime = UserAgant.IsPerformanceEnabled() ? (function () {
+            return performance.now();
+        }) : (function () {
+            return Date.now();
+        });
 
         function DefineColorStyle(StyleName, StyleDef) {
             $("<style>").html("." + StyleName + " { " + $("span").css(StyleDef).attr("style") + " }").appendTo("head");
@@ -262,20 +259,21 @@ var AssureNote;
         AnimationFrameTask.prototype.Start = function (Duration, Callback) {
             var _this = this;
             this.Cancel();
-            var LastTime = AssureNoteUtils.GetTime();
-            var StartTime = LastTime;
+            this.LastTime = this.StartTime = AssureNoteUtils.GetTime();
+            this.EndTime = this.StartTime + Duration;
+            this.Callback = Callback;
 
             var Update = function () {
                 var CurrentTime = AssureNoteUtils.GetTime();
-                var DeltaT = CurrentTime - LastTime;
-                if (CurrentTime - StartTime < Duration) {
+                var DeltaT = CurrentTime - _this.LastTime;
+                if (CurrentTime < _this.EndTime) {
                     _this.TimerHandle = AssureNoteUtils.RequestAnimationFrame(Update);
                 } else {
-                    DeltaT = Duration - (LastTime - StartTime);
+                    DeltaT = _this.EndTime - _this.LastTime;
                     _this.TimerHandle = 0;
                 }
-                Callback(DeltaT, CurrentTime, StartTime);
-                LastTime = CurrentTime;
+                _this.Callback(DeltaT, CurrentTime, _this.StartTime);
+                _this.LastTime = CurrentTime;
             };
             Update();
         };
@@ -290,10 +288,18 @@ var AssureNote;
             }
         };
 
-        AnimationFrameTask.prototype.Cancel = function () {
+        AnimationFrameTask.prototype.IsRunning = function () {
+            return this.TimerHandle != 0;
+        };
+
+        AnimationFrameTask.prototype.Cancel = function (RunToEnd) {
             if (this.TimerHandle) {
                 AssureNoteUtils.CancelAnimationFrame(this.TimerHandle);
                 this.TimerHandle = 0;
+                if (RunToEnd) {
+                    var DeltaT = this.EndTime - this.LastTime;
+                    this.Callback(DeltaT, this.EndTime, this.StartTime);
+                }
             }
         };
         return AnimationFrameTask;
@@ -376,7 +382,7 @@ var AssureNote;
                 Panel.ActivePanel = this;
                 document.addEventListener("keydown", function (Event) {
                     Panel.ActivePanel.OnKeyDown(Event);
-                });
+                }, true);
                 Panel.Initialized = true;
             }
         }
@@ -3209,7 +3215,7 @@ var AssureNote;
         function WGSNEditorPanel(App) {
             var TextArea = document.getElementById('editor');
             var Wrapper = document.getElementById('editor-wrapper');
-            _super.call(this, App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
+            _super.call(this, App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true, extraKeys: { "Shift-Space": "autocomplete" } }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
         }
         return WGSNEditorPanel;
     })(CodeMirrorEditorPanel);
@@ -3703,29 +3709,64 @@ var AssureNote;
     })(Command);
     AssureNote.HelpCommand = HelpCommand;
 
-    var UploadCommand = (function (_super) {
-        __extends(UploadCommand, _super);
-        function UploadCommand(App) {
+    var ShareCommand = (function (_super) {
+        __extends(ShareCommand, _super);
+        function ShareCommand(App) {
             _super.call(this, App);
         }
-        UploadCommand.prototype.GetCommandLineNames = function () {
+        ShareCommand.prototype.GetCommandLineNames = function () {
             return ["share"];
         };
 
-        UploadCommand.prototype.GetHelpHTML = function () {
-            return "<code>share</code><br>Upload editing GSN to the server(online version only).";
+        ShareCommand.prototype.GetHelpHTML = function () {
+            return "<code>share</code><br>Share editing GSN to the server(online version only).";
         };
 
-        UploadCommand.prototype.Invoke = function (CommandName, Params) {
+        ShareCommand.prototype.Invoke = function (CommandName, Params) {
+            var _this = this;
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
+            this.App.SetLoading(true);
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {
                 window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+            }, function () {
+                _this.App.SetLoading(false);
             });
         };
-        return UploadCommand;
+        return ShareCommand;
     })(Command);
-    AssureNote.UploadCommand = UploadCommand;
+    AssureNote.ShareCommand = ShareCommand;
+
+    var SetGuestUserNameCommand = (function (_super) {
+        __extends(SetGuestUserNameCommand, _super);
+        function SetGuestUserNameCommand(App) {
+            _super.call(this, App);
+        }
+        SetGuestUserNameCommand.prototype.GetCommandLineNames = function () {
+            return ["set-user", "setuser"];
+        };
+
+        SetGuestUserNameCommand.prototype.Invoke = function (CommandName, Params) {
+            var Name = Params[0];
+            if (!Name || Name == '') {
+                Name = prompt('Enter the new name for guest', '');
+            }
+            if (!Name || Name == '') {
+                Name = 'Guest';
+            }
+            this.App.SetUserName(Name);
+        };
+
+        SetGuestUserNameCommand.prototype.GetHelpHTML = function () {
+            return "<code>set-user [name]</code><br>Rename guest user.";
+        };
+
+        SetGuestUserNameCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
+        return SetGuestUserNameCommand;
+    })(Command);
+    AssureNote.SetGuestUserNameCommand = SetGuestUserNameCommand;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -4094,7 +4135,6 @@ var AssureNote;
             _super.call(this, App);
             this.App = App;
             this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
-            this.FoldingAnimationCallbacks = [];
             this.SVGLayer = document.getElementById("svg-layer");
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
@@ -4304,6 +4344,20 @@ var AssureNote;
                     }
                     Event.preventDefault();
                     break;
+                case 187:
+                    var Command = this.App.FindCommandByCommandLineName("set-scale");
+                    if (Command && Event.shiftKey) {
+                        Command.Invoke(null, [this.Viewport.GetCameraScale() + 0.1]);
+                    }
+                    Event.preventDefault();
+                    break;
+                case 189:
+                    var Command = this.App.FindCommandByCommandLineName("set-scale");
+                    if (Command && Event.shiftKey) {
+                        Command.Invoke(null, [this.Viewport.GetCameraScale() - 0.1]);
+                    }
+                    Event.preventDefault();
+                    break;
                 default:
                     handled = false;
                     break;
@@ -4441,12 +4495,18 @@ var AssureNote;
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
-            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
 
-            TargetView.UpdateDocumentPosition(this.FoldingAnimationCallbacks, Duration);
+            this.FoldingAnimationTask.Cancel(true);
+
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
+            var FoldingAnimationCallbacks = [];
+
+            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration);
             TargetView.ClearAnimationCache();
-            this.FoldingAnimationTask.StartMany(Duration, this.FoldingAnimationCallbacks);
-            this.FoldingAnimationCallbacks = [];
+            this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
+
+            var Shape = TargetView.GetShape();
+            this.Viewport.CameraLimitRect = new AssureNote.Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
@@ -4454,13 +4514,11 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Clear = function () {
-            this.ContentLayer.style.display = "none";
-            this.SVGLayer.style.display = "none";
             this.ContentLayer.innerHTML = "";
+            this.SVGLayer.style.display = "none";
             for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
                 this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
             }
-            this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
         };
 
@@ -5249,6 +5307,25 @@ var AssureNote;
         return AboutMenuItem;
     })(TopMenuItem);
     AssureNote.AboutMenuItem = AboutMenuItem;
+
+    var ShowHistoryPanelItem = (function (_super) {
+        __extends(ShowHistoryPanelItem, _super);
+        function ShowHistoryPanelItem() {
+            _super.apply(this, arguments);
+        }
+        ShowHistoryPanelItem.prototype.GetIconName = function () {
+            return "time";
+        };
+        ShowHistoryPanelItem.prototype.GetDisplayName = function () {
+            return "Show history panel";
+        };
+        ShowHistoryPanelItem.prototype.Invoke = function (App) {
+            var Command = App.FindCommandByCommandLineName("history");
+            Command.Invoke(null, []);
+        };
+        return ShowHistoryPanelItem;
+    })(TopMenuItem);
+    AssureNote.ShowHistoryPanelItem = ShowHistoryPanelItem;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -5266,18 +5343,10 @@ var AssureNote;
     var UserList = (function (_super) {
         __extends(UserList, _super);
         function UserList(App) {
-            var _this = this;
             _super.call(this, App);
             this.App = App;
             this.UserName = 'Guest';
             this.UserList = [];
-            $('.change-user').on('click', function (e) {
-                var Name = prompt('Enter the new user name', '');
-                if (Name == '')
-                    Name = 'Guest';
-                _this.App.SetUserName(Name);
-                _this.Show();
-            });
         }
         UserList.prototype.Show = function () {
             var found = false;
@@ -5484,7 +5553,12 @@ var AssureNote;
             this.Element.empty();
             var h = this.App.MasterRecord.HistoryList[this.Index];
             var message = h.GetCommitMessage() || "(No Commit Message)";
-            var t = { Message: message, User: h.Author, DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString) };
+            var t = {
+                Message: message,
+                User: h.Author,
+                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString),
+                Count: h.Doc.GetNodeCount()
+            };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
 
             if (this.Index == 0) {
@@ -5494,6 +5568,10 @@ var AssureNote;
             if (this.Index == this.App.MasterRecord.HistoryList.length - 1) {
                 $("#next-revision").addClass("disabled");
             }
+
+            $("#history-panel-close").click(function () {
+                _this.Hide();
+            });
 
             $("#prev-revision").click(function () {
                 var length = _this.App.MasterRecord.HistoryList.length;
@@ -5572,8 +5650,9 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetColorCommand(this));
             this.RegistCommand(new AssureNote.SetScaleCommand(this));
             this.RegistCommand(new AssureNote.HelpCommand(this));
-            this.RegistCommand(new AssureNote.UploadCommand(this));
+            this.RegistCommand(new AssureNote.ShareCommand(this));
             this.RegistCommand(new AssureNote.HistoryCommand(this));
+            this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
 
@@ -5581,6 +5660,9 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "history", [
+                new AssureNote.ShowHistoryPanelItem()
+            ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
                 new AssureNote.NewMenuItem(),
                 new AssureNote.OpenMenuItem(),
@@ -5998,15 +6080,31 @@ var AssureNote;
             return this.CameraCenterPageY - this.CameraGY * this.Scale;
         };
 
+        ViewportManager.prototype.LimitCameraPosition = function () {
+            var R = this.CameraLimitRect;
+            if (R) {
+                if (this.CameraGX < R.X)
+                    this.CameraGX = R.X;
+                if (this.CameraGY < R.Y)
+                    this.CameraGY = R.Y;
+                if (this.CameraGX > R.X + R.Width)
+                    this.CameraGX = R.X + R.Width;
+                if (this.CameraGY > R.Y + R.Height)
+                    this.CameraGY = R.Y + R.Height;
+            }
+        };
+
         ViewportManager.prototype.SetOffset = function (PageX, PageY) {
             this.CameraGX = (this.CameraCenterPageX - PageX) / this.Scale;
             this.CameraGY = (this.CameraCenterPageY - PageY) / this.Scale;
+            this.LimitCameraPosition();
             this.UpdateAttr();
         };
 
         ViewportManager.prototype.AddOffset = function (PageX, PageY) {
             this.CameraGX -= PageX / this.Scale;
             this.CameraGY -= PageY / this.Scale;
+            this.LimitCameraPosition();
             this.UpdateAttr();
         };
 
@@ -6819,14 +6917,6 @@ var AssureNote;
             this.TreeBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
         }
         GSNShape.CreateArrowPath = function () {
-            if (!GSNShape.ArrowPathMaster) {
-                GSNShape.ArrowPathMaster = AssureNote.AssureNoteUtils.CreateSVGElement("path");
-                GSNShape.ArrowPathMaster.setAttribute("marker-end", "url(#Triangle-black)");
-                GSNShape.ArrowPathMaster.setAttribute("fill", "none");
-                GSNShape.ArrowPathMaster.setAttribute("stroke", "gray");
-                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-                GSNShape.ArrowPathMaster.setAttribute("d", "M0,0 C0,0 0,0 0,0");
-            }
             return GSNShape.ArrowPathMaster.cloneNode();
         };
 
@@ -7045,12 +7135,14 @@ var AssureNote;
             this.ShapeGroup.setAttribute("transform", "translate(0,0)");
             this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             this.ArrowPath = GSNShape.CreateArrowPath();
+            this.ArrowStart = this.ArrowPath.pathSegList.getItem(0);
+            this.ArrowCurve = this.ArrowPath.pathSegList.getItem(1);
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         };
 
         GSNShape.prototype.SetArrowPosition = function (P1, P2, Dir) {
-            var start = this.ArrowPath.pathSegList.getItem(0);
-            var curve = this.ArrowPath.pathSegList.getItem(1);
+            var start = this.ArrowStart;
+            var curve = this.ArrowCurve;
             start.x = P1.X;
             start.y = P1.Y;
             curve.x = P2.X;
@@ -7094,9 +7186,10 @@ var AssureNote;
             var P2VX = (P2.X - this.ArrowP2.X) / Duration;
             var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
 
+            var CurrentP1 = this.ArrowP1.Clone();
+            var CurrentP2 = this.ArrowP2.Clone();
+
             AnimationCallbacks.push(function (deltaT) {
-                var CurrentP1 = _this.ArrowP1.Clone();
-                var CurrentP2 = _this.ArrowP2.Clone();
                 CurrentP1.X += P1VX * deltaT;
                 CurrentP1.Y += P1VY * deltaT;
                 CurrentP2.X += P2VX * deltaT;
@@ -7157,6 +7250,9 @@ var AssureNote;
 
         GSNShape.prototype.SetColorStyle = function (Styles) {
             this.ColorStyles = Styles;
+            if (this.ColorStyles.indexOf(AssureNote.ColorStyle.Default) < 0) {
+                this.ColorStyles.push(AssureNote.ColorStyle.Default);
+            }
         };
 
         GSNShape.prototype.ClearColorStyle = function () {
@@ -7165,7 +7261,14 @@ var AssureNote;
                 this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             }
         };
-        GSNShape.ArrowPathMaster = null;
+        GSNShape.ArrowPathMaster = (function () {
+            var Master = AssureNote.AssureNoteUtils.CreateSVGElement("path");
+            Master.setAttribute("marker-end", "url(#Triangle-black)");
+            Master.setAttribute("fill", "none");
+            Master.setAttribute("stroke", "gray");
+            Master.setAttribute("d", "M0,0 C0,0 0,0 0,0");
+            return Master;
+        })();
         return GSNShape;
     })();
     AssureNote.GSNShape = GSNShape;
@@ -7180,15 +7283,10 @@ var AssureNote;
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.ShapeGroup.appendChild(this.BodyRect);
             if (this.NodeView.IsFolded) {
-                this.ModuleRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
-                this.ModuleRect.setAttribute("width", "80px");
-                this.ModuleRect.setAttribute("height", "13px");
-                this.ModuleRect.setAttribute("y", "-13px");
-                this.ShapeGroup.appendChild(this.ModuleRect);
+                this.ShapeGroup.appendChild(GSNGoalShape.ModuleSymbolMaster.cloneNode());
             }
             if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
-                this.UndevelopedSymbol = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
-                this.UndevelopedSymbol.setAttribute("points", "0 -20 -20 0 0 20 20 0");
+                this.UndevelopedSymbol = GSNGoalShape.UndevelopedSymbolMaster.cloneNode();
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
         };
@@ -7207,6 +7305,19 @@ var AssureNote;
         GSNGoalShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-goal";
         };
+        GSNGoalShape.ModuleSymbolMaster = (function () {
+            var Master = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
+            Master.setAttribute("width", "80px");
+            Master.setAttribute("height", "13px");
+            Master.setAttribute("y", "-13px");
+            return Master;
+        })();
+
+        GSNGoalShape.UndevelopedSymbolMaster = (function () {
+            var Master = AssureNote.AssureNoteUtils.CreateSVGElement("polygon");
+            Master.setAttribute("points", "0 -20 -20 0 0 20 20 0");
+            return Master;
+        })();
         return GSNGoalShape;
     })(GSNShape);
     AssureNote.GSNGoalShape = GSNGoalShape;
@@ -8292,23 +8403,18 @@ var AssureNote;
         __extends(MonitorListPanel, _super);
         function MonitorListPanel(App) {
             _super.call(this, App);
-            var Modal = $('\
-<div id="monitorlist-modal" tabindex="-1" role="dialog" aria-labelledby="monitorlist-modal-label" aria-hidden="true" class="modal fade">\n\
-  <div class="modal-dialog">\n\
-    <div class="modal-content">\n\
-      <div class="modal-header">\n\
-        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>\n\
-        <h4 id="monitorlist-modal-label" class="modal-title">Active Monitor List</h4>\n\
-      </div>\n\
-      <div id="monitorlist-modal-body" class="modal-body">\n\
-      </div>\n\
-      <div class="modal-footer">\n\
-        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>\n\
-      </div>\n\
-    </div>\n\
-  </div>\n\
-</div>\n\
-            ');
+            var Modal = null;
+            $.ajax({
+                url: '/plugin/MonitorNode/MonitorList.html',
+                async: false,
+                dataType: "html",
+                success: function (Response) {
+                    Modal = $(Response);
+                },
+                error: function (Request, Status, Error) {
+                    alert("ajax error");
+                }
+            });
             $('#plugin-layer').append(Modal);
 
             $('#monitorlist-modal').on('hidden.bs.modal', function () {
