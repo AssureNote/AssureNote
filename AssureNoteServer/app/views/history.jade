@@ -5,10 +5,14 @@
               span.glyphicon.glyphicon-remove-circle(style="font-size: 24px;")
             h4.list-group-item-heading ${Message}
             p.list-group-item-text
-                small ${User} commited &nbsp;
-                    a#history-panel-date(data-toggle="tooltip", data-placement="bottom" , title="${DateTimeString}") ${DateTime}
-                    br
-                    a#history-panel-count(data-toggle="tooltip", data-placement="bottom") ${Count.All} Nodes
+              small
+                span.glyphicon.glyphicon-user
+                | &nbsp; ${User} &nbsp;
+                span.glyphicon.glyphicon-time
+                | &nbsp;
+                a#history-panel-date(data-toggle="tooltip", data-placement="bottom" , title="${DateTimeString}") ${DateTime}
+                br
+                a#history-panel-count(data-toggle="tooltip", data-placement="bottom") ${Count.All} Nodes
 
             .list-group-item-text(style="padding-top: 10px")
                 .btn-group

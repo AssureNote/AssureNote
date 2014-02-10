@@ -79,7 +79,6 @@ var AssureNote;
                 html: true,
                 title: "Goal: " + t.Count.Goal + "" + "<br>Evidence: " + t.Count.Evidence + "" + "<br>Context: " + t.Count.Context + "" + "<br>Strategy: " + t.Count.Strategy + ""
             });
-            $(".tooltip-inner").css({ "text-align": "right" });
 
             if (this.Index == 0) {
                 $("#prev-revision").addClass("disabled");
