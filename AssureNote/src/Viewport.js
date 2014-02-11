@@ -440,6 +440,10 @@ var AssureNote;
             return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
         };
 
+        ViewportManager.prototype.GetPageRectInGxGy = function () {
+            return this.ConvertRectGlobalXYFromPageXY(new AssureNote.Rect(0, 0, this.PageWidth, this.PageHeight));
+        };
+
         ViewportManager.prototype.GetPageWidth = function () {
             return this.PageWidth;
         };

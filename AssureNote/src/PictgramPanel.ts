@@ -459,7 +459,7 @@ module AssureNote {
             NodeView.SetGlobalPositionCacheEnabled(true);
             var FoldingAnimationCallbacks = [];
 
-            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration);
+            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration,  this.Viewport.GetPageRectInGxGy());
             TargetView.ClearAnimationCache();
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 

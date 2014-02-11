@@ -207,45 +207,39 @@ var AssureNote;
             return P;
         };
 
-        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, PositionBaseNode) {
+        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, ScreenRect, PositionBaseNode) {
             var _this = this;
             Duration = Duration || 0;
             if (!this.IsVisible) {
                 return;
             }
-            var UpdateSubNode = function (SubNode, P1, P2) {
+            var UpdateSubNode = function (SubNode) {
                 var Base = PositionBaseNode;
                 if (!Base && SubNode.Shape.WillFadein()) {
                     Base = _this;
                 }
                 if (Base && Duration > 0) {
                     SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, Base);
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect, Base);
                 } else {
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration);
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect);
                 }
             };
 
             var GlobalPosition = this.GetGlobalPosition();
-            this.Shape.MoveTo(AnimationCallbacks, GlobalPosition.X, GlobalPosition.Y, Duration);
-            var P1 = this.GetConnectorPosition(3 /* Bottom */, GlobalPosition);
-            this.ForEachVisibleChildren(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(1 /* Top */, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 3 /* Bottom */, Duration);
-            });
-            P1 = this.GetConnectorPosition(2 /* Right */, GlobalPosition);
-            this.ForEachVisibleRightNodes(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(0 /* Left */, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 2 /* Right */, Duration);
-            });
-            P1 = this.GetConnectorPosition(0 /* Left */, GlobalPosition);
-            this.ForEachVisibleLeftNodes(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(2 /* Right */, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 0 /* Left */, Duration);
-            });
+            this.Shape.MoveTo(AnimationCallbacks, GlobalPosition.X, GlobalPosition.Y, Duration, ScreenRect);
+
+            var ArrowDirections = [3 /* Bottom */, 2 /* Right */, 0 /* Left */];
+            var SubNodeTypes = [this.Children, this.Right, this.Left];
+            for (var i = 0; i < 3; ++i) {
+                var P1 = this.GetConnectorPosition(ArrowDirections[i], GlobalPosition);
+                var ArrowToDirection = AssureNote.ReverseDirection(ArrowDirections[i]);
+                this.ForEachVisibleSubNode(SubNodeTypes[i], function (SubNode) {
+                    var P2 = SubNode.GetConnectorPosition(ArrowToDirection, SubNode.GetGlobalPosition());
+                    UpdateSubNode(SubNode);
+                    SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, ArrowDirections[i], Duration, ScreenRect);
+                });
+            }
         };
 
         NodeView.prototype.ForEachVisibleSubNode = function (SubNodes, Action) {

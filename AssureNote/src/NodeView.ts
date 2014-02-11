@@ -219,44 +219,38 @@ module AssureNote {
             return P;
         }
 
-        UpdateDocumentPosition(AnimationCallbacks?: Function[], Duration?: number, PositionBaseNode?: NodeView): void {
+        UpdateDocumentPosition(AnimationCallbacks?: Function[], Duration?: number, ScreenRect?: Rect, PositionBaseNode?: NodeView): void {
             Duration = Duration || 0;
             if (!this.IsVisible) {
                 return
             }
-            var UpdateSubNode = (SubNode: NodeView, P1: Point, P2: Point) => {
+            var UpdateSubNode = (SubNode: NodeView) => {
                 var Base = PositionBaseNode;
                 if (!Base && SubNode.Shape.WillFadein()) {
                     Base = this;
                 }
                 if (Base && Duration > 0) {
                     SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, Base);
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect, Base);
                 } else {
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration);
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect);
                 }
             }
 
             var GlobalPosition = this.GetGlobalPosition();
-            this.Shape.MoveTo(AnimationCallbacks, GlobalPosition.X, GlobalPosition.Y, Duration);
-            var P1 = this.GetConnectorPosition(Direction.Bottom, GlobalPosition);
-            this.ForEachVisibleChildren((SubNode: NodeView) => {
-                var P2 = SubNode.GetConnectorPosition(Direction.Top, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, Direction.Bottom, Duration);
-            });
-            P1 = this.GetConnectorPosition(Direction.Right, GlobalPosition);
-            this.ForEachVisibleRightNodes((SubNode: NodeView) => {
-                var P2 = SubNode.GetConnectorPosition(Direction.Left, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, Direction.Right, Duration);
-            });
-            P1 = this.GetConnectorPosition(Direction.Left, GlobalPosition);
-            this.ForEachVisibleLeftNodes((SubNode: NodeView) => {
-                var P2 = SubNode.GetConnectorPosition(Direction.Right, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, Direction.Left, Duration);
-            });
+            this.Shape.MoveTo(AnimationCallbacks, GlobalPosition.X, GlobalPosition.Y, Duration, ScreenRect);
+
+            var ArrowDirections = [Direction.Bottom, Direction.Right, Direction.Left];
+            var SubNodeTypes = [this.Children, this.Right, this.Left];
+            for (var i = 0; i < 3; ++i) {
+                var P1 = this.GetConnectorPosition(ArrowDirections[i], GlobalPosition);
+                var ArrowToDirection = ReverseDirection(ArrowDirections[i]);
+                this.ForEachVisibleSubNode(SubNodeTypes[i], (SubNode: NodeView) => {
+                    var P2 = SubNode.GetConnectorPosition(ArrowToDirection, SubNode.GetGlobalPosition());
+                    UpdateSubNode(SubNode);
+                    SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, ArrowDirections[i], Duration, ScreenRect);
+                });
+            }
         }
 
         private ForEachVisibleSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {

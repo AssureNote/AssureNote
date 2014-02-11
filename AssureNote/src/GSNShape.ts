@@ -231,13 +231,18 @@ module AssureNote {
             });
         }
 
-        public MoveTo(AnimationCallbacks: Function[], x: number, y: number, Duration: number): void {
-            if (Duration <= 0) {
+        public MoveTo(AnimationCallbacks: Function[], x: number, y: number, Duration: number, ScreenRect?: Rect): void {
+            if (Duration <= 0 || ScreenRect && (this.GY + this.GetNodeHeight() < ScreenRect.Y || this.GY > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetPosition(x, y);
                 return;
             }
 
             if (this.WillFadein()) {
+                if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
+                    this.SetPosition(x, y);
+                    this.willFadein = false;
+                    return;
+                }
                 this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GX == null || this.GY == null) {
@@ -249,9 +254,7 @@ module AssureNote {
             var VX = (x - this.GX) / Duration;
             var VY = (y - this.GY) / Duration;
             
-            AnimationCallbacks.push((deltaT: number) => {
-                this.SetPosition(this.GX + VX * deltaT, this.GY + VY * deltaT);
-            });
+            AnimationCallbacks.push((deltaT: number) => this.SetPosition(this.GX + VX * deltaT, this.GY + VY * deltaT));
         }
 
         SetFadeinBasePosition(StartGX: number, StartGY: number): void {
@@ -328,8 +331,13 @@ module AssureNote {
             this.ArrowPath.style.opacity = Opacity.toString();
         }
 
-        MoveArrowTo(AnimationCallbacks: Function[], P1: Point, P2: Point, Dir: Direction, Duration: number) {
-            if (Duration <= 0) {
+        MoveArrowTo(AnimationCallbacks: Function[], P1: Point, P2: Point, Dir: Direction, Duration: number, ScreenRect?: Rect) {
+            if (Duration <= 0 || ScreenRect && (this.ArrowP2.Y + this.GetNodeHeight() < ScreenRect.Y || this.ArrowP1.Y > ScreenRect.Y + ScreenRect.Height)) {
+                this.SetArrowPosition(P1, P2, Dir);
+                return;
+            }
+
+            if (this.ArrowP1 == this.ArrowP2 && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetArrowPosition(P1, P2, Dir);
                 return;
             }

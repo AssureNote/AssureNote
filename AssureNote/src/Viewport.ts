@@ -427,6 +427,10 @@ module AssureNote {
             return new Rect(x1, y1, x2 - x1, y2 - y1); 
         }
 
+        GetPageRectInGxGy(): Rect {
+            return this.ConvertRectGlobalXYFromPageXY(new Rect(0, 0, this.PageWidth, this.PageHeight));
+        }
+
         GetPageWidth(): number {
             return this.PageWidth;
         }

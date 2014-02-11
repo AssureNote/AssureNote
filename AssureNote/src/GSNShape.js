@@ -217,14 +217,19 @@ var AssureNote;
             });
         };
 
-        GSNShape.prototype.MoveTo = function (AnimationCallbacks, x, y, Duration) {
+        GSNShape.prototype.MoveTo = function (AnimationCallbacks, x, y, Duration, ScreenRect) {
             var _this = this;
-            if (Duration <= 0) {
+            if (Duration <= 0 || ScreenRect && (this.GY + this.GetNodeHeight() < ScreenRect.Y || this.GY > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetPosition(x, y);
                 return;
             }
 
             if (this.WillFadein()) {
+                if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
+                    this.SetPosition(x, y);
+                    this.willFadein = false;
+                    return;
+                }
                 this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GX == null || this.GY == null) {
@@ -237,7 +242,7 @@ var AssureNote;
             var VY = (y - this.GY) / Duration;
 
             AnimationCallbacks.push(function (deltaT) {
-                _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
+                return _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
             });
         };
 
@@ -309,9 +314,14 @@ var AssureNote;
             this.ArrowPath.style.opacity = Opacity.toString();
         };
 
-        GSNShape.prototype.MoveArrowTo = function (AnimationCallbacks, P1, P2, Dir, Duration) {
+        GSNShape.prototype.MoveArrowTo = function (AnimationCallbacks, P1, P2, Dir, Duration, ScreenRect) {
             var _this = this;
-            if (Duration <= 0) {
+            if (Duration <= 0 || ScreenRect && (this.ArrowP2.Y + this.GetNodeHeight() < ScreenRect.Y || this.ArrowP1.Y > ScreenRect.Y + ScreenRect.Height)) {
+                this.SetArrowPosition(P1, P2, Dir);
+                return;
+            }
+
+            if (this.ArrowP1 == this.ArrowP2 && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetArrowPosition(P1, P2, Dir);
                 return;
             }
