@@ -538,18 +538,23 @@ var AssureNote;
         __extends(MonitorListPanel, _super);
         function MonitorListPanel(App) {
             _super.call(this, App);
-            var Modal = null;
-            $.ajax({
-                url: '/plugin/MonitorNode/MonitorList.html',
-                async: false,
-                dataType: "html",
-                success: function (Response) {
-                    Modal = $(Response);
-                },
-                error: function (Request, Status, Error) {
-                    alert("ajax error");
-                }
-            });
+            var Modal = $('\
+<div id="monitorlist-modal" tabindex="-1" role="dialog" aria-labelledby="monitorlist-modal-label" aria-hidden="true" class="modal fade">\n\
+  <div class="modal-dialog">\n\
+    <div class="modal-content">\n\
+      <div class="modal-header">\n\
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>\n\
+        <h4 id="monitorlist-modal-label" class="modal-title">Active Monitor List</h4>\n\
+      </div>\n\
+      <div id="monitorlist-modal-body" class="modal-body">\n\
+      </div>\n\
+      <div class="modal-footer">\n\
+        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>\n\
+      </div>\n\
+    </div>\n\
+  </div>\n\
+</div>\n\
+            ');
             $('#plugin-layer').append(Modal);
 
             $('#monitorlist-modal').on('hidden.bs.modal', function () {
