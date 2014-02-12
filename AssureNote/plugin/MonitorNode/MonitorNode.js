@@ -289,7 +289,8 @@ var AssureNote;
 
         MonitorNodeManager.prototype.UpdateNodeColorMap = function () {
             this.NodeColorMap = {};
-            for (var MNode in this.MonitorNodeMap) {
+            for (var Label in this.MonitorNodeMap) {
+                var MNode = this.MonitorNodeMap[Label];
                 if (MNode.GetLatestStatus() == false) {
                     var View = MNode.GetView();
                     while (View != null) {
