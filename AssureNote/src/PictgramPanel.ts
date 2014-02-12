@@ -443,23 +443,53 @@ module AssureNote {
             this.MasterView.UpdateViewMap(this.ViewMap);
         }
 
-        Draw(Label?: string, Duration?: number): void {
+        Draw(Label?: string, Duration?: number, FixedNode?: NodeView): void {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
                 TargetView = this.MasterView;
             }
+
+            var FixedNodeGX0: number;
+            var FixedNodeGY0: number;
+            var FixedNodeDX: number;
+            var FixedNodeDY: number;
+            if (FixedNode) {
+                FixedNodeGX0 = FixedNode.GetGX();
+                FixedNodeGY0 = FixedNode.GetGY();
+            }
+
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
+
+            GSNShape.__Debug_Animation_SkippedNodeCount = 0;
+            GSNShape.__Debug_Animation_TotalNodeCount = 0;
 
             this.FoldingAnimationTask.Cancel(true);
 
             NodeView.SetGlobalPositionCacheEnabled(true);
             var FoldingAnimationCallbacks = [];
 
-            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration,  this.Viewport.GetPageRectInGxGy());
+            var ScreenRect = this.Viewport.GetPageRectInGxGy();
+            if (FixedNode) {
+                FixedNodeDX = FixedNode.GetGX() - FixedNodeGX0;
+                FixedNodeDY = FixedNode.GetGY() - FixedNodeGY0;
+                if (FixedNodeDX > 0) {
+                    ScreenRect.Width += FixedNodeDX;
+                } else {
+                    ScreenRect.Width -= FixedNodeDX;
+                    ScreenRect.X += FixedNodeDX;
+                }
+                var Scale = this.Viewport.GetCameraScale();
+                var Task = this.Viewport.CreateMoveTaskFunction(FixedNodeDX, FixedNodeDY, Scale, Duration);
+                if (Task) {
+                    FoldingAnimationCallbacks.push(Task);
+                }
+            }
+
+            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
@@ -469,6 +499,9 @@ module AssureNote {
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
+            console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
+                GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
+                GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
         }
 
         private Clear(): void {

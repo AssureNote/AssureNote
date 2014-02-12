@@ -483,11 +483,23 @@ var AssureNote;
         @async
         */
         ViewportManager.prototype.MoveTo = function (GX, GY, Scale, Duration) {
+            var Task = this.CreateMoveToTaskFunction(GX, GY, Scale, Duration);
+            if (!Task) {
+                this.SetCamera(GX, GY, Scale);
+                return;
+            }
+            this.CameraMoveTask.Start(Duration, Task);
+        };
+
+        ViewportManager.prototype.CreateMoveTaskFunction = function (GX, GY, Scale, Duration) {
+            return this.CreateMoveToTaskFunction(this.GetCameraGX() + GX, this.GetCameraGY() + GY, Scale, Duration);
+        };
+
+        ViewportManager.prototype.CreateMoveToTaskFunction = function (GX, GY, Scale, Duration) {
             var _this = this;
             Scale = ViewportManager.LimitScale(Scale);
             if (Duration <= 0) {
-                this.SetCamera(GX, GY, Scale);
-                return;
+                return null;
             }
 
             var VX = (GX - this.GetCameraGX()) / Duration;
@@ -501,10 +513,10 @@ var AssureNote;
             };
 
             if (VY == 0 && VX == 0 && (Scale == S0)) {
-                return;
+                return null;
             }
 
-            this.CameraMoveTask.Start(Duration, function (deltaT, currentTime, startTime) {
+            return (function (deltaT, currentTime, startTime) {
                 var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(currentTime - deltaT - startTime);
                 _this.MoveCamera(VX * deltaT, VY * deltaT, DeltaS);
             });

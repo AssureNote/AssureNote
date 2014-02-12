@@ -472,10 +472,22 @@ module AssureNote {
             @async
         */
         MoveTo(GX: number, GY: number, Scale: number, Duration: number): void {
-            Scale = ViewportManager.LimitScale(Scale);
-            if (Duration <= 0) {
+            var Task = this.CreateMoveToTaskFunction(GX, GY, Scale, Duration);
+            if (!Task) {
                 this.SetCamera(GX, GY, Scale);
                 return;
+            }
+            this.CameraMoveTask.Start(Duration, Task);
+        }
+
+        CreateMoveTaskFunction(GX: number, GY: number, Scale: number, Duration: number): (a: number, b: number, c: number) => void {
+            return this.CreateMoveToTaskFunction(this.GetCameraGX() + GX, this.GetCameraGY() + GY, Scale, Duration);
+        }
+
+        CreateMoveToTaskFunction(GX: number, GY: number, Scale: number, Duration: number): (a: number, b:number, c:number) => void {
+            Scale = ViewportManager.LimitScale(Scale);
+            if (Duration <= 0) {
+                return null;
             }
 
             var VX = (GX - this.GetCameraGX()) / Duration;
@@ -487,13 +499,13 @@ module AssureNote {
             var ScaleFunction = (t: number) => S0 * Math.pow(ScaleRate, t * DInv);
 
             if (VY == 0 && VX == 0 && (Scale == S0)) {
-                return;
+                return null;
             }
 
-            this.CameraMoveTask.Start(Duration, (deltaT: number, currentTime: number, startTime: number) => {
+            return ((deltaT: number, currentTime: number, startTime: number) => {
                 var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(currentTime - deltaT - startTime);
                 this.MoveCamera(VX * deltaT, VY * deltaT, DeltaS);
-            })
+            });
         }
 
         private UpdatePageRect(): void {

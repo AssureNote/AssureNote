@@ -85,13 +85,7 @@ var AssureNote;
             while (TopGoalView.Parent != null) {
                 TopGoalView = TopGoalView.Parent;
             }
-            var X0 = TargetView.GetGX();
-            var Y0 = TargetView.GetGY();
-            Panel.Draw(Panel.MasterView.Label, 300);
-            var X1 = TargetView.GetGX();
-            var Y1 = TargetView.GetGY();
-            var Scale = ViewPort.GetCameraScale();
-            ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
+            Panel.Draw(Panel.MasterView.Label, 300, TargetView);
         };
         return FoldingCommand;
     })(AssureNote.Command);

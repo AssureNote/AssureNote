@@ -207,14 +207,14 @@ var AssureNote;
             return P;
         };
 
-        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, ScreenRect, PositionBaseNode) {
+        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, ScreenRect, UnfoldBaseNode) {
             var _this = this;
             Duration = Duration || 0;
             if (!this.IsVisible) {
                 return;
             }
             var UpdateSubNode = function (SubNode) {
-                var Base = PositionBaseNode;
+                var Base = UnfoldBaseNode;
                 if (!Base && SubNode.Shape.WillFadein()) {
                     Base = _this;
                 }

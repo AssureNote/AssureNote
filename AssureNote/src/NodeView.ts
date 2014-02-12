@@ -219,13 +219,13 @@ module AssureNote {
             return P;
         }
 
-        UpdateDocumentPosition(AnimationCallbacks?: Function[], Duration?: number, ScreenRect?: Rect, PositionBaseNode?: NodeView): void {
+        UpdateDocumentPosition(AnimationCallbacks?: Function[], Duration?: number, ScreenRect?: Rect, UnfoldBaseNode?: NodeView): void {
             Duration = Duration || 0;
             if (!this.IsVisible) {
                 return
             }
             var UpdateSubNode = (SubNode: NodeView) => {
-                var Base = PositionBaseNode;
+                var Base = UnfoldBaseNode;
                 if (!Base && SubNode.Shape.WillFadein()) {
                     Base = this;
                 }

@@ -425,23 +425,53 @@ var AssureNote;
             this.MasterView.UpdateViewMap(this.ViewMap);
         };
 
-        PictgramPanel.prototype.Draw = function (Label, Duration) {
+        PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
                 TargetView = this.MasterView;
             }
+
+            var FixedNodeGX0;
+            var FixedNodeGY0;
+            var FixedNodeDX;
+            var FixedNodeDY;
+            if (FixedNode) {
+                FixedNodeGX0 = FixedNode.GetGX();
+                FixedNodeGY0 = FixedNode.GetGY();
+            }
+
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
+
+            AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount = 0;
+            AssureNote.GSNShape.__Debug_Animation_TotalNodeCount = 0;
 
             this.FoldingAnimationTask.Cancel(true);
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
             var FoldingAnimationCallbacks = [];
 
-            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, this.Viewport.GetPageRectInGxGy());
+            var ScreenRect = this.Viewport.GetPageRectInGxGy();
+            if (FixedNode) {
+                FixedNodeDX = FixedNode.GetGX() - FixedNodeGX0;
+                FixedNodeDY = FixedNode.GetGY() - FixedNodeGY0;
+                if (FixedNodeDX > 0) {
+                    ScreenRect.Width += FixedNodeDX;
+                } else {
+                    ScreenRect.Width -= FixedNodeDX;
+                    ScreenRect.X += FixedNodeDX;
+                }
+                var Scale = this.Viewport.GetCameraScale();
+                var Task = this.Viewport.CreateMoveTaskFunction(FixedNodeDX, FixedNodeDY, Scale, Duration);
+                if (Task) {
+                    FoldingAnimationCallbacks.push(Task);
+                }
+            }
+
+            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
@@ -451,6 +481,7 @@ var AssureNote;
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
+            console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
         };
 
         PictgramPanel.prototype.Clear = function () {
