@@ -362,12 +362,15 @@ var AssureNote;
                     self.App.MasterRecord.CloseEditor();
                 }
             }, Interval);
+
+            SetMonitorMenuItem.ChangeMenuToggle(this.App);
         };
 
         MonitorNodeManager.prototype.StopMonitoring = function () {
             this.IsRunning = false;
             console.log("Stop monitoring...");
             clearTimeout(this.Timer);
+            SetMonitorMenuItem.ChangeMenuToggle(this.App);
         };
         return MonitorNodeManager;
     })();
@@ -654,6 +657,10 @@ var AssureNote;
             }
         };
 
+        SetMonitorMenuItem.ChangeMenuToggle = function (App) {
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        };
+
         SetMonitorMenuItem.prototype.Invoke = function (App) {
             if (MNodeManager.IsRunning) {
                 var Command = App.FindCommandByCommandLineName("unset-monitor");
@@ -666,7 +673,6 @@ var AssureNote;
                     Command.Invoke(null, ["all"]);
                 }
             }
-            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
         };
         return SetMonitorMenuItem;
     })(AssureNote.TopMenuItem);

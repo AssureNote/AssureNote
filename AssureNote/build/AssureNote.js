@@ -1352,6 +1352,14 @@ var AssureNote;
             }
             return res;
         };
+
+        GSNNode.prototype.GetNodeCountTypeOf = function (type) {
+            var res = this.NodeType == type ? 1 : 0;
+            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
+                res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCountTypeOf(type);
+            }
+            return res;
+        };
         return GSNNode;
     })();
     AssureNote.GSNNode = GSNNode;
@@ -1468,6 +1476,10 @@ var AssureNote;
 
         GSNDoc.prototype.GetNodeCount = function () {
             return this.TopNode.GetNodeCount();
+        };
+
+        GSNDoc.prototype.GetNodeCountTypeOf = function (type) {
+            return this.TopNode.GetNodeCountTypeOf(type);
         };
 
         GSNDoc.prototype.RenumberAll = function () {
@@ -2538,101 +2550,92 @@ var AssureNote;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
-    var Search = (function () {
-        function Search(AssureNoteApp) {
-            this.AssureNoteApp = AssureNoteApp;
-            this.SearchWord = "";
+    var VisitableNodeList = (function () {
+        function VisitableNodeList(Panel) {
             this.NodeIndex = 0;
-            this.HitNodes = [];
-            this.Searching = false;
+            this.NodeList = [];
+            this.Visiting = false;
+            this.ColorStyle = AssureNote.ColorStyle.Searched;
+            this.Panel = Panel;
         }
-        Search.prototype.Search = function (TargetView, SearchWord) {
-            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            this.SearchWord = SearchWord;
-
-            if (this.SearchWord == "") {
-                return;
+        VisitableNodeList.prototype.StartVisit = function (NodeList) {
+            if (this.IsVisiting()) {
+                this.FinishVisit();
             }
-            this.HitNodes = TargetView.Model.SearchNode(this.SearchWord);
-            this.AssureNoteApp.DebugP(this.HitNodes);
-
-            if (this.HitNodes.length == 0) {
-                this.SearchWord = "";
-                return;
+            this.NodeList = NodeList;
+            if (this.NodeList.length > 0) {
+                this.Visiting = true;
+                this.UnfoldAllFoundNode();
+                this.AddColorToAllHitNodes(this.ColorStyle);
+                this.Panel.FocusAndMoveToNode(this.NodeList[0].GetLabel());
             }
-
-            this.Searching = true;
-            this.UnfoldAllFoundNode(ViewMap);
-            this.AddColorToAllHitNodes(ViewMap, AssureNote.ColorStyle.Searched);
-            this.AssureNoteApp.PictgramPanel.FocusAndMoveToNode(this.HitNodes[0].GetLabel());
         };
 
-        Search.prototype.SearchNext = function (TargetView, IsReversed) {
-            var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
-            var ViewPort = this.AssureNoteApp.PictgramPanel.Viewport;
-            if (this.HitNodes.length == 1) {
-                return;
+        VisitableNodeList.prototype.VisitNext = function (IsReversed) {
+            if (this.IsVisiting() && this.NodeList.length > 1) {
+                var Length = this.NodeList.length;
+                this.NodeIndex = (Length + this.NodeIndex + (IsReversed ? -1 : 1)) % Length;
+                this.Panel.FocusAndMoveToNode(this.NodeList[this.NodeIndex].GetLabel());
             }
-
-            if (!IsReversed) {
-                this.NodeIndex++;
-                if (this.NodeIndex >= this.HitNodes.length) {
-                    this.NodeIndex = 0;
-                }
-            } else {
-                this.NodeIndex--;
-                if (this.NodeIndex < 0) {
-                    this.NodeIndex = this.HitNodes.length - 1;
-                }
-            }
-
-            this.AssureNoteApp.PictgramPanel.FocusAndMoveToNode(this.HitNodes[this.NodeIndex].GetLabel());
         };
 
-        Search.prototype.UnfoldAllFoundNode = function (ViewMap) {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        VisitableNodeList.prototype.UnfoldAllFoundNode = function () {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 while (Node != null) {
                     Node.IsFolded = false;
                     Node = Node.Parent;
                 }
             }
-            this.AssureNoteApp.PictgramPanel.Draw(this.AssureNoteApp.PictgramPanel.MasterView.Label, 300);
+            this.Panel.Draw(this.Panel.MasterView.Label, 300);
         };
 
-        Search.prototype.IsSearching = function () {
-            return this.Searching;
+        VisitableNodeList.prototype.IsVisiting = function () {
+            return this.Visiting;
         };
 
-        Search.prototype.EndSearch = function () {
-            this.RemoveColorFromAllHitNodes(this.AssureNoteApp.PictgramPanel.ViewMap, AssureNote.ColorStyle.Searched);
-            this.HitNodes = [];
+        VisitableNodeList.prototype.FinishVisit = function () {
+            this.RemoveColorFromAllHitNodes(this.ColorStyle);
+            this.NodeList = [];
             this.NodeIndex = 0;
-            this.SearchWord = "";
-            this.Searching = false;
+            this.Visiting = false;
         };
 
-        Search.prototype.AddColorToAllHitNodes = function (ViewMap, ColorStyle) {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        VisitableNodeList.prototype.AddColorToAllHitNodes = function (ColorStyle) {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 if (Node != null) {
                     Node.GetShape().AddColorStyle(ColorStyle);
                 }
             }
         };
 
-        Search.prototype.RemoveColorFromAllHitNodes = function (ViewMap, ColorStyle) {
-            for (var i = 0; i < this.HitNodes.length; i++) {
-                var Node = ViewMap[this.HitNodes[i].GetLabel()];
+        VisitableNodeList.prototype.RemoveColorFromAllHitNodes = function (ColorStyle) {
+            var ViewMap = this.Panel.ViewMap;
+            for (var i = 0; i < this.NodeList.length; i++) {
+                var Node = ViewMap[this.NodeList[i].GetLabel()];
                 if (Node != null) {
                     Node.GetShape().RemoveColorStyle(ColorStyle);
                 }
             }
         };
-        return Search;
+        return VisitableNodeList;
     })();
-    AssureNote.Search = Search;
+    AssureNote.VisitableNodeList = VisitableNodeList;
+
+    var SearchResultNodeList = (function (_super) {
+        __extends(SearchResultNodeList, _super);
+        function SearchResultNodeList(Panel) {
+            _super.call(this, Panel);
+        }
+        SearchResultNodeList.prototype.Search = function (TargetView, SearchWord) {
+            this.StartVisit(TargetView.Model.SearchNode(SearchWord));
+        };
+        return SearchResultNodeList;
+    })(VisitableNodeList);
+    AssureNote.SearchResultNodeList = SearchResultNodeList;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -4207,7 +4210,7 @@ var AssureNote;
             });
 
             this.CmdLine = new AssureNote.CommandLine(App);
-            this.Search = new AssureNote.Search(App);
+            this.Search = new AssureNote.SearchResultNodeList(this);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", function (event) {
@@ -4283,14 +4286,14 @@ var AssureNote;
                 case 186:
                 case 191:
                 case 219:
-                    if (this.Search.IsSearching()) {
-                        this.Search.EndSearch();
+                    if (this.Search.IsVisiting()) {
+                        this.Search.FinishVisit();
                     }
                     this.CmdLine.Activate();
                     break;
                 case 27:
-                    if (this.Search.IsSearching()) {
-                        this.Search.EndSearch();
+                    if (this.Search.IsVisiting()) {
+                        this.Search.FinishVisit();
                         Event.preventDefault();
                     }
                     if (this.App.HistoryPanel) {
@@ -4298,8 +4301,8 @@ var AssureNote;
                     }
                     break;
                 case 13:
-                    if (this.Search.IsSearching()) {
-                        this.Search.SearchNext(this.MasterView, event.shiftKey);
+                    if (this.Search.IsVisiting()) {
+                        this.Search.VisitNext(event.shiftKey);
                         Event.preventDefault();
                     }
                     break;
@@ -4485,23 +4488,53 @@ var AssureNote;
             this.MasterView.UpdateViewMap(this.ViewMap);
         };
 
-        PictgramPanel.prototype.Draw = function (Label, Duration) {
+        PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
             this.Clear();
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
                 TargetView = this.MasterView;
             }
+
+            var FixedNodeGX0;
+            var FixedNodeGY0;
+            var FixedNodeDX;
+            var FixedNodeDY;
+            if (FixedNode) {
+                FixedNodeGX0 = FixedNode.GetGX();
+                FixedNodeGY0 = FixedNode.GetGY();
+            }
+
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
+
+            AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount = 0;
+            AssureNote.GSNShape.__Debug_Animation_TotalNodeCount = 0;
 
             this.FoldingAnimationTask.Cancel(true);
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
             var FoldingAnimationCallbacks = [];
 
-            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration);
+            var ScreenRect = this.Viewport.GetPageRectInGxGy();
+            if (FixedNode) {
+                FixedNodeDX = FixedNode.GetGX() - FixedNodeGX0;
+                FixedNodeDY = FixedNode.GetGY() - FixedNodeGY0;
+                if (FixedNodeDX > 0) {
+                    ScreenRect.Width += FixedNodeDX;
+                } else {
+                    ScreenRect.Width -= FixedNodeDX;
+                    ScreenRect.X += FixedNodeDX;
+                }
+                var Scale = this.Viewport.GetCameraScale();
+                var Task = this.Viewport.CreateMoveTaskFunction(FixedNodeDX, FixedNodeDY, Scale, Duration);
+                if (Task) {
+                    FoldingAnimationCallbacks.push(Task);
+                }
+            }
+
+            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
@@ -4511,6 +4544,7 @@ var AssureNote;
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
+            console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
         };
 
         PictgramPanel.prototype.Clear = function () {
@@ -5557,9 +5591,21 @@ var AssureNote;
                 Message: message,
                 User: h.Author,
                 DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString),
-                Count: h.Doc.GetNodeCount()
+                DateTimeString: new Date(h.DateString).toLocaleString(),
+                Count: {
+                    All: h.Doc.GetNodeCount(),
+                    Goal: h.Doc.GetNodeCountTypeOf(0 /* Goal */),
+                    Evidence: h.Doc.GetNodeCountTypeOf(3 /* Evidence */),
+                    Context: h.Doc.GetNodeCountTypeOf(1 /* Context */),
+                    Strategy: h.Doc.GetNodeCountTypeOf(2 /* Strategy */)
+                }
             };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
+            $("#history-panel-date").tooltip({});
+            $("#history-panel-count").tooltip({
+                html: true,
+                title: "Goal: " + t.Count.Goal + "" + "<br>Evidence: " + t.Count.Evidence + "" + "<br>Context: " + t.Count.Context + "" + "<br>Strategy: " + t.Count.Strategy + ""
+            });
 
             if (this.Index == 0) {
                 $("#prev-revision").addClass("disabled");
@@ -5628,6 +5674,7 @@ var AssureNote;
         function AssureNoteApp() {
             this.LoadingIndicatorVisible = true;
             this.LoadingIndicator = document.getElementById("loading-indicator");
+            AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
 
@@ -5660,7 +5707,7 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "history", [
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
                 new AssureNote.ShowHistoryPanelItem()
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
@@ -5800,7 +5847,6 @@ var AssureNote;
                 }
             } else {
                 var TopGoal = this.PictgramPanel.MasterView;
-                console.log("else " + TopGoal.GetGX());
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");
@@ -6169,6 +6215,10 @@ var AssureNote;
             return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
         };
 
+        ViewportManager.prototype.GetPageRectInGxGy = function () {
+            return this.ConvertRectGlobalXYFromPageXY(new AssureNote.Rect(0, 0, this.PageWidth, this.PageHeight));
+        };
+
         ViewportManager.prototype.GetPageWidth = function () {
             return this.PageWidth;
         };
@@ -6190,11 +6240,23 @@ var AssureNote;
         };
 
         ViewportManager.prototype.MoveTo = function (GX, GY, Scale, Duration) {
+            var Task = this.CreateMoveToTaskFunction(GX, GY, Scale, Duration);
+            if (!Task) {
+                this.SetCamera(GX, GY, Scale);
+                return;
+            }
+            this.CameraMoveTask.Start(Duration, Task);
+        };
+
+        ViewportManager.prototype.CreateMoveTaskFunction = function (GX, GY, Scale, Duration) {
+            return this.CreateMoveToTaskFunction(this.GetCameraGX() + GX, this.GetCameraGY() + GY, Scale, Duration);
+        };
+
+        ViewportManager.prototype.CreateMoveToTaskFunction = function (GX, GY, Scale, Duration) {
             var _this = this;
             Scale = ViewportManager.LimitScale(Scale);
             if (Duration <= 0) {
-                this.SetCamera(GX, GY, Scale);
-                return;
+                return null;
             }
 
             var VX = (GX - this.GetCameraGX()) / Duration;
@@ -6208,10 +6270,10 @@ var AssureNote;
             };
 
             if (VY == 0 && VX == 0 && (Scale == S0)) {
-                return;
+                return null;
             }
 
-            this.CameraMoveTask.Start(Duration, function (deltaT, currentTime, startTime) {
+            return (function (deltaT, currentTime, startTime) {
                 var DeltaS = ScaleFunction(currentTime - startTime) - ScaleFunction(currentTime - deltaT - startTime);
                 _this.MoveCamera(VX * deltaT, VY * deltaT, DeltaS);
             });
@@ -6322,13 +6384,7 @@ var AssureNote;
             while (TopGoalView.Parent != null) {
                 TopGoalView = TopGoalView.Parent;
             }
-            var X0 = TargetView.GetGX();
-            var Y0 = TargetView.GetGY();
-            Panel.Draw(Panel.MasterView.Label, 300);
-            var X1 = TargetView.GetGX();
-            var Y1 = TargetView.GetGY();
-            var Scale = ViewPort.GetCameraScale();
-            ViewPort.Move(X1 - X0, Y1 - Y0, Scale, 300);
+            Panel.Draw(Panel.MasterView.Label, 300, TargetView);
         };
         return FoldingCommand;
     })(AssureNote.Command);
@@ -6753,45 +6809,39 @@ var AssureNote;
             return P;
         };
 
-        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, PositionBaseNode) {
+        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, ScreenRect, UnfoldBaseNode) {
             var _this = this;
             Duration = Duration || 0;
             if (!this.IsVisible) {
                 return;
             }
-            var UpdateSubNode = function (SubNode, P1, P2) {
-                var Base = PositionBaseNode;
+            var UpdateSubNode = function (SubNode) {
+                var Base = UnfoldBaseNode;
                 if (!Base && SubNode.Shape.WillFadein()) {
                     Base = _this;
                 }
                 if (Base && Duration > 0) {
                     SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, Base);
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect, Base);
                 } else {
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration);
+                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect);
                 }
             };
 
             var GlobalPosition = this.GetGlobalPosition();
-            this.Shape.MoveTo(AnimationCallbacks, GlobalPosition.X, GlobalPosition.Y, Duration);
-            var P1 = this.GetConnectorPosition(3 /* Bottom */, GlobalPosition);
-            this.ForEachVisibleChildren(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(1 /* Top */, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 3 /* Bottom */, Duration);
-            });
-            P1 = this.GetConnectorPosition(2 /* Right */, GlobalPosition);
-            this.ForEachVisibleRightNodes(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(0 /* Left */, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 2 /* Right */, Duration);
-            });
-            P1 = this.GetConnectorPosition(0 /* Left */, GlobalPosition);
-            this.ForEachVisibleLeftNodes(function (SubNode) {
-                var P2 = SubNode.GetConnectorPosition(2 /* Right */, SubNode.GetGlobalPosition());
-                UpdateSubNode(SubNode, P1, P2);
-                SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, 0 /* Left */, Duration);
-            });
+            this.Shape.MoveTo(AnimationCallbacks, GlobalPosition.X, GlobalPosition.Y, Duration, ScreenRect);
+
+            var ArrowDirections = [3 /* Bottom */, 2 /* Right */, 0 /* Left */];
+            var SubNodeTypes = [this.Children, this.Right, this.Left];
+            for (var i = 0; i < 3; ++i) {
+                var P1 = this.GetConnectorPosition(ArrowDirections[i], GlobalPosition);
+                var ArrowToDirection = AssureNote.ReverseDirection(ArrowDirections[i]);
+                this.ForEachVisibleSubNode(SubNodeTypes[i], function (SubNode) {
+                    var P2 = SubNode.GetConnectorPosition(ArrowToDirection, SubNode.GetGlobalPosition());
+                    UpdateSubNode(SubNode);
+                    SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, ArrowDirections[i], Duration, ScreenRect);
+                });
+            }
         };
 
         NodeView.prototype.ForEachVisibleSubNode = function (SubNodes, Action) {
@@ -7082,14 +7132,34 @@ var AssureNote;
             });
         };
 
-        GSNShape.prototype.MoveTo = function (AnimationCallbacks, x, y, Duration) {
+        GSNShape.prototype.MoveTo = function (AnimationCallbacks, x, y, Duration, ScreenRect) {
             var _this = this;
             if (Duration <= 0) {
                 this.SetPosition(x, y);
                 return;
             }
+            if (ScreenRect) {
+                GSNShape.__Debug_Animation_TotalNodeCount++;
+                if (this.GX + this.GetNodeWidth() < ScreenRect.X || this.GX > ScreenRect.X + ScreenRect.Width) {
+                    if (x + this.GetNodeWidth() < ScreenRect.X || x > ScreenRect.X + ScreenRect.Width) {
+                        GSNShape.__Debug_Animation_SkippedNodeCount++;
+                        this.SetPosition(x, y);
+                        return;
+                    }
+                }
+                if (this.GY + this.GetNodeHeight() < ScreenRect.Y || this.GY > ScreenRect.Y + ScreenRect.Height) {
+                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+                    this.SetPosition(x, y);
+                    return;
+                }
+            }
 
             if (this.WillFadein()) {
+                if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
+                    this.SetPosition(x, y);
+                    this.willFadein = false;
+                    return;
+                }
                 this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GX == null || this.GY == null) {
@@ -7102,7 +7172,7 @@ var AssureNote;
             var VY = (y - this.GY) / Duration;
 
             AnimationCallbacks.push(function (deltaT) {
-                _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
+                return _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
             });
         };
 
@@ -7174,9 +7244,30 @@ var AssureNote;
             this.ArrowPath.style.opacity = Opacity.toString();
         };
 
-        GSNShape.prototype.MoveArrowTo = function (AnimationCallbacks, P1, P2, Dir, Duration) {
+        GSNShape.prototype.MoveArrowTo = function (AnimationCallbacks, P1, P2, Dir, Duration, ScreenRect) {
             var _this = this;
             if (Duration <= 0) {
+                this.SetArrowPosition(P1, P2, Dir);
+                return;
+            }
+            if (ScreenRect) {
+                var R0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP2.X : this.ArrowP1.X;
+                var L0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP1.X : this.ArrowP2.X;
+                if (R0 < ScreenRect.X || L0 > ScreenRect.X + ScreenRect.Width) {
+                    var R1 = P1.X < P2.X ? P2.X : P1.X;
+                    var L1 = P1.X < P2.X ? P1.X : P2.X;
+                    if (R1 < ScreenRect.X || L1 > ScreenRect.X + ScreenRect.Width) {
+                        this.SetArrowPosition(P1, P2, Dir);
+                        return;
+                    }
+                }
+                if (this.ArrowP2.Y < ScreenRect.Y || this.ArrowP1.Y > ScreenRect.Y + ScreenRect.Height) {
+                    this.SetArrowPosition(P1, P2, Dir);
+                    return;
+                }
+            }
+
+            if (this.ArrowP1 == this.ArrowP2 && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetArrowPosition(P1, P2, Dir);
                 return;
             }
@@ -8232,12 +8323,15 @@ var AssureNote;
                     self.App.MasterRecord.CloseEditor();
                 }
             }, Interval);
+
+            SetMonitorMenuItem.ChangeMenuToggle(this.App);
         };
 
         MonitorNodeManager.prototype.StopMonitoring = function () {
             this.IsRunning = false;
             console.log("Stop monitoring...");
             clearTimeout(this.Timer);
+            SetMonitorMenuItem.ChangeMenuToggle(this.App);
         };
         return MonitorNodeManager;
     })();
@@ -8519,6 +8613,10 @@ var AssureNote;
             }
         };
 
+        SetMonitorMenuItem.ChangeMenuToggle = function (App) {
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        };
+
         SetMonitorMenuItem.prototype.Invoke = function (App) {
             if (MNodeManager.IsRunning) {
                 var Command = App.FindCommandByCommandLineName("unset-monitor");
@@ -8531,7 +8629,6 @@ var AssureNote;
                     Command.Invoke(null, ["all"]);
                 }
             }
-            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
         };
         return SetMonitorMenuItem;
     })(AssureNote.TopMenuItem);

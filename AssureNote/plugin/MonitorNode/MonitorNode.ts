@@ -373,12 +373,15 @@ module AssureNote {
                     self.App.MasterRecord.CloseEditor();
                 }
             }, Interval);
+
+            SetMonitorMenuItem.ChangeMenuToggle(this.App);
         }
 
         StopMonitoring(): void {
             this.IsRunning = false;
             console.log("Stop monitoring...");
             clearTimeout(this.Timer);
+            SetMonitorMenuItem.ChangeMenuToggle(this.App);
         }
 
     }
@@ -674,6 +677,10 @@ module AssureNote {
             }
         }
 
+        static ChangeMenuToggle(App: AssureNoteApp): void {
+            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
+        }
+
         Invoke(App: AssureNoteApp): void {
             if(MNodeManager.IsRunning) {
                 var Command = App.FindCommandByCommandLineName("unset-monitor");
@@ -687,7 +694,6 @@ module AssureNote {
                     Command.Invoke(null, ["all"]);
                 }
             }
-            App.TopMenu.Render(App, $("#top-menu").empty()[0], true);
         }
 
     }
