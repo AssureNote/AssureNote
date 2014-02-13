@@ -49,7 +49,11 @@ var AssureNote;
             this.App = App;
             // We do not use FocusedView but FocusedLabel to make it modular.
             this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
-            this.SVGLayer = document.getElementById("svg-layer");
+            this.SVGLayerBox = document.getElementById("svglayer-box");
+            this.SVGLayer = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.id = "svg-layer";
+            this.SVGLayer.setAttribute("transform", "translate(0,0)");
+            this.SVGLayerBox.appendChild(this.SVGLayer);
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
             this.ControlLayer = (document.getElementById("control-layer"));
@@ -426,7 +430,10 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
+            var t0 = AssureNote.AssureNoteUtils.GetTime();
             this.Clear();
+            var t1 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Clear: " + (t1 - t0));
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
@@ -471,8 +478,11 @@ var AssureNote;
                 }
             }
 
+            var t2 = AssureNote.AssureNoteUtils.GetTime();
             TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
+            var t3 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Update: " + (t3 - t2));
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
             var Shape = TargetView.GetShape();
@@ -485,12 +495,16 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Clear = function () {
+            document.getElementById("assure-note").style.display = "none";
             this.ContentLayer.innerHTML = "";
-            this.SVGLayer.style.display = "none";
-            for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
-                this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
-            }
-            this.SVGLayer.style.display = "";
+            this.SVGLayerBox.removeChild(this.SVGLayer);
+            var Transfrom = this.SVGLayer.getAttribute("transform");
+            this.SVGLayer = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.setAttribute("transform", Transfrom);
+            this.SVGLayer.id = "svg-layer";
+            this.SVGLayerBox.appendChild(this.SVGLayer);
+            this.Viewport.SVGLayer = this.SVGLayer;
+            document.getElementById("assure-note").style.display = "";
         };
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {

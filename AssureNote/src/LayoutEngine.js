@@ -64,14 +64,19 @@ var AssureNote;
             var DivFragment = document.createDocumentFragment();
             var SvgNodeFragment = document.createDocumentFragment();
             var SvgConnectionFragment = document.createDocumentFragment();
+            var t0 = AssureNote.AssureNoteUtils.GetTime();
 
             this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
-
+            var t1 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Lender1: " + (t1 - t0));
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
-
+            var t2 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Lender2: " + (t2 - t1));
             this.Layout(NodeView);
+            var t3 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Layout: " + (t3 - t2));
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode) {

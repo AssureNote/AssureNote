@@ -40,6 +40,7 @@ module AssureNote {
     */
     export class PictgramPanel extends Panel {
         LayoutEngine: LayoutEngine;
+        SVGLayerBox: SVGSVGElement;
         SVGLayer: SVGGElement;
         EventMapLayer: HTMLDivElement;
         ContentLayer: HTMLDivElement;
@@ -60,7 +61,11 @@ module AssureNote {
         
         constructor(public App: AssureNoteApp) {
             super(App);
-            this.SVGLayer = <SVGGElement>(<Element>document.getElementById("svg-layer"));
+            this.SVGLayerBox = <SVGSVGElement>(<Element>document.getElementById("svglayer-box"));
+            this.SVGLayer = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.id = "svg-layer";
+            this.SVGLayer.setAttribute("transform", "translate(0,0)");
+            this.SVGLayerBox.appendChild(this.SVGLayer);
             this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
             this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
             this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
@@ -444,7 +449,10 @@ module AssureNote {
         }
 
         Draw(Label?: string, Duration?: number, FixedNode?: NodeView): void {
+            var t0 = AssureNoteUtils.GetTime();
             this.Clear();
+            var t1 = AssureNoteUtils.GetTime();
+            console.log("Clear: " + (t1 - t0));
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
@@ -489,8 +497,11 @@ module AssureNote {
                 }
             }
 
+            var t2 = AssureNoteUtils.GetTime();
             TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
+            var t3 = AssureNoteUtils.GetTime();
+            console.log("Update: " + (t3 - t2));
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
             var Shape = TargetView.GetShape();
@@ -505,12 +516,16 @@ module AssureNote {
         }
 
         private Clear(): void {
+            document.getElementById("assure-note").style.display = "none";
             this.ContentLayer.innerHTML = "";
-            this.SVGLayer.style.display = "none";
-            for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
-                this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
-            }
-            this.SVGLayer.style.display = "";
+            this.SVGLayerBox.removeChild(this.SVGLayer);
+            var Transfrom = this.SVGLayer.getAttribute("transform");
+            this.SVGLayer = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.setAttribute("transform", Transfrom);
+            this.SVGLayer.id = "svg-layer";
+            this.SVGLayerBox.appendChild(this.SVGLayer);
+            this.Viewport.SVGLayer = this.SVGLayer;
+            document.getElementById("assure-note").style.display = "";
         }
 
         DisplayPluginPanel(PluginName: string, Label?: string): void {
