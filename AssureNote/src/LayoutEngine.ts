@@ -61,12 +61,13 @@ module AssureNote {
             var DivFragment = document.createDocumentFragment();
             var SvgNodeFragment = document.createDocumentFragment();
             var SvgConnectionFragment = document.createDocumentFragment();
-            var t0 = AssureNoteUtils.GetTime();
             var Dummy = document.createDocumentFragment();
 
+            var t0 = AssureNoteUtils.GetTime();
             this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
             var t1 = AssureNoteUtils.GetTime();
             console.log("Render: " + (t1 - t0));
+
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
@@ -76,6 +77,7 @@ module AssureNote {
             Dummy.appendChild(SvgNodeFragment);
             var t2 = AssureNoteUtils.GetTime();
             console.log("NodeSize: " + (t2 - t1));
+
             this.Layout(NodeView);
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);

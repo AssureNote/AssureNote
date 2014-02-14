@@ -264,6 +264,24 @@ var AssureNote;
                 this.SetPosition(x, y);
                 return;
             }
+
+            if (this.WillFadein()) {
+                GSNShape.__Debug_Animation_TotalNodeCount++;
+                if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
+                    this.SetPosition(x, y);
+                    this.willFadein = false;
+                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+                    return;
+                }
+                this.Fadein(AnimationCallbacks, Duration);
+                this.willFadein = false;
+                if (this.GXCache == null || this.GYCache == null) {
+                    this.SetPosition(x, y);
+                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+                    return;
+                }
+            }
+
             if (ScreenRect) {
                 GSNShape.__Debug_Animation_TotalNodeCount++;
                 if (this.GXCache + this.GetNodeWidth() < ScreenRect.X || this.GXCache > ScreenRect.X + ScreenRect.Width) {
@@ -275,20 +293,6 @@ var AssureNote;
                 }
                 if (this.GYCache + this.GetNodeHeight() < ScreenRect.Y || this.GYCache > ScreenRect.Y + ScreenRect.Height) {
                     GSNShape.__Debug_Animation_SkippedNodeCount++;
-                    this.SetPosition(x, y);
-                    return;
-                }
-            }
-
-            if (this.WillFadein()) {
-                if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
-                    this.SetPosition(x, y);
-                    this.willFadein = false;
-                    return;
-                }
-                this.Fadein(AnimationCallbacks, Duration);
-                this.willFadein = false;
-                if (this.GXCache == null || this.GYCache == null) {
                     this.SetPosition(x, y);
                     return;
                 }
