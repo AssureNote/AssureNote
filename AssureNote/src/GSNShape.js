@@ -38,18 +38,59 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path='../plugin/FullScreenEditor/FullScreenEditor.ts'/>
 var AssureNote;
 (function (AssureNote) {
+    var GSNShapeSizePreFetcher = (function () {
+        function GSNShapeSizePreFetcher() {
+            var _this = this;
+            this.Queue = [];
+            this.TimerHandle = 0;
+            this.DummyDiv = document.createElement("div");
+            this.DummyDiv.style.position = "absolute";
+            this.DummyDiv.style.top = "1000%";
+            document.body.appendChild(this.DummyDiv);
+
+            this.TimerHandle = setInterval(function () {
+                var StartTime = AssureNote.AssureNoteUtils.GetTime();
+                while (_this.Queue.length > 0 && AssureNote.AssureNoteUtils.GetTime() - StartTime < 16) {
+                    var Shape = _this.Queue.shift();
+                    if (Shape["NodeHeightCache"] == 0 || Shape["NodeWidthCache"] == 0) {
+                        Shape.PrerenderContent(AssureNote.AssureNoteApp.Current.PluginManager);
+                        _this.DummyDiv.appendChild(Shape.Content);
+                        Shape.GetNodeWidth();
+                        Shape.FitSizeToContent();
+                    }
+                }
+            }, 20);
+
+            //for debug
+            setInterval(function () {
+                if (_this.Queue.length) {
+                    console.log("size prefetch: " + _this.Queue.length + " nodes left");
+                }
+            }, 500);
+        }
+        GSNShapeSizePreFetcher.prototype.AddShape = function (Shape) {
+            this.Queue.push(Shape);
+        };
+        return GSNShapeSizePreFetcher;
+    })();
+    AssureNote.GSNShapeSizePreFetcher = GSNShapeSizePreFetcher;
+
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
             this.ColorStyles = [AssureNote.ColorStyle.Default];
             this.willFadein = false;
-            this.GX = null;
-            this.GY = null;
+            this.GXCache = null;
+            this.GYCache = null;
             this.Content = null;
-            this.NodeWidth = 250;
-            this.NodeHeight = 0;
+            this.NodeWidthCache = 250;
+            this.NodeHeightCache = 0;
             this.HeadBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
             this.TreeBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
+            if (GSNShape.AsyncSizePrefetcher == null) {
+                GSNShape.AsyncSizePrefetcher = new GSNShapeSizePreFetcher();
+            }
+            GSNShape.AsyncSizePrefetcher.AddShape(this);
         }
         GSNShape.CreateArrowPath = function () {
             return GSNShape.ArrowPathMaster.cloneNode();
@@ -76,14 +117,14 @@ var AssureNote;
         };
 
         GSNShape.prototype.GetNodeWidth = function () {
-            return this.NodeWidth;
+            return this.NodeWidthCache;
         };
 
         GSNShape.prototype.GetNodeHeight = function () {
-            if (this.NodeHeight == 0) {
-                this.NodeHeight = this.Content.clientHeight;
+            if (this.NodeHeightCache == 0) {
+                this.NodeHeightCache = this.Content.clientHeight;
             }
-            return this.NodeHeight;
+            return this.NodeHeightCache;
         };
 
         GSNShape.prototype.GetTreeWidth = function () {
@@ -197,8 +238,8 @@ var AssureNote;
                 mat.e = x;
                 mat.f = y;
             }
-            this.GX = x;
-            this.GY = y;
+            this.GXCache = x;
+            this.GYCache = y;
         };
 
         GSNShape.prototype.SetOpacity = function (Opacity) {
@@ -225,14 +266,14 @@ var AssureNote;
             }
             if (ScreenRect) {
                 GSNShape.__Debug_Animation_TotalNodeCount++;
-                if (this.GX + this.GetNodeWidth() < ScreenRect.X || this.GX > ScreenRect.X + ScreenRect.Width) {
+                if (this.GXCache + this.GetNodeWidth() < ScreenRect.X || this.GXCache > ScreenRect.X + ScreenRect.Width) {
                     if (x + this.GetNodeWidth() < ScreenRect.X || x > ScreenRect.X + ScreenRect.Width) {
                         GSNShape.__Debug_Animation_SkippedNodeCount++;
                         this.SetPosition(x, y);
                         return;
                     }
                 }
-                if (this.GY + this.GetNodeHeight() < ScreenRect.Y || this.GY > ScreenRect.Y + ScreenRect.Height) {
+                if (this.GYCache + this.GetNodeHeight() < ScreenRect.Y || this.GYCache > ScreenRect.Y + ScreenRect.Height) {
                     GSNShape.__Debug_Animation_SkippedNodeCount++;
                     this.SetPosition(x, y);
                     return;
@@ -247,42 +288,42 @@ var AssureNote;
                 }
                 this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
-                if (this.GX == null || this.GY == null) {
+                if (this.GXCache == null || this.GYCache == null) {
                     this.SetPosition(x, y);
                     return;
                 }
             }
 
-            var VX = (x - this.GX) / Duration;
-            var VY = (y - this.GY) / Duration;
+            var VX = (x - this.GXCache) / Duration;
+            var VY = (y - this.GYCache) / Duration;
 
             AnimationCallbacks.push(function (deltaT) {
-                return _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
+                return _this.SetPosition(_this.GXCache + VX * deltaT, _this.GYCache + VY * deltaT);
             });
         };
 
         GSNShape.prototype.SetFadeinBasePosition = function (StartGX, StartGY) {
             this.willFadein = true;
-            this.GX = StartGX;
-            this.GY = StartGY;
+            this.GXCache = StartGX;
+            this.GYCache = StartGY;
             this.ArrowP1 = this.ArrowP2 = new AssureNote.Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
         };
 
         GSNShape.prototype.GetGXCache = function () {
-            return this.GX;
+            return this.GXCache;
         };
 
         GSNShape.prototype.GetGYCache = function () {
-            return this.GY;
+            return this.GYCache;
         };
 
         GSNShape.prototype.WillFadein = function () {
-            return this.willFadein || this.GX == null || this.GY == null;
+            return this.willFadein || this.GXCache == null || this.GYCache == null;
         };
 
         GSNShape.prototype.ClearAnimationCache = function () {
-            this.GX = null;
-            this.GY = null;
+            this.GXCache = null;
+            this.GYCache = null;
         };
 
         GSNShape.prototype.PrerenderSVGContent = function (manager) {

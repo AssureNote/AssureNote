@@ -65,18 +65,45 @@ var AssureNote;
             var SvgNodeFragment = document.createDocumentFragment();
             var SvgConnectionFragment = document.createDocumentFragment();
             var t0 = AssureNote.AssureNoteUtils.GetTime();
+            var Dummy = document.createDocumentFragment();
 
             this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
             var t1 = AssureNote.AssureNoteUtils.GetTime();
-            console.log("Lender1: " + (t1 - t0));
+            console.log("Render: " + (t1 - t0));
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
+            this.PrepareNodeSize(NodeView);
+            Dummy.appendChild(DivFragment);
+            Dummy.appendChild(SvgConnectionFragment);
+            Dummy.appendChild(SvgNodeFragment);
             var t2 = AssureNote.AssureNoteUtils.GetTime();
-            console.log("Lender2: " + (t2 - t1));
+            console.log("NodeSize: " + (t2 - t1));
             this.Layout(NodeView);
+            PictgramPanel.ContentLayer.appendChild(DivFragment);
+            PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
+            PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
             var t3 = AssureNote.AssureNoteUtils.GetTime();
             console.log("Layout: " + (t3 - t2));
+        };
+
+        SimpleLayoutEngine.prototype.PrepareNodeSize = function (ThisNode) {
+            var _this = this;
+            var Shape = ThisNode.GetShape();
+            Shape.GetNodeWidth();
+            Shape.GetNodeHeight();
+            if (ThisNode.IsFolded) {
+                return;
+            }
+            ThisNode.ForEachVisibleLeftNodes(function (SubNode) {
+                _this.PrepareNodeSize(SubNode);
+            });
+            ThisNode.ForEachVisibleRightNodes(function (SubNode) {
+                _this.PrepareNodeSize(SubNode);
+            });
+            ThisNode.ForEachVisibleChildren(function (SubNode) {
+                _this.PrepareNodeSize(SubNode);
+            });
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode) {

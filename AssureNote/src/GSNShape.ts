@@ -35,15 +35,54 @@
 
 module AssureNote {
 
+    export class GSNShapeSizePreFetcher {
+        Queue: GSNShape[] = [];
+        TimerHandle: number = 0;
+        DummyDiv: HTMLDivElement = document.createElement("div");
+
+        constructor() {
+            this.DummyDiv.style.position = "absolute";
+            this.DummyDiv.style.top = "1000%";
+            document.body.appendChild(this.DummyDiv);
+
+            this.TimerHandle = setInterval(() => {
+                var StartTime = AssureNoteUtils.GetTime();
+                while (this.Queue.length > 0 && AssureNoteUtils.GetTime() - StartTime < 16) {
+                    var Shape = this.Queue.shift();
+                    if (Shape["NodeHeightCache"] == 0 || Shape["NodeWidthCache"] == 0) {
+                        Shape.PrerenderContent(AssureNoteApp.Current.PluginManager);
+                        this.DummyDiv.appendChild(Shape.Content);
+                        Shape.GetNodeWidth();
+                        Shape.FitSizeToContent();
+                    }
+                }
+            }, 20);
+
+            //for debug
+            setInterval(() => {
+                if (this.Queue.length) {
+                    console.log("size prefetch: " + this.Queue.length + " nodes left");
+                }
+            }, 500);
+        }
+
+        AddShape(Shape: GSNShape) {
+            this.Queue.push(Shape);
+        }
+
+    }
+
     export class GSNShape {
         ShapeGroup: SVGGElement;
         ArrowPath: SVGPathElement;
         Content: HTMLElement;
         private ColorStyles: string[] = [ColorStyle.Default];
-        private NodeWidth: number;
-        private NodeHeight: number;
+        private NodeWidthCache: number;
+        private NodeHeightCache: number;
         private HeadBoundingBox: Rect; // Head is the node and Left and Right.
         private TreeBoundingBox: Rect; // Tree is Head and Children
+
+        private static AsyncSizePrefetcher: GSNShapeSizePreFetcher;
 
         private static ArrowPathMaster: SVGPathElement = (() => {
             var Master = AssureNoteUtils.CreateSVGElement("path");
@@ -56,10 +95,14 @@ module AssureNote {
 
         constructor(public NodeView: NodeView) {
             this.Content = null;
-            this.NodeWidth = 250;
-            this.NodeHeight = 0;
+            this.NodeWidthCache = 250;
+            this.NodeHeightCache = 0;
             this.HeadBoundingBox = new Rect(0, 0, 0, 0);
             this.TreeBoundingBox = new Rect(0, 0, 0, 0);
+            if (GSNShape.AsyncSizePrefetcher == null) {
+                GSNShape.AsyncSizePrefetcher = new GSNShapeSizePreFetcher();
+            }
+            GSNShape.AsyncSizePrefetcher.AddShape(this);
         }
 
         private static CreateArrowPath(): SVGPathElement {
@@ -87,14 +130,14 @@ module AssureNote {
         }
 
         GetNodeWidth(): number {
-            return this.NodeWidth;
+            return this.NodeWidthCache;
         }
 
         GetNodeHeight(): number {
-            if (this.NodeHeight == 0) {
-                this.NodeHeight = this.Content.clientHeight;
+            if (this.NodeHeightCache == 0) {
+                this.NodeHeightCache = this.Content.clientHeight;
             }
-            return this.NodeHeight;
+            return this.NodeHeightCache;
         }
 
         GetTreeWidth(): number {
@@ -189,8 +232,8 @@ module AssureNote {
         }
 
         private willFadein = false;
-        private GX = null;
-        private GY = null;
+        private GXCache = null;
+        private GYCache = null;
 
         private RemoveAnimateElement(Animate: SVGElement) {
             if (Animate) {
@@ -212,8 +255,8 @@ module AssureNote {
                 mat.e = x;
                 mat.f = y;
             }
-            this.GX = x;
-            this.GY = y;
+            this.GXCache = x;
+            this.GYCache = y;
         }
 
         private SetOpacity(Opacity: number) {
@@ -241,14 +284,14 @@ module AssureNote {
             }
             if (ScreenRect) {
                 GSNShape.__Debug_Animation_TotalNodeCount++;
-                if (this.GX + this.GetNodeWidth() < ScreenRect.X || this.GX > ScreenRect.X + ScreenRect.Width) {
+                if (this.GXCache + this.GetNodeWidth() < ScreenRect.X || this.GXCache > ScreenRect.X + ScreenRect.Width) {
                     if (x + this.GetNodeWidth() < ScreenRect.X || x > ScreenRect.X + ScreenRect.Width) {
                         GSNShape.__Debug_Animation_SkippedNodeCount++;
                         this.SetPosition(x, y);
                         return;
                     }
                 }
-                if (this.GY + this.GetNodeHeight() < ScreenRect.Y || this.GY > ScreenRect.Y + ScreenRect.Height) {
+                if (this.GYCache + this.GetNodeHeight() < ScreenRect.Y || this.GYCache > ScreenRect.Y + ScreenRect.Height) {
                     GSNShape.__Debug_Animation_SkippedNodeCount++;
                     this.SetPosition(x, y);
                     return;
@@ -263,40 +306,40 @@ module AssureNote {
                 }
                 this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
-                if (this.GX == null || this.GY == null) {
+                if (this.GXCache == null || this.GYCache == null) {
                     this.SetPosition(x, y);
                     return;
                 }
             }
 
-            var VX = (x - this.GX) / Duration;
-            var VY = (y - this.GY) / Duration;
+            var VX = (x - this.GXCache) / Duration;
+            var VY = (y - this.GYCache) / Duration;
             
-            AnimationCallbacks.push((deltaT: number) => this.SetPosition(this.GX + VX * deltaT, this.GY + VY * deltaT));
+            AnimationCallbacks.push((deltaT: number) => this.SetPosition(this.GXCache + VX * deltaT, this.GYCache + VY * deltaT));
         }
 
         SetFadeinBasePosition(StartGX: number, StartGY: number): void {
             this.willFadein = true;
-            this.GX = StartGX;
-            this.GY = StartGY;
+            this.GXCache = StartGX;
+            this.GYCache = StartGY;
             this.ArrowP1 = this.ArrowP2 = new Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
         }
 
         GetGXCache(): number {
-            return this.GX;
+            return this.GXCache;
         }
 
         GetGYCache(): number {
-            return this.GY;
+            return this.GYCache;
         }
 
         WillFadein(): boolean {
-            return this.willFadein || this.GX == null || this.GY == null;
+            return this.willFadein || this.GXCache == null || this.GYCache == null;
         }
 
         ClearAnimationCache(): void {
-            this.GX = null;
-            this.GY = null;
+            this.GXCache = null;
+            this.GYCache = null;
         }
 
         private ArrowStart: SVGPathSegMovetoAbs;
