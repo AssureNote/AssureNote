@@ -134,7 +134,12 @@ var AssureNote;
 
         GSNShape.prototype.GetNodeHeight = function () {
             if (this.NodeHeightCache == 0) {
-                this.NodeHeightCache = this.Content.clientHeight;
+                var Cached = GSNShape.NodeHeightCache[this.Content.innerHTML];
+                if (Cached) {
+                    this.NodeHeightCache = Cached;
+                } else {
+                    GSNShape.NodeHeightCache[this.Content.innerHTML] = this.NodeHeightCache = this.Content.clientHeight;
+                }
             }
             return this.NodeHeightCache;
         };
@@ -494,6 +499,8 @@ var AssureNote;
                 this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             }
         };
+        GSNShape.NodeHeightCache = {};
+
         GSNShape.DefaultWidth = 250;
 
         GSNShape.ArrowPathMaster = (function () {

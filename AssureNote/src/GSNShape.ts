@@ -85,6 +85,7 @@ module AssureNote {
         private TreeBoundingBox: Rect; // Tree is Head and Children
 
         private static AsyncSizePrefetcher: GSNShapeSizePreFetcher;
+        private static NodeHeightCache: { [index: string]: number } = {};
 
         private static DefaultWidth = 250;
 
@@ -96,6 +97,7 @@ module AssureNote {
             Master.setAttribute("d", "M0,0 C0,0 0,0 0,0");
             return Master;
         })();
+
 
         constructor(public NodeView: NodeView) {
             this.Content = null;
@@ -149,7 +151,12 @@ module AssureNote {
 
         GetNodeHeight(): number {
             if (this.NodeHeightCache == 0) {
-                this.NodeHeightCache = this.Content.clientHeight;
+                var Cached = GSNShape.NodeHeightCache[this.Content.innerHTML];
+                if (Cached) {
+                    this.NodeHeightCache = Cached;
+                } else {
+                    GSNShape.NodeHeightCache[this.Content.innerHTML] = this.NodeHeightCache = this.Content.clientHeight;
+                }
             }
             return this.NodeHeightCache;
         }
