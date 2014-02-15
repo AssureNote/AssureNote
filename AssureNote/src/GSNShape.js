@@ -94,12 +94,11 @@ var AssureNote;
             }
             GSNShape.AsyncSizePrefetcher.AddShape(this);
         }
-        GSNShape.prototype.ClearSizeCache = function () {
-            this.NodeWidthCache = GSNShape.DefaultWidth;
-            this.NodeHeightCache = 0;
-            GSNShape.AsyncSizePrefetcher.AddShape(this);
-        };
-
+        //ClearSizeCache(): void {
+        //    this.NodeWidthCache = GSNShape.DefaultWidth;
+        //    this.NodeHeightCache = 0;
+        //    GSNShape.AsyncSizePrefetcher.AddShape(this);
+        //}
         GSNShape.prototype.IsSizeCached = function () {
             return this.NodeHeightCache != 0 && this.NodeWidthCache != 0;
         };
@@ -524,10 +523,10 @@ var AssureNote;
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.ShapeGroup.appendChild(this.BodyRect);
-            if (this.NodeView.IsFolded) {
+            if (this.NodeView.IsFolded()) {
                 this.ShapeGroup.appendChild(GSNGoalShape.ModuleSymbolMaster.cloneNode());
             }
-            if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
+            if (this.NodeView.Children == null && !this.NodeView.IsFolded()) {
                 this.UndevelopedSymbol = GSNGoalShape.UndevelopedSymbolMaster.cloneNode();
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
@@ -536,7 +535,7 @@ var AssureNote;
         GSNGoalShape.prototype.FitSizeToContent = function () {
             this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
             this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
-            if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
+            if (this.NodeView.Children == null && !this.NodeView.IsFolded()) {
                 var x = (this.GetNodeWidth() / 2).toString();
                 var y = (this.GetNodeHeight() + 20).toString();
                 this.UndevelopedSymbol.setAttribute("transform", "translate(" + x + "," + y + ")");

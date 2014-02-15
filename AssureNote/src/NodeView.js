@@ -41,10 +41,11 @@ var AssureNote;
             this.Right = null;
             this.Children = null;
             this.Shape = null;
+            this.ShouldReLayoutFlag = true;
             this.Label = Model.GetLabel();
             this.NodeDoc = Model.NodeDoc;
             this.IsVisible = true;
-            this.IsFolded = false;
+            this.IsFoldedFlag = false;
             this.Status = 0 /* TreeEditable */;
             if (IsRecursive && Model.SubNodeList != null) {
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
@@ -59,6 +60,28 @@ var AssureNote;
                 }
             }
         }
+        NodeView.prototype.IsFolded = function () {
+            return this.IsFoldedFlag;
+        };
+
+        NodeView.prototype.SetIsFolded = function (Flag) {
+            if (this.IsFoldedFlag != Flag) {
+                this.SetShouldReLayout(true);
+            }
+            this.IsFoldedFlag = Flag;
+        };
+
+        NodeView.prototype.SetShouldReLayout = function (Flag) {
+            if (!this.ShouldReLayoutFlag && Flag && this.Parent) {
+                this.Parent.SetShouldReLayout(true);
+            }
+            this.ShouldReLayoutFlag = Flag;
+        };
+
+        NodeView.prototype.ShouldReLayout = function () {
+            return this.ShouldReLayoutFlag;
+        };
+
         NodeView.prototype.UpdateViewMap = function (ViewMap) {
             ViewMap[this.Label] = this;
             if (this.Left != null) {
@@ -201,7 +224,7 @@ var AssureNote;
         NodeView.prototype.SaveFlags = function (OldViewMap) {
             var OldView = OldViewMap[this.Model.GetLabel()];
             if (OldView) {
-                this.IsFolded = OldView.IsFolded;
+                this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
                 if (this.NodeDoc == OldView.NodeDoc) {
                     this.SetShape(OldView.GetShape());
@@ -267,7 +290,7 @@ var AssureNote;
         };
 
         NodeView.prototype.ForEachVisibleSubNode = function (SubNodes, Action) {
-            if (SubNodes != null && !this.IsFolded) {
+            if (SubNodes != null && !this.IsFoldedFlag) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
                         if (Action(SubNodes[i]) === false) {
@@ -339,7 +362,7 @@ var AssureNote;
             if (Force || !this.IsVisible) {
                 this.GetShape().ClearAnimationCache();
             }
-            if (Force || this.IsFolded) {
+            if (Force || this.IsFoldedFlag) {
                 this.ForEachAllSubNodes(function (SubNode) {
                     SubNode.ClearAnimationCache(true);
                 });

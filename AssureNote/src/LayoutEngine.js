@@ -52,7 +52,7 @@ var AssureNote;
             if (ThisNode.IsVisible) {
                 ThisNode.GetShape().PrerenderContent(this.AssureNoteApp.PluginManager);
                 ThisNode.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
-                if (!ThisNode.IsFolded) {
+                if (!ThisNode.IsFolded()) {
                     ThisNode.ForEachVisibleAllSubNodes(function (SubNode) {
                         _this.Render(SubNode, DivFrag, SvgNodeFrag, SvgConnectionFrag);
                     });
@@ -94,7 +94,7 @@ var AssureNote;
             var Shape = ThisNode.GetShape();
             Shape.GetNodeWidth();
             Shape.GetNodeHeight();
-            if (ThisNode.IsFolded) {
+            if (ThisNode.IsFolded()) {
                 return;
             }
             ThisNode.ForEachVisibleLeftNodes(function (SubNode) {
@@ -114,12 +114,19 @@ var AssureNote;
                 return;
             }
             var Shape = ThisNode.GetShape();
+            if (!ThisNode.ShouldReLayout()) {
+                ThisNode.TraverseVisibleNode(function (Node) {
+                    Node.Shape.FitSizeToContent();
+                });
+                return;
+            }
+            ThisNode.SetShouldReLayout(false);
             Shape.FitSizeToContent();
             var TreeLeftX = 0;
             var ThisNodeWidth = Shape.GetNodeWidth();
             var TreeRightX = ThisNodeWidth;
             var TreeHeight = Shape.GetNodeHeight();
-            if (ThisNode.IsFolded) {
+            if (ThisNode.IsFolded()) {
                 Shape.SetHeadRect(0, 0, ThisNodeWidth, TreeHeight);
                 Shape.SetTreeRect(0, 0, ThisNodeWidth, TreeHeight);
                 return;
@@ -187,15 +194,15 @@ var AssureNote;
                     VisibleChildrenCount++;
                     _this.Layout(SubNode);
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
-                    var ChildHeadWidth = SubNode.IsFolded ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
-                    var ChildHeadHeight = SubNode.IsFolded ? SubNode.Shape.GetNodeHeight() : SubNode.Shape.GetHeadHeight();
+                    var ChildHeadWidth = SubNode.IsFolded() ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
+                    var ChildHeadHeight = SubNode.IsFolded() ? SubNode.Shape.GetNodeHeight() : SubNode.Shape.GetHeadHeight();
                     var ChildHeadLeftSideMargin = SubNode.Shape.GetHeadLeftLocalX() - SubNode.Shape.GetTreeLeftLocalX();
                     var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     var HMargin = SimpleLayoutEngine.ChildrenHorizontalMargin;
 
                     var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
-                    var IsFoldedLike = (SubNode.IsFolded || IsUndeveloped) && ChildHeadHeight <= FormarUnfoldedChildHeight;
+                    var IsFoldedLike = (SubNode.IsFolded() || IsUndeveloped) && ChildHeadHeight <= FormarUnfoldedChildHeight;
 
                     if (IsFoldedLike) {
                         SubNode.RelativeX = ChildrenTopWidth;
@@ -247,7 +254,7 @@ var AssureNote;
                 if (VisibleChildrenCount == 1) {
                     ThisNode.ForEachVisibleChildren(function (SubNode) {
                         ShiftX = -SubNode.Shape.GetTreeLeftLocalX();
-                        if (!SubNode.HasSideNode() || SubNode.IsFolded) {
+                        if (!SubNode.HasSideNode() || SubNode.IsFolded()) {
                             var ShiftY = 0;
                             var SubNodeHeight = SubNode.Shape.GetNodeHeight();
                             var ThisHeight = ThisNode.Shape.GetNodeHeight();

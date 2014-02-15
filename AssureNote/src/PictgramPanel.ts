@@ -195,7 +195,7 @@ module AssureNote {
                 }
                 var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
                 this.MasterView.TraverseVisibleNode((Node: NodeView) => {
-                    if (Node.IsFolded) {
+                    if (Node.IsFolded()) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / this.Viewport.GetCameraScale();
@@ -400,7 +400,7 @@ module AssureNote {
                 this.FoldDeepSubGoals(SubNode);
                 if (SubNode.GetNodeType() == GSNType.Goal && SubNode.Children != null) {
                     if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != GSNType.Evidence) {
-                        SubNode.IsFolded = true;
+                        SubNode.SetIsFolded(true);
                     }
                 }
             });

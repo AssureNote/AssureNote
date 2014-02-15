@@ -374,7 +374,7 @@ var AssureNote;
         UnfoldAllCommand.prototype.Invoke = function (CommandName, Params) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = function (TargetView) {
-                TargetView.IsFolded = false;
+                TargetView.SetIsFolded(false);
                 TargetView.ForEachVisibleChildren(function (SubNode) {
                     unfoldAll(SubNode);
                 });

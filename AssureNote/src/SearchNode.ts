@@ -67,7 +67,7 @@ module AssureNote {
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
                 while (Node != null) {
-                    Node.IsFolded = false;
+                    Node.SetIsFolded(false);
                     Node = Node.Parent;
                 }
             }

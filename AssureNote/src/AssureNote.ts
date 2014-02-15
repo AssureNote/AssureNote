@@ -232,7 +232,7 @@ module AssureNote {
                 if (NodeView) {
                     var ParentView: AssureNote.NodeView = NodeView.Parent;
                     while (ParentView) {
-                        ParentView.IsFolded = false;
+                        ParentView.SetIsFolded(false);
                         ParentView = ParentView.Parent;
                     }
                     this.PictgramPanel.Draw();

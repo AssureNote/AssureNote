@@ -357,7 +357,7 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = (TargetView: NodeView) => {
-                TargetView.IsFolded = false;
+                TargetView.SetIsFolded(false);
                 TargetView.ForEachVisibleChildren((SubNode: NodeView) => {
                     unfoldAll(SubNode);
                 });

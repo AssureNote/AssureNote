@@ -60,14 +60,14 @@ module AssureNote {
             var Panel = this.App.PictgramPanel;
             var ViewPort = Panel.Viewport;
 
-            this.App.SocketManager.FoldNode({"IsFolded": TargetView.IsFolded, "UID": TargetView.Model.UID});
+            this.App.SocketManager.FoldNode({ "IsFolded": TargetView.IsFolded(), "UID": TargetView.Model.UID});
 
             if (TargetView.GetNodeType() == GSNType.Strategy) {
                 if (TargetView.Children != null) {
                     for (var i = 0; i < TargetView.Children.length; i++) {
                         var SubView = TargetView.Children[i];
                         if (SubView.GetNodeType() == GSNType.Goal) {
-                            SubView.IsFolded = true;
+                            SubView.SetIsFolded(true);
                         }
                     }
                 }
@@ -75,11 +75,7 @@ module AssureNote {
                 this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
                 return;
             } else {
-                TargetView.IsFolded = TargetView.IsFolded != true;
-            }
-            var TopGoalView: NodeView = TargetView;
-            while (TopGoalView.Parent != null) {
-                TopGoalView = TopGoalView.Parent;
+                TargetView.SetIsFolded(!TargetView.IsFolded());
             }
             Panel.Draw(Panel.MasterView.Label, 300, TargetView);
         }

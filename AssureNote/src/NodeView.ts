@@ -37,7 +37,7 @@ module AssureNote {
 
     export class NodeView {
         IsVisible: boolean;
-        IsFolded: boolean;
+        private IsFoldedFlag: boolean;
         Label: string;
         NodeDoc: string;
         RelativeX: number = 0; // relative x from parent node
@@ -48,12 +48,13 @@ module AssureNote {
         Children: NodeView[] = null;
         Shape: GSNShape = null;
         Status: EditStatus;
+        private ShouldReLayoutFlag: boolean = true;
 
         constructor(public Model: GSNNode, IsRecursive: boolean) {
             this.Label = Model.GetLabel();
             this.NodeDoc = Model.NodeDoc;
             this.IsVisible = true;
-            this.IsFolded = false;
+            this.IsFoldedFlag = false;
             this.Status   = EditStatus.TreeEditable;
             if (IsRecursive && Model.SubNodeList != null) {
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
@@ -67,6 +68,28 @@ module AssureNote {
                     }
                 }
             }
+        }
+
+        IsFolded(): boolean {
+            return this.IsFoldedFlag;
+        }
+
+        SetIsFolded(Flag: boolean): void {
+            if (this.IsFoldedFlag != Flag) {
+                this.SetShouldReLayout(true);
+            }
+            this.IsFoldedFlag = Flag;
+        }
+
+        SetShouldReLayout(Flag: boolean): void {
+            if (!this.ShouldReLayoutFlag && Flag && this.Parent) {
+                this.Parent.SetShouldReLayout(true);
+            }
+            this.ShouldReLayoutFlag = Flag;
+        }
+
+        ShouldReLayout(): boolean {
+            return this.ShouldReLayoutFlag;
         }
 
         UpdateViewMap(ViewMap: { [index: string]: NodeView }): void {
@@ -213,7 +236,7 @@ module AssureNote {
         SaveFlags(OldViewMap: { [index: string]: NodeView }): void {
             var OldView = OldViewMap[this.Model.GetLabel()];
             if (OldView) {
-                this.IsFolded = OldView.IsFolded;
+                this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
                 if (this.NodeDoc == OldView.NodeDoc) {
                     this.SetShape(OldView.GetShape());
@@ -278,7 +301,7 @@ module AssureNote {
         }
 
         private ForEachVisibleSubNode(SubNodes: NodeView[], Action: (NodeView) => any): boolean {
-            if (SubNodes != null && !this.IsFolded) {
+            if (SubNodes != null && !this.IsFoldedFlag) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
                         if (Action(SubNodes[i]) === false) {
@@ -346,7 +369,7 @@ module AssureNote {
             if (Force || !this.IsVisible) {
                 this.GetShape().ClearAnimationCache();
             }
-            if (Force || this.IsFolded) {
+            if (Force || this.IsFoldedFlag) {
                 this.ForEachAllSubNodes((SubNode: NodeView) => {
                     SubNode.ClearAnimationCache(true);
                 });

@@ -182,7 +182,7 @@ var AssureNote;
                 }
                 var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
                 _this.MasterView.TraverseVisibleNode(function (Node) {
-                    if (Node.IsFolded) {
+                    if (Node.IsFolded()) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
@@ -381,7 +381,7 @@ var AssureNote;
                 _this.FoldDeepSubGoals(SubNode);
                 if (SubNode.GetNodeType() == 0 /* Goal */ && SubNode.Children != null) {
                     if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != 3 /* Evidence */) {
-                        SubNode.IsFolded = true;
+                        SubNode.SetIsFolded(true);
                     }
                 }
             });

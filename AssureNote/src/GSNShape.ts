@@ -111,11 +111,11 @@ module AssureNote {
             GSNShape.AsyncSizePrefetcher.AddShape(this);
         }
 
-        ClearSizeCache(): void {
-            this.NodeWidthCache = GSNShape.DefaultWidth;
-            this.NodeHeightCache = 0;
-            GSNShape.AsyncSizePrefetcher.AddShape(this);
-        }
+        //ClearSizeCache(): void {
+        //    this.NodeWidthCache = GSNShape.DefaultWidth;
+        //    this.NodeHeightCache = 0;
+        //    GSNShape.AsyncSizePrefetcher.AddShape(this);
+        //}
 
         IsSizeCached(): boolean {
             return this.NodeHeightCache != 0 && this.NodeWidthCache != 0
@@ -550,10 +550,10 @@ module AssureNote {
             super.PrerenderSVGContent(manager);
             this.BodyRect = AssureNoteUtils.CreateSVGElement("rect");
             this.ShapeGroup.appendChild(this.BodyRect);
-            if (this.NodeView.IsFolded) {
+            if (this.NodeView.IsFolded()) {
                 this.ShapeGroup.appendChild(GSNGoalShape.ModuleSymbolMaster.cloneNode());
             }
-            if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
+            if (this.NodeView.Children == null && !this.NodeView.IsFolded()) {
                 this.UndevelopedSymbol = <SVGPolygonElement>GSNGoalShape.UndevelopedSymbolMaster.cloneNode();
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
@@ -562,7 +562,7 @@ module AssureNote {
         FitSizeToContent(): void {
             this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
             this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
-            if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
+            if (this.NodeView.Children == null && !this.NodeView.IsFolded()) {
                 var x = (this.GetNodeWidth() / 2).toString();
                 var y = (this.GetNodeHeight() + 20).toString();
                 this.UndevelopedSymbol.setAttribute("transform", "translate(" + x + "," + y + ")");
