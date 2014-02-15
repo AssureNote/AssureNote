@@ -498,7 +498,7 @@ module AssureNote {
             }
 
             var t2 = AssureNoteUtils.GetTime();
-            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, ScreenRect);
+            TargetView.UpdateNodePosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
             var t3 = AssureNoteUtils.GetTime();
             console.log("Update: " + (t3 - t2));

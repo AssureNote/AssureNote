@@ -109,13 +109,20 @@ var AssureNote;
             return this.Shape;
         };
 
-        NodeView.prototype.UpdateShape = function () {
-            this.Shape = AssureNote.AssureNoteUtils.CreateGSNShape(this);
-            return this.Shape;
+        NodeView.prototype.SetShape = function (Shape) {
+            if (this.Shape) {
+                this.Shape.NodeView = null;
+            }
+            if (Shape) {
+                Shape.NodeView = this;
+            }
+            this.Shape = Shape;
         };
 
-        // Global X: Scale-independent and transform-independent X distance from leftside of the top goal.
-        // Return always 0 if this is top goal.
+        /**
+        Global X: Scale-independent and transform-independent X distance from leftside of the top goal.
+        @return always 0 if this is top goal.
+        */
         NodeView.prototype.GetGX = function () {
             if (NodeView.GlobalPositionCache != null && NodeView.GlobalPositionCache[this.Label]) {
                 return NodeView.GlobalPositionCache[this.Label].X;
@@ -126,8 +133,10 @@ var AssureNote;
             return this.Parent.GetGX() + this.RelativeX;
         };
 
-        // Global Y: Scale-independent and transform-independent Y distance from top of the top goal.
-        // Return always 0 if this is top goal.
+        /**
+        Global Y: Scale-independent and transform-independent Y distance from top of the top goal.
+        @eturn always 0 if this is top goal.
+        */
         NodeView.prototype.GetGY = function () {
             if (NodeView.GlobalPositionCache != null && NodeView.GlobalPositionCache[this.Label]) {
                 return NodeView.GlobalPositionCache[this.Label].Y;
@@ -155,8 +164,10 @@ var AssureNote;
             }
         };
 
-        // Scale-independent and transform-independent distance from leftside of GSN.
-        // Return always (0, 0) if this is top goal.
+        /**
+        Scale-independent and transform-independent distance from leftside of GSN.
+        @return always (0, 0) if this is top goal.
+        */
         NodeView.prototype.GetGlobalPosition = function () {
             if (NodeView.GlobalPositionCache != null && NodeView.GlobalPositionCache[this.Label]) {
                 return NodeView.GlobalPositionCache[this.Label].Clone();
@@ -177,16 +188,26 @@ var AssureNote;
             return this.Model.NodeType;
         };
 
+        /**
+        Append content elements of this node to layer fragments.
+        */
         NodeView.prototype.Render = function (DivFrag, SvgNodeFrag, SvgConnectionFrag) {
             this.Shape.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
         };
 
+        /**
+        Try to reuse shape.
+        */
         NodeView.prototype.SaveFlags = function (OldViewMap) {
             var OldView = OldViewMap[this.Model.GetLabel()];
             if (OldView) {
                 this.IsFolded = OldView.IsFolded;
                 this.Status = OldView.Status;
-                this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
+                if (this.NodeDoc == OldView.NodeDoc) {
+                    this.SetShape(OldView.GetShape());
+                } else {
+                    this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
+                }
             }
 
             for (var i = 0; this.Children && i < this.Children.length; i++) {
@@ -207,7 +228,10 @@ var AssureNote;
             return P;
         };
 
-        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, ScreenRect, UnfoldBaseNode) {
+        /**
+        Update DOM node position by the position that layout engine caluculated
+        */
+        NodeView.prototype.UpdateNodePosition = function (AnimationCallbacks, Duration, ScreenRect, UnfoldBaseNode) {
             var _this = this;
             Duration = Duration || 0;
             if (!this.IsVisible) {
@@ -220,9 +244,9 @@ var AssureNote;
                 }
                 if (Base && Duration > 0) {
                     SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect, Base);
+                    SubNode.UpdateNodePosition(AnimationCallbacks, Duration, ScreenRect, Base);
                 } else {
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect);
+                    SubNode.UpdateNodePosition(AnimationCallbacks, Duration, ScreenRect);
                 }
             };
 
@@ -307,6 +331,10 @@ var AssureNote;
             return false;
         };
 
+        /**
+        Clear position cache and enable to fading in when the node re-appearing.
+        This method should be called after the node became invibible or the node never fade in.
+        */
         NodeView.prototype.ClearAnimationCache = function (Force) {
             if (Force || !this.IsVisible) {
                 this.GetShape().ClearAnimationCache();

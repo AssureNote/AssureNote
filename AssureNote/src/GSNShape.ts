@@ -49,9 +49,11 @@ module AssureNote {
                 var StartTime = AssureNoteUtils.GetTime();
                 while (this.Queue.length > 0 && AssureNoteUtils.GetTime() - StartTime < 16) {
                     var Shape = this.Queue.shift();
-                    if (Shape["NodeHeightCache"] == 0 || Shape["NodeWidthCache"] == 0) {
+                    if (Shape.NodeView && !Shape.IsSizeCached()) {
                         Shape.PrerenderContent(AssureNoteApp.Current.PluginManager);
-                        this.DummyDiv.appendChild(Shape.Content);
+                        if (!Shape.Content.parentElement) {
+                            this.DummyDiv.appendChild(Shape.Content);
+                        }
                         Shape.GetNodeWidth();
                         Shape.FitSizeToContent();
                     }
@@ -84,6 +86,8 @@ module AssureNote {
 
         private static AsyncSizePrefetcher: GSNShapeSizePreFetcher;
 
+        private static DefaultWidth = 250;
+
         private static ArrowPathMaster: SVGPathElement = (() => {
             var Master = AssureNoteUtils.CreateSVGElement("path");
             Master.setAttribute("marker-end", "url(#Triangle-black)");
@@ -95,7 +99,7 @@ module AssureNote {
 
         constructor(public NodeView: NodeView) {
             this.Content = null;
-            this.NodeWidthCache = 250;
+            this.NodeWidthCache = GSNShape.DefaultWidth;
             this.NodeHeightCache = 0;
             this.HeadBoundingBox = new Rect(0, 0, 0, 0);
             this.TreeBoundingBox = new Rect(0, 0, 0, 0);
@@ -103,6 +107,16 @@ module AssureNote {
                 GSNShape.AsyncSizePrefetcher = new GSNShapeSizePreFetcher();
             }
             GSNShape.AsyncSizePrefetcher.AddShape(this);
+        }
+
+        ClearSizeCache(): void {
+            this.NodeWidthCache = GSNShape.DefaultWidth;
+            this.NodeHeightCache = 0;
+            GSNShape.AsyncSizePrefetcher.AddShape(this);
+        }
+
+        IsSizeCached(): boolean {
+            return this.NodeHeightCache != 0 && this.NodeWidthCache != 0
         }
 
         private static CreateArrowPath(): SVGPathElement {
@@ -326,7 +340,7 @@ module AssureNote {
             this.willFadein = true;
             this.GXCache = StartGX;
             this.GYCache = StartGY;
-            this.ArrowP1 = this.ArrowP2 = new Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
+            this.ArrowP1Cache = this.ArrowP2Cache = new Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
         }
 
         GetGXCache(): number {
@@ -359,8 +373,8 @@ module AssureNote {
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         }
 
-        private ArrowP1: Point;
-        private ArrowP2: Point;
+        private ArrowP1Cache: Point;
+        private ArrowP2Cache: Point;
 
         SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
             var start = this.ArrowStart;
@@ -388,8 +402,8 @@ module AssureNote {
                 curve.x2 = (P1.X + P2.X) / 2;
                 curve.y2 = (9 * P2.Y + P1.Y) / 10;
             }
-            this.ArrowP1 = P1;
-            this.ArrowP2 = P2;
+            this.ArrowP1Cache = P1;
+            this.ArrowP2Cache = P2;
         }
 
         private SetArrowOpacity(Opacity: number) {
@@ -402,8 +416,8 @@ module AssureNote {
                 return;
             }
             if (ScreenRect) {
-                var R0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP2.X : this.ArrowP1.X; 
-                var L0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP1.X : this.ArrowP2.X; 
+                var R0 = this.ArrowP1Cache.X < this.ArrowP2Cache.X ? this.ArrowP2Cache.X : this.ArrowP1Cache.X; 
+                var L0 = this.ArrowP1Cache.X < this.ArrowP2Cache.X ? this.ArrowP1Cache.X : this.ArrowP2Cache.X; 
                 if (R0 < ScreenRect.X || L0 > ScreenRect.X + ScreenRect.Width) {
                     var R1 = P1.X < P2.X ? P2.X : P1.X; 
                     var L1 = P1.X < P2.X ? P1.X : P2.X; 
@@ -412,24 +426,24 @@ module AssureNote {
                         return;
                     }
                 }
-                if (this.ArrowP2.Y < ScreenRect.Y || this.ArrowP1.Y > ScreenRect.Y + ScreenRect.Height) {
+                if (this.ArrowP2Cache.Y < ScreenRect.Y || this.ArrowP1Cache.Y > ScreenRect.Y + ScreenRect.Height) {
                     this.SetArrowPosition(P1, P2, Dir);
                     return;
                 }
             }
 
-            if (this.ArrowP1 == this.ArrowP2 && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
+            if (this.ArrowP1Cache == this.ArrowP2Cache && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetArrowPosition(P1, P2, Dir);
                 return;
             }
 
-            var P1VX = (P1.X - this.ArrowP1.X) / Duration;
-            var P1VY = (P1.Y - this.ArrowP1.Y) / Duration;
-            var P2VX = (P2.X - this.ArrowP2.X) / Duration;
-            var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
+            var P1VX = (P1.X - this.ArrowP1Cache.X) / Duration;
+            var P1VY = (P1.Y - this.ArrowP1Cache.Y) / Duration;
+            var P2VX = (P2.X - this.ArrowP2Cache.X) / Duration;
+            var P2VY = (P2.Y - this.ArrowP2Cache.Y) / Duration;
 
-            var CurrentP1 = this.ArrowP1.Clone();
-            var CurrentP2 = this.ArrowP2.Clone();
+            var CurrentP1 = this.ArrowP1Cache.Clone();
+            var CurrentP2 = this.ArrowP2Cache.Clone();
 
             AnimationCallbacks.push((deltaT: number) => {
                 CurrentP1.X += P1VX * deltaT;

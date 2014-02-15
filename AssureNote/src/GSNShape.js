@@ -52,9 +52,11 @@ var AssureNote;
                 var StartTime = AssureNote.AssureNoteUtils.GetTime();
                 while (_this.Queue.length > 0 && AssureNote.AssureNoteUtils.GetTime() - StartTime < 16) {
                     var Shape = _this.Queue.shift();
-                    if (Shape["NodeHeightCache"] == 0 || Shape["NodeWidthCache"] == 0) {
+                    if (Shape.NodeView && !Shape.IsSizeCached()) {
                         Shape.PrerenderContent(AssureNote.AssureNoteApp.Current.PluginManager);
-                        _this.DummyDiv.appendChild(Shape.Content);
+                        if (!Shape.Content.parentElement) {
+                            _this.DummyDiv.appendChild(Shape.Content);
+                        }
                         Shape.GetNodeWidth();
                         Shape.FitSizeToContent();
                     }
@@ -83,7 +85,7 @@ var AssureNote;
             this.GXCache = null;
             this.GYCache = null;
             this.Content = null;
-            this.NodeWidthCache = 250;
+            this.NodeWidthCache = GSNShape.DefaultWidth;
             this.NodeHeightCache = 0;
             this.HeadBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
             this.TreeBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
@@ -92,6 +94,16 @@ var AssureNote;
             }
             GSNShape.AsyncSizePrefetcher.AddShape(this);
         }
+        GSNShape.prototype.ClearSizeCache = function () {
+            this.NodeWidthCache = GSNShape.DefaultWidth;
+            this.NodeHeightCache = 0;
+            GSNShape.AsyncSizePrefetcher.AddShape(this);
+        };
+
+        GSNShape.prototype.IsSizeCached = function () {
+            return this.NodeHeightCache != 0 && this.NodeWidthCache != 0;
+        };
+
         GSNShape.CreateArrowPath = function () {
             return GSNShape.ArrowPathMaster.cloneNode();
         };
@@ -310,7 +322,7 @@ var AssureNote;
             this.willFadein = true;
             this.GXCache = StartGX;
             this.GYCache = StartGY;
-            this.ArrowP1 = this.ArrowP2 = new AssureNote.Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
+            this.ArrowP1Cache = this.ArrowP2Cache = new AssureNote.Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
         };
 
         GSNShape.prototype.GetGXCache = function () {
@@ -366,8 +378,8 @@ var AssureNote;
                 curve.x2 = (P1.X + P2.X) / 2;
                 curve.y2 = (9 * P2.Y + P1.Y) / 10;
             }
-            this.ArrowP1 = P1;
-            this.ArrowP2 = P2;
+            this.ArrowP1Cache = P1;
+            this.ArrowP2Cache = P2;
         };
 
         GSNShape.prototype.SetArrowOpacity = function (Opacity) {
@@ -381,8 +393,8 @@ var AssureNote;
                 return;
             }
             if (ScreenRect) {
-                var R0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP2.X : this.ArrowP1.X;
-                var L0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP1.X : this.ArrowP2.X;
+                var R0 = this.ArrowP1Cache.X < this.ArrowP2Cache.X ? this.ArrowP2Cache.X : this.ArrowP1Cache.X;
+                var L0 = this.ArrowP1Cache.X < this.ArrowP2Cache.X ? this.ArrowP1Cache.X : this.ArrowP2Cache.X;
                 if (R0 < ScreenRect.X || L0 > ScreenRect.X + ScreenRect.Width) {
                     var R1 = P1.X < P2.X ? P2.X : P1.X;
                     var L1 = P1.X < P2.X ? P1.X : P2.X;
@@ -391,24 +403,24 @@ var AssureNote;
                         return;
                     }
                 }
-                if (this.ArrowP2.Y < ScreenRect.Y || this.ArrowP1.Y > ScreenRect.Y + ScreenRect.Height) {
+                if (this.ArrowP2Cache.Y < ScreenRect.Y || this.ArrowP1Cache.Y > ScreenRect.Y + ScreenRect.Height) {
                     this.SetArrowPosition(P1, P2, Dir);
                     return;
                 }
             }
 
-            if (this.ArrowP1 == this.ArrowP2 && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
+            if (this.ArrowP1Cache == this.ArrowP2Cache && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetArrowPosition(P1, P2, Dir);
                 return;
             }
 
-            var P1VX = (P1.X - this.ArrowP1.X) / Duration;
-            var P1VY = (P1.Y - this.ArrowP1.Y) / Duration;
-            var P2VX = (P2.X - this.ArrowP2.X) / Duration;
-            var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
+            var P1VX = (P1.X - this.ArrowP1Cache.X) / Duration;
+            var P1VY = (P1.Y - this.ArrowP1Cache.Y) / Duration;
+            var P2VX = (P2.X - this.ArrowP2Cache.X) / Duration;
+            var P2VY = (P2.Y - this.ArrowP2Cache.Y) / Duration;
 
-            var CurrentP1 = this.ArrowP1.Clone();
-            var CurrentP2 = this.ArrowP2.Clone();
+            var CurrentP1 = this.ArrowP1Cache.Clone();
+            var CurrentP2 = this.ArrowP2Cache.Clone();
 
             AnimationCallbacks.push(function (deltaT) {
                 CurrentP1.X += P1VX * deltaT;
@@ -482,6 +494,8 @@ var AssureNote;
                 this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             }
         };
+        GSNShape.DefaultWidth = 250;
+
         GSNShape.ArrowPathMaster = (function () {
             var Master = AssureNote.AssureNoteUtils.CreateSVGElement("path");
             Master.setAttribute("marker-end", "url(#Triangle-black)");
