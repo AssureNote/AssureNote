@@ -193,6 +193,11 @@ var AssureNoteServer = (function () {
     };
 
     AssureNoteServer.prototype.GetJoinedRoom = function (id) {
+        /*
+        From https://github.com/LearnBoost/socket.io/wiki/Rooms:
+        ` You can get a dictionary of rooms a particular client socket has joined by looking in io.sockets.manager.roomClients[socket.id].
+        ` Again, the room name will have a leading / character, but the name with and without the leading '/' will be in the dictionary, and their values will be true.
+        */
         var room = this.io.sockets.manager.roomClients[id];
         var keys = Object.keys(room);
         console.log(keys);
