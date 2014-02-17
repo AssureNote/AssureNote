@@ -24,21 +24,29 @@ var EditNodeStatus = (function () {
 })();
 exports.EditNodeStatus = EditNodeStatus;
 
-var FocusedInfo = (function () {
-    function FocusedInfo(SID, Label) {
+var FocusedStatus = (function () {
+    function FocusedStatus(SID, Label) {
         this.SID = SID;
         this.Label = Label;
     }
-    return FocusedInfo;
+    return FocusedStatus;
 })();
-exports.FocusedInfo = FocusedInfo;
+exports.FocusedStatus = FocusedStatus;
+
+var RoomStatus = (function () {
+    function RoomStatus(UserStatus, EditNodeStatus, FocusedStatus) {
+        this.UserStatus = UserStatus;
+        this.EditNodeStatus = EditNodeStatus;
+    }
+    return RoomStatus;
+})();
+exports.RoomStatus = RoomStatus;
 
 var AssureNoteServer = (function () {
     function AssureNoteServer() {
         var _this = this;
         this.room = 'room';
-        this.UsersInfo = [];
-        this.EditNodeInfo = [];
+        this.RoomStatus = {};
         this.WGSNName = null;
         this.MasterRecord = null;
         this.io = socketio.listen(3002);
@@ -56,18 +64,21 @@ var AssureNoteServer = (function () {
 
                 console.log('id: ' + socket.id + ' leave');
                 console.log('close');
-                if (_this.EditNodeInfo.length != 0) {
-                    for (var i = 0; i < _this.EditNodeInfo.length; i++) {
-                        if (_this.EditNodeInfo[i].SID == socket.id) {
-                            socket.broadcast.emit('finishedit', { UID: _this.EditNodeInfo[i].UID });
-                            _this.EditNodeInfo.splice(i, 1);
+                var RoomStatus = _this.GetRoomStatus(socket.id);
+                var RoomEditNodeStatus = _this.GetRoomStatus(socket.id).EditNodeStatus;
+                if (RoomEditNodeStatus.length != 0) {
+                    for (var i = 0; i < RoomEditNodeStatus.length; i++) {
+                        if (RoomEditNodeStatus[i].SID == socket.id) {
+                            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('finishedit', { UID: RoomEditNodeStatus[i].UID });
+                            RoomEditNodeStatus.splice(i, 1);
                         }
                     }
                 }
-                socket.broadcast.emit('close', socket.id);
-                for (var i = 0; i < _this.UsersInfo.length; i++) {
-                    if (_this.UsersInfo[i].SID == socket.id) {
-                        _this.UsersInfo.splice(i, 1);
+                socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('close', socket.id);
+                var RoomUserStatus = RoomStatus.UserStatus;
+                for (var i = 0; i < RoomUserStatus.length; i++) {
+                    if (RoomUserStatus[i].SID == socket.id) {
+                        RoomUserStatus.splice(i, 1);
                     }
                 }
             });
@@ -76,7 +87,7 @@ var AssureNoteServer = (function () {
     AssureNoteServer.prototype.EnableListeners = function (socket) {
         var _this = this;
         socket.on('message', function (message) {
-            socket.broadcast.emit('message', message);
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('message', message);
         });
 
         socket.on('update', function (data) {
@@ -90,7 +101,7 @@ var AssureNoteServer = (function () {
                 _this.MasterRecord.Merge(NewRecord);
             }
             data.WGSN = _this.GetLatestWGSN();
-            socket.broadcast.emit('update', data);
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('update', data);
         });
 
         socket.on('adduser', function (data) {
@@ -104,50 +115,54 @@ var AssureNoteServer = (function () {
                 room = _this.room;
             }
             var Info = new UserStatus(data.User, data.Mode, socket.id, room);
-            if (_this.UsersInfo.length != 0) {
-                socket.broadcast.emit('adduser', Info);
-                for (var i = 0; i < _this.UsersInfo.length; i++) {
-                    socket.emit('adduser', _this.UsersInfo[i]);
+            var RoomUserStatus = _this.GetRoomStatus(_this.GetJoinedRoom(socket.id)).UserStatus;
+            if (RoomUserStatus.length != 0) {
+                socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('adduser', Info);
+                for (var i = 0; i < RoomUserStatus.length; i++) {
+                    socket.emit('adduser', RoomUserStatus[i]);
                 }
             }
-            _this.UsersInfo.push(Info);
+            RoomUserStatus.push(Info);
         });
 
         socket.on('focusednode', function (Label) {
-            var FocusInfo = new FocusedInfo(socket.id, Label);
-            socket.broadcast.emit('focusednode', FocusInfo);
+            var FocusInfo = new FocusedStatus(socket.id, Label);
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('focusednode', FocusInfo);
         });
 
         socket.on('updateeditmode', function (data) {
             var Info = new UserStatus(data.User, data.Mode, socket.id, _this.GetJoinedRoom(socket.id));
-            socket.broadcast.emit('updateeditmode', Info);
-            for (var i = 0; i < _this.UsersInfo.length; i++) {
-                if (socket.id == _this.UsersInfo[i].SID) {
-                    _this.UsersInfo[i].Mode = data.Mode;
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('updateeditmode', Info);
+            var RoomUserStatus = _this.GetRoomStatus(_this.GetJoinedRoom(socket.id)).UserStatus;
+            for (var i = 0; i < RoomUserStatus.length; i++) {
+                if (socket.id == RoomUserStatus[i].SID) {
+                    RoomUserStatus[i].Mode = data.Mode;
                 }
             }
         });
 
         socket.on('sync', function (data) {
-            socket.broadcast.emit('sync', data);
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('sync', data);
         });
 
         socket.on('fold', function (data) {
-            socket.broadcast.emit('fold', data);
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('fold', data);
         });
 
         socket.on('startedit', function (data) {
             var datas = new EditNodeStatus(data.UserName, data.UID, data.IsRecursive, socket.id);
-            socket.broadcast.emit('startedit', datas);
-            _this.EditNodeInfo.push(datas);
-            console.log("this is editing list" + _this.EditNodeInfo);
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('startedit', datas);
+            var RoomEditNodeStatus = _this.GetRoomStatus(_this.GetJoinedRoom(socket.id)).EditNodeStatus;
+            RoomEditNodeStatus.push(datas);
+            console.log("this is editing list" + RoomEditNodeStatus);
         });
 
         socket.on('finishedit', function (UID) {
-            socket.broadcast.emit('finishedit', UID);
-            for (var i = 0; i < _this.EditNodeInfo.length; i++) {
-                if (_this.EditNodeInfo[i].UID == UID) {
-                    _this.EditNodeInfo.splice(i, 1);
+            socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('finishedit', UID);
+            var RoomEditNodeStatus = _this.GetRoomStatus(_this.GetJoinedRoom(socket.id)).EditNodeStatus;
+            for (var i = 0; i < RoomEditNodeStatus.length; i++) {
+                if (RoomEditNodeStatus[i].UID == UID) {
+                    RoomEditNodeStatus.splice(i, 1);
                 }
             }
         });
@@ -178,7 +193,22 @@ var AssureNoteServer = (function () {
     };
 
     AssureNoteServer.prototype.GetJoinedRoom = function (id) {
-        return this.io.sockets.manager.roomClients[id];
+        var room = this.io.sockets.manager.roomClients[id];
+        var keys = Object.keys(room);
+        console.log(keys);
+        for (var key in keys) {
+            console.log('key: ' + keys[key]);
+            if (keys[key].indexOf('/') == 0) {
+                return keys[key].substr(1);
+            }
+        }
+    };
+
+    AssureNoteServer.prototype.GetRoomStatus = function (room) {
+        if (this.RoomStatus[room] == null) {
+            this.RoomStatus[room] = new RoomStatus([], [], []);
+        }
+        return this.RoomStatus[room];
     };
     return AssureNoteServer;
 })();
