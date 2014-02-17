@@ -58,7 +58,8 @@ var AssureNote;
                             _this.DummyDiv.appendChild(Shape.Content);
                         }
                         Shape.GetNodeWidth();
-                        Shape.FitSizeToContent();
+                        Shape.GetHeadHeight();
+                        _this.DummyDiv.removeChild(Shape.Content);
                     }
                 }
             }, 20);
@@ -68,7 +69,7 @@ var AssureNote;
                 if (_this.Queue.length) {
                     console.log("size prefetch: " + _this.Queue.length + " nodes left");
                 }
-            }, 500);
+            }, 1000);
         }
         GSNShapeSizePreFetcher.prototype.AddShape = function (Shape) {
             this.Queue.push(Shape);

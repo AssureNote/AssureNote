@@ -55,7 +55,8 @@ module AssureNote {
                             this.DummyDiv.appendChild(Shape.Content);
                         }
                         Shape.GetNodeWidth();
-                        Shape.FitSizeToContent();
+                        Shape.GetHeadHeight();
+                        this.DummyDiv.removeChild(Shape.Content);
                     }
                 }
             }, 20);
@@ -65,7 +66,7 @@ module AssureNote {
                 if (this.Queue.length) {
                     console.log("size prefetch: " + this.Queue.length + " nodes left");
                 }
-            }, 500);
+            }, 1000);
         }
 
         AddShape(Shape: GSNShape) {
