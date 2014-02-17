@@ -42,6 +42,8 @@ module AssureNote {
         LayoutEngine: LayoutEngine;
         SVGLayerBox: SVGSVGElement;
         SVGLayer: SVGGElement;
+        SVGLayerConnector: SVGGElement;
+        SVGLayerNode: SVGGElement;
         EventMapLayer: HTMLDivElement;
         ContentLayer: HTMLDivElement;
         ControlLayer: HTMLDivElement;
@@ -63,6 +65,10 @@ module AssureNote {
             super(App);
             this.SVGLayerBox = <SVGSVGElement>(<Element>document.getElementById("svglayer-box"));
             this.SVGLayer = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerConnector = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerNode = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.appendChild(this.SVGLayerConnector);
+            this.SVGLayer.appendChild(this.SVGLayerNode);
             this.SVGLayer.id = "svg-layer";
             this.SVGLayer.setAttribute("transform", "translate(0,0)");
             this.SVGLayerBox.appendChild(this.SVGLayer);

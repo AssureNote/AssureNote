@@ -45,6 +45,15 @@ module AssureNote {
             this.DummyDiv.style.top = "1000%";
             document.body.appendChild(this.DummyDiv);
 
+            //for debug
+            setInterval(() => {
+                if (this.Queue.length) {
+                    console.log("size prefetch: " + this.Queue.length + " nodes left");
+                }
+            }, 1000);
+        }
+
+        private Start() {
             this.TimerHandle = setInterval(() => {
                 var StartTime = AssureNoteUtils.GetTime();
                 while (this.Queue.length > 0 && AssureNoteUtils.GetTime() - StartTime < 16) {
@@ -59,18 +68,18 @@ module AssureNote {
                         this.DummyDiv.removeChild(Shape.Content);
                     }
                 }
-            }, 20);
-
-            //for debug
-            setInterval(() => {
-                if (this.Queue.length) {
-                    console.log("size prefetch: " + this.Queue.length + " nodes left");
+                if (this.Queue.length == 0) {
+                    clearInterval(this.TimerHandle);
+                    this.TimerHandle = 0;
                 }
-            }, 1000);
+            }, 20);
         }
 
         AddShape(Shape: GSNShape) {
             this.Queue.push(Shape);
+            if (!this.TimerHandle) {
+                this.Start();
+            }
         }
 
     }

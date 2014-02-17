@@ -319,6 +319,35 @@ var AssureNote;
         }
         AssureNoteUtils.isValidURL = isValidURL;
         ;
+
+        function GenerateStyleSetter(OriginalName) {
+            var CameledName = OriginalName.substring(0, 1).toUpperCase() + OriginalName.substring(1);
+            if (UserAgant.IsTrident()) {
+                CameledName = "ms" + CameledName;
+                return function (Element, Value) {
+                    Element.style[CameledName] = Value;
+                };
+            }
+            if (UserAgant.IsGecko()) {
+                CameledName = "Moz" + CameledName;
+                return function (Element, Value) {
+                    Element.style[CameledName] = Value;
+                };
+            }
+            if (UserAgant.IsWebkit() || UserAgant.IsBlink()) {
+                CameledName = "webkit" + CameledName;
+                return function (Element, Value) {
+                    Element.style[CameledName] = Value;
+                };
+            }
+            return function (Element, Value) {
+                Element.style[OriginalName] = Value;
+            };
+        }
+
+        AssureNoteUtils.SetTransformOriginToElement = GenerateStyleSetter("transformOrigin");
+
+        AssureNoteUtils.SetTransformToElement = GenerateStyleSetter("transform");
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

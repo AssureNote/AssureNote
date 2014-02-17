@@ -48,6 +48,15 @@ var AssureNote;
             this.DummyDiv.style.top = "1000%";
             document.body.appendChild(this.DummyDiv);
 
+            //for debug
+            setInterval(function () {
+                if (_this.Queue.length) {
+                    console.log("size prefetch: " + _this.Queue.length + " nodes left");
+                }
+            }, 1000);
+        }
+        GSNShapeSizePreFetcher.prototype.Start = function () {
+            var _this = this;
             this.TimerHandle = setInterval(function () {
                 var StartTime = AssureNote.AssureNoteUtils.GetTime();
                 while (_this.Queue.length > 0 && AssureNote.AssureNoteUtils.GetTime() - StartTime < 16) {
@@ -62,17 +71,18 @@ var AssureNote;
                         _this.DummyDiv.removeChild(Shape.Content);
                     }
                 }
-            }, 20);
-
-            //for debug
-            setInterval(function () {
-                if (_this.Queue.length) {
-                    console.log("size prefetch: " + _this.Queue.length + " nodes left");
+                if (_this.Queue.length == 0) {
+                    clearInterval(_this.TimerHandle);
+                    _this.TimerHandle = 0;
                 }
-            }, 1000);
-        }
+            }, 20);
+        };
+
         GSNShapeSizePreFetcher.prototype.AddShape = function (Shape) {
             this.Queue.push(Shape);
+            if (!this.TimerHandle) {
+                this.Start();
+            }
         };
         return GSNShapeSizePreFetcher;
     })();

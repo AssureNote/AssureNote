@@ -222,34 +222,17 @@ module AssureNote {
         public OnScroll: (Viewport: ViewportManager) => void;
         public CameraLimitRect: Rect;
 
-        private SetTransformOriginToElement(Element: HTMLElement, Value: string) {
-            Element.style["transformOrigin"] = Value;
-            Element.style["MozTransformOrigin"] = Value;
-            Element.style["msTransformOrigin"] = Value;
-            Element.style["webkitTransformOrigin"] = Value;
-        }
-
-        private SetTransformToElement(Element: HTMLElement, Value: string) {
-            Element.style["transform"] = Value;
-            Element.style["MozTransform"] = Value;
-            Element.style["msTransform"] = Value;
-            Element.style["webkitTransform"] = Value;
-        }
-
         constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
             window.addEventListener("resize", (e) => { this.UpdatePageRect(); });
             this.UpdatePageRect();
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
-            this.SetTransformOriginToElement(this.ContentLayer, "left top");
-            this.SetTransformOriginToElement(this.ControlLayer, "left top");
+            AssureNoteUtils.SetTransformOriginToElement(this.ContentLayer, "left top");
+            AssureNoteUtils.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
             var OnPointer = (e: PointerEvent) => { if (this.IsPointerEnabled) { this.ScrollManager.OnPointerEvent(e, this); } };
-            this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerout", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerleave", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointercancel", OnPointer, false);
+            ["down", "move", "up", "out", "leave", "cancel"].forEach((Name) => {
+                this.EventMapLayer.addEventListener("pointer" + Name, OnPointer, false);
+            });
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
             $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { if (this.IsPointerEnabled) { this.ScrollManager.OnMouseWheel(e, this); } });
@@ -526,30 +509,22 @@ module AssureNote {
             this.IsEventMapUpper = IsUpper;
         }
 
-        private static translateA(x: number, y: number): string {
-            return "translate(" + x + " " + y + ") ";
+        private static CreateTranformAttr(x: number, y: number, scale: number): string {
+            return "translate(" + x + " " + y + ") scale(" + scale + ")";
         }
 
-        private static scaleA(scale: number): string {
-            return "scale(" + scale + ") ";
-        }
-
-        private static translateS(x: number, y: number): string {
-            return "translate(" + x + "px, " + y + "px) ";
-        }
-
-        private static scaleS(scale: number): string {
-            return "scale(" + scale + ") ";
+        private static CreateTransformStyle(x: number, y: number, scale: number): string {
+            return "translate(" + x + "px, " + y + "px) scale(" + scale + ") ";
         }
 
         private UpdateAttr(): void {
             var OffsetPageX = this.GetOffsetPageX();
             var OffsetPageY = this.GetOffsetPageY();
-            var attr: string = ViewportManager.translateA(OffsetPageX, OffsetPageY) + ViewportManager.scaleA(this.Scale);
-            var style: string = ViewportManager.translateS(OffsetPageX, OffsetPageY) + ViewportManager.scaleS(this.Scale);
+            var attr: string = ViewportManager.CreateTranformAttr(OffsetPageX, OffsetPageY, this.Scale);
+            var style: string = ViewportManager.CreateTransformStyle(OffsetPageX, OffsetPageY, this.Scale);
             this.SVGLayer.setAttribute("transform", attr);
-            this.SetTransformToElement(this.ContentLayer, style);
-            this.SetTransformToElement(this.ControlLayer, style);
+            AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
+            AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
 
             if (this.OnScroll) {
                 this.OnScroll(this);

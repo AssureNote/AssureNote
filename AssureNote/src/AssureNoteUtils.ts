@@ -353,6 +353,28 @@ module AssureNote {
                 return false;
             }
         };
+
+        function GenerateStyleSetter(OriginalName: string): (Element: HTMLElement, Value: string) => void {
+            var CameledName = OriginalName.substring(0, 1).toUpperCase() + OriginalName.substring(1);
+            if (UserAgant.IsTrident()) {
+                CameledName = "ms" + CameledName;
+                return (Element: HTMLElement, Value: string) => { Element.style[CameledName] = Value; }
+            }
+            if (UserAgant.IsGecko()) {
+                CameledName = "Moz" + CameledName;
+                return (Element: HTMLElement, Value: string) => { Element.style[CameledName] = Value; }
+            }
+            if (UserAgant.IsWebkit() || UserAgant.IsBlink()) {
+                CameledName = "webkit" + CameledName;
+                return (Element: HTMLElement, Value: string) => { Element.style[CameledName] = Value; }
+            }
+            return (Element: HTMLElement, Value: string) => { Element.style[OriginalName] = Value; }
+        }
+
+        export var SetTransformOriginToElement: (Element: HTMLElement, Value: string) => void = GenerateStyleSetter("transformOrigin");
+
+        export var SetTransformToElement: (Element: HTMLElement, Value: string) => void = GenerateStyleSetter("transform");
+
     }
 
     export class AnimationFrameTask {

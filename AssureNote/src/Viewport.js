@@ -227,20 +227,17 @@ var AssureNote;
             });
             this.UpdatePageRect();
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
-            this.SetTransformOriginToElement(this.ContentLayer, "left top");
-            this.SetTransformOriginToElement(this.ControlLayer, "left top");
+            AssureNote.AssureNoteUtils.SetTransformOriginToElement(this.ContentLayer, "left top");
+            AssureNote.AssureNoteUtils.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
             var OnPointer = function (e) {
                 if (_this.IsPointerEnabled) {
                     _this.ScrollManager.OnPointerEvent(e, _this);
                 }
             };
-            this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerout", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerleave", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointercancel", OnPointer, false);
+            ["down", "move", "up", "out", "leave", "cancel"].forEach(function (Name) {
+                _this.EventMapLayer.addEventListener("pointer" + Name, OnPointer, false);
+            });
 
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
@@ -250,20 +247,6 @@ var AssureNote;
                 }
             });
         }
-        ViewportManager.prototype.SetTransformOriginToElement = function (Element, Value) {
-            Element.style["transformOrigin"] = Value;
-            Element.style["MozTransformOrigin"] = Value;
-            Element.style["msTransformOrigin"] = Value;
-            Element.style["webkitTransformOrigin"] = Value;
-        };
-
-        ViewportManager.prototype.SetTransformToElement = function (Element, Value) {
-            Element.style["transform"] = Value;
-            Element.style["MozTransform"] = Value;
-            Element.style["msTransform"] = Value;
-            Element.style["webkitTransform"] = Value;
-        };
-
         /**
         @method GetCameraScale
         @return {number} Scale of camera. 1.0 for 100%.
@@ -539,30 +522,22 @@ var AssureNote;
             this.IsEventMapUpper = IsUpper;
         };
 
-        ViewportManager.translateA = function (x, y) {
-            return "translate(" + x + " " + y + ") ";
+        ViewportManager.CreateTranformAttr = function (x, y, scale) {
+            return "translate(" + x + " " + y + ") scale(" + scale + ")";
         };
 
-        ViewportManager.scaleA = function (scale) {
-            return "scale(" + scale + ") ";
-        };
-
-        ViewportManager.translateS = function (x, y) {
-            return "translate(" + x + "px, " + y + "px) ";
-        };
-
-        ViewportManager.scaleS = function (scale) {
-            return "scale(" + scale + ") ";
+        ViewportManager.CreateTransformStyle = function (x, y, scale) {
+            return "translate(" + x + "px, " + y + "px) scale(" + scale + ") ";
         };
 
         ViewportManager.prototype.UpdateAttr = function () {
             var OffsetPageX = this.GetOffsetPageX();
             var OffsetPageY = this.GetOffsetPageY();
-            var attr = ViewportManager.translateA(OffsetPageX, OffsetPageY) + ViewportManager.scaleA(this.Scale);
-            var style = ViewportManager.translateS(OffsetPageX, OffsetPageY) + ViewportManager.scaleS(this.Scale);
+            var attr = ViewportManager.CreateTranformAttr(OffsetPageX, OffsetPageY, this.Scale);
+            var style = ViewportManager.CreateTransformStyle(OffsetPageX, OffsetPageY, this.Scale);
             this.SVGLayer.setAttribute("transform", attr);
-            this.SetTransformToElement(this.ContentLayer, style);
-            this.SetTransformToElement(this.ControlLayer, style);
+            AssureNote.AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
+            AssureNote.AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
 
             if (this.OnScroll) {
                 this.OnScroll(this);
