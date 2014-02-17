@@ -538,7 +538,6 @@ var AssureNote;
             this.SVGLayer.setAttribute("transform", attr);
             AssureNote.AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
             AssureNote.AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
-
             if (this.OnScroll) {
                 this.OnScroll(this);
             }

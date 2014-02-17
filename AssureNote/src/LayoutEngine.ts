@@ -69,8 +69,8 @@ module AssureNote {
             console.log("Render: " + (t1 - t0));
 
             PictgramPanel.ContentLayer.appendChild(DivFragment);
-            PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
-            PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
+            PictgramPanel.SVGLayerConnectorGroup.appendChild(SvgConnectionFragment);
+            PictgramPanel.SVGLayerNodeGroup.appendChild(SvgNodeFragment);
             this.PrepareNodeSize(NodeView);
             Dummy.appendChild(DivFragment);
             Dummy.appendChild(SvgConnectionFragment);

@@ -42,11 +42,12 @@ module AssureNote {
         LayoutEngine: LayoutEngine;
         SVGLayerBox: SVGSVGElement;
         SVGLayer: SVGGElement;
-        SVGLayerConnector: SVGGElement;
-        SVGLayerNode: SVGGElement;
+        SVGLayerConnectorGroup: SVGGElement;
+        SVGLayerNodeGroup: SVGGElement;
         EventMapLayer: HTMLDivElement;
         ContentLayer: HTMLDivElement;
         ControlLayer: HTMLDivElement;
+        HiddenNodeBuffer: DocumentFragment;
         Viewport: ViewportManager;
         ViewMap: { [index: string]: NodeView };
         MasterView: NodeView;
@@ -65,13 +66,14 @@ module AssureNote {
             super(App);
             this.SVGLayerBox = <SVGSVGElement>(<Element>document.getElementById("svglayer-box"));
             this.SVGLayer = AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayerConnector = AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayerNode = AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayer.appendChild(this.SVGLayerConnector);
-            this.SVGLayer.appendChild(this.SVGLayerNode);
+            this.SVGLayerConnectorGroup = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerNodeGroup = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
             this.SVGLayer.id = "svg-layer";
             this.SVGLayer.setAttribute("transform", "translate(0,0)");
             this.SVGLayerBox.appendChild(this.SVGLayer);
+            this.HiddenNodeBuffer = document.createDocumentFragment();
             this.EventMapLayer = <HTMLDivElement>(document.getElementById("eventmap-layer"));
             this.ContentLayer = <HTMLDivElement>(document.getElementById("content-layer"));
             this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
@@ -219,6 +221,9 @@ module AssureNote {
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").hide(100);
             };
+        }
+
+        OnViewportChanged() {
 
         }
 
@@ -524,12 +529,12 @@ module AssureNote {
         private Clear(): void {
             document.getElementById("assure-note").style.display = "none";
             this.ContentLayer.innerHTML = "";
-            this.SVGLayerBox.removeChild(this.SVGLayer);
-            var Transfrom = this.SVGLayer.getAttribute("transform");
-            this.SVGLayer = AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayer.setAttribute("transform", Transfrom);
-            this.SVGLayer.id = "svg-layer";
-            this.SVGLayerBox.appendChild(this.SVGLayer);
+            this.SVGLayer.removeChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.removeChild(this.SVGLayerNodeGroup);
+            this.SVGLayerConnectorGroup = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerNodeGroup = AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
             this.Viewport.SVGLayer = this.SVGLayer;
             document.getElementById("assure-note").style.display = "";
         }

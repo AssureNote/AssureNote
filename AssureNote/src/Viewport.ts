@@ -525,7 +525,6 @@ module AssureNote {
             this.SVGLayer.setAttribute("transform", attr);
             AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
             AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
-
             if (this.OnScroll) {
                 this.OnScroll(this);
             }

@@ -51,13 +51,14 @@ var AssureNote;
             this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
             this.SVGLayerBox = document.getElementById("svglayer-box");
             this.SVGLayer = AssureNote.AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayerConnector = AssureNote.AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayerNode = AssureNote.AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayer.appendChild(this.SVGLayerConnector);
-            this.SVGLayer.appendChild(this.SVGLayerNode);
+            this.SVGLayerConnectorGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerNodeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
             this.SVGLayer.id = "svg-layer";
             this.SVGLayer.setAttribute("transform", "translate(0,0)");
             this.SVGLayerBox.appendChild(this.SVGLayer);
+            this.HiddenNodeBuffer = document.createDocumentFragment();
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
             this.ControlLayer = (document.getElementById("control-layer"));
@@ -205,6 +206,9 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
+        PictgramPanel.prototype.OnViewportChanged = function () {
+        };
+
         PictgramPanel.prototype.OnKeyDown = function (Event) {
             var Label;
             var handled = true;
@@ -501,12 +505,12 @@ var AssureNote;
         PictgramPanel.prototype.Clear = function () {
             document.getElementById("assure-note").style.display = "none";
             this.ContentLayer.innerHTML = "";
-            this.SVGLayerBox.removeChild(this.SVGLayer);
-            var Transfrom = this.SVGLayer.getAttribute("transform");
-            this.SVGLayer = AssureNote.AssureNoteUtils.CreateSVGElement("g");
-            this.SVGLayer.setAttribute("transform", Transfrom);
-            this.SVGLayer.id = "svg-layer";
-            this.SVGLayerBox.appendChild(this.SVGLayer);
+            this.SVGLayer.removeChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.removeChild(this.SVGLayerNodeGroup);
+            this.SVGLayerConnectorGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerNodeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
             this.Viewport.SVGLayer = this.SVGLayer;
             document.getElementById("assure-note").style.display = "";
         };
