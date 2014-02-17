@@ -5,22 +5,25 @@ import socketio = require('socket.io');
 import parser = require('./AssureNoteParser');
 
 export class UserStatus {
-    constructor (public User: string, public Mode: number, public SID: string) { }
+    constructor (public User: string, public Mode: number, public SID: string, Room: string) { }
 }
 
 export class EditNodeStatus {
     constructor (public UserName: string, public UID: number, public IsRecursive: boolean, public SID: string) { }
 }
 
-export class FocusedInfo {
+export class FocusedStatus {
     constructor (public SID: string, public Label: string) { }
+}
+
+export class RoomStatus {
+    constructor(public UserStatus: UserStatus[], public EditNodeStatus: EditNodeStatus[], FocusedStatus: FocusedStatus[]) { }
 }
 
 class AssureNoteServer {
     io: SocketManager;
     room: string = 'room';
-    UsersInfo: UserStatus[] = [];
-    EditNodeInfo: EditNodeStatus[] = [];
+    RoomInfo: { [room: string]: RoomStatus };
     WGSNName: string = null;
     MasterRecord: parser.GSNRecord = null;
 
@@ -28,7 +31,6 @@ class AssureNoteServer {
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', (socket: Socket) => {
             this.EnableListeners(socket);
-            socket.join(this.room, null);
             console.log('id: ' + socket.id + ' connected');
             socket.emit('init', {
                 id   : socket.id,
@@ -41,11 +43,12 @@ class AssureNoteServer {
 
                 console.log('id: ' + socket.id + ' leave');
                 console.log('close');
-                if (this.EditNodeInfo.length != 0) {
-                    for (var i:number = 0; i < this.EditNodeInfo.length; i++) {
-                        if (this.EditNodeInfo[i].SID == socket.id) {
-                            socket.broadcast.emit('finishedit', {UID:this.EditNodeInfo[i].UID});
-                            this.EditNodeInfo.splice(i, 1);
+                var RoomEditNodeInfo = this.GetRoomEditNodeStatus(socket.id);
+                if (RoomEditNodeInfo.length != 0) {
+                    for (var i:number = 0; i < RoomEditNodeInfo.length; i++) {
+                        if (RoomEditNodeInfo[i].SID == socket.id) {
+                            socket.broadcast.emit('finishedit', {UID:RoomEditNodeInfo[i].UID});
+                            RoomEditNodeInfo.splice(i, 1);
                         }
                     }
                 }
@@ -77,8 +80,17 @@ class AssureNoteServer {
             socket.broadcast.emit('update', data);
         });
 
-        socket.on('adduser', (data: {User: string; Mode: number}) => {
-            var Info: UserStatus = new UserStatus(data.User, data.Mode, socket.id);
+        socket.on('adduser', (data: {User: string; Mode: number; Room: string}) => {
+            console.log(data);
+            var room: string = null;
+            if (data.Room != null) {
+                socket.join(data.Room, null);
+                room = data.Room;
+            } else {
+                socket.join(this.room, null);
+                room = this.room;
+            }
+            var Info: UserStatus = new UserStatus(data.User, data.Mode, socket.id, room);
             if (this.UsersInfo.length != 0) {
                 socket.broadcast.emit('adduser', Info);
                 for (var i:number = 0; i< this.UsersInfo.length; i++) {
@@ -89,12 +101,12 @@ class AssureNoteServer {
         });
 
         socket.on('focusednode', (Label: string) => {
-            var FocusInfo: FocusedInfo = new FocusedInfo(socket.id, Label);
+            var FocusInfo: FocusedStatus = new FocusedStatus(socket.id, Label);
             socket.broadcast.emit('focusednode', FocusInfo);
         });
 
         socket.on('updateeditmode', (data: {User: string; Mode: number}) => {
-            var Info: UserStatus = new UserStatus(data.User, data.Mode, socket.id);
+            var Info: UserStatus = new UserStatus(data.User, data.Mode, socket.id, this.GetJoinedRoom(socket.id));
             socket.broadcast.emit('updateeditmode', Info);
             for (var i: number = 0; i < this.UsersInfo.length; i++) {
                 if (socket.id == this.UsersInfo[i].SID) {
@@ -150,6 +162,16 @@ class AssureNoteServer {
         var GSNNode: parser.GSNNode      = Parser.ParseNode(Reader);
         return GSNNode;
     }
+
+    GetJoinedRoom(id: string): string{
+        return (<any>this.io.sockets).manager.roomClients[id];
+    }
+
+    GetRoomEditNodeStatus(id: string): EditNodeStatus[] {
+        return this.RoomInfo[this.GetJoinedRoom(id)].EditNodeStatus;
+    }
+
+    GetRoomU
 }
 
 new AssureNoteServer();

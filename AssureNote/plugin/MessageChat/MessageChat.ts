@@ -55,18 +55,29 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>connect [uri]</code><br>Connect to the chat server."
+            return "<code>connect [room?] [uri?]</code><br>Connect to the chat server."
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            console.log(Params);
-            if (Params.length > 1) {
+            if (Params.length > 2) {
                 this.App.DebugP('Invalid parameter: ' + Params);
                 return;
             }
+            var room: string = null;
+            var url: string = null;
+            if (Params.length == 2) {
+                room = Params[0];
+                url = Params[1];
+            } else if (Params.length == 1) {
+                if (AssureNoteUtils.isValidURL(Params[0])) {
+                    url = Params[0];
+                } else {
+                    room = Params[0];
+                }
+            }
             this.App.ModeManager.SetMode(AssureNoteMode.View);
             if (this.App.SocketManager.IsOperational()) {
-                this.App.SocketManager.Connect(Params[0]);
+                this.App.SocketManager.Connect(room, url);
             }
         }
 

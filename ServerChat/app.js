@@ -4,7 +4,7 @@ var socketio = require('socket.io');
 var parser = require('./AssureNoteParser');
 
 var UserStatus = (function () {
-    function UserStatus(User, Mode, SID) {
+    function UserStatus(User, Mode, SID, Room) {
         this.User = User;
         this.Mode = Mode;
         this.SID = SID;
@@ -44,7 +44,6 @@ var AssureNoteServer = (function () {
         this.io = socketio.listen(3002);
         this.io.sockets.on('connection', function (socket) {
             _this.EnableListeners(socket);
-            socket.join(_this.room, null);
             console.log('id: ' + socket.id + ' connected');
             socket.emit('init', {
                 id: socket.id,
@@ -95,7 +94,16 @@ var AssureNoteServer = (function () {
         });
 
         socket.on('adduser', function (data) {
-            var Info = new UserStatus(data.User, data.Mode, socket.id);
+            console.log(data);
+            var room = null;
+            if (data.Room != null) {
+                socket.join(data.Room, null);
+                room = data.Room;
+            } else {
+                socket.join(_this.room, null);
+                room = _this.room;
+            }
+            var Info = new UserStatus(data.User, data.Mode, socket.id, room);
             if (_this.UsersInfo.length != 0) {
                 socket.broadcast.emit('adduser', Info);
                 for (var i = 0; i < _this.UsersInfo.length; i++) {
@@ -111,7 +119,7 @@ var AssureNoteServer = (function () {
         });
 
         socket.on('updateeditmode', function (data) {
-            var Info = new UserStatus(data.User, data.Mode, socket.id);
+            var Info = new UserStatus(data.User, data.Mode, socket.id, _this.GetJoinedRoom(socket.id));
             socket.broadcast.emit('updateeditmode', Info);
             for (var i = 0; i < _this.UsersInfo.length; i++) {
                 if (socket.id == _this.UsersInfo[i].SID) {
@@ -167,6 +175,10 @@ var AssureNoteServer = (function () {
         var Parser = new parser.ParserContext(null);
         var GSNNode = Parser.ParseNode(Reader);
         return GSNNode;
+    };
+
+    AssureNoteServer.prototype.GetJoinedRoom = function (id) {
+        return this.io.sockets.manager.roomClients[id];
     };
     return AssureNoteServer;
 })();
