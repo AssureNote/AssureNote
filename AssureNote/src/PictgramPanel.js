@@ -47,6 +47,8 @@ var AssureNote;
             var _this = this;
             _super.call(this, App);
             this.App = App;
+            this.OnScreenNodeMap = {};
+            this.HiddenNodeMap = {};
             // We do not use FocusedView but FocusedLabel to make it modular.
             this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
             this.SVGLayerBox = document.getElementById("svglayer-box");
@@ -64,6 +66,10 @@ var AssureNote;
             this.ControlLayer = (document.getElementById("control-layer"));
             this.Viewport = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.App);
+
+            this.Viewport.OnScroll2 = function (Viewport) {
+                _this.UpdateHiddenNodeList();
+            };
 
             this.ContextMenu = new AssureNote.NodeMenu(App);
             this.NodeTooltip = new AssureNote.Tooltip(App);
@@ -438,6 +444,7 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
+            var _this = this;
             var t0 = AssureNote.AssureNoteUtils.GetTime();
             this.Clear();
             var t1 = AssureNote.AssureNoteUtils.GetTime();
@@ -496,10 +503,63 @@ var AssureNote;
             var Shape = TargetView.GetShape();
             this.Viewport.CameraLimitRect = new AssureNote.Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
 
+            var PageRect = this.Viewport.GetPageRectInGxGy();
+            this.MasterView.TraverseVisibleNode(function (Node) {
+                if (Node.IsInRect(PageRect)) {
+                    _this.OnScreenNodeMap[Node.Label] = Node;
+                } else {
+                    _this.HiddenNodeMap[Node.Label] = Node;
+                    _this.HiddenNodeBuffer.appendChild(Node.Shape.Content);
+                    _this.HiddenNodeBuffer.appendChild(Node.Shape.ShapeGroup);
+                }
+            });
+
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
+        };
+
+        PictgramPanel.prototype.UpdateHiddenNodeList = function () {
+            var _this = this;
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
+            var PageRect = this.Viewport.GetPageRectInGxGy();
+            var UpdateArrow = function (Node) {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Node.IsConnectorInRect(PageRect)) {
+                        if (Arrow.parentNode != _this.SVGLayerConnectorGroup) {
+                            _this.SVGLayerConnectorGroup.appendChild(Arrow);
+                        }
+                    } else {
+                        if (Arrow.parentNode != _this.HiddenNodeBuffer) {
+                            _this.HiddenNodeBuffer.appendChild(Arrow);
+                        }
+                    }
+                }
+            };
+            for (var Label in this.OnScreenNodeMap) {
+                var Node = this.OnScreenNodeMap[Label];
+                if (!Node.IsInRect(PageRect)) {
+                    delete this.OnScreenNodeMap[Label];
+                    this.HiddenNodeMap[Label] = Node;
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.Content);
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.ShapeGroup);
+                }
+                UpdateArrow(Node);
+            }
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[Label];
+                if (Node.IsInRect(PageRect)) {
+                    delete this.HiddenNodeMap[Label];
+                    this.OnScreenNodeMap[Label] = Node;
+                    this.ContentLayer.appendChild(Node.Shape.Content);
+                    this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                }
+                UpdateArrow(Node);
+            }
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
+            //console.log("Visible:Hidden = " + Object.keys(this.OnScreenNodeMap).length + ":" + Object.keys(this.HiddenNodeMap).length);
         };
 
         PictgramPanel.prototype.Clear = function () {
@@ -512,6 +572,9 @@ var AssureNote;
             this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
             this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
             this.Viewport.SVGLayer = this.SVGLayer;
+            this.HiddenNodeMap = {};
+            this.OnScreenNodeMap = {};
+            this.HiddenNodeBuffer = document.createDocumentFragment();
             document.getElementById("assure-note").style.display = "";
         };
 

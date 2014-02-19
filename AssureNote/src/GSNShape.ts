@@ -393,6 +393,14 @@ module AssureNote {
         private ArrowP1Cache: Point;
         private ArrowP2Cache: Point;
 
+        GetArrowP1Cache(): Point {
+            return this.ArrowP1Cache;
+        }
+
+        GetArrowP2Cache(): Point {
+            return this.ArrowP2Cache;
+        }
+
         SetArrowPosition(P1: Point, P2: Point, Dir: Direction) {
             var start = this.ArrowStart;
             var curve = this.ArrowCurve;

@@ -367,6 +367,14 @@ var AssureNote;
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
         };
 
+        GSNShape.prototype.GetArrowP1Cache = function () {
+            return this.ArrowP1Cache;
+        };
+
+        GSNShape.prototype.GetArrowP2Cache = function () {
+            return this.ArrowP2Cache;
+        };
+
         GSNShape.prototype.SetArrowPosition = function (P1, P2, Dir) {
             var start = this.ArrowStart;
             var curve = this.ArrowCurve;

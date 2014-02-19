@@ -56,6 +56,9 @@ module AssureNote {
         ContextMenu: NodeMenu;
         NodeTooltip: Tooltip;
 
+        OnScreenNodeMap: { [index: string]: NodeView } = {};
+        HiddenNodeMap: { [index: string]: NodeView } = {};
+
         CurrentDoc: GSNDoc;// Convert to caseview
         private FocusedLabel: string;// A label pointed out or clicked.
         // We do not use FocusedView but FocusedLabel to make it modular.
@@ -79,6 +82,10 @@ module AssureNote {
             this.ControlLayer = <HTMLDivElement>(document.getElementById("control-layer"));
             this.Viewport = new ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new SimpleLayoutEngine(this.App);
+
+            this.Viewport.OnScroll2 = (Viewport: ViewportManager) => {
+                this.UpdateHiddenNodeList();
+            };
 
             this.ContextMenu = new NodeMenu(App);
             this.NodeTooltip = new AssureNote.Tooltip(App);
@@ -518,12 +525,64 @@ module AssureNote {
             var Shape = TargetView.GetShape();
             this.Viewport.CameraLimitRect = new Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
 
+            var PageRect = this.Viewport.GetPageRectInGxGy();
+            this.MasterView.TraverseVisibleNode((Node: NodeView) => {
+                if (Node.IsInRect(PageRect)) {
+                    this.OnScreenNodeMap[Node.Label] = Node;
+                } else {
+                    this.HiddenNodeMap[Node.Label] = Node;
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.Content);
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.ShapeGroup);
+                }
+            });
+
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
                 GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
                 GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
+        }
+
+        private UpdateHiddenNodeList() {
+            NodeView.SetGlobalPositionCacheEnabled(true);
+            var PageRect = this.Viewport.GetPageRectInGxGy();
+            var UpdateArrow = (Node: NodeView) => {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Node.IsConnectorInRect(PageRect)) {
+                        if (Arrow.parentNode != this.SVGLayerConnectorGroup) {
+                            this.SVGLayerConnectorGroup.appendChild(Arrow);
+                        }
+                    } else {
+                        if (Arrow.parentNode != this.HiddenNodeBuffer) {
+                            this.HiddenNodeBuffer.appendChild(Arrow);
+                        }
+                    }
+                }
+            };
+            for (var Label in this.OnScreenNodeMap) {
+                var Node = this.OnScreenNodeMap[<string>Label];
+                if (!Node.IsInRect(PageRect)) {
+                    delete this.OnScreenNodeMap[<string>Label];
+                    this.HiddenNodeMap[<string>Label] = Node;
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.Content);
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.ShapeGroup);
+                }
+                UpdateArrow(Node);
+            }
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[<string>Label];
+                if (Node.IsInRect(PageRect)) {
+                    delete this.HiddenNodeMap[<string>Label];
+                    this.OnScreenNodeMap[<string>Label] = Node;
+                    this.ContentLayer.appendChild(Node.Shape.Content);
+                    this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                }
+                UpdateArrow(Node);
+            }
+            NodeView.SetGlobalPositionCacheEnabled(false);
+            //console.log("Visible:Hidden = " + Object.keys(this.OnScreenNodeMap).length + ":" + Object.keys(this.HiddenNodeMap).length);
         }
 
         private Clear(): void {
@@ -536,6 +595,9 @@ module AssureNote {
             this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
             this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
             this.Viewport.SVGLayer = this.SVGLayer;
+            this.HiddenNodeMap = {};
+            this.OnScreenNodeMap = {};
+            this.HiddenNodeBuffer = document.createDocumentFragment();
             document.getElementById("assure-note").style.display = "";
         }
 

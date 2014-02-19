@@ -285,6 +285,7 @@ var AssureNote;
                     var P2 = SubNode.GetConnectorPosition(ArrowToDirection, SubNode.GetGlobalPosition());
                     UpdateSubNode(SubNode);
                     SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, ArrowDirections[i], Duration, ScreenRect);
+                    SubNode.ParentDirection = AssureNote.ReverseDirection(ArrowDirections[i]);
                 });
             }
         };
@@ -387,6 +388,52 @@ var AssureNote;
 
         NodeView.prototype.RemoveColorStyle = function (ColorStyle) {
             this.Shape.RemoveColorStyle(ColorStyle);
+        };
+
+        NodeView.prototype.IsInRect = function (Target) {
+            // While animation playing, cached position(visible position) != this.position(logical position)
+            var GXC = this.Shape.GetGXCache();
+            var GYC = this.Shape.GetGYCache();
+            var Pos;
+            if (GXC != null && GYC != null) {
+                Pos = new AssureNote.Point(GXC, GYC);
+            } else {
+                Pos = this.GetGlobalPosition();
+            }
+            if (Pos.X > Target.X + Target.Width || Pos.Y > Target.Y + Target.Height) {
+                return false;
+            }
+            Pos.X += this.Shape.GetNodeWidth();
+            Pos.Y += this.Shape.GetNodeHeight();
+            if (Pos.X < Target.X || Pos.Y < Target.Y) {
+                return false;
+            }
+            return true;
+        };
+
+        NodeView.prototype.IsConnectorInRect = function (Target) {
+            if (!this.Parent) {
+                return false;
+            }
+            var PA;
+            var PB;
+            if (this.Shape.GetGXCache() != null && this.Shape.GetGYCache() != null) {
+                PA = this.Shape.GetArrowP1Cache();
+                PB = this.Shape.GetArrowP2Cache();
+            } else {
+                PA = this.GetConnectorPosition(this.ParentDirection, this.GetGlobalPosition());
+                PB = this.Parent.GetConnectorPosition(AssureNote.ReverseDirection(this.ParentDirection), this.Parent.GetGlobalPosition());
+            }
+            var Pos = new AssureNote.Point(Math.min(PA.X, PB.X), Math.min(PA.Y, PB.Y));
+            if (Pos.X > Target.X + Target.Width || Pos.Y > Target.Y + Target.Height) {
+                return false;
+            }
+            Pos.X = Math.max(PA.X, PB.X);
+            Pos.Y = Math.max(PA.Y, PB.Y);
+            if (Pos.X < Target.X || Pos.Y < Target.Y) {
+                return false;
+            }
+            return true;
         };
         NodeView.GlobalPositionCache = null;
         return NodeView;

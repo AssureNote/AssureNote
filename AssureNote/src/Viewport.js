@@ -21,6 +21,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 ///<reference path="../d.ts/jquery.d.ts" />
 ///<reference path="../d.ts/pointer.d.ts" />
 /* VIEW (MVC) */
@@ -206,9 +212,11 @@ var AssureNote;
     /**
     @class AssureNote.ViewportManager
     */
-    var ViewportManager = (function () {
+    var ViewportManager = (function (_super) {
+        __extends(ViewportManager, _super);
         function ViewportManager(SVGLayer, EventMapLayer, ContentLayer, ControlLayer) {
             var _this = this;
+            _super.call(this);
             this.SVGLayer = SVGLayer;
             this.EventMapLayer = EventMapLayer;
             this.ContentLayer = ContentLayer;
@@ -424,7 +432,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.GetPageRectInGxGy = function () {
-            return this.ConvertRectGlobalXYFromPageXY(new AssureNote.Rect(0, 0, this.PageWidth, this.PageHeight));
+            var x1 = this.GXFromPageX(0);
+            var y1 = this.GYFromPageY(0);
+            var x2 = this.GXFromPageX(this.PageWidth);
+            var y2 = this.GYFromPageY(this.PageHeight);
+            return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
         };
 
         ViewportManager.prototype.GetPageWidth = function () {
@@ -541,9 +553,13 @@ var AssureNote;
             if (this.OnScroll) {
                 this.OnScroll(this);
             }
+            if (this.OnScroll2) {
+                this.OnScroll2(this);
+            }
+            this.dispatchEvent(document.createEvent("scroll"));
         };
         return ViewportManager;
-    })();
+    })(AssureNote.EventTarget);
     AssureNote.ViewportManager = ViewportManager;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Viewport.js.map

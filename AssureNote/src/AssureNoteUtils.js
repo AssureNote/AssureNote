@@ -404,6 +404,50 @@ var AssureNote;
     })();
     AssureNote.AnimationFrameTask = AnimationFrameTask;
 
+    var EventTarget = (function () {
+        function EventTarget() {
+            this.Listeners = {};
+        }
+        EventTarget.prototype.removeEventListener = function (type, listener) {
+            var listeners = this.Listeners[type];
+            if (listeners != null) {
+                var i = listeners.indexOf(listener);
+                if (i !== -1) {
+                    listeners.splice(i, 1);
+                }
+            }
+        };
+
+        EventTarget.prototype.addEventListener = function (type, listener) {
+            var listeners = this.Listeners[type];
+            if (listeners == null) {
+                this.Listeners[type] = [listener];
+            } else if (listeners.indexOf(listener) === -1) {
+                listeners.unshift(listener);
+            }
+        };
+
+        EventTarget.prototype.dispatchEvent = function (e) {
+            e.target = this;
+            if (this["on" + e.type] != null) {
+                this["on" + e.type](e);
+            }
+            if (this["On" + e.type] != null) {
+                this["On" + e.type](e);
+            }
+            var listeners = this.Listeners[e.type];
+            if (listeners != null) {
+                listeners = listeners.slice(0);
+                for (var i = 0, len = listeners.length; i < len; i++) {
+                    listeners[i].call(this, e);
+                }
+            }
+            return !e.defaultPrevented;
+        };
+        return EventTarget;
+    })();
+    AssureNote.EventTarget = EventTarget;
+
     var ColorStyle = (function () {
         function ColorStyle() {
         }

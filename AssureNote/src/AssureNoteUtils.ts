@@ -434,6 +434,47 @@ module AssureNote {
         }
     }
 
+    export class EventTarget {
+        private Listeners: { [index: string]: EventListener[] } = {}
+
+        removeEventListener(type: string, listener: EventListener): void {
+            var listeners = this.Listeners[type];
+            if (listeners != null) {
+                var i = listeners.indexOf(listener);
+                if (i !== -1) {
+                    listeners.splice(i, 1);
+                }
+            }
+        }
+
+        addEventListener(type: string, listener: EventListener): void {
+            var listeners = this.Listeners[type];
+            if (listeners == null) {
+                this.Listeners[type] = [listener];
+            } else if (listeners.indexOf(listener) === -1) {
+                listeners.unshift(listener);
+            }
+        }
+
+        dispatchEvent(e: Event): boolean {
+            e.target = this;
+            if (this["on" + e.type] != null) {
+                this["on" + e.type](e);
+            }
+            if (this["On" + e.type] != null) {
+                this["On" + e.type](e);
+            }
+            var listeners = this.Listeners[e.type];
+            if (listeners != null) {
+                listeners = listeners.slice(0);
+                for (var i = 0, len = listeners.length; i < len; i++) {
+                    listeners[i].call(this, e);
+                }
+            }
+            return !e.defaultPrevented;
+        }
+    }
+
     export class ColorStyle {
         static Default: string = "assurenote-default";
         static Highlight: string = "assurenote-default-highlight";

@@ -209,7 +209,7 @@ module AssureNote {
     /**
         @class AssureNote.ViewportManager
     */
-    export class ViewportManager {
+    export class ViewportManager extends EventTarget {
         ScrollManager: ScrollManager = new ScrollManager(this);
         private CameraGX: number = 0;
         private CameraGY: number = 0;
@@ -220,9 +220,11 @@ module AssureNote {
         private CameraCenterPageY: number;
         public IsPointerEnabled: boolean = true;
         public OnScroll: (Viewport: ViewportManager) => void;
+        public OnScroll2: (Viewport: ViewportManager) => void; // FIXME: impl addEventListener/dispatchEvent
         public CameraLimitRect: Rect;
 
         constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
+            super();
             window.addEventListener("resize", (e) => { this.UpdatePageRect(); });
             this.UpdatePageRect();
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
@@ -411,7 +413,11 @@ module AssureNote {
         }
 
         GetPageRectInGxGy(): Rect {
-            return this.ConvertRectGlobalXYFromPageXY(new Rect(0, 0, this.PageWidth, this.PageHeight));
+            var x1 = this.GXFromPageX(0);
+            var y1 = this.GYFromPageY(0);
+            var x2 = this.GXFromPageX(this.PageWidth);
+            var y2 = this.GYFromPageY(this.PageHeight);
+            return new Rect(x1, y1, x2 - x1, y2 - y1); 
         }
 
         GetPageWidth(): number {
@@ -528,6 +534,10 @@ module AssureNote {
             if (this.OnScroll) {
                 this.OnScroll(this);
             }
+            if (this.OnScroll2) {
+                this.OnScroll2(this);
+            }
+            this.dispatchEvent(document.createEvent("scroll"));
         }
 
     }
