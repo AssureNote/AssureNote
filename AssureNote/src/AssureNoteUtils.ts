@@ -128,6 +128,7 @@ module AssureNote {
         export function CreateSVGElement(name: "svg"): SVGSVGElement;
         export function CreateSVGElement(name: "switch"): SVGSwitchElement;
         export function CreateSVGElement(name: "symbol"): SVGSymbolElement;
+        export function CreateSVGElement(name: "text"): SVGTextElement;
         export function CreateSVGElement(name: "textcontent"): SVGTextContentElement;
         export function CreateSVGElement(name: "title"): SVGTitleElement;
         export function CreateSVGElement(name: "use"): SVGUseElement;

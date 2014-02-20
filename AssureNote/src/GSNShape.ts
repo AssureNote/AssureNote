@@ -657,6 +657,11 @@ module AssureNote {
             super.PrerenderSVGContent(manager);
             this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
+
+            /* FIXME detect monitor*/
+            if (false) {
+                this.ShapeGroup.appendChild(GSNEvidenceShape.MonitorLabelMaster);
+            }
         }
 
         FitSizeToContent(): void {
@@ -669,5 +674,17 @@ module AssureNote {
         UpdateHtmlClass() {
             this.Content.className = "node node-evidence";
         }
+
+        private static MonitorLabelMaster: SVGTextElement = (() => {
+            var MonitorMaster = AssureNoteUtils.CreateSVGElement("text");
+            MonitorMaster.setAttribute("x", "220");
+            MonitorMaster.setAttribute("y", "20");
+            MonitorMaster.setAttribute("font-size", "24px");
+            MonitorMaster.setAttribute("font-family", "Times New Roman");
+            MonitorMaster.setAttribute("fill", "#000");
+            MonitorMaster.setAttribute("stroke", "#000");
+            MonitorMaster.textContent = "M";
+            return MonitorMaster;
+        })();
     }
 }

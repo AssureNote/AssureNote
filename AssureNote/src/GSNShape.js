@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -655,6 +655,11 @@ var AssureNote;
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
+
+            /* FIXME detect monitor*/
+            if (false) {
+                this.ShapeGroup.appendChild(GSNEvidenceShape.MonitorLabelMaster);
+            }
         };
 
         GSNEvidenceShape.prototype.FitSizeToContent = function () {
@@ -667,6 +672,18 @@ var AssureNote;
         GSNEvidenceShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-evidence";
         };
+
+        GSNEvidenceShape.MonitorLabelMaster = (function () {
+            var MonitorMaster = AssureNote.AssureNoteUtils.CreateSVGElement("text");
+            MonitorMaster.setAttribute("x", "220");
+            MonitorMaster.setAttribute("y", "20");
+            MonitorMaster.setAttribute("font-size", "24px");
+            MonitorMaster.setAttribute("font-family", "Times New Roman");
+            MonitorMaster.setAttribute("fill", "#000");
+            MonitorMaster.setAttribute("stroke", "#000");
+            MonitorMaster.textContent = "M";
+            return MonitorMaster;
+        })();
         return GSNEvidenceShape;
     })(GSNShape);
     AssureNote.GSNEvidenceShape = GSNEvidenceShape;
