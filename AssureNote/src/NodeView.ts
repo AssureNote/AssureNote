@@ -239,7 +239,7 @@ module AssureNote {
             if (OldView) {
                 this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
-                if (this.NodeDoc == OldView.NodeDoc) {
+                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType()) {
                     this.SetShape(OldView.GetShape());
                 } else {
                     this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());

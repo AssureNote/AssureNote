@@ -220,7 +220,6 @@ module AssureNote {
         private CameraCenterPageY: number;
         public IsPointerEnabled: boolean = true;
         public OnScroll: (Viewport: ViewportManager) => void;
-        public OnScroll2: (Viewport: ViewportManager) => void; // FIXME: impl addEventListener/dispatchEvent
         public CameraLimitRect: Rect;
 
         constructor(public SVGLayer: SVGGElement, public EventMapLayer: HTMLDivElement, public ContentLayer: HTMLDivElement, public ControlLayer: HTMLDivElement) {
@@ -534,10 +533,10 @@ module AssureNote {
             if (this.OnScroll) {
                 this.OnScroll(this);
             }
-            if (this.OnScroll2) {
-                this.OnScroll2(this);
-            }
-            this.dispatchEvent(document.createEvent("scroll"));
+            var Event = new AssureNote.AssureNoteEvent();
+            Event.Type = "cameramove";
+            Event.Target = this;
+            this.DispatchEvent(Event);
         }
 
     }

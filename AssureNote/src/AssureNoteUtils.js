@@ -404,11 +404,21 @@ var AssureNote;
     })();
     AssureNote.AnimationFrameTask = AnimationFrameTask;
 
+    var AssureNoteEvent = (function () {
+        function AssureNoteEvent() {
+        }
+        AssureNoteEvent.prototype.PreventDefault = function () {
+            this.DefaultPrevented = true;
+        };
+        return AssureNoteEvent;
+    })();
+    AssureNote.AssureNoteEvent = AssureNoteEvent;
+
     var EventTarget = (function () {
         function EventTarget() {
             this.Listeners = {};
         }
-        EventTarget.prototype.removeEventListener = function (type, listener) {
+        EventTarget.prototype.RemoveEventListener = function (type, listener) {
             var listeners = this.Listeners[type];
             if (listeners != null) {
                 var i = listeners.indexOf(listener);
@@ -418,7 +428,7 @@ var AssureNote;
             }
         };
 
-        EventTarget.prototype.addEventListener = function (type, listener) {
+        EventTarget.prototype.AddEventListener = function (type, listener) {
             var listeners = this.Listeners[type];
             if (listeners == null) {
                 this.Listeners[type] = [listener];
@@ -427,22 +437,22 @@ var AssureNote;
             }
         };
 
-        EventTarget.prototype.dispatchEvent = function (e) {
-            e.target = this;
-            if (this["on" + e.type] != null) {
-                this["on" + e.type](e);
+        EventTarget.prototype.DispatchEvent = function (e) {
+            e.Target = this;
+            if (this["on" + e.Type] != null) {
+                this["on" + e.Type](e);
             }
-            if (this["On" + e.type] != null) {
-                this["On" + e.type](e);
+            if (this["On" + e.Type] != null) {
+                this["On" + e.Type](e);
             }
-            var listeners = this.Listeners[e.type];
+            var listeners = this.Listeners[e.Type];
             if (listeners != null) {
                 listeners = listeners.slice(0);
                 for (var i = 0, len = listeners.length; i < len; i++) {
                     listeners[i].call(this, e);
                 }
             }
-            return !e.defaultPrevented;
+            return !e.DefaultPrevented;
         };
         return EventTarget;
     })();

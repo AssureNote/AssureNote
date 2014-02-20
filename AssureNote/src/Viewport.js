@@ -553,10 +553,10 @@ var AssureNote;
             if (this.OnScroll) {
                 this.OnScroll(this);
             }
-            if (this.OnScroll2) {
-                this.OnScroll2(this);
-            }
-            this.dispatchEvent(document.createEvent("scroll"));
+            var Event = new AssureNote.AssureNoteEvent();
+            Event.Type = "cameramove";
+            Event.Target = this;
+            this.DispatchEvent(Event);
         };
         return ViewportManager;
     })(AssureNote.EventTarget);

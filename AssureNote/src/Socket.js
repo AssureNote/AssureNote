@@ -66,7 +66,8 @@ var AssureNote;
                 App.DebugP('socket.io not found');
             }
 
-            App.PictgramPanel.Viewport.OnScroll = function (Viewport) {
+            App.PictgramPanel.Viewport.AddEventListener("cameramove", function (e) {
+                var Viewport = e.Target;
                 if (_this.IsConnected() && _this.UseOnScrollEvent && (_this.App.ModeManager.GetMode() != 1 /* View */)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
@@ -75,7 +76,7 @@ var AssureNote;
 
                     _this.Emit("sync", { "X": X, "Y": Y, "Scale": Scale });
                 }
-            };
+            });
             this.socket = null;
             this.handler = {};
         }

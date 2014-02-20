@@ -434,10 +434,19 @@ module AssureNote {
         }
     }
 
-    export class EventTarget {
-        private Listeners: { [index: string]: EventListener[] } = {}
+    export class AssureNoteEvent {
+        Target: EventTarget;
+        Type: string;
+        DefaultPrevented: boolean;
+        PreventDefault() {
+            this.DefaultPrevented = true;
+        }
+    }
 
-        removeEventListener(type: string, listener: EventListener): void {
+    export class EventTarget {
+        private Listeners: { [index: string]: Function[] } = {}
+
+        RemoveEventListener(type: string, listener: EventListener): void {
             var listeners = this.Listeners[type];
             if (listeners != null) {
                 var i = listeners.indexOf(listener);
@@ -447,7 +456,10 @@ module AssureNote {
             }
         }
 
-        addEventListener(type: string, listener: EventListener): void {
+        AddEventListener(type: string, listener: () => void): void;
+        AddEventListener(type: string, listener: () => any): void;
+        AddEventListener(type: string, listener: (e: AssureNoteEvent) => void): void;
+        AddEventListener(type: string, listener: (e: AssureNoteEvent) => any): void {
             var listeners = this.Listeners[type];
             if (listeners == null) {
                 this.Listeners[type] = [listener];
@@ -456,22 +468,22 @@ module AssureNote {
             }
         }
 
-        dispatchEvent(e: Event): boolean {
-            e.target = this;
-            if (this["on" + e.type] != null) {
-                this["on" + e.type](e);
+        DispatchEvent(e: AssureNoteEvent): boolean {
+            e.Target = this;
+            if (this["on" + e.Type] != null) {
+                this["on" + e.Type](e);
             }
-            if (this["On" + e.type] != null) {
-                this["On" + e.type](e);
+            if (this["On" + e.Type] != null) {
+                this["On" + e.Type](e);
             }
-            var listeners = this.Listeners[e.type];
+            var listeners = this.Listeners[e.Type];
             if (listeners != null) {
                 listeners = listeners.slice(0);
                 for (var i = 0, len = listeners.length; i < len; i++) {
                     listeners[i].call(this, e);
                 }
             }
-            return !e.defaultPrevented;
+            return !e.DefaultPrevented;
         }
     }
 

@@ -54,7 +54,8 @@ module AssureNote {
                 App.DebugP('socket.io not found')
             }
 
-            App.PictgramPanel.Viewport.OnScroll = (Viewport: ViewportManager) => {
+            App.PictgramPanel.Viewport.AddEventListener("cameramove", (e: AssureNoteEvent) => {
+                var Viewport = <ViewportManager>e.Target;
                 if (this.IsConnected() && this.UseOnScrollEvent && (this.App.ModeManager.GetMode() != AssureNoteMode.View)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
@@ -63,7 +64,7 @@ module AssureNote {
 
                     this.Emit("sync", {"X": X, "Y": Y, "Scale": Scale});
                 }
-            };
+            });
             this.socket = null;
             this.handler = {};
         }

@@ -67,9 +67,9 @@ var AssureNote;
             this.Viewport = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.App);
 
-            this.Viewport.OnScroll2 = function (Viewport) {
+            this.Viewport.AddEventListener("cameramove", function () {
                 _this.UpdateHiddenNodeList();
-            };
+            });
 
             this.ContextMenu = new AssureNote.NodeMenu(App);
             this.NodeTooltip = new AssureNote.Tooltip(App);
