@@ -496,7 +496,7 @@ module AssureNote {
             this.FoldingAnimationTask.Cancel(true);
 
             NodeView.SetGlobalPositionCacheEnabled(true);
-            var FoldingAnimationCallbacks = [];
+            var FoldingAnimationCallbacks: Function[] = [];
 
             var ScreenRect = this.Viewport.GetPageRectInGxGy();
             if (FixedNode) {
@@ -512,7 +512,11 @@ module AssureNote {
                 var Task = this.Viewport.CreateMoveTaskFunction(FixedNodeDX, FixedNodeDY, Scale, Duration);
                 if (Task) {
                     FoldingAnimationCallbacks.push(Task);
+                } else {
+                    FoldingAnimationCallbacks.push(() => { this.UpdateHiddenNodeList(); });
                 }
+            } else {
+                FoldingAnimationCallbacks.push(() => { this.UpdateHiddenNodeList(); });
             }
 
             var t2 = AssureNoteUtils.GetTime();

@@ -490,7 +490,15 @@ var AssureNote;
                 var Task = this.Viewport.CreateMoveTaskFunction(FixedNodeDX, FixedNodeDY, Scale, Duration);
                 if (Task) {
                     FoldingAnimationCallbacks.push(Task);
+                } else {
+                    FoldingAnimationCallbacks.push(function () {
+                        _this.UpdateHiddenNodeList();
+                    });
                 }
+            } else {
+                FoldingAnimationCallbacks.push(function () {
+                    _this.UpdateHiddenNodeList();
+                });
             }
 
             var t2 = AssureNote.AssureNoteUtils.GetTime();
