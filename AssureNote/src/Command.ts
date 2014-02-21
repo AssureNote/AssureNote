@@ -239,7 +239,7 @@ module AssureNote {
 
         public Invoke(CommandName: string, Params: any[]) {
             var Filename: string = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
-            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
+            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.TopNodeView), Filename);
         }
 
         public GetHelpHTML(): string {
@@ -355,7 +355,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            var TopView = this.App.PictgramPanel.MasterView;
+            var TopView = this.App.PictgramPanel.TopNodeView;
             var unfoldAll = (TargetView: NodeView) => {
                 TargetView.SetIsFolded(false);
                 TargetView.ForEachVisibleChildren((SubNode: NodeView) => {

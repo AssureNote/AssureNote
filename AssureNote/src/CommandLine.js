@@ -193,7 +193,7 @@ var AssureNote;
                     var ParsedCommand = new CommandParser();
                     ParsedCommand.Parse(this.GetValue());
                     if (ParsedCommand.GetMethod() == "search") {
-                        this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.MasterView, ParsedCommand.GetArgs()[0]);
+                        this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, ParsedCommand.GetArgs()[0]);
                     }
                     this.App.ExecCommand(ParsedCommand);
                     this.AddHistory(ParsedCommand.GetRawString());

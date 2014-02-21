@@ -256,7 +256,7 @@ var AssureNote;
 
         SaveSVGCommand.prototype.Invoke = function (CommandName, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
-            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
+            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.TopNodeView), Filename);
         };
 
         SaveSVGCommand.prototype.GetHelpHTML = function () {
@@ -372,7 +372,7 @@ var AssureNote;
         };
 
         UnfoldAllCommand.prototype.Invoke = function (CommandName, Params) {
-            var TopView = this.App.PictgramPanel.MasterView;
+            var TopView = this.App.PictgramPanel.TopNodeView;
             var unfoldAll = function (TargetView) {
                 TargetView.SetIsFolded(false);
                 TargetView.ForEachVisibleChildren(function (SubNode) {

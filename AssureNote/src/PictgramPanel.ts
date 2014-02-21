@@ -50,7 +50,7 @@ module AssureNote {
         HiddenNodeBuffer: DocumentFragment;
         Viewport: ViewportManager;
         ViewMap: { [index: string]: NodeView };
-        MasterView: NodeView;
+        TopNodeView: NodeView;
         CmdLine: CommandLine;
         Search: SearchResultNodeList;
         ContextMenu: NodeMenu;
@@ -205,11 +205,11 @@ module AssureNote {
             //}
 
             this.Viewport.ScrollManager.OnDragged = (Viewport: ViewportManager) => {
-                if (!this.MasterView) {
+                if (!this.TopNodeView) {
                     return;
                 }
                 var HitBoxCenter = new Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
-                this.MasterView.TraverseVisibleNode((Node: NodeView) => {
+                this.TopNodeView.TraverseVisibleNode((Node: NodeView) => {
                     if (Node.IsFolded()) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
@@ -339,7 +339,7 @@ module AssureNote {
             @param {AssureNote.Direction} Dir 
         */
         MoveToNearestNode(Dir: Direction): void {
-            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
+            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
             this.FocusAndMoveToNode(NextNode);
         }
 
@@ -393,7 +393,7 @@ module AssureNote {
             }
             var NearestNode: NodeView = null;
             var CurrentMinimumDistanceSquere = Infinity;
-            this.MasterView.TraverseVisibleNode((Node: NodeView) => {
+            this.TopNodeView.TraverseVisibleNode((Node: NodeView) => {
                 var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
                 var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
                 var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
@@ -461,9 +461,9 @@ module AssureNote {
         }
 
         InitializeView(NodeView: NodeView): void {
-            this.MasterView = NodeView;
+            this.TopNodeView = NodeView;
             this.ViewMap = {};
-            this.MasterView.UpdateViewMap(this.ViewMap);
+            this.TopNodeView.UpdateViewMap(this.ViewMap);
         }
 
         Draw(Label?: string, Duration?: number, FixedNode?: NodeView): void {
@@ -474,7 +474,7 @@ module AssureNote {
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
-                TargetView = this.MasterView;
+                TargetView = this.TopNodeView;
             }
 
             var FixedNodeGX0: number;
@@ -530,7 +530,7 @@ module AssureNote {
             this.Viewport.CameraLimitRect = new Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
 
             var PageRect = this.Viewport.GetPageRectInGxGy();
-            this.MasterView.TraverseVisibleNode((Node: NodeView) => {
+            this.TopNodeView.TraverseVisibleNode((Node: NodeView) => {
                 if (Node.IsInRect(PageRect)) {
                     this.OnScreenNodeMap[Node.Label] = Node;
                 } else {
@@ -637,7 +637,7 @@ module AssureNote {
             this.MoveToNearestNode(Direction.Right);
         }
         NavigateHome(): void {
-            this.FocusAndMoveToNode(this.MasterView);
+            this.FocusAndMoveToNode(this.TopNodeView);
         }
 
     }

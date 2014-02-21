@@ -81,7 +81,7 @@ var AssureNote;
             } else {
                 TargetView.SetIsFolded(!TargetView.IsFolded());
             }
-            Panel.Draw(Panel.MasterView.Label, 300, TargetView);
+            Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         };
         return FoldingCommand;
     })(AssureNote.Command);

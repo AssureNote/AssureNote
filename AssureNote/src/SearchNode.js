@@ -68,7 +68,7 @@ var AssureNote;
                     Node = Node.Parent;
                 }
             }
-            this.Panel.Draw(this.Panel.MasterView.Label, 300);
+            this.Panel.Draw(this.Panel.TopNodeView.Label, 300);
         };
 
         VisitableNodeList.prototype.IsVisiting = function () {

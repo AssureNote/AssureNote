@@ -192,7 +192,7 @@ var AssureNote;
             var TopGoalNode = LatestDoc.TopNode;
 
             this.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoalNode, true));
-            this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.MasterView);
+            this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.TopNodeView);
             this.PictgramPanel.Draw();
 
             if (location.hash != "") {
@@ -210,7 +210,7 @@ var AssureNote;
                     this.PictgramPanel.Viewport.SetCamera(NodeView.GetCenterGX(), NodeView.GetCenterGY(), 1);
                 }
             } else {
-                var TopGoal = this.PictgramPanel.MasterView;
+                var TopGoal = this.PictgramPanel.TopNodeView;
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");

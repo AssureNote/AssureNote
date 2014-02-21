@@ -188,11 +188,11 @@ var AssureNote;
             //    });
             //}
             this.Viewport.ScrollManager.OnDragged = function (Viewport) {
-                if (!_this.MasterView) {
+                if (!_this.TopNodeView) {
                     return;
                 }
                 var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
-                _this.MasterView.TraverseVisibleNode(function (Node) {
+                _this.TopNodeView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded()) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
@@ -320,7 +320,7 @@ var AssureNote;
         @param {AssureNote.Direction} Dir
         */
         PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
-            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
+            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
             this.FocusAndMoveToNode(NextNode);
         };
 
@@ -369,7 +369,7 @@ var AssureNote;
             }
             var NearestNode = null;
             var CurrentMinimumDistanceSquere = Infinity;
-            this.MasterView.TraverseVisibleNode(function (Node) {
+            this.TopNodeView.TraverseVisibleNode(function (Node) {
                 var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
                 var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
                 var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
@@ -438,9 +438,9 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.InitializeView = function (NodeView) {
-            this.MasterView = NodeView;
+            this.TopNodeView = NodeView;
             this.ViewMap = {};
-            this.MasterView.UpdateViewMap(this.ViewMap);
+            this.TopNodeView.UpdateViewMap(this.ViewMap);
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
@@ -452,7 +452,7 @@ var AssureNote;
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
-                TargetView = this.MasterView;
+                TargetView = this.TopNodeView;
             }
 
             var FixedNodeGX0;
@@ -512,7 +512,7 @@ var AssureNote;
             this.Viewport.CameraLimitRect = new AssureNote.Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
 
             var PageRect = this.Viewport.GetPageRectInGxGy();
-            this.MasterView.TraverseVisibleNode(function (Node) {
+            this.TopNodeView.TraverseVisibleNode(function (Node) {
                 if (Node.IsInRect(PageRect)) {
                     _this.OnScreenNodeMap[Node.Label] = Node;
                 } else {
@@ -619,7 +619,7 @@ var AssureNote;
             this.MoveToNearestNode(2 /* Right */);
         };
         PictgramPanel.prototype.NavigateHome = function () {
-            this.FocusAndMoveToNode(this.MasterView);
+            this.FocusAndMoveToNode(this.TopNodeView);
         };
         return PictgramPanel;
     })(AssureNote.Panel);
