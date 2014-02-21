@@ -20,6 +20,10 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]) {
             this.History.Show();
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class HistoryPanel extends Panel {

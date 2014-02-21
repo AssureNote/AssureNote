@@ -384,6 +384,10 @@ var AssureNote;
             unfoldAll(TopView);
             this.App.PictgramPanel.Draw();
         };
+
+        UnfoldAllCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnfoldAllCommand;
     })(Command);
     AssureNote.UnfoldAllCommand = UnfoldAllCommand;
@@ -436,6 +440,10 @@ var AssureNote;
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
+        };
+
+        SetScaleCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SetScaleCommand;
     })(Command);
@@ -547,6 +555,10 @@ var AssureNote;
             }, function () {
                 _this.App.SetLoading(false);
             });
+        };
+
+        ShareCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShareCommand;
     })(Command);
