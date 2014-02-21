@@ -439,6 +439,36 @@ var AssureNote;
         NodeView.prototype.HasParameter = function () {
             return this.NodeDoc.match(/\[([^\[\]]*)\]/) != null;
         };
+
+        NodeView.prototype.IsMonitorNode = function () {
+            var ThisModel = this.Model;
+            if (!ThisModel.IsEvidence()) {
+                return false;
+            }
+
+            var GoalModel = ThisModel.GetCloseGoal();
+            var ContextModel = null;
+
+            for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
+                var BroutherModel = GoalModel.SubNodeList[i];
+                if (BroutherModel.IsContext()) {
+                    ContextModel = BroutherModel;
+                    break;
+                }
+            }
+            if (ContextModel == null) {
+                return false;
+            }
+
+            var TagMap = ContextModel.GetTagMapWithLexicalScope();
+            var Location = TagMap.get("Location");
+            var Condition = TagMap.get("Condition");
+            if (Location && Condition) {
+                return true;
+            }
+
+            return false;
+        };
         NodeView.GlobalPositionCache = null;
         return NodeView;
     })();

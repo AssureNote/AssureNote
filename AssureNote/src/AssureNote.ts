@@ -96,26 +96,26 @@ module AssureNote {
             this.UserList = new UserList(this);
 
             this.TopMenu.AppendSubMenu(
-                new SubMenuItem("History", "time", [
-                    new ShowHistoryPanelItem()
+                new SubMenuItem(true, "history", "History", "time", [
+                    new ShowHistoryPanelItem(true)
                 ])
             );
             this.TopMenu.AppendSubMenu(
-                new SubMenuItem("File", "file", [
-                    new NewMenuItem(),
-                    new OpenMenuItem(),
-                    new SaveMenuItem(),
-                    new SubMenuItem("Save As", "floppy-save", [
-                        new SaveAsWGSNMenuItem(),
-                        new SaveAsDCaseMenuItem(),
-                        new SaveAsSVGMenuItem()
+                new SubMenuItem(true, "file", "File", "file", [
+                    new NewMenuItem(true),
+                    new OpenMenuItem(true),
+                    new SaveMenuItem(true),
+                    new SubMenuItem(true, "save-as", "Save As", "floppy-save", [
+                        new SaveAsWGSNMenuItem(true),
+                        new SaveAsDCaseMenuItem(true),
+                        new SaveAsSVGMenuItem(true)
                     ]),
-                    new DividerMenuItem(),
-                    new HelpMenuItem(),
-                    new AboutMenuItem()
+                    new DividerMenuItem(true),
+                    new HelpMenuItem(true),
+                    new AboutMenuItem(true)
                 ])
             );
-            this.TopMenuRight.AppendSubMenu(new UploadMenuItem());
+            this.TopMenuRight.AppendSubMenu(new UploadMenuItem(true));
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);

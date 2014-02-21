@@ -653,39 +653,13 @@ module AssureNote {
         private BodyEllipse: SVGEllipseElement;
         private ClientHeight: number;
 
-        private IsMonitorNodeShape(): boolean {
-            var ThisModel = this.NodeView.Model;
-            var GoalModel = ThisModel.GetCloseGoal();
-            var ContextModel = null;
-
-            for(var i: number = 0; i < GoalModel.SubNodeList.length; i++) {
-                var BroutherModel = GoalModel.SubNodeList[i];
-                if(BroutherModel.IsContext()) {
-                    ContextModel = BroutherModel;
-                    break;
-                }
-            }
-            if(ContextModel == null) {
-                return false;
-            }
-
-            var TagMap = ContextModel.GetTagMapWithLexicalScope();
-            var Location = TagMap.get("Location");
-            var Condition = TagMap.get("Condition");
-            if(Location && Condition) {
-                return true;
-            }
-
-            return false;
-        }
-
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
 
             /* FIXME change the following code to use API in common with MonitorNode plugin */
-            if (this.IsMonitorNodeShape()) {
+            if (this.NodeView.IsMonitorNode()) {
                 var MonitorMaster = GSNEvidenceShape.MonitorLabelMaster.cloneNode();
                 MonitorMaster.textContent = "M";
                 this.ShapeGroup.appendChild(MonitorMaster);

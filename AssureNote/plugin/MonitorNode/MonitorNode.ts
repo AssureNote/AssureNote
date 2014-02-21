@@ -157,8 +157,10 @@ module AssureNote {
 
             // Check status
             this.Data = LatestLog.data;
-            var Script = "var "+this.Type+"="+this.Data+";";
-            Script += this.Condition+";";
+            var RecType = this.Type.replace(/[\.\/\-]/g, "_");
+            var RecCondition = this.Condition.replace(/[\.\/\-]/g, "_");
+            var Script = "var "+RecType+"="+this.Data+";";
+            Script += RecCondition+";";
             var LatestStatus = eval(Script);   // FIXME Don't use eval()
 
             // Update past logs & status
@@ -740,9 +742,9 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
             this.AssureNoteApp.TopMenu.AppendSubMenu(
-                new SubMenuItem("Monitor", "eye-open", [
-                    new SetMonitorMenuItem(),
-                    new ShowMonitorListMenuItem()
+                new SubMenuItem(false, "monitor", "Monitor", "eye-open", [
+                    new SetMonitorMenuItem(true),
+                    new ShowMonitorListMenuItem(true)
                 ])
             );
         }

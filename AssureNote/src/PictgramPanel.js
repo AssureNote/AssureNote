@@ -444,10 +444,25 @@ var AssureNote;
             return this.FocusedLabel;
         };
 
+        PictgramPanel.prototype.HasMonitorNode = function () {
+            for (var Label in this.ViewMap) {
+                var View = this.ViewMap[Label];
+                if (View.IsMonitorNode()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         PictgramPanel.prototype.InitializeView = function (NodeView) {
             this.TopNodeView = NodeView;
             this.ViewMap = {};
             this.TopNodeView.UpdateViewMap(this.ViewMap);
+
+            this.App.TopMenu.SubMenuMap["monitor"].Disable();
+            if (this.HasMonitorNode()) {
+                this.App.TopMenu.SubMenuMap["monitor"].Enable();
+            }
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {

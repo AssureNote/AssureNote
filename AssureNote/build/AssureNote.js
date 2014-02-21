@@ -3293,18 +3293,15 @@ var AssureNote;
             var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
-            this.Element.show().css("opacity", 1).off("blur").on("blur", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                _this.DisableEditor(NodeView, WGSN);
-            });
+
             this.OnOutSideClicked = function () {
-                _this.Element.blur();
+                _this.DisableEditor(NodeView, WGSN);
             };
             this.App.PictgramPanel.ContentLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            this.Element.css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();
             this.Activate();
@@ -3343,14 +3340,13 @@ var AssureNote;
             Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
 
             Panel.Activate();
-            return null;
         };
 
         CodeMirrorEditorPanel.prototype.OnKeyDown = function (Event) {
             this.Editor.focus();
             if (Event.keyCode == 27) {
                 Event.stopPropagation();
-                this.Element.blur();
+                this.OnOutSideClicked();
             }
         };
         return CodeMirrorEditorPanel;
@@ -3619,6 +3615,8 @@ var AssureNote;
             var $svg = $('<svg width="' + (TopView.Shape.GetTreeWidth() + 20) + 'px" height="' + (TopView.Shape.GetTreeHeight() + 20) + 'px" version="1.1" xmlns="' + SVG_NS + '">');
             $svg.append($("svg defs").clone(false));
 
+            this.App.PictgramPanel.ForceAppendAllOutOfScreenNode();
+
             var $target = $(AssureNote.AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + (10 - TopView.Shape.GetTreeLeftLocalX()) + " 10) scale(1)").appendTo($svg);
             TopView.TraverseVisibleNode(function (nodeView) {
                 var svg = nodeView.Shape.ShapeGroup;
@@ -3733,6 +3731,10 @@ var AssureNote;
             unfoldAll(TopView);
             this.App.PictgramPanel.Draw();
         };
+
+        UnfoldAllCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnfoldAllCommand;
     })(Command);
     AssureNote.UnfoldAllCommand = UnfoldAllCommand;
@@ -3785,6 +3787,10 @@ var AssureNote;
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
+        };
+
+        SetScaleCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SetScaleCommand;
     })(Command);
@@ -3890,6 +3896,10 @@ var AssureNote;
             }, function () {
                 _this.App.SetLoading(false);
             });
+        };
+
+        ShareCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShareCommand;
     })(Command);
@@ -4081,6 +4091,7 @@ var AssureNote;
             this.App = App;
             this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
+            this.SetHasDoubleClicked(true);
 
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
@@ -4092,6 +4103,15 @@ var AssureNote;
                     Command.Invoke(null, [TargetView.Label]);
                 }
             });
+        };
+
+        SingleNodeEditorPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 0 /* Edit */) {
+                var Command = this.App.FindCommandByCommandLineName("SingleEdit");
+                if (Command) {
+                    Command.Invoke(null, [NodeView.Label]);
+                }
+            }
         };
         return SingleNodeEditorPlugin;
     })(AssureNote.Plugin);
@@ -4332,6 +4352,7 @@ var AssureNote;
                 if (_this.NodeTooltip.IsEnable) {
                     _this.NodeTooltip.Remove();
                 }
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -4376,6 +4397,7 @@ var AssureNote;
                     _this.NodeTooltip.Remove();
                 }
                 _this.App.ExecDoubleClicked(NodeView);
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -4434,9 +4456,12 @@ var AssureNote;
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            _this.App.ExecDoubleClicked(Node);
+                            var FoldCommand = _this.App.FindCommandByCommandLineName("fold");
+                            if (FoldCommand) {
+                                FoldCommand.Invoke(null, [Node.Label]);
+                            }
+                            return false;
                         }
-                        return false;
                     }
                 });
             };
@@ -4448,9 +4473,6 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
-        PictgramPanel.prototype.OnViewportChanged = function () {
-        };
-
         PictgramPanel.prototype.OnKeyDown = function (Event) {
             var Label;
             var handled = true;
@@ -4476,6 +4498,12 @@ var AssureNote;
                 case 13:
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
+                        Event.preventDefault();
+                    } else {
+                        var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
                         Event.preventDefault();
                     }
                     break;
@@ -4503,12 +4531,11 @@ var AssureNote;
                     this.NavigateHome();
                     Event.preventDefault();
                     break;
+                case 32:
                 case 70:
-                    if (!this.CmdLine.IsVisible) {
-                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
-                        if (EditCommand && this.FocusedLabel) {
-                            EditCommand.Invoke(null, [this.FocusedLabel]);
-                        }
+                    var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                    if (FoldCommand && this.FocusedLabel) {
+                        FoldCommand.Invoke(null, [this.FocusedLabel]);
                     }
                     Event.preventDefault();
                     break;
@@ -4655,10 +4682,25 @@ var AssureNote;
             return this.FocusedLabel;
         };
 
+        PictgramPanel.prototype.HasMonitorNode = function () {
+            for (var Label in this.ViewMap) {
+                var View = this.ViewMap[Label];
+                if (View.IsMonitorNode()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         PictgramPanel.prototype.InitializeView = function (NodeView) {
             this.TopNodeView = NodeView;
             this.ViewMap = {};
             this.TopNodeView.UpdateViewMap(this.ViewMap);
+
+            this.App.TopMenu.SubMenuMap["monitor"].Disable();
+            if (this.HasMonitorNode()) {
+                this.App.TopMenu.SubMenuMap["monitor"].Enable();
+            }
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
@@ -4744,6 +4786,26 @@ var AssureNote;
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
+        };
+
+        PictgramPanel.prototype.ForceAppendAllOutOfScreenNode = function () {
+            var _this = this;
+            var UpdateArrow = function (Node) {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Arrow.parentNode != _this.HiddenNodeBuffer) {
+                        _this.HiddenNodeBuffer.appendChild(Arrow);
+                    }
+                }
+            };
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[Label];
+                delete this.HiddenNodeMap[Label];
+                this.OnScreenNodeMap[Label] = Node;
+                this.ContentLayer.appendChild(Node.Shape.Content);
+                this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                UpdateArrow(Node);
+            }
         };
 
         PictgramPanel.prototype.UpdateHiddenNodeList = function () {
@@ -5205,7 +5267,14 @@ var AssureNote;
 var AssureNote;
 (function (AssureNote) {
     var TopMenuItem = (function () {
-        function TopMenuItem() {
+        function TopMenuItem(IsEnabled, ButtonId) {
+            this.IsEnabled = IsEnabled;
+            this.ButtonId = null;
+            this.ElementId = null;
+            if (ButtonId) {
+                this.ButtonId = ButtonId;
+                this.ElementId = ButtonId + "-menu-button";
+            }
         }
         TopMenuItem.prototype.GetIconName = function () {
             return "";
@@ -5213,6 +5282,34 @@ var AssureNote;
         TopMenuItem.prototype.GetDisplayName = function () {
             return "";
         };
+
+        TopMenuItem.prototype.Enable = function () {
+            this.IsEnabled = true;
+            if (this.ElementId) {
+                var button = $('#' + this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if (index > 0) {
+                    classes.splice(index, 1);
+                }
+                button.attr('class', classes.join(" "));
+            }
+        };
+
+        TopMenuItem.prototype.Disable = function () {
+            this.IsEnabled = false;
+            if (this.ElementId) {
+                var button = $('#' + this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if (index > 0) {
+                    return;
+                }
+                classes.push('disabled');
+                button.attr('class', classes.join(" "));
+            }
+        };
+
         TopMenuItem.CreateIconElement = function (Name) {
             var span = document.createElement("span");
             span.className = "glyphicon glyphicon-" + Name;
@@ -5230,8 +5327,15 @@ var AssureNote;
             if (IsTopLevel) {
                 item = document.createElement("button");
                 item.type = "button";
+                if (this.ElementId) {
+                    item.setAttribute("id", this.ElementId);
+                }
                 item.setAttribute("oncontextmenu", "return false");
-                item.className = "btn navbar-btn btn-default clickable navbar-left";
+                var classes = "btn navbar-btn btn-default clickable navbar-left";
+                if (!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                item.className = classes;
                 item.appendChild(icon);
                 item.appendChild(text);
             } else {
@@ -5256,8 +5360,8 @@ var AssureNote;
 
     var SubMenuItem = (function (_super) {
         __extends(SubMenuItem, _super);
-        function SubMenuItem(DisplayName, IconName, SubMenuList) {
-            _super.call(this);
+        function SubMenuItem(IsEnabled, ButtonId, DisplayName, IconName, SubMenuList) {
+            _super.call(this, IsEnabled, ButtonId);
             this.DisplayName = DisplayName;
             this.IconName = IconName;
             this.SubMenuList = SubMenuList;
@@ -5278,9 +5382,14 @@ var AssureNote;
                 dropdown.className = "dropdown clickable navbar-left";
                 var button = document.createElement("button");
                 button.type = "button";
+                button.setAttribute("id", this.ElementId);
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
-                button.className = "btn navbar-btn btn-default dropdown-toggle";
+                var classes = "btn navbar-btn btn-default dropdown-toggle";
+                if (!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                button.className = classes;
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
@@ -5328,11 +5437,20 @@ var AssureNote;
     var TopMenuTopItem = (function (_super) {
         __extends(TopMenuTopItem, _super);
         function TopMenuTopItem(SubMenuList) {
-            _super.call(this);
+            _super.call(this, true);
             this.SubMenuList = SubMenuList;
+            this.SubMenuMap = {};
+            for (var i; i < SubMenuList.length; i++) {
+                if (SubMenuList[i].ButtonId) {
+                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+                }
+            }
         }
         TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
             this.SubMenuList.unshift(SubMenu);
+            if (SubMenu.ButtonId) {
+                this.SubMenuMap[SubMenu.ButtonId] = SubMenu;
+            }
         };
 
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
@@ -5800,6 +5918,10 @@ var AssureNote;
         HistoryCommand.prototype.Invoke = function (CommandName, Params) {
             this.History.Show();
         };
+
+        HistoryCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return HistoryCommand;
     })(AssureNote.Command);
     AssureNote.HistoryCommand = HistoryCommand;
@@ -5957,23 +6079,23 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
-                new AssureNote.ShowHistoryPanelItem()
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "history", "History", "time", [
+                new AssureNote.ShowHistoryPanelItem(true)
             ]));
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
-                new AssureNote.NewMenuItem(),
-                new AssureNote.OpenMenuItem(),
-                new AssureNote.SaveMenuItem(),
-                new AssureNote.SubMenuItem("Save As", "floppy-save", [
-                    new AssureNote.SaveAsWGSNMenuItem(),
-                    new AssureNote.SaveAsDCaseMenuItem(),
-                    new AssureNote.SaveAsSVGMenuItem()
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "file", "File", "file", [
+                new AssureNote.NewMenuItem(true),
+                new AssureNote.OpenMenuItem(true),
+                new AssureNote.SaveMenuItem(true),
+                new AssureNote.SubMenuItem(true, "save-as", "Save As", "floppy-save", [
+                    new AssureNote.SaveAsWGSNMenuItem(true),
+                    new AssureNote.SaveAsDCaseMenuItem(true),
+                    new AssureNote.SaveAsSVGMenuItem(true)
                 ]),
-                new AssureNote.DividerMenuItem(),
-                new AssureNote.HelpMenuItem(),
-                new AssureNote.AboutMenuItem()
+                new AssureNote.DividerMenuItem(true),
+                new AssureNote.HelpMenuItem(true),
+                new AssureNote.AboutMenuItem(true)
             ]));
-            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem());
+            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
@@ -6618,6 +6740,10 @@ var AssureNote;
             }
             Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         };
+
+        FoldingCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return FoldingCommand;
     })(AssureNote.Command);
     AssureNote.FoldingCommand = FoldingCommand;
@@ -6631,7 +6757,9 @@ var AssureNote;
             AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
         FoldingViewSwitchPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
-            this.FoldingCommand.Fold(NodeView);
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 1 /* View */) {
+                this.FoldingCommand.Fold(NodeView);
+            }
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);
@@ -7269,6 +7397,36 @@ var AssureNote;
         NodeView.prototype.HasParameter = function () {
             return this.NodeDoc.match(/\[([^\[\]]*)\]/) != null;
         };
+
+        NodeView.prototype.IsMonitorNode = function () {
+            var ThisModel = this.Model;
+            if (!ThisModel.IsEvidence()) {
+                return false;
+            }
+
+            var GoalModel = ThisModel.GetCloseGoal();
+            var ContextModel = null;
+
+            for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
+                var BroutherModel = GoalModel.SubNodeList[i];
+                if (BroutherModel.IsContext()) {
+                    ContextModel = BroutherModel;
+                    break;
+                }
+            }
+            if (ContextModel == null) {
+                return false;
+            }
+
+            var TagMap = ContextModel.GetTagMapWithLexicalScope();
+            var Location = TagMap.get("Location");
+            var Condition = TagMap.get("Condition");
+            if (Location && Condition) {
+                return true;
+            }
+
+            return false;
+        };
         NodeView.GlobalPositionCache = null;
         return NodeView;
     })();
@@ -7890,38 +8048,12 @@ var AssureNote;
         function GSNEvidenceShape() {
             _super.apply(this, arguments);
         }
-        GSNEvidenceShape.prototype.IsMonitorNodeShape = function () {
-            var ThisModel = this.NodeView.Model;
-            var GoalModel = ThisModel.GetCloseGoal();
-            var ContextModel = null;
-
-            for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
-                var BroutherModel = GoalModel.SubNodeList[i];
-                if (BroutherModel.IsContext()) {
-                    ContextModel = BroutherModel;
-                    break;
-                }
-            }
-            if (ContextModel == null) {
-                return false;
-            }
-
-            var TagMap = ContextModel.GetTagMapWithLexicalScope();
-            var Location = TagMap.get("Location");
-            var Condition = TagMap.get("Condition");
-            if (Location && Condition) {
-                return true;
-            }
-
-            return false;
-        };
-
         GSNEvidenceShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
 
-            if (this.IsMonitorNodeShape()) {
+            if (this.NodeView.IsMonitorNode()) {
                 var MonitorMaster = GSNEvidenceShape.MonitorLabelMaster.cloneNode();
                 MonitorMaster.textContent = "M";
                 this.ShapeGroup.appendChild(MonitorMaster);
@@ -8084,7 +8216,7 @@ var AssureNote;
                 ReturnValue = Response;
             },
             error: function (Request, Status, Error) {
-                alert("ajax error");
+                console.log("ajax error");
                 if (ErrorCallback != null) {
                     ErrorCallback(Request, Status, Error);
                 }
@@ -8580,8 +8712,10 @@ var AssureNote;
             }
 
             this.Data = LatestLog.data;
-            var Script = "var " + this.Type + "=" + this.Data + ";";
-            Script += this.Condition + ";";
+            var RecType = this.Type.replace(/[\.\/\-]/g, "_");
+            var RecCondition = this.Condition.replace(/[\.\/\-]/g, "_");
+            var Script = "var " + RecType + "=" + this.Data + ";";
+            Script += RecCondition + ";";
             var LatestStatus = eval(Script);
 
             this.SetLatestLog(LatestLog);
@@ -8870,6 +9004,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        SetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.SetMonitorCommand = SetMonitorCommand;
@@ -8917,6 +9055,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        UnsetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnsetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.UnsetMonitorCommand = UnsetMonitorCommand;
@@ -8942,6 +9084,10 @@ var AssureNote;
             } else {
                 console.log("Need parameter");
             }
+        };
+
+        UseRecAtCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return UseRecAtCommand;
     })(AssureNote.Command);
@@ -9042,6 +9188,10 @@ var AssureNote;
         ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
             this.MonitorListPanel.Activate();
         };
+
+        ShowMonitorListCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return ShowMonitorListCommand;
     })(AssureNote.Command);
     AssureNote.ShowMonitorListCommand = ShowMonitorListCommand;
@@ -9120,9 +9270,9 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
-            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
-                new SetMonitorMenuItem(),
-                new ShowMonitorListMenuItem()
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(false, "monitor", "Monitor", "eye-open", [
+                new SetMonitorMenuItem(true),
+                new ShowMonitorListMenuItem(true)
             ]));
         }
         MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {

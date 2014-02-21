@@ -22,7 +22,7 @@ module AssureNote {
                 ReturnValue = Response;
             },
             error: function(Request, Status, Error) {
-                alert("ajax error")    ;
+                console.log("ajax error");
                 if(ErrorCallback != null) {
                     ErrorCallback(Request, Status, Error);
                 }
