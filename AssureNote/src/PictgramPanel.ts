@@ -217,9 +217,12 @@ module AssureNote {
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            this.App.ExecDoubleClicked(Node);
+                            var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                            if (FoldCommand) {
+                                FoldCommand.Invoke(null, [Node.Label]);
+                            }
+                            return false;
                         }
-                        return false;
                     }
                 });
             };
@@ -292,9 +295,9 @@ module AssureNote {
                     break;
                 case 32: /*space*/
                 case 70: /*f*/
-                    var EditCommand = this.App.FindCommandByCommandLineName("fold");
-                    if (EditCommand && this.FocusedLabel) {
-                        EditCommand.Invoke(null, [this.FocusedLabel]);
+                    var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                    if (FoldCommand && this.FocusedLabel) {
+                        FoldCommand.Invoke(null, [this.FocusedLabel]);
                     }
                     Event.preventDefault();
                     break;
