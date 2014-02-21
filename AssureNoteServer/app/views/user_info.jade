@@ -2,7 +2,7 @@ span
   #top-menu-right.navbar-right
   if !isLocal
     if(UserName != "Guest")
-      button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/logout')
+      button.btn.btn-default.navbar-btn.clickable.navbar-right(href='#{basepath}/logout')
         span.glyphicon.glyphicon-log-out
         | &nbsp;Logout
     else
