@@ -80,10 +80,10 @@ module AssureNote {
             this.OnOutSideClicked = () => {
                 this.DisableEditor(NodeView, WGSN);
             };
-            this.App.PictgramPanel.ContentLayer.addEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            $("#editor-background").off("click").on("click", this.OnOutSideClicked);
+            $("#editor-background").off("contextmenu").on("contextmenu", this.OnOutSideClicked);
+
+            $("#editor-background").stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
             this.Element.stop(true, true).css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();
@@ -114,14 +114,9 @@ module AssureNote {
             }
             this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
+            $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
 
             var Panel = this.App.PictgramPanel;
-
-            Panel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            Panel.ContentLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
-            Panel.EventMapLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
-
             Panel.Activate();
         }
 
@@ -132,6 +127,10 @@ module AssureNote {
                 this.OnOutSideClicked();
             }
         }
+
+        DarkenBackGround(): boolean {
+            return true;
+        }
     }
 
     export class SingleNodeEditorPanel extends CodeMirrorEditorPanel {
@@ -139,6 +138,9 @@ module AssureNote {
             var TextArea = <HTMLTextAreaElement>document.getElementById('singlenode-editor');
             var Wrapper = document.getElementById('singlenode-editor-wrapper');
             super(App, false, TextArea, { lineNumbers: false, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "absolute" });
+        }
+        DarkenBackGround(): boolean {
+            return false;
         }
     }
 

@@ -85,10 +85,10 @@ var AssureNote;
             this.OnOutSideClicked = function () {
                 _this.DisableEditor(NodeView, WGSN);
             };
-            this.App.PictgramPanel.ContentLayer.addEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
-            this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            $("#editor-background").off("click").on("click", this.OnOutSideClicked);
+            $("#editor-background").off("contextmenu").on("contextmenu", this.OnOutSideClicked);
+
+            $("#editor-background").stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
             this.Element.stop(true, true).css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();
@@ -119,14 +119,9 @@ var AssureNote;
             }
             this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
+            $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
 
             var Panel = this.App.PictgramPanel;
-
-            Panel.ContentLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            Panel.ContentLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
-            Panel.EventMapLayer.removeEventListener("pointerdown", this.OnOutSideClicked);
-            Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
-
             Panel.Activate();
         };
 
@@ -136,6 +131,10 @@ var AssureNote;
                 Event.stopPropagation();
                 this.OnOutSideClicked();
             }
+        };
+
+        CodeMirrorEditorPanel.prototype.DarkenBackGround = function () {
+            return true;
         };
         return CodeMirrorEditorPanel;
     })(AssureNote.Panel);
@@ -148,6 +147,9 @@ var AssureNote;
             var Wrapper = document.getElementById('singlenode-editor-wrapper');
             _super.call(this, App, false, TextArea, { lineNumbers: false, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "absolute" });
         }
+        SingleNodeEditorPanel.prototype.DarkenBackGround = function () {
+            return false;
+        };
         return SingleNodeEditorPanel;
     })(CodeMirrorEditorPanel);
     AssureNote.SingleNodeEditorPanel = SingleNodeEditorPanel;
