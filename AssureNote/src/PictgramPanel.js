@@ -88,6 +88,7 @@ var AssureNote;
                 if (_this.NodeTooltip.IsEnable) {
                     _this.NodeTooltip.Remove();
                 }
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -132,6 +133,7 @@ var AssureNote;
                     _this.NodeTooltip.Remove();
                 }
                 _this.App.ExecDoubleClicked(NodeView);
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -212,9 +214,6 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
-        PictgramPanel.prototype.OnViewportChanged = function () {
-        };
-
         PictgramPanel.prototype.OnKeyDown = function (Event) {
             var Label;
             var handled = true;
@@ -526,6 +525,26 @@ var AssureNote;
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
+        };
+
+        PictgramPanel.prototype.ForceAppendAllOutOfScreenNode = function () {
+            var _this = this;
+            var UpdateArrow = function (Node) {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Arrow.parentNode != _this.HiddenNodeBuffer) {
+                        _this.HiddenNodeBuffer.appendChild(Arrow);
+                    }
+                }
+            };
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[Label];
+                delete this.HiddenNodeMap[Label];
+                this.OnScreenNodeMap[Label] = Node;
+                this.ContentLayer.appendChild(Node.Shape.Content);
+                this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                UpdateArrow(Node);
+            }
         };
 
         PictgramPanel.prototype.UpdateHiddenNodeList = function () {

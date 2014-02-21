@@ -104,6 +104,7 @@ module AssureNote {
                 if (this.NodeTooltip.IsEnable) {
                     this.NodeTooltip.Remove();
                 }
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -148,6 +149,7 @@ module AssureNote {
                     this.NodeTooltip.Remove();
                 }
                 this.App.ExecDoubleClicked(NodeView);
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -228,10 +230,6 @@ module AssureNote {
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").hide(100);
             };
-        }
-
-        OnViewportChanged() {
-
         }
 
         OnKeyDown(Event: KeyboardEvent): void {
@@ -546,6 +544,25 @@ module AssureNote {
             console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
                 GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
                 GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
+        }
+
+        public ForceAppendAllOutOfScreenNode() {
+            var UpdateArrow = (Node: NodeView) => {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Arrow.parentNode != this.HiddenNodeBuffer) {
+                        this.HiddenNodeBuffer.appendChild(Arrow);
+                    }
+                }
+            };
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[<string>Label];
+                delete this.HiddenNodeMap[<string>Label];
+                this.OnScreenNodeMap[<string>Label] = Node;
+                this.ContentLayer.appendChild(Node.Shape.Content);
+                this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                UpdateArrow(Node);
+            }
         }
 
         private UpdateHiddenNodeList() {
