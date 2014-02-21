@@ -14,11 +14,15 @@ body {
 }
 
 #logo {
-	width: 194px;
-	height: 64px;
-	position: fixed;
+	width: 180px;
+	height: 60px;
+	-webkit-transform: translate(-2px,-2px);
+	-moz-transform: translate(-2px,-2px);
+	-ms-transform: translate(-2px,-2px);
+	transform: translate(-2px,-2px);
+	/*position: fixed;
 	left: -4px;
-	top: -3px;
+	top: -3px;*/
 }
 
 #tooltip {
