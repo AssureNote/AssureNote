@@ -41,7 +41,7 @@ module AssureNote {
             this.Input.setAttribute('data-on-label', 'Edit');
             this.Input.setAttribute('data-off-label', 'View');
 
-            //$(input).appendTo(this.WrapperElement);
+            this.Enable();
         }
 
         GetMode(): AssureNoteMode {

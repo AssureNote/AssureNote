@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,8 @@ var AssureNote;
             }
             this.Input.setAttribute('data-on-label', 'Edit');
             this.Input.setAttribute('data-off-label', 'View');
-            //$(input).appendTo(this.WrapperElement);
+
+            this.Enable();
         }
         ModeManager.prototype.GetMode = function () {
             return this.Mode;
