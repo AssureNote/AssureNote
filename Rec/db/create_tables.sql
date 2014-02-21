@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `rec`.`rawdata` (
   `recid` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `monitorid` INT UNSIGNED NOT NULL,
   `data` INT NOT NULL,
-  `context` VARCHAR(45) NOT NULL,
+  `context` TEXT NOT NULL,
   `timestamp` DATETIME NOT NULL,
   PRIMARY KEY (`recid`),
   UNIQUE INDEX `rawdataid_UNIQUE` (`recid` ASC),
