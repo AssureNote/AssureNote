@@ -84,7 +84,7 @@ module AssureNote {
             this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
-            this.Element.css("opacity", 1).show()
+            this.Element.stop(true, true).css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();
             this.Activate();

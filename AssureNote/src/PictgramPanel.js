@@ -210,11 +210,11 @@ var AssureNote;
                 });
             };
             this.Viewport.ScrollManager.OnStartDrag = function (Viewport) {
-                $("#auto-expand-area").show(100);
+                $("#auto-expand-area").stop(true, true).show(100);
                 $(".dropdown.open > .dropdown-toggle").dropdown("toggle");
             };
             this.Viewport.ScrollManager.OnEndDrag = function (Viewport) {
-                $("#auto-expand-area").hide(100);
+                $("#auto-expand-area").stop(true, true).hide(100);
             };
         }
         PictgramPanel.prototype.OnKeyDown = function (Event) {

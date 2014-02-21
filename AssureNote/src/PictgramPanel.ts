@@ -227,11 +227,11 @@ module AssureNote {
                 });
             };
             this.Viewport.ScrollManager.OnStartDrag = (Viewport: ViewportManager) => {
-                $("#auto-expand-area").show(100);
+                $("#auto-expand-area").stop(true, true).show(100);
                 (<any>$(".dropdown.open > .dropdown-toggle")).dropdown("toggle");
             };
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
-                $("#auto-expand-area").hide(100);
+                $("#auto-expand-area").stop(true, true).hide(100);
             };
         }
 
