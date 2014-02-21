@@ -95,7 +95,7 @@ module AssureNote {
             this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
             this.UserList = new UserList(this);
 
-            this.TopMenuRight.AppendSubMenu(
+            this.TopMenu.AppendSubMenu(
                 new SubMenuItem("History", "time", [
                     new ShowHistoryPanelItem()
                 ])
