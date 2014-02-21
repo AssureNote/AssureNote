@@ -83,6 +83,10 @@ var AssureNote;
             }
             Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         };
+
+        FoldingCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return FoldingCommand;
     })(AssureNote.Command);
     AssureNote.FoldingCommand = FoldingCommand;
