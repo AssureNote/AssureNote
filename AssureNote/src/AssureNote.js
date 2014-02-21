@@ -70,23 +70,23 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
-                new AssureNote.ShowHistoryPanelItem()
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "history", "History", "time", [
+                new AssureNote.ShowHistoryPanelItem(true)
             ]));
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
-                new AssureNote.NewMenuItem(),
-                new AssureNote.OpenMenuItem(),
-                new AssureNote.SaveMenuItem(),
-                new AssureNote.SubMenuItem("Save As", "floppy-save", [
-                    new AssureNote.SaveAsWGSNMenuItem(),
-                    new AssureNote.SaveAsDCaseMenuItem(),
-                    new AssureNote.SaveAsSVGMenuItem()
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "file", "File", "file", [
+                new AssureNote.NewMenuItem(true),
+                new AssureNote.OpenMenuItem(true),
+                new AssureNote.SaveMenuItem(true),
+                new AssureNote.SubMenuItem(true, "save-as", "Save As", "floppy-save", [
+                    new AssureNote.SaveAsWGSNMenuItem(true),
+                    new AssureNote.SaveAsDCaseMenuItem(true),
+                    new AssureNote.SaveAsSVGMenuItem(true)
                 ]),
-                new AssureNote.DividerMenuItem(),
-                new AssureNote.HelpMenuItem(),
-                new AssureNote.AboutMenuItem()
+                new AssureNote.DividerMenuItem(true),
+                new AssureNote.HelpMenuItem(true),
+                new AssureNote.AboutMenuItem(true)
             ]));
-            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem());
+            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);

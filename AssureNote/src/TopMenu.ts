@@ -2,13 +2,44 @@
 
 module AssureNote {
     export class TopMenuItem {
-        constructor() { }
+
+        ButtonId: string;
+        ElementId: string;
+
+        constructor(public IsEnabled: boolean, ButtonId?: string) {
+            this.ButtonId = null;
+            this.ElementId = null;
+            if(ButtonId) {
+                this.ButtonId = ButtonId;
+                this.ElementId = ButtonId+"-menu-button";
+            }
+        }
+
         GetIconName(): string {
             return "";
         }
         GetDisplayName(): string {
             return "";
         }
+
+        Enable(): void {
+            if(this.ElementId) {
+                var button = $('#'+this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if(index > 0) {
+                    classes.splice(index, 1);
+                }
+                button.attr('class', classes.join(" "));
+            }
+        }
+
+        Disable(): void {
+            if(this.ElementId) {
+                var button = $('#'+this.ElementId);
+            }
+        }
+
         static CreateIconElement(Name: string): HTMLSpanElement {
             var span = document.createElement("span");
             span.className = "glyphicon glyphicon-" + Name;
@@ -33,8 +64,15 @@ module AssureNote {
                 */
                 item = document.createElement("button");
                 (<HTMLButtonElement>item).type = "button";
+                if(this.ElementId) {
+                    item.setAttribute("id", this.ElementId);
+                }
                 item.setAttribute("oncontextmenu", "return false");
-                item.className = "btn navbar-btn btn-default clickable navbar-left";
+                var classes = "btn navbar-btn btn-default clickable navbar-left";
+                if(!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                item.className = classes;
                 item.appendChild(icon);
                 item.appendChild(text);
             } else {
@@ -64,8 +102,9 @@ module AssureNote {
     }
 
     export class SubMenuItem extends TopMenuItem {
-        constructor(private DisplayName: string, private IconName: string, public SubMenuList: TopMenuItem[]) {
-            super();
+
+        constructor(IsEnabled: boolean, ButtonId: string, private DisplayName: string, private IconName: string, public SubMenuList: TopMenuItem[]) {
+            super(IsEnabled, ButtonId);
         }
 
         GetIconName(): string {
@@ -92,9 +131,14 @@ module AssureNote {
                 dropdown.className = "dropdown clickable navbar-left";
                 var button = document.createElement("button");
                 button.type = "button";
+                button.setAttribute("id", this.ElementId);
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
-                button.className = "btn navbar-btn btn-default dropdown-toggle";
+                var classes = "btn navbar-btn btn-default dropdown-toggle";
+                if(!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                button.className = classes;
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
@@ -147,12 +191,23 @@ module AssureNote {
 
     export class TopMenuTopItem extends TopMenuItem {
 
+        SubMenuMap: { [index: string]: TopMenuItem };
+
         constructor(public SubMenuList: TopMenuItem[]) {
-            super();
+            super(true);
+            this.SubMenuMap = {};
+            for(var i: number; i < SubMenuList.length; i++) {
+                if(SubMenuList[i].ButtonId) {
+                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+                }
+            }
         }
 
         AppendSubMenu(SubMenu: TopMenuItem) {
             this.SubMenuList.unshift(SubMenu);
+            if(SubMenu.ButtonId) {
+                this.SubMenuMap[SubMenu.ButtonId] = SubMenu;
+            }
         }
 
         Render(App: AssureNoteApp, Target: Element, IsTopLevel: boolean): void {

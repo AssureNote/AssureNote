@@ -727,9 +727,9 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
             this.AssureNoteApp.TopMenu.AppendSubMenu(
-                new SubMenuItem("Monitor", "eye-open", [
-                    new SetMonitorMenuItem(),
-                    new ShowMonitorListMenuItem()
+                new SubMenuItem(true, "monitor", "Monitor", "eye-open", [
+                    new SetMonitorMenuItem(true),
+                    new ShowMonitorListMenuItem(true)
                 ])
             );
         }

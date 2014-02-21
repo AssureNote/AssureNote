@@ -3619,6 +3619,8 @@ var AssureNote;
             var $svg = $('<svg width="' + (TopView.Shape.GetTreeWidth() + 20) + 'px" height="' + (TopView.Shape.GetTreeHeight() + 20) + 'px" version="1.1" xmlns="' + SVG_NS + '">');
             $svg.append($("svg defs").clone(false));
 
+            this.App.PictgramPanel.ForceAppendAllOutOfScreenNode();
+
             var $target = $(AssureNote.AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + (10 - TopView.Shape.GetTreeLeftLocalX()) + " 10) scale(1)").appendTo($svg);
             TopView.TraverseVisibleNode(function (nodeView) {
                 var svg = nodeView.Shape.ShapeGroup;
@@ -4081,6 +4083,7 @@ var AssureNote;
             this.App = App;
             this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
+            this.SetHasDoubleClicked(true);
 
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
@@ -4092,6 +4095,15 @@ var AssureNote;
                     Command.Invoke(null, [TargetView.Label]);
                 }
             });
+        };
+
+        SingleNodeEditorPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 0 /* Edit */) {
+                var Command = this.App.FindCommandByCommandLineName("SingleEdit");
+                if (Command) {
+                    Command.Invoke(null, [NodeView.Label]);
+                }
+            }
         };
         return SingleNodeEditorPlugin;
     })(AssureNote.Plugin);
@@ -4332,6 +4344,7 @@ var AssureNote;
                 if (_this.NodeTooltip.IsEnable) {
                     _this.NodeTooltip.Remove();
                 }
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -4376,6 +4389,7 @@ var AssureNote;
                     _this.NodeTooltip.Remove();
                 }
                 _this.App.ExecDoubleClicked(NodeView);
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -4448,9 +4462,6 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
-        PictgramPanel.prototype.OnViewportChanged = function () {
-        };
-
         PictgramPanel.prototype.OnKeyDown = function (Event) {
             var Label;
             var handled = true;
@@ -4744,6 +4755,26 @@ var AssureNote;
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
+        };
+
+        PictgramPanel.prototype.ForceAppendAllOutOfScreenNode = function () {
+            var _this = this;
+            var UpdateArrow = function (Node) {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Arrow.parentNode != _this.HiddenNodeBuffer) {
+                        _this.HiddenNodeBuffer.appendChild(Arrow);
+                    }
+                }
+            };
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[Label];
+                delete this.HiddenNodeMap[Label];
+                this.OnScreenNodeMap[Label] = Node;
+                this.ContentLayer.appendChild(Node.Shape.Content);
+                this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                UpdateArrow(Node);
+            }
         };
 
         PictgramPanel.prototype.UpdateHiddenNodeList = function () {
@@ -5205,7 +5236,14 @@ var AssureNote;
 var AssureNote;
 (function (AssureNote) {
     var TopMenuItem = (function () {
-        function TopMenuItem() {
+        function TopMenuItem(IsEnabled, ButtonId) {
+            this.IsEnabled = IsEnabled;
+            this.ButtonId = null;
+            this.ElementId = null;
+            if (ButtonId) {
+                this.ButtonId = ButtonId;
+                this.ElementId = ButtonId + "-menu-button";
+            }
         }
         TopMenuItem.prototype.GetIconName = function () {
             return "";
@@ -5213,6 +5251,25 @@ var AssureNote;
         TopMenuItem.prototype.GetDisplayName = function () {
             return "";
         };
+
+        TopMenuItem.prototype.Enable = function () {
+            if (this.ElementId) {
+                var button = $('#' + this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if (index > 0) {
+                    classes.splice(index, 1);
+                }
+                button.attr('class', classes.join(" "));
+            }
+        };
+
+        TopMenuItem.prototype.Disable = function () {
+            if (this.ElementId) {
+                var button = $('#' + this.ElementId);
+            }
+        };
+
         TopMenuItem.CreateIconElement = function (Name) {
             var span = document.createElement("span");
             span.className = "glyphicon glyphicon-" + Name;
@@ -5230,8 +5287,15 @@ var AssureNote;
             if (IsTopLevel) {
                 item = document.createElement("button");
                 item.type = "button";
+                if (this.ElementId) {
+                    item.setAttribute("id", this.ElementId);
+                }
                 item.setAttribute("oncontextmenu", "return false");
-                item.className = "btn navbar-btn btn-default clickable navbar-left";
+                var classes = "btn navbar-btn btn-default clickable navbar-left";
+                if (!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                item.className = classes;
                 item.appendChild(icon);
                 item.appendChild(text);
             } else {
@@ -5256,8 +5320,8 @@ var AssureNote;
 
     var SubMenuItem = (function (_super) {
         __extends(SubMenuItem, _super);
-        function SubMenuItem(DisplayName, IconName, SubMenuList) {
-            _super.call(this);
+        function SubMenuItem(IsEnabled, ButtonId, DisplayName, IconName, SubMenuList) {
+            _super.call(this, IsEnabled, ButtonId);
             this.DisplayName = DisplayName;
             this.IconName = IconName;
             this.SubMenuList = SubMenuList;
@@ -5278,9 +5342,14 @@ var AssureNote;
                 dropdown.className = "dropdown clickable navbar-left";
                 var button = document.createElement("button");
                 button.type = "button";
+                button.setAttribute("id", this.ElementId);
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
-                button.className = "btn navbar-btn btn-default dropdown-toggle";
+                var classes = "btn navbar-btn btn-default dropdown-toggle";
+                if (!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                button.className = classes;
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
@@ -5328,11 +5397,20 @@ var AssureNote;
     var TopMenuTopItem = (function (_super) {
         __extends(TopMenuTopItem, _super);
         function TopMenuTopItem(SubMenuList) {
-            _super.call(this);
+            _super.call(this, true);
             this.SubMenuList = SubMenuList;
+            this.SubMenuMap = {};
+            for (var i; i < SubMenuList.length; i++) {
+                if (SubMenuList[i].ButtonId) {
+                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+                }
+            }
         }
         TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
             this.SubMenuList.unshift(SubMenu);
+            if (SubMenu.ButtonId) {
+                this.SubMenuMap[SubMenu.ButtonId] = SubMenu;
+            }
         };
 
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
@@ -5957,23 +6035,23 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
-                new AssureNote.ShowHistoryPanelItem()
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "history", "History", "time", [
+                new AssureNote.ShowHistoryPanelItem(true)
             ]));
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
-                new AssureNote.NewMenuItem(),
-                new AssureNote.OpenMenuItem(),
-                new AssureNote.SaveMenuItem(),
-                new AssureNote.SubMenuItem("Save As", "floppy-save", [
-                    new AssureNote.SaveAsWGSNMenuItem(),
-                    new AssureNote.SaveAsDCaseMenuItem(),
-                    new AssureNote.SaveAsSVGMenuItem()
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "file", "File", "file", [
+                new AssureNote.NewMenuItem(true),
+                new AssureNote.OpenMenuItem(true),
+                new AssureNote.SaveMenuItem(true),
+                new AssureNote.SubMenuItem(true, "save-as", "Save As", "floppy-save", [
+                    new AssureNote.SaveAsWGSNMenuItem(true),
+                    new AssureNote.SaveAsDCaseMenuItem(true),
+                    new AssureNote.SaveAsSVGMenuItem(true)
                 ]),
-                new AssureNote.DividerMenuItem(),
-                new AssureNote.HelpMenuItem(),
-                new AssureNote.AboutMenuItem()
+                new AssureNote.DividerMenuItem(true),
+                new AssureNote.HelpMenuItem(true),
+                new AssureNote.AboutMenuItem(true)
             ]));
-            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem());
+            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
@@ -6631,7 +6709,9 @@ var AssureNote;
             AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
         FoldingViewSwitchPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
-            this.FoldingCommand.Fold(NodeView);
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 1 /* View */) {
+                this.FoldingCommand.Fold(NodeView);
+            }
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);
@@ -9120,9 +9200,9 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
-            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("Monitor", "eye-open", [
-                new SetMonitorMenuItem(),
-                new ShowMonitorListMenuItem()
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "monitor", "Monitor", "eye-open", [
+                new SetMonitorMenuItem(true),
+                new ShowMonitorListMenuItem(true)
             ]));
         }
         MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {

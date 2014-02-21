@@ -7,7 +7,14 @@ var __extends = this.__extends || function (d, b) {
 var AssureNote;
 (function (AssureNote) {
     var TopMenuItem = (function () {
-        function TopMenuItem() {
+        function TopMenuItem(IsEnabled, ButtonId) {
+            this.IsEnabled = IsEnabled;
+            this.ButtonId = null;
+            this.ElementId = null;
+            if (ButtonId) {
+                this.ButtonId = ButtonId;
+                this.ElementId = ButtonId + "-menu-button";
+            }
         }
         TopMenuItem.prototype.GetIconName = function () {
             return "";
@@ -15,6 +22,25 @@ var AssureNote;
         TopMenuItem.prototype.GetDisplayName = function () {
             return "";
         };
+
+        TopMenuItem.prototype.Enable = function () {
+            if (this.ElementId) {
+                var button = $('#' + this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if (index > 0) {
+                    classes.splice(index, 1);
+                }
+                button.attr('class', classes.join(" "));
+            }
+        };
+
+        TopMenuItem.prototype.Disable = function () {
+            if (this.ElementId) {
+                var button = $('#' + this.ElementId);
+            }
+        };
+
         TopMenuItem.CreateIconElement = function (Name) {
             var span = document.createElement("span");
             span.className = "glyphicon glyphicon-" + Name;
@@ -40,8 +66,15 @@ var AssureNote;
                 */
                 item = document.createElement("button");
                 item.type = "button";
+                if (this.ElementId) {
+                    item.setAttribute("id", this.ElementId);
+                }
                 item.setAttribute("oncontextmenu", "return false");
-                item.className = "btn navbar-btn btn-default clickable navbar-left";
+                var classes = "btn navbar-btn btn-default clickable navbar-left";
+                if (!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                item.className = classes;
                 item.appendChild(icon);
                 item.appendChild(text);
             } else {
@@ -74,8 +107,8 @@ var AssureNote;
 
     var SubMenuItem = (function (_super) {
         __extends(SubMenuItem, _super);
-        function SubMenuItem(DisplayName, IconName, SubMenuList) {
-            _super.call(this);
+        function SubMenuItem(IsEnabled, ButtonId, DisplayName, IconName, SubMenuList) {
+            _super.call(this, IsEnabled, ButtonId);
             this.DisplayName = DisplayName;
             this.IconName = IconName;
             this.SubMenuList = SubMenuList;
@@ -104,9 +137,14 @@ var AssureNote;
                 dropdown.className = "dropdown clickable navbar-left";
                 var button = document.createElement("button");
                 button.type = "button";
+                button.setAttribute("id", this.ElementId);
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
-                button.className = "btn navbar-btn btn-default dropdown-toggle";
+                var classes = "btn navbar-btn btn-default dropdown-toggle";
+                if (!this.IsEnabled) {
+                    classes += " disabled";
+                }
+                button.className = classes;
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
@@ -162,11 +200,20 @@ var AssureNote;
     var TopMenuTopItem = (function (_super) {
         __extends(TopMenuTopItem, _super);
         function TopMenuTopItem(SubMenuList) {
-            _super.call(this);
+            _super.call(this, true);
             this.SubMenuList = SubMenuList;
+            this.SubMenuMap = {};
+            for (var i; i < SubMenuList.length; i++) {
+                if (SubMenuList[i].ButtonId) {
+                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+                }
+            }
         }
         TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
             this.SubMenuList.unshift(SubMenu);
+            if (SubMenu.ButtonId) {
+                this.SubMenuMap[SubMenu.ButtonId] = SubMenu;
+            }
         };
 
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
