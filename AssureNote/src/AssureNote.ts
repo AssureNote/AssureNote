@@ -54,6 +54,7 @@ module AssureNote {
         HistoryPanel: HistoryPanel;
 
         TopMenu: TopMenuTopItem;
+        TopMenuRight: TopMenuTopItem;
 
         private UserName: string;
         private LoadingIndicatorVisible = true;
@@ -69,7 +70,7 @@ module AssureNote {
             this.SocketManager = new SocketManager(this);
             this.FullScreenEditorPanel = new WGSNEditorPanel(this);
             this.SingleNodeEditorPanel = new SingleNodeEditorPanel(this);
-            this.ModeManager = new ModeManager(this, AssureNoteMode.View);
+            this.ModeManager = new ModeManager(this, AssureNoteMode.Edit);
 
             this.DefaultCommand = new CommandMissingCommand(this);
             this.RegistCommand(new SaveCommand(this));
@@ -88,12 +89,13 @@ module AssureNote {
             this.RegistCommand(new SetGuestUserNameCommand(this));
 
             this.TopMenu = new TopMenuTopItem([]);
+            this.TopMenuRight = new TopMenuTopItem([]);
 
             this.PluginManager.LoadPlugin();
             this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
             this.UserList = new UserList(this);
 
-            this.TopMenu.AppendSubMenu(
+            this.TopMenuRight.AppendSubMenu(
                 new SubMenuItem("History", "time", [
                     new ShowHistoryPanelItem()
                 ])
@@ -102,7 +104,6 @@ module AssureNote {
                 new SubMenuItem("File", "file", [
                     new NewMenuItem(),
                     new OpenMenuItem(),
-                    new UploadMenuItem(),
                     new SaveMenuItem(),
                     new SubMenuItem("Save As", "floppy-save", [
                         new SaveAsWGSNMenuItem(),
@@ -114,7 +115,10 @@ module AssureNote {
                     new AboutMenuItem()
                 ])
             );
+            this.TopMenuRight.AppendSubMenu(new UploadMenuItem());
+
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
+            this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
         }
 
         public IsLoading(): boolean {

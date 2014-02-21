@@ -1,22 +1,22 @@
-#user-info.text-right
+span#user-info
   .glyphicon.glyphicon-user
   span.user-name &nbsp; #{UserName} 
   if !isLocal
     if(UserName != "Guest")
       button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/logout')
         span.glyphicon.glyphicon-log-out
-        | &nbsp; Logout
+        | &nbsp;Logout
     else
       button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/auth/github')
         span.glyphicon.glyphicon-log-in
-        | &nbsp; Login
+        | &nbsp;Login
   else
     button.btn.btn-default.navbar-btn.clickable.disable(disabled)
       span.glyphicon.glyphicon-log-in
-      | &nbsp; Login
+      | &nbsp;Login
+  span#top-menu-right.navbar-right
   #user-list
     br
-
 +template("user-list-tmpl")
   span(style="color: ${Color}")
     .glyphicon.glyphicon-user

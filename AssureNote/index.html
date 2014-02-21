@@ -35,12 +35,10 @@
           <div class="navbar-collapse"><a href="#" class="logo-fixed"><img id="logo" src="./images/logo.png" alt="AssureNote"></a>
             <div id="top-menu"></div>
             <div class="edit-mode clickable navbar-left"></div>
-            <!--p.navbar-text#filename-view(style="margin-left: 10px;")-->
-            <div id="user-info" class="text-right">
+            <!--p.navbar-text#filename-view(style="margin-left: 10px;")--><span id="user-info">
               <div class="glyphicon glyphicon-user"></div><span class="user-name">&nbsp; Guest </span>
-              <button disabled class="btn btn-default navbar-btn clickable disable"><span class="glyphicon glyphicon-log-in"></span>&nbsp; Login</button>
-              <div id="user-list"><br></div>
-            </div>
+              <button disabled class="btn btn-default navbar-btn clickable disable"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Login</button><span id="top-menu-right" class="navbar-right"></span>
+              <div id="user-list"><br></div></span>
             <script id="user-list-tmpl" type="text/x-jquery-tmpl"><span style="color: ${Color}">
                 <div class="glyphicon glyphicon-user"></div>{{if IsEditMode == true}}<small style="vertical-align: super;" class="glyphicon glyphicon-pencil"></small>&nbsp;{{else}}{{/if}}
                 ${UserName} &nbsp;</span>

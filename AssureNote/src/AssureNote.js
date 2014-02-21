@@ -1,4 +1,4 @@
-﻿// ***************************************************************************
+// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -45,7 +45,7 @@ var AssureNote;
             this.SocketManager = new AssureNote.SocketManager(this);
             this.FullScreenEditorPanel = new AssureNote.WGSNEditorPanel(this);
             this.SingleNodeEditorPanel = new AssureNote.SingleNodeEditorPanel(this);
-            this.ModeManager = new AssureNote.ModeManager(this, 1 /* View */);
+            this.ModeManager = new AssureNote.ModeManager(this, 0 /* Edit */);
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
@@ -64,18 +64,18 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
+            this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
 
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
+            this.TopMenuRight.AppendSubMenu(new AssureNote.SubMenuItem("History", "time", [
                 new AssureNote.ShowHistoryPanelItem()
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
                 new AssureNote.NewMenuItem(),
                 new AssureNote.OpenMenuItem(),
-                new AssureNote.UploadMenuItem(),
                 new AssureNote.SaveMenuItem(),
                 new AssureNote.SubMenuItem("Save As", "floppy-save", [
                     new AssureNote.SaveAsWGSNMenuItem(),
@@ -86,7 +86,10 @@ var AssureNote;
                 new AssureNote.HelpMenuItem(),
                 new AssureNote.AboutMenuItem()
             ]));
+            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem());
+
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
+            this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
         }
         AssureNoteApp.prototype.IsLoading = function () {
             return this.LoadingIndicatorVisible;
