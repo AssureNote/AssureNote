@@ -258,6 +258,12 @@ module AssureNote {
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
                         Event.preventDefault();
+                    } else {
+                        var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
+                        Event.preventDefault();
                     }
                     break;
                 case 72: /*h*/
@@ -284,12 +290,11 @@ module AssureNote {
                     this.NavigateHome();
                     Event.preventDefault();
                     break;
+                case 32: /*space*/
                 case 70: /*f*/
-                    if (!this.CmdLine.IsVisible) {
-                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
-                        if (EditCommand && this.FocusedLabel) {
-                            EditCommand.Invoke(null, [this.FocusedLabel]);
-                        }
+                    var EditCommand = this.App.FindCommandByCommandLineName("fold");
+                    if (EditCommand && this.FocusedLabel) {
+                        EditCommand.Invoke(null, [this.FocusedLabel]);
                     }
                     Event.preventDefault();
                     break;
