@@ -268,6 +268,8 @@ var AssureNote;
             var $svg = $('<svg width="' + (TopView.Shape.GetTreeWidth() + 20) + 'px" height="' + (TopView.Shape.GetTreeHeight() + 20) + 'px" version="1.1" xmlns="' + SVG_NS + '">');
             $svg.append($("svg defs").clone(false));
 
+            this.App.PictgramPanel.ForceAppendAllOutOfScreenNode();
+
             var $target = $(AssureNote.AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + (10 - TopView.Shape.GetTreeLeftLocalX()) + " 10) scale(1)").appendTo($svg);
             TopView.TraverseVisibleNode(function (nodeView) {
                 var svg = nodeView.Shape.ShapeGroup;

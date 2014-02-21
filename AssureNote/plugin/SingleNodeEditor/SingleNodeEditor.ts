@@ -83,6 +83,7 @@ module AssureNote {
             super();
             this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
+            this.SetHasDoubleClicked(true);
 
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
@@ -95,6 +96,15 @@ module AssureNote {
                         Command.Invoke(null, [TargetView.Label]);
                     }
             });
+        }
+
+        OnNodeDoubleClicked(NodeView: NodeView): void {
+            if (AssureNoteApp.Current.ModeManager.GetMode() == AssureNoteMode.Edit) {
+                var Command = this.App.FindCommandByCommandLineName("SingleEdit");
+                if (Command) {
+                    Command.Invoke(null, [NodeView.Label]);
+                }
+            }
         }
     }
 }

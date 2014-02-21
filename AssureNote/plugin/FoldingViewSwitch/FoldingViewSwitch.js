@@ -96,7 +96,9 @@ var AssureNote;
             AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
         FoldingViewSwitchPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
-            this.FoldingCommand.Fold(NodeView);
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 1 /* View */) {
+                this.FoldingCommand.Fold(NodeView);
+            }
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);
