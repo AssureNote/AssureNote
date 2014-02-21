@@ -3293,18 +3293,15 @@ var AssureNote;
             var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
-            this.Element.show().css("opacity", 1).off("blur").on("blur", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                _this.DisableEditor(NodeView, WGSN);
-            });
+
             this.OnOutSideClicked = function () {
-                _this.Element.blur();
+                _this.DisableEditor(NodeView, WGSN);
             };
             this.App.PictgramPanel.ContentLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            this.Element.css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();
             this.Activate();
@@ -3343,14 +3340,13 @@ var AssureNote;
             Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
 
             Panel.Activate();
-            return null;
         };
 
         CodeMirrorEditorPanel.prototype.OnKeyDown = function (Event) {
             this.Editor.focus();
             if (Event.keyCode == 27) {
                 Event.stopPropagation();
-                this.Element.blur();
+                this.OnOutSideClicked();
             }
         };
         return CodeMirrorEditorPanel;
@@ -8933,6 +8929,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        SetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.SetMonitorCommand = SetMonitorCommand;
@@ -8980,6 +8980,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        UnsetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnsetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.UnsetMonitorCommand = UnsetMonitorCommand;
@@ -9005,6 +9009,10 @@ var AssureNote;
             } else {
                 console.log("Need parameter");
             }
+        };
+
+        UseRecAtCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return UseRecAtCommand;
     })(AssureNote.Command);
@@ -9104,6 +9112,10 @@ var AssureNote;
 
         ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
             this.MonitorListPanel.Activate();
+        };
+
+        ShowMonitorListCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShowMonitorListCommand;
     })(AssureNote.Command);
