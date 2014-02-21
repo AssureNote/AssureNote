@@ -8712,8 +8712,8 @@ var AssureNote;
             }
 
             this.Data = LatestLog.data;
-            var RecType = this.Type.replace(/[\.\/]/g, "_");
-            var RecCondition = this.Condition.replace(/[\.\/]/g, "_");
+            var RecType = this.Type.replace(/[\.\/\-]/g, "_");
+            var RecCondition = this.Condition.replace(/[\.\/\-]/g, "_");
             var Script = "var " + RecType + "=" + this.Data + ";";
             Script += RecCondition + ";";
             var LatestStatus = eval(Script);
