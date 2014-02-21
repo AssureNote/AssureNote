@@ -24,6 +24,10 @@ var AssureNote;
         HistoryCommand.prototype.Invoke = function (CommandName, Params) {
             this.History.Show();
         };
+
+        HistoryCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return HistoryCommand;
     })(AssureNote.Command);
     AssureNote.HistoryCommand = HistoryCommand;

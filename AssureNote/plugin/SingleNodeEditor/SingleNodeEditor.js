@@ -92,6 +92,7 @@ var AssureNote;
             this.App = App;
             this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
+            this.SetHasDoubleClicked(true);
 
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
@@ -103,6 +104,15 @@ var AssureNote;
                     Command.Invoke(null, [TargetView.Label]);
                 }
             });
+        };
+
+        SingleNodeEditorPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 0 /* Edit */) {
+                var Command = this.App.FindCommandByCommandLineName("SingleEdit");
+                if (Command) {
+                    Command.Invoke(null, [NodeView.Label]);
+                }
+            }
         };
         return SingleNodeEditorPlugin;
     })(AssureNote.Plugin);

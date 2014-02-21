@@ -79,6 +79,10 @@ module AssureNote {
             }
             Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class FoldingViewSwitchPlugin extends Plugin {
@@ -92,7 +96,9 @@ module AssureNote {
         }
 
         OnNodeDoubleClicked(NodeView: NodeView): void {
-            this.FoldingCommand.Fold(NodeView);
+            if (AssureNoteApp.Current.ModeManager.GetMode() == AssureNoteMode.View) {
+                this.FoldingCommand.Fold(NodeView);
+            }
         }
     }
 }

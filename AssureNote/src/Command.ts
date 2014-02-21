@@ -251,6 +251,8 @@ module AssureNote {
             var $svg = $('<svg width="' + (TopView.Shape.GetTreeWidth() + 20) +  'px" height="' + (TopView.Shape.GetTreeHeight() + 20) + 'px" version="1.1" xmlns="' + SVG_NS + '">');
             $svg.append($("svg defs").clone(false));
 
+            this.App.PictgramPanel.ForceAppendAllOutOfScreenNode();
+
             var $target = $(AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + (10 -TopView.Shape.GetTreeLeftLocalX()) + " 10) scale(1)").appendTo($svg);
             TopView.TraverseVisibleNode((nodeView) => {
                 var svg = nodeView.Shape.ShapeGroup;
@@ -365,6 +367,10 @@ module AssureNote {
             unfoldAll(TopView);
             this.App.PictgramPanel.Draw();
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class SetColorCommand extends Command {
@@ -413,6 +419,10 @@ module AssureNote {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(<number><any>Params[0] - 0);
             }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 
@@ -511,6 +521,10 @@ module AssureNote {
             }, ()=> {
                 this.App.SetLoading(false);
             });
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 

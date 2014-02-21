@@ -88,6 +88,7 @@ var AssureNote;
                 if (_this.NodeTooltip.IsEnable) {
                     _this.NodeTooltip.Remove();
                 }
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -132,6 +133,7 @@ var AssureNote;
                     _this.NodeTooltip.Remove();
                 }
                 _this.App.ExecDoubleClicked(NodeView);
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -198,9 +200,12 @@ var AssureNote;
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            _this.App.ExecDoubleClicked(Node);
+                            var FoldCommand = _this.App.FindCommandByCommandLineName("fold");
+                            if (FoldCommand) {
+                                FoldCommand.Invoke(null, [Node.Label]);
+                            }
+                            return false;
                         }
-                        return false;
                     }
                 });
             };
@@ -212,9 +217,6 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
-        PictgramPanel.prototype.OnViewportChanged = function () {
-        };
-
         PictgramPanel.prototype.OnKeyDown = function (Event) {
             var Label;
             var handled = true;
@@ -240,6 +242,12 @@ var AssureNote;
                 case 13:
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
+                        Event.preventDefault();
+                    } else {
+                        var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
                         Event.preventDefault();
                     }
                     break;
@@ -267,12 +275,11 @@ var AssureNote;
                     this.NavigateHome();
                     Event.preventDefault();
                     break;
+                case 32:
                 case 70:
-                    if (!this.CmdLine.IsVisible) {
-                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
-                        if (EditCommand && this.FocusedLabel) {
-                            EditCommand.Invoke(null, [this.FocusedLabel]);
-                        }
+                    var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                    if (FoldCommand && this.FocusedLabel) {
+                        FoldCommand.Invoke(null, [this.FocusedLabel]);
                     }
                     Event.preventDefault();
                     break;
@@ -526,6 +533,26 @@ var AssureNote;
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
+        };
+
+        PictgramPanel.prototype.ForceAppendAllOutOfScreenNode = function () {
+            var _this = this;
+            var UpdateArrow = function (Node) {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Arrow.parentNode != _this.HiddenNodeBuffer) {
+                        _this.HiddenNodeBuffer.appendChild(Arrow);
+                    }
+                }
+            };
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[Label];
+                delete this.HiddenNodeMap[Label];
+                this.OnScreenNodeMap[Label] = Node;
+                this.ContentLayer.appendChild(Node.Shape.Content);
+                this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                UpdateArrow(Node);
+            }
         };
 
         PictgramPanel.prototype.UpdateHiddenNodeList = function () {

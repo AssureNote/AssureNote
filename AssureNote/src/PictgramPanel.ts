@@ -104,6 +104,7 @@ module AssureNote {
                 if (this.NodeTooltip.IsEnable) {
                     this.NodeTooltip.Remove();
                 }
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -148,6 +149,7 @@ module AssureNote {
                     this.NodeTooltip.Remove();
                 }
                 this.App.ExecDoubleClicked(NodeView);
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -215,9 +217,12 @@ module AssureNote {
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            this.App.ExecDoubleClicked(Node);
+                            var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                            if (FoldCommand) {
+                                FoldCommand.Invoke(null, [Node.Label]);
+                            }
+                            return false;
                         }
-                        return false;
                     }
                 });
             };
@@ -228,10 +233,6 @@ module AssureNote {
             this.Viewport.ScrollManager.OnEndDrag = (Viewport: ViewportManager) => {
                 $("#auto-expand-area").hide(100);
             };
-        }
-
-        OnViewportChanged() {
-
         }
 
         OnKeyDown(Event: KeyboardEvent): void {
@@ -260,6 +261,12 @@ module AssureNote {
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
                         Event.preventDefault();
+                    } else {
+                        var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
+                        Event.preventDefault();
                     }
                     break;
                 case 72: /*h*/
@@ -286,12 +293,11 @@ module AssureNote {
                     this.NavigateHome();
                     Event.preventDefault();
                     break;
+                case 32: /*space*/
                 case 70: /*f*/
-                    if (!this.CmdLine.IsVisible) {
-                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
-                        if (EditCommand && this.FocusedLabel) {
-                            EditCommand.Invoke(null, [this.FocusedLabel]);
-                        }
+                    var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                    if (FoldCommand && this.FocusedLabel) {
+                        FoldCommand.Invoke(null, [this.FocusedLabel]);
                     }
                     Event.preventDefault();
                     break;
@@ -546,6 +552,25 @@ module AssureNote {
             console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
                 GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
                 GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
+        }
+
+        public ForceAppendAllOutOfScreenNode() {
+            var UpdateArrow = (Node: NodeView) => {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Arrow.parentNode != this.HiddenNodeBuffer) {
+                        this.HiddenNodeBuffer.appendChild(Arrow);
+                    }
+                }
+            };
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[<string>Label];
+                delete this.HiddenNodeMap[<string>Label];
+                this.OnScreenNodeMap[<string>Label] = Node;
+                this.ContentLayer.appendChild(Node.Shape.Content);
+                this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                UpdateArrow(Node);
+            }
         }
 
         private UpdateHiddenNodeList() {

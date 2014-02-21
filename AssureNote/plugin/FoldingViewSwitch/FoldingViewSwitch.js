@@ -83,6 +83,10 @@ var AssureNote;
             }
             Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         };
+
+        FoldingCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return FoldingCommand;
     })(AssureNote.Command);
     AssureNote.FoldingCommand = FoldingCommand;
@@ -96,7 +100,9 @@ var AssureNote;
             AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
         FoldingViewSwitchPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
-            this.FoldingCommand.Fold(NodeView);
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 1 /* View */) {
+                this.FoldingCommand.Fold(NodeView);
+            }
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);

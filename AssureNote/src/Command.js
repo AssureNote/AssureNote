@@ -268,6 +268,8 @@ var AssureNote;
             var $svg = $('<svg width="' + (TopView.Shape.GetTreeWidth() + 20) + 'px" height="' + (TopView.Shape.GetTreeHeight() + 20) + 'px" version="1.1" xmlns="' + SVG_NS + '">');
             $svg.append($("svg defs").clone(false));
 
+            this.App.PictgramPanel.ForceAppendAllOutOfScreenNode();
+
             var $target = $(AssureNote.AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + (10 - TopView.Shape.GetTreeLeftLocalX()) + " 10) scale(1)").appendTo($svg);
             TopView.TraverseVisibleNode(function (nodeView) {
                 var svg = nodeView.Shape.ShapeGroup;
@@ -382,6 +384,10 @@ var AssureNote;
             unfoldAll(TopView);
             this.App.PictgramPanel.Draw();
         };
+
+        UnfoldAllCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnfoldAllCommand;
     })(Command);
     AssureNote.UnfoldAllCommand = UnfoldAllCommand;
@@ -434,6 +440,10 @@ var AssureNote;
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
+        };
+
+        SetScaleCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SetScaleCommand;
     })(Command);
@@ -545,6 +555,10 @@ var AssureNote;
             }, function () {
                 _this.App.SetLoading(false);
             });
+        };
+
+        ShareCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShareCommand;
     })(Command);
