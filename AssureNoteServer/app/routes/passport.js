@@ -14,12 +14,24 @@ function GetUserId(user) {
     if (user.provider && user.provider == 'github') {
         return 'github_' + user.id;
     }
+    if (user.provider && user.provider == 'twitter') {
+        return 'twitter_' + user.id;
+    }
+    if (user.provider && user.provider == 'facebook') {
+        return 'facebook_' + user.id;
+    }
     return null;
 }
 
 function GetUserName(user) {
     if (user.provider && user.provider == 'github') {
         return user.username;
+    }
+    if (user.provider && user.provider == 'twitter') {
+        return user.username;
+    }
+    if (user.provider && user.provider == 'facebook') {
+        return user.displayName;
     }
     return null;
 }
@@ -69,7 +81,7 @@ exports.logout = function (req, res) {
     passport.use(new TwitterStrategy({
         consumerKey: CONFIG.passport.TWITTER_CONSUMER_KEY,
         consumerSecret: CONFIG.passport.TWITTER_CONSUMER_SECRET,
-        callbackURL: CONFIG.passport.resolveURL + "/auth    witter/callback"
+        callbackURL: CONFIG.passport.resolveURL + "/auth/twitter/callback"
     }, function (token, tokenSecret, profile, done) {
         passport.session.accessToken = token;
         passport.session.profile = profile;
