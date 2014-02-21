@@ -27,7 +27,8 @@ var AssureNote;
             var _this = this;
             var item;
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
-            var text = document.createTextNode("\u00a0" + this.GetDisplayName());
+            var spaceChar = "\u00a0";
+            var text = document.createTextNode(spaceChar + this.GetDisplayName());
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">

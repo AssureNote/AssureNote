@@ -1,37 +1,22 @@
-#user-info.text-right
+span#user-info
   .glyphicon.glyphicon-user
   span.user-name &nbsp; #{UserName} 
   if !isLocal
     if(UserName != "Guest")
       button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/logout')
         span.glyphicon.glyphicon-log-out
-        | &nbsp; Logout
+        | &nbsp;Logout
     else
-      .dropdown.clickable.navbar-left
-        button.btn.navbar-btn.btn-default.dropdown-toggle(type='button' data-toggle='dropdown')
-          span.glyphicon.glyphicon-log-in
-          | &nbsp; Login
-          span.caret
-        ul.dropdown-menu
-          li
-            a(href='/auth/github')
-              span.glyphicon.glyphicon-user
-              | &nbsp; Github
-          li
-            a(href='/auth/facebook')
-              span.glyphicon.glyphicon-user
-              | &nbsp; Facebook
-          li
-            a(href='/auth/twitter')
-              span.glyphicon.glyphicon-user
-              | &nbsp; Twitter
+      button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/auth/github')
+        span.glyphicon.glyphicon-log-in
+        | &nbsp;Login
   else
     button.btn.btn-default.navbar-btn.clickable.disable(disabled)
       span.glyphicon.glyphicon-log-in
-      | &nbsp; Login &nbsp;
+      | &nbsp;Login
+  span#top-menu-right.navbar-right
   #user-list
     br
-
 +template("user-list-tmpl")
   span(style="color: ${Color}")
     .glyphicon.glyphicon-user

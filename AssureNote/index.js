@@ -34,6 +34,11 @@
 ///<reference path='plugin/ToDo/ToDo.ts'/>
 var Debug = {};
 
+(function () {
+    var NavBar = document.getElementsByClassName("navbar")[0];
+    NavBar.innerHTML = NavBar.innerHTML.replace(/\s\s+/g, "");
+})();
+
 $(function () {
     //Browser detection
     var UA = AssureNote.AssureNoteUtils.UserAgant;

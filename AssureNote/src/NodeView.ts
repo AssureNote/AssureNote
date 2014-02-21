@@ -239,7 +239,7 @@ module AssureNote {
             if (OldView) {
                 this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
-                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType()) {
+                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType() && !OldView.HasParameter()) {
                     this.SetShape(OldView.GetShape());
                 } else {
                     this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
@@ -443,6 +443,10 @@ module AssureNote {
                 return false;
             }
             return true;
+        }
+
+        HasParameter(): boolean {
+            return this.NodeDoc.match(/\[([^\[\]]*)\]/) != null;
         }
     }
 

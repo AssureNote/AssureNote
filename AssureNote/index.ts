@@ -37,6 +37,11 @@
 
 var Debug = <any>{};
 
+(() => {
+    var NavBar = (<HTMLElement>document.getElementsByClassName("navbar")[0]);
+    NavBar.innerHTML = NavBar.innerHTML.replace(/\s\s+/g, "")
+})();
+
 $(() => {
 
     //Browser detection
