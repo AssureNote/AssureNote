@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -226,7 +226,7 @@ var AssureNote;
             if (OldView) {
                 this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
-                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType()) {
+                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType() && !OldView.HasParameter()) {
                     this.SetShape(OldView.GetShape());
                 } else {
                     this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
@@ -434,6 +434,10 @@ var AssureNote;
                 return false;
             }
             return true;
+        };
+
+        NodeView.prototype.HasParameter = function () {
+            return this.NodeDoc.match(/\[([^\[\]]*)\]/) != null;
         };
         NodeView.GlobalPositionCache = null;
         return NodeView;
