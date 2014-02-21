@@ -200,10 +200,7 @@ var AssureNote;
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            var FoldCommand = _this.App.FindCommandByCommandLineName("fold");
-                            if (FoldCommand) {
-                                FoldCommand.Invoke(null, [Node.Label]);
-                            }
+                            _this.App.ExecCommandByName("fold", Node.Label);
                             return false;
                         }
                     }
@@ -244,9 +241,8 @@ var AssureNote;
                         this.Search.VisitNext(event.shiftKey);
                         Event.preventDefault();
                     } else {
-                        var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
-                        if (EditCommand && this.FocusedLabel) {
-                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        if (this.FocusedLabel) {
+                            this.App.ExecCommandByName((Event.shiftKey ? "edit" : "singleedit"), this.FocusedLabel);
                         }
                         Event.preventDefault();
                     }
@@ -277,31 +273,27 @@ var AssureNote;
                     break;
                 case 32:
                 case 70:
-                    var FoldCommand = this.App.FindCommandByCommandLineName("fold");
-                    if (FoldCommand && this.FocusedLabel) {
-                        FoldCommand.Invoke(null, [this.FocusedLabel]);
+                    if (this.FocusedLabel) {
+                        this.App.ExecCommandByName("fold", this.FocusedLabel);
                     }
                     Event.preventDefault();
                     break;
                 case 65:
                 case 73:
-                    var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
-                    if (EditCommand && this.FocusedLabel) {
-                        EditCommand.Invoke(null, [this.FocusedLabel]);
+                    if (this.FocusedLabel) {
+                        this.App.ExecCommandByName((Event.shiftKey ? "edit" : "singleedit"), this.FocusedLabel);
                     }
                     Event.preventDefault();
                     break;
                 case 187:
-                    var Command = this.App.FindCommandByCommandLineName("set-scale");
-                    if (Command && Event.shiftKey) {
-                        Command.Invoke(null, [this.Viewport.GetCameraScale() + 0.1]);
+                    if (Event.shiftKey) {
+                        this.App.ExecCommandByName("set-scale", (this.Viewport.GetCameraScale() + 0.1));
                     }
                     Event.preventDefault();
                     break;
                 case 189:
-                    var Command = this.App.FindCommandByCommandLineName("set-scale");
-                    if (Command && Event.shiftKey) {
-                        Command.Invoke(null, [this.Viewport.GetCameraScale() - 0.1]);
+                    if (Event.shiftKey) {
+                        this.App.ExecCommandByName("set-scale", (this.Viewport.GetCameraScale() - 0.1));
                     }
                     Event.preventDefault();
                     break;

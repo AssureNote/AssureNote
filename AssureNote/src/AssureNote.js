@@ -134,6 +134,19 @@ var AssureNote;
             return Command;
         };
 
+        AssureNoteApp.prototype.ExecCommandByName = function (Name) {
+            var Params = [];
+            for (var _i = 0; _i < (arguments.length - 1); _i++) {
+                Params[_i] = arguments[_i + 1];
+            }
+            var Command = this.FindCommandByCommandLineName(Name);
+            if (Command) {
+                Command.Invoke(Name, Params);
+                return true;
+            }
+            return false;
+        };
+
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
             var CommandName = ParsedCommand.GetMethod();
             if (CommandName == "search") {

@@ -26,27 +26,14 @@ var AssureNote;
         TopMenuItem.prototype.Enable = function () {
             this.IsEnabled = true;
             if (this.ElementId) {
-                var button = $('#' + this.ElementId);
-                var classes = button.attr('class').split(" ");
-                var index = classes.indexOf('disabled');
-                if (index > 0) {
-                    classes.splice(index, 1);
-                }
-                button.attr('class', classes.join(" "));
+                $('#' + this.ElementId).removeClass("disabled").attr("disabled", "disabled");
             }
         };
 
         TopMenuItem.prototype.Disable = function () {
             this.IsEnabled = false;
             if (this.ElementId) {
-                var button = $('#' + this.ElementId);
-                var classes = button.attr('class').split(" ");
-                var index = classes.indexOf('disabled');
-                if (index > 0) {
-                    return;
-                }
-                classes.push('disabled');
-                button.attr('class', classes.join(" "));
+                $('#' + this.ElementId).addClass("disabled").removeAttr("disabled");
             }
         };
 
@@ -261,8 +248,7 @@ var AssureNote;
             return "New...";
         };
         NewMenuItem.prototype.Invoke = function (App) {
-            var Command = App.FindCommandByCommandLineName("new");
-            Command.Invoke(null, []);
+            App.ExecCommandByName("new");
         };
         return NewMenuItem;
     })(TopMenuItem);
@@ -280,8 +266,7 @@ var AssureNote;
             return "Open...";
         };
         OpenMenuItem.prototype.Invoke = function (App) {
-            var Command = App.FindCommandByCommandLineName("open");
-            Command.Invoke(null, []);
+            App.ExecCommandByName("open");
         };
         return OpenMenuItem;
     })(TopMenuItem);
@@ -300,11 +285,9 @@ var AssureNote;
         };
         UploadMenuItem.prototype.Invoke = function (App) {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
-                var CommitCommand = App.FindCommandByCommandLineName("commit");
-                CommitCommand.Invoke(null, ["Share"]);
+                App.ExecCommandByName("commit", "Share");
             }
-            var Command = App.FindCommandByCommandLineName("share");
-            Command.Invoke(null, []);
+            App.ExecCommandByName("share");
         };
         return UploadMenuItem;
     })(TopMenuItem);
@@ -323,12 +306,10 @@ var AssureNote;
         };
         SaveMenuItem.prototype.Invoke = function (App) {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
-                var CommitCommand = App.FindCommandByCommandLineName("commit");
-                CommitCommand.Invoke(null, ["Save"]);
+                App.ExecCommandByName("commit", "Save");
             }
-            var Command = App.FindCommandByCommandLineName("save");
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".wgsn");
-            Command.Invoke(null, [DefaultName]);
+            App.ExecCommandByName("save", DefaultName);
         };
         return SaveMenuItem;
     })(TopMenuItem);
@@ -347,8 +328,7 @@ var AssureNote;
         };
         SaveAsMenuItem.prototype.Invoke = function (App) {
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
-                var CommitCommand = App.FindCommandByCommandLineName("commit");
-                CommitCommand.Invoke(null, ["Save"]);
+                App.ExecCommandByName("commit", "Save");
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, "." + this.GetExtention());
             var Command = App.FindCommandByCommandLineName("save");
@@ -438,8 +418,7 @@ var AssureNote;
             return "Command list";
         };
         CommandListMenuItem.prototype.Invoke = function (App) {
-            var Command = App.FindCommandByCommandLineName("help");
-            Command.Invoke(null, []);
+            App.ExecCommandByName("help");
         };
         return CommandListMenuItem;
     })(TopMenuItem);
@@ -493,8 +472,7 @@ var AssureNote;
             return "Show history panel";
         };
         ShowHistoryPanelItem.prototype.Invoke = function (App) {
-            var Command = App.FindCommandByCommandLineName("history");
-            Command.Invoke(null, []);
+            App.ExecCommandByName("history");
         };
         return ShowHistoryPanelItem;
     })(TopMenuItem);
