@@ -151,8 +151,9 @@ module AssureNote {
         }
 
         ExecDoubleClicked(NodeView: NodeView): void {
-            var Plugin = this.PluginManager.GetDoubleClicked();
-            Plugin.OnNodeDoubleClicked(NodeView);
+            this.PluginManager.GetDoubleClicked().forEach((Plugin) => {
+                Plugin.OnNodeDoubleClicked(NodeView);
+            });
         }
 
         FindCommandByCommandLineName(Name: string): Command {

@@ -37,48 +37,6 @@ html
         #editor-background.full-size-layer(style='display: none;')
         #editor-wrapper(style='border: 1px solid black')
           textarea#editor(placeholder='Type something...', style='display: none;')
-        // Help Modal
-        #help-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='help-modal-label', aria-hidden='true')
-          .modal-dialog
-            .modal-content
-              .modal-header
-                button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
-                h4#help-modal-label.modal-title Help&colon; Command list
-              .modal-body
-                ul
-              .modal-footer
-                button.btn.btn-default(type='button', data-dismiss='modal') Close
-        // Help Modal
-        #about-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
-          .modal-dialog
-            .modal-content
-              .modal-header
-                button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
-                h4#about-modal-label.modal-title About
-              .modal-body(style='text-align: center;')
-                img(src='#{basepath}/images/logo.png', alt='AssureNote', style='width: 60%')
-                p Version 0.2.2
-                p Copyright &copy; 2014, AssureNote project authors. All rights reserved.
-                h3 Credit
-                ul.list-inline
-                  li Atsushi Uchida
-                  li Kimio Kuramitsu
-                  li Shunsuke Shida
-                  li Tetsuro Matsumura
-                  li Yuki Okamoto
-                  li Yusuke Nakayama
-                h3 Special Thanks
-                ul.list-inline
-                  li
-                    img(src='#{basepath}/images/logo_deos.png', width='100px', height='100px')
-                    br
-                    | DEOS project
-                  li
-                    img(src='#{basepath}/images/logo_ynu.png', width='100px', height='100px')
-                    br
-                    | Yokohama National Univercity
-              .modal-footer
-                button.btn.btn-default(type='button', data-dismiss='modal') Close
     svg(width='0', height='0')
       defs
         marker#Triangle-black(viewbox='0 0 10 10', refx='10', refy='5', markerunits='strokeWidth', markerwidth='15', markerheight='9', orient='auto')
@@ -89,6 +47,48 @@ html
         rect#goal-master.assurenote-default(width='1', height='1')
         polygon#strategy-master.assurenote-default(points='0.08,0 1,0 0.92,1 0,1')
         ellipse#evidence-master.assurenote-default(cx='1', cy='1', rx='0.5', ry='0.5')
+    // Help Modal
+    #help-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='help-modal-label', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+            h4#help-modal-label.modal-title Help&colon; Command list
+          .modal-body
+            ul
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
+    // Help Modal
+    #about-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+            h4#about-modal-label.modal-title About
+          .modal-body(style='text-align: center;')
+            img(src='#{basepath}/images/logo.png', alt='AssureNote', style='width: 60%')
+            p Version 0.2.2
+            p Copyright &copy; 2014, AssureNote project authors. All rights reserved.
+            h3 Credit
+            ul.list-inline
+              li Atsushi Uchida
+              li Kimio Kuramitsu
+              li Shunsuke Shida
+              li Tetsuro Matsumura
+              li Yuki Okamoto
+              li Yusuke Nakayama
+            h3 Special Thanks
+            ul.list-inline
+              li
+                img(src='#{basepath}/images/logo_deos.png', width='100px', height='100px')
+                br
+                | DEOS project
+              li
+                img(src='#{basepath}/images/logo_ynu.png', width='100px', height='100px')
+                br
+                | Yokohama National Univercity
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
     +js('/lib/jquery.min.js')
     +js('/lib/jquery.tmpl.min.js')
     +js('/lib/jquery.jqdock.min.js')

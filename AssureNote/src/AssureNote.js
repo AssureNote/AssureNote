@@ -121,8 +121,9 @@ var AssureNote;
         };
 
         AssureNoteApp.prototype.ExecDoubleClicked = function (NodeView) {
-            var Plugin = this.PluginManager.GetDoubleClicked();
-            Plugin.OnNodeDoubleClicked(NodeView);
+            this.PluginManager.GetDoubleClicked().forEach(function (Plugin) {
+                Plugin.OnNodeDoubleClicked(NodeView);
+            });
         };
 
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {

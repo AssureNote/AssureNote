@@ -153,13 +153,12 @@ var AssureNote;
         };
 
         PluginManager.prototype.GetDoubleClicked = function () {
-            var ret = null;
+            var ret = [];
 
             //FIXME Editing mode
             $.each(this.PluginMap, function (key, value) {
                 if (value.HasDoubleClicked()) {
-                    ret = value;
-                    return false;
+                    ret.push(value);
                 }
             });
             return ret;

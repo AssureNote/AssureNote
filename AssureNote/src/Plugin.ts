@@ -159,13 +159,12 @@ module AssureNote {
             return ret;
         }
 
-        GetDoubleClicked(): Plugin {
-            var ret: Plugin = null;
+        GetDoubleClicked(): Plugin[] {
+            var ret: Plugin[] = [];
             //FIXME Editing mode
             $.each(this.PluginMap, (key, value: Plugin) => {
                 if (value.HasDoubleClicked()) {
-                    ret = value;
-                    return false;
+                    ret.push(value);
                 }
             });
             return ret;

@@ -64,55 +64,6 @@
         <div id="editor-wrapper" style="border: 1px solid black">
           <textarea id="editor" placeholder="Type something..." style="display: none;"></textarea>
         </div>
-        <!-- Help Modal-->
-        <div id="help-modal" tabindex="-1" role="dialog" aria-labelledby="help-modal-label" aria-hidden="true" class="modal fade">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
-                <h4 id="help-modal-label" class="modal-title">Help&colon; Command list</h4>
-              </div>
-              <div class="modal-body">
-                <ul></ul>
-              </div>
-              <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Help Modal-->
-        <div id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true" class="modal fade">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
-                <h4 id="about-modal-label" class="modal-title">About</h4>
-              </div>
-              <div style="text-align: center;" class="modal-body"><img src="./images/logo.png" alt="AssureNote" style="width: 60%">
-                <p>Version 0.2.2</p>
-                <p>Copyright &copy; 2014, AssureNote project authors. All rights reserved.</p>
-                <h3>Credit</h3>
-                <ul class="list-inline">
-                  <li>Atsushi Uchida</li>
-                  <li>Kimio Kuramitsu</li>
-                  <li>Shunsuke Shida</li>
-                  <li>Tetsuro Matsumura</li>
-                  <li>Yuki Okamoto</li>
-                  <li>Yusuke Nakayama</li>
-                </ul>
-                <h3>Special Thanks</h3>
-                <ul class="list-inline">
-                  <li><img src="./images/logo_deos.png" width="100px" height="100px"><br>DEOS project</li>
-                  <li><img src="./images/logo_ynu.png" width="100px" height="100px"><br>Yokohama National Univercity</li>
-                </ul>
-              </div>
-              <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     <svg width="0" height="0">
@@ -129,6 +80,55 @@
         <ellipse id="evidence-master" cx="1" cy="1" rx="0.5" ry="0.5" class="assurenote-default"></ellipse>
       </defs>
     </svg>
+    <!-- Help Modal-->
+    <div id="help-modal" tabindex="-1" role="dialog" aria-labelledby="help-modal-label" aria-hidden="true" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
+            <h4 id="help-modal-label" class="modal-title">Help&colon; Command list</h4>
+          </div>
+          <div class="modal-body">
+            <ul></ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Help Modal-->
+    <div id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
+            <h4 id="about-modal-label" class="modal-title">About</h4>
+          </div>
+          <div style="text-align: center;" class="modal-body"><img src="./images/logo.png" alt="AssureNote" style="width: 60%">
+            <p>Version 0.2.2</p>
+            <p>Copyright &copy; 2014, AssureNote project authors. All rights reserved.</p>
+            <h3>Credit</h3>
+            <ul class="list-inline">
+              <li>Atsushi Uchida</li>
+              <li>Kimio Kuramitsu</li>
+              <li>Shunsuke Shida</li>
+              <li>Tetsuro Matsumura</li>
+              <li>Yuki Okamoto</li>
+              <li>Yusuke Nakayama</li>
+            </ul>
+            <h3>Special Thanks</h3>
+            <ul class="list-inline">
+              <li><img src="./images/logo_deos.png" width="100px" height="100px"><br>DEOS project</li>
+              <li><img src="./images/logo_ynu.png" width="100px" height="100px"><br>Yokohama National Univercity</li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="text/javascript" src="./lib/jquery.min.js"></script>
     <script type="text/javascript" src="./lib/jquery.tmpl.min.js"></script>
     <script type="text/javascript" src="./lib/jquery.jqdock.min.js"></script>
