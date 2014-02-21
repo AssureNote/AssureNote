@@ -7,13 +7,28 @@
         span.glyphicon.glyphicon-log-out
         | &nbsp; Logout
     else
-      button.btn.btn-default.navbar-btn.clickable(href='#{basepath}/auth/github')
-        span.glyphicon.glyphicon-log-in
-        | &nbsp; Login
+      .dropdown.clickable.navbar-left
+        button.btn.navbar-btn.btn-default.dropdown-toggle(type='button' data-toggle='dropdown')
+          span.glyphicon.glyphicon-log-in
+          | &nbsp; Login
+          span.caret
+        ul.dropdown-menu
+          li
+            a(href='/auth/github')
+              span.glyphicon.glyphicon-user
+              | &nbsp; Github
+          li
+            a(href='/auth/facebook')
+              span.glyphicon.glyphicon-user
+              | &nbsp; Facebook
+          li
+            a(href='/auth/twitter')
+              span.glyphicon.glyphicon-user
+              | &nbsp; Twitter
   else
     button.btn.btn-default.navbar-btn.clickable.disable(disabled)
       span.glyphicon.glyphicon-log-in
-      | &nbsp; Login
+      | &nbsp; Login &nbsp;
   #user-list
     br
 
