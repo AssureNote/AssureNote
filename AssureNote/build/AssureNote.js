@@ -4682,10 +4682,25 @@ var AssureNote;
             return this.FocusedLabel;
         };
 
+        PictgramPanel.prototype.HasMonitorNode = function () {
+            for (var Label in this.ViewMap) {
+                var View = this.ViewMap[Label];
+                if (View.IsMonitorNode()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         PictgramPanel.prototype.InitializeView = function (NodeView) {
             this.TopNodeView = NodeView;
             this.ViewMap = {};
             this.TopNodeView.UpdateViewMap(this.ViewMap);
+
+            this.App.TopMenu.SubMenuMap["monitor"].Disable();
+            if (this.HasMonitorNode()) {
+                this.App.TopMenu.SubMenuMap["monitor"].Enable();
+            }
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
@@ -5269,6 +5284,7 @@ var AssureNote;
         };
 
         TopMenuItem.prototype.Enable = function () {
+            this.IsEnabled = true;
             if (this.ElementId) {
                 var button = $('#' + this.ElementId);
                 var classes = button.attr('class').split(" ");
@@ -5281,8 +5297,16 @@ var AssureNote;
         };
 
         TopMenuItem.prototype.Disable = function () {
+            this.IsEnabled = false;
             if (this.ElementId) {
                 var button = $('#' + this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if (index > 0) {
+                    return;
+                }
+                classes.push('disabled');
+                button.attr('class', classes.join(" "));
             }
         };
 
@@ -7373,6 +7397,36 @@ var AssureNote;
         NodeView.prototype.HasParameter = function () {
             return this.NodeDoc.match(/\[([^\[\]]*)\]/) != null;
         };
+
+        NodeView.prototype.IsMonitorNode = function () {
+            var ThisModel = this.Model;
+            if (!ThisModel.IsEvidence()) {
+                return false;
+            }
+
+            var GoalModel = ThisModel.GetCloseGoal();
+            var ContextModel = null;
+
+            for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
+                var BroutherModel = GoalModel.SubNodeList[i];
+                if (BroutherModel.IsContext()) {
+                    ContextModel = BroutherModel;
+                    break;
+                }
+            }
+            if (ContextModel == null) {
+                return false;
+            }
+
+            var TagMap = ContextModel.GetTagMapWithLexicalScope();
+            var Location = TagMap.get("Location");
+            var Condition = TagMap.get("Condition");
+            if (Location && Condition) {
+                return true;
+            }
+
+            return false;
+        };
         NodeView.GlobalPositionCache = null;
         return NodeView;
     })();
@@ -7994,38 +8048,12 @@ var AssureNote;
         function GSNEvidenceShape() {
             _super.apply(this, arguments);
         }
-        GSNEvidenceShape.prototype.IsMonitorNodeShape = function () {
-            var ThisModel = this.NodeView.Model;
-            var GoalModel = ThisModel.GetCloseGoal();
-            var ContextModel = null;
-
-            for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
-                var BroutherModel = GoalModel.SubNodeList[i];
-                if (BroutherModel.IsContext()) {
-                    ContextModel = BroutherModel;
-                    break;
-                }
-            }
-            if (ContextModel == null) {
-                return false;
-            }
-
-            var TagMap = ContextModel.GetTagMapWithLexicalScope();
-            var Location = TagMap.get("Location");
-            var Condition = TagMap.get("Condition");
-            if (Location && Condition) {
-                return true;
-            }
-
-            return false;
-        };
-
         GSNEvidenceShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
 
-            if (this.IsMonitorNodeShape()) {
+            if (this.NodeView.IsMonitorNode()) {
                 var MonitorMaster = GSNEvidenceShape.MonitorLabelMaster.cloneNode();
                 MonitorMaster.textContent = "M";
                 this.ShapeGroup.appendChild(MonitorMaster);
@@ -9242,7 +9270,7 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
-            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "monitor", "Monitor", "eye-open", [
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(false, "monitor", "Monitor", "eye-open", [
                 new SetMonitorMenuItem(true),
                 new ShowMonitorListMenuItem(true)
             ]));

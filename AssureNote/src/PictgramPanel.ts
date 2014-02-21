@@ -466,10 +466,25 @@ module AssureNote {
             return this.FocusedLabel;
         }
 
+        private HasMonitorNode(): boolean {
+            for(var Label in this.ViewMap) {
+                var View = this.ViewMap[Label];
+                if(View.IsMonitorNode()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         InitializeView(NodeView: NodeView): void {
             this.TopNodeView = NodeView;
             this.ViewMap = {};
             this.TopNodeView.UpdateViewMap(this.ViewMap);
+
+            this.App.TopMenu.SubMenuMap["monitor"].Disable();
+            if(this.HasMonitorNode()) {
+                this.App.TopMenu.SubMenuMap["monitor"].Enable();
+            }
         }
 
         Draw(Label?: string, Duration?: number, FixedNode?: NodeView): void {

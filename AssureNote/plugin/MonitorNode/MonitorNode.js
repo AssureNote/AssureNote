@@ -729,7 +729,7 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
-            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "monitor", "Monitor", "eye-open", [
+            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(false, "monitor", "Monitor", "eye-open", [
                 new SetMonitorMenuItem(true),
                 new ShowMonitorListMenuItem(true)
             ]));

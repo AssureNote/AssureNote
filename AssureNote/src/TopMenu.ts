@@ -23,6 +23,7 @@ module AssureNote {
         }
 
         Enable(): void {
+            this.IsEnabled = true;
             if(this.ElementId) {
                 var button = $('#'+this.ElementId);
                 var classes = button.attr('class').split(" ");
@@ -35,8 +36,16 @@ module AssureNote {
         }
 
         Disable(): void {
+            this.IsEnabled = false;
             if(this.ElementId) {
                 var button = $('#'+this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if(index > 0) {
+                    return;
+                }
+                classes.push('disabled');
+                button.attr('class', classes.join(" "));
             }
         }
 

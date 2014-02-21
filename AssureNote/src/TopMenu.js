@@ -24,6 +24,7 @@ var AssureNote;
         };
 
         TopMenuItem.prototype.Enable = function () {
+            this.IsEnabled = true;
             if (this.ElementId) {
                 var button = $('#' + this.ElementId);
                 var classes = button.attr('class').split(" ");
@@ -36,8 +37,16 @@ var AssureNote;
         };
 
         TopMenuItem.prototype.Disable = function () {
+            this.IsEnabled = false;
             if (this.ElementId) {
                 var button = $('#' + this.ElementId);
+                var classes = button.attr('class').split(" ");
+                var index = classes.indexOf('disabled');
+                if (index > 0) {
+                    return;
+                }
+                classes.push('disabled');
+                button.attr('class', classes.join(" "));
             }
         };
 
