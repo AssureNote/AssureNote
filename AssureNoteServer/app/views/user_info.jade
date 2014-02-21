@@ -2,9 +2,10 @@ span
   #top-menu-right.navbar-right
   if !isLocal
     if(UserName != "Guest")
-      button.btn.btn-default.navbar-btn.clickable.navbar-right(href='#{basepath}/logout')
-        span.glyphicon.glyphicon-log-out
-        | &nbsp;Logout
+      a(href='#{basepath}/logout')
+        button.btn.btn-default.navbar-btn.clickable.navbar-right
+          span.glyphicon.glyphicon-log-out
+          | &nbsp;Logout
     else
       .dropdown.clickable.navbar-right
         button.btn.navbar-btn.btn-default.dropdown-toggle.clickable(type='button' data-toggle='dropdown')
