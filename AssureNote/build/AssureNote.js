@@ -2702,7 +2702,7 @@ var AssureNote;
                     Node = Node.Parent;
                 }
             }
-            this.Panel.Draw(this.Panel.MasterView.Label, 300);
+            this.Panel.Draw(this.Panel.TopNodeView.Label, 300);
         };
 
         VisitableNodeList.prototype.IsVisiting = function () {
@@ -3607,7 +3607,7 @@ var AssureNote;
 
         SaveSVGCommand.prototype.Invoke = function (CommandName, Params) {
             var Filename = Params.length > 0 ? Params[0] : this.App.WGSNName.replace(/(\.\w+)?$/, ".svg");
-            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.MasterView), Filename);
+            AssureNote.AssureNoteUtils.SaveAs(this.ConvertToSVG(this.App.PictgramPanel.TopNodeView), Filename);
         };
 
         SaveSVGCommand.prototype.GetHelpHTML = function () {
@@ -3723,7 +3723,7 @@ var AssureNote;
         };
 
         UnfoldAllCommand.prototype.Invoke = function (CommandName, Params) {
-            var TopView = this.App.PictgramPanel.MasterView;
+            var TopView = this.App.PictgramPanel.TopNodeView;
             var unfoldAll = function (TargetView) {
                 TargetView.SetIsFolded(false);
                 TargetView.ForEachVisibleChildren(function (SubNode) {
@@ -4264,7 +4264,7 @@ var AssureNote;
                     var ParsedCommand = new CommandParser();
                     ParsedCommand.Parse(this.GetValue());
                     if (ParsedCommand.GetMethod() == "search") {
-                        this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.MasterView, ParsedCommand.GetArgs()[0]);
+                        this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, ParsedCommand.GetArgs()[0]);
                     }
                     this.App.ExecCommand(ParsedCommand);
                     this.AddHistory(ParsedCommand.GetRawString());
@@ -4424,11 +4424,11 @@ var AssureNote;
             }, true);
 
             this.Viewport.ScrollManager.OnDragged = function (Viewport) {
-                if (!_this.MasterView) {
+                if (!_this.TopNodeView) {
                     return;
                 }
                 var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
-                _this.MasterView.TraverseVisibleNode(function (Node) {
+                _this.TopNodeView.TraverseVisibleNode(function (Node) {
                     if (Node.IsFolded()) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
@@ -4552,7 +4552,7 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
-            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.MasterView;
+            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
             this.FocusAndMoveToNode(NextNode);
         };
 
@@ -4595,7 +4595,7 @@ var AssureNote;
             }
             var NearestNode = null;
             var CurrentMinimumDistanceSquere = Infinity;
-            this.MasterView.TraverseVisibleNode(function (Node) {
+            this.TopNodeView.TraverseVisibleNode(function (Node) {
                 var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
                 var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
                 var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
@@ -4656,9 +4656,9 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.InitializeView = function (NodeView) {
-            this.MasterView = NodeView;
+            this.TopNodeView = NodeView;
             this.ViewMap = {};
-            this.MasterView.UpdateViewMap(this.ViewMap);
+            this.TopNodeView.UpdateViewMap(this.ViewMap);
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
@@ -4670,7 +4670,7 @@ var AssureNote;
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
-                TargetView = this.MasterView;
+                TargetView = this.TopNodeView;
             }
 
             var FixedNodeGX0;
@@ -4730,7 +4730,7 @@ var AssureNote;
             this.Viewport.CameraLimitRect = new AssureNote.Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
 
             var PageRect = this.Viewport.GetPageRectInGxGy();
-            this.MasterView.TraverseVisibleNode(function (Node) {
+            this.TopNodeView.TraverseVisibleNode(function (Node) {
                 if (Node.IsInRect(PageRect)) {
                     _this.OnScreenNodeMap[Node.Label] = Node;
                 } else {
@@ -4836,7 +4836,7 @@ var AssureNote;
             this.MoveToNearestNode(2 /* Right */);
         };
         PictgramPanel.prototype.NavigateHome = function () {
-            this.FocusAndMoveToNode(this.MasterView);
+            this.FocusAndMoveToNode(this.TopNodeView);
         };
         return PictgramPanel;
     })(AssureNote.Panel);
@@ -6076,7 +6076,7 @@ var AssureNote;
             var TopGoalNode = LatestDoc.TopNode;
 
             this.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoalNode, true));
-            this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.MasterView);
+            this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.TopNodeView);
             this.PictgramPanel.Draw();
 
             if (location.hash != "") {
@@ -6094,7 +6094,7 @@ var AssureNote;
                     this.PictgramPanel.Viewport.SetCamera(NodeView.GetCenterGX(), NodeView.GetCenterGY(), 1);
                 }
             } else {
-                var TopGoal = this.PictgramPanel.MasterView;
+                var TopGoal = this.PictgramPanel.TopNodeView;
                 this.PictgramPanel.Viewport.SetCamera(TopGoal.GetCenterGX(), TopGoal.GetCenterGY() + this.PictgramPanel.Viewport.GetPageHeight() / 3, 1);
             }
             $("title").text("AssureNote");
@@ -6612,7 +6612,7 @@ var AssureNote;
             } else {
                 TargetView.SetIsFolded(!TargetView.IsFolded());
             }
-            Panel.Draw(Panel.MasterView.Label, 300, TargetView);
+            Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         };
         return FoldingCommand;
     })(AssureNote.Command);
@@ -7877,13 +7877,41 @@ var AssureNote;
         function GSNEvidenceShape() {
             _super.apply(this, arguments);
         }
+        GSNEvidenceShape.prototype.IsMonitorNodeShape = function () {
+            var ThisModel = this.NodeView.Model;
+            var GoalModel = ThisModel.GetCloseGoal();
+            var ContextModel = null;
+
+            for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
+                var BroutherModel = GoalModel.SubNodeList[i];
+                if (BroutherModel.IsContext()) {
+                    ContextModel = BroutherModel;
+                    break;
+                }
+            }
+            if (ContextModel == null) {
+                return false;
+            }
+
+            var TagMap = ContextModel.GetTagMapWithLexicalScope();
+            var Location = TagMap.get("Location");
+            var Condition = TagMap.get("Condition");
+            if (Location && Condition) {
+                return true;
+            }
+
+            return false;
+        };
+
         GSNEvidenceShape.prototype.PrerenderSVGContent = function (manager) {
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
 
-            if (false) {
-                this.ShapeGroup.appendChild(GSNEvidenceShape.MonitorLabelMaster);
+            if (this.IsMonitorNodeShape()) {
+                var MonitorMaster = GSNEvidenceShape.MonitorLabelMaster.cloneNode();
+                MonitorMaster.textContent = "M";
+                this.ShapeGroup.appendChild(MonitorMaster);
             }
         };
 
@@ -7902,11 +7930,10 @@ var AssureNote;
             var MonitorMaster = AssureNote.AssureNoteUtils.CreateSVGElement("text");
             MonitorMaster.setAttribute("x", "220");
             MonitorMaster.setAttribute("y", "20");
-            MonitorMaster.setAttribute("font-size", "24px");
+            MonitorMaster.setAttribute("font-size", "36px");
             MonitorMaster.setAttribute("font-family", "Times New Roman");
-            MonitorMaster.setAttribute("fill", "#000");
-            MonitorMaster.setAttribute("stroke", "#000");
-            MonitorMaster.textContent = "M";
+            MonitorMaster.setAttribute("fill", "gray");
+            MonitorMaster.setAttribute("stroke", "none");
             return MonitorMaster;
         })();
         return GSNEvidenceShape;

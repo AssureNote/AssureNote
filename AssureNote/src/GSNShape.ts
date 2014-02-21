@@ -653,14 +653,42 @@ module AssureNote {
         private BodyEllipse: SVGEllipseElement;
         private ClientHeight: number;
 
+        private IsMonitorNodeShape(): boolean {
+            var ThisModel = this.NodeView.Model;
+            var GoalModel = ThisModel.GetCloseGoal();
+            var ContextModel = null;
+
+            for(var i: number = 0; i < GoalModel.SubNodeList.length; i++) {
+                var BroutherModel = GoalModel.SubNodeList[i];
+                if(BroutherModel.IsContext()) {
+                    ContextModel = BroutherModel;
+                    break;
+                }
+            }
+            if(ContextModel == null) {
+                return false;
+            }
+
+            var TagMap = ContextModel.GetTagMapWithLexicalScope();
+            var Location = TagMap.get("Location");
+            var Condition = TagMap.get("Condition");
+            if(Location && Condition) {
+                return true;
+            }
+
+            return false;
+        }
+
         PrerenderSVGContent(manager: PluginManager): void {
             super.PrerenderSVGContent(manager);
             this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
 
-            /* FIXME detect monitor*/
-            if (false) {
-                this.ShapeGroup.appendChild(GSNEvidenceShape.MonitorLabelMaster);
+            /* FIXME change the following code to use API in common with MonitorNode plugin */
+            if (this.IsMonitorNodeShape()) {
+                var MonitorMaster = GSNEvidenceShape.MonitorLabelMaster.cloneNode();
+                MonitorMaster.textContent = "M";
+                this.ShapeGroup.appendChild(MonitorMaster);
             }
         }
 
@@ -679,11 +707,10 @@ module AssureNote {
             var MonitorMaster = AssureNoteUtils.CreateSVGElement("text");
             MonitorMaster.setAttribute("x", "220");
             MonitorMaster.setAttribute("y", "20");
-            MonitorMaster.setAttribute("font-size", "24px");
+            MonitorMaster.setAttribute("font-size", "36px");
             MonitorMaster.setAttribute("font-family", "Times New Roman");
-            MonitorMaster.setAttribute("fill", "#000");
-            MonitorMaster.setAttribute("stroke", "#000");
-            MonitorMaster.textContent = "M";
+            MonitorMaster.setAttribute("fill", "gray");
+            MonitorMaster.setAttribute("stroke", "none");
             return MonitorMaster;
         })();
     }
