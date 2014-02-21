@@ -48,7 +48,7 @@ module AssureNote {
             this.Element.css(CSS);
         }
 
-        private OnOutSideClicked: (Event: MouseEvent) => void;
+        private OnOutSideClicked: () => void;
 
         EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive: boolean): void {
             if (this.Timeout) {
@@ -72,18 +72,19 @@ module AssureNote {
             var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
-            this.Element.show().css("opacity", 1).off("blur").on("blur", (e: JQueryEventObject) => {
-                e.stopPropagation();
-                e.preventDefault();
-                this.DisableEditor(NodeView, WGSN);
-            });
+            //this.Element.off("blur").on("blur", (e: JQueryEventObject) => {
+            //    e.stopPropagation();
+            //    e.preventDefault();
+            //    this.DisableEditor(NodeView, WGSN);
+            //});
             this.OnOutSideClicked = () => {
-                this.Element.blur();
+                this.DisableEditor(NodeView, WGSN);
             };
             this.App.PictgramPanel.ContentLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            this.Element.css("opacity", 1).show()
             this.Editor.refresh();
             this.Editor.focus();
             this.Activate();
@@ -122,14 +123,13 @@ module AssureNote {
             Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
 
             Panel.Activate();
-            return null;
         }
 
         OnKeyDown(Event: KeyboardEvent): void {
             this.Editor.focus();
             if (Event.keyCode == 27 /* Esc */) {
                 Event.stopPropagation();
-                this.Element.blur();
+                this.OnOutSideClicked();
             }
         }
     }

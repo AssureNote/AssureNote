@@ -367,6 +367,10 @@ module AssureNote {
             unfoldAll(TopView);
             this.App.PictgramPanel.Draw();
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class SetColorCommand extends Command {
@@ -415,6 +419,10 @@ module AssureNote {
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(<number><any>Params[0] - 0);
             }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 
@@ -513,6 +521,10 @@ module AssureNote {
             }, ()=> {
                 this.App.SetLoading(false);
             });
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 

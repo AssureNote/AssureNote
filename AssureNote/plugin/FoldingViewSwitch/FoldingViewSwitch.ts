@@ -79,6 +79,10 @@ module AssureNote {
             }
             Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class FoldingViewSwitchPlugin extends Plugin {

@@ -3293,18 +3293,15 @@ var AssureNote;
             var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
-            this.Element.show().css("opacity", 1).off("blur").on("blur", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                _this.DisableEditor(NodeView, WGSN);
-            });
+
             this.OnOutSideClicked = function () {
-                _this.Element.blur();
+                _this.DisableEditor(NodeView, WGSN);
             };
             this.App.PictgramPanel.ContentLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.ContentLayer.addEventListener("contextmenu", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("pointerdown", this.OnOutSideClicked);
             this.App.PictgramPanel.EventMapLayer.addEventListener("contextmenu", this.OnOutSideClicked);
+            this.Element.css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();
             this.Activate();
@@ -3343,14 +3340,13 @@ var AssureNote;
             Panel.EventMapLayer.removeEventListener("contextmenu", this.OnOutSideClicked);
 
             Panel.Activate();
-            return null;
         };
 
         CodeMirrorEditorPanel.prototype.OnKeyDown = function (Event) {
             this.Editor.focus();
             if (Event.keyCode == 27) {
                 Event.stopPropagation();
-                this.Element.blur();
+                this.OnOutSideClicked();
             }
         };
         return CodeMirrorEditorPanel;
@@ -3735,6 +3731,10 @@ var AssureNote;
             unfoldAll(TopView);
             this.App.PictgramPanel.Draw();
         };
+
+        UnfoldAllCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnfoldAllCommand;
     })(Command);
     AssureNote.UnfoldAllCommand = UnfoldAllCommand;
@@ -3787,6 +3787,10 @@ var AssureNote;
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
+        };
+
+        SetScaleCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SetScaleCommand;
     })(Command);
@@ -3892,6 +3896,10 @@ var AssureNote;
             }, function () {
                 _this.App.SetLoading(false);
             });
+        };
+
+        ShareCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShareCommand;
     })(Command);
@@ -4448,9 +4456,12 @@ var AssureNote;
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            _this.App.ExecDoubleClicked(Node);
+                            var FoldCommand = _this.App.FindCommandByCommandLineName("fold");
+                            if (FoldCommand) {
+                                FoldCommand.Invoke(null, [Node.Label]);
+                            }
+                            return false;
                         }
-                        return false;
                     }
                 });
             };
@@ -4488,6 +4499,12 @@ var AssureNote;
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
                         Event.preventDefault();
+                    } else {
+                        var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
+                        Event.preventDefault();
                     }
                     break;
                 case 72:
@@ -4514,12 +4531,11 @@ var AssureNote;
                     this.NavigateHome();
                     Event.preventDefault();
                     break;
+                case 32:
                 case 70:
-                    if (!this.CmdLine.IsVisible) {
-                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
-                        if (EditCommand && this.FocusedLabel) {
-                            EditCommand.Invoke(null, [this.FocusedLabel]);
-                        }
+                    var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                    if (FoldCommand && this.FocusedLabel) {
+                        FoldCommand.Invoke(null, [this.FocusedLabel]);
                     }
                     Event.preventDefault();
                     break;
@@ -5878,6 +5894,10 @@ var AssureNote;
         HistoryCommand.prototype.Invoke = function (CommandName, Params) {
             this.History.Show();
         };
+
+        HistoryCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return HistoryCommand;
     })(AssureNote.Command);
     AssureNote.HistoryCommand = HistoryCommand;
@@ -6695,6 +6715,10 @@ var AssureNote;
                 TargetView.SetIsFolded(!TargetView.IsFolded());
             }
             Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
+        };
+
+        FoldingCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return FoldingCommand;
     })(AssureNote.Command);
@@ -8164,7 +8188,7 @@ var AssureNote;
                 ReturnValue = Response;
             },
             error: function (Request, Status, Error) {
-                alert("ajax error");
+                console.log("ajax error");
                 if (ErrorCallback != null) {
                     ErrorCallback(Request, Status, Error);
                 }
@@ -8660,8 +8684,10 @@ var AssureNote;
             }
 
             this.Data = LatestLog.data;
-            var Script = "var " + this.Type + "=" + this.Data + ";";
-            Script += this.Condition + ";";
+            var RecType = this.Type.replace(/[\.\/]/g, "_");
+            var RecCondition = this.Condition.replace(/[\.\/]/g, "_");
+            var Script = "var " + RecType + "=" + this.Data + ";";
+            Script += RecCondition + ";";
             var LatestStatus = eval(Script);
 
             this.SetLatestLog(LatestLog);
@@ -8950,6 +8976,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        SetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.SetMonitorCommand = SetMonitorCommand;
@@ -8997,6 +9027,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        UnsetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnsetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.UnsetMonitorCommand = UnsetMonitorCommand;
@@ -9022,6 +9056,10 @@ var AssureNote;
             } else {
                 console.log("Need parameter");
             }
+        };
+
+        UseRecAtCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return UseRecAtCommand;
     })(AssureNote.Command);
@@ -9121,6 +9159,10 @@ var AssureNote;
 
         ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
             this.MonitorListPanel.Activate();
+        };
+
+        ShowMonitorListCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShowMonitorListCommand;
     })(AssureNote.Command);

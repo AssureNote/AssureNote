@@ -153,8 +153,10 @@ var AssureNote;
 
             // Check status
             this.Data = LatestLog.data;
-            var Script = "var " + this.Type + "=" + this.Data + ";";
-            Script += this.Condition + ";";
+            var RecType = this.Type.replace(/[\.\/]/g, "_");
+            var RecCondition = this.Condition.replace(/[\.\/]/g, "_");
+            var Script = "var " + RecType + "=" + this.Data + ";";
+            Script += RecCondition + ";";
             var LatestStatus = eval(Script);
 
             // Update past logs & status
@@ -459,6 +461,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        SetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.SetMonitorCommand = SetMonitorCommand;
@@ -508,6 +514,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        UnsetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnsetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.UnsetMonitorCommand = UnsetMonitorCommand;
@@ -533,6 +543,10 @@ var AssureNote;
             } else {
                 console.log("Need parameter");
             }
+        };
+
+        UseRecAtCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return UseRecAtCommand;
     })(AssureNote.Command);
@@ -632,6 +646,10 @@ var AssureNote;
 
         ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
             this.MonitorListPanel.Activate();
+        };
+
+        ShowMonitorListCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShowMonitorListCommand;
     })(AssureNote.Command);
