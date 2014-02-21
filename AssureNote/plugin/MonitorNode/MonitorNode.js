@@ -459,6 +459,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        SetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return SetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.SetMonitorCommand = SetMonitorCommand;
@@ -508,6 +512,10 @@ var AssureNote;
                 console.log("Need parameter");
             }
         };
+
+        UnsetMonitorCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnsetMonitorCommand;
     })(AssureNote.Command);
     AssureNote.UnsetMonitorCommand = UnsetMonitorCommand;
@@ -533,6 +541,10 @@ var AssureNote;
             } else {
                 console.log("Need parameter");
             }
+        };
+
+        UseRecAtCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return UseRecAtCommand;
     })(AssureNote.Command);
@@ -632,6 +644,10 @@ var AssureNote;
 
         ShowMonitorListCommand.prototype.Invoke = function (CommandName, Params) {
             this.MonitorListPanel.Activate();
+        };
+
+        ShowMonitorListCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShowMonitorListCommand;
     })(AssureNote.Command);
