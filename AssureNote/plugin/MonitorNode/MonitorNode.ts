@@ -475,6 +475,10 @@ module AssureNote {
             }
         }
 
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
+
     }
 
     export class UnsetMonitorCommand extends Command {
@@ -527,6 +531,9 @@ module AssureNote {
             }
         }
 
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class UseRecAtCommand extends Command {
@@ -555,6 +562,9 @@ module AssureNote {
             }
         }
 
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class MonitorListPanel extends Panel {
@@ -658,6 +668,9 @@ module AssureNote {
             this.MonitorListPanel.Activate();
         }
 
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class SetMonitorMenuItem extends TopMenuItem {
