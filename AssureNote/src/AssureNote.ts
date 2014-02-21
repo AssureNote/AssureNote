@@ -70,7 +70,7 @@ module AssureNote {
             this.SocketManager = new SocketManager(this);
             this.FullScreenEditorPanel = new WGSNEditorPanel(this);
             this.SingleNodeEditorPanel = new SingleNodeEditorPanel(this);
-            this.ModeManager = new ModeManager(this, AssureNoteMode.Edit);
+            this.ModeManager = new ModeManager(this, AssureNoteMode.View);
 
             this.DefaultCommand = new CommandMissingCommand(this);
             this.RegistCommand(new SaveCommand(this));

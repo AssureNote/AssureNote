@@ -5225,7 +5225,8 @@ var AssureNote;
             var _this = this;
             var item;
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
-            var text = document.createTextNode("\u00a0" + this.GetDisplayName());
+            var spaceChar = "\u00a0";
+            var text = document.createTextNode(spaceChar + this.GetDisplayName());
             if (IsTopLevel) {
                 item = document.createElement("button");
                 item.type = "button";
@@ -5950,6 +5951,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
+            this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
 
             this.PluginManager.LoadPlugin();
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
@@ -5961,7 +5963,6 @@ var AssureNote;
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem("File", "file", [
                 new AssureNote.NewMenuItem(),
                 new AssureNote.OpenMenuItem(),
-                new AssureNote.UploadMenuItem(),
                 new AssureNote.SaveMenuItem(),
                 new AssureNote.SubMenuItem("Save As", "floppy-save", [
                     new AssureNote.SaveAsWGSNMenuItem(),
@@ -5972,7 +5973,10 @@ var AssureNote;
                 new AssureNote.HelpMenuItem(),
                 new AssureNote.AboutMenuItem()
             ]));
+            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem());
+
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
+            this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
         }
         AssureNoteApp.prototype.IsLoading = function () {
             return this.LoadingIndicatorVisible;
@@ -6846,6 +6850,11 @@ AssureNote.OnLoadPlugin(function (App) {
 });
 var Debug = {};
 
+(function () {
+    var NavBar = document.getElementsByClassName("navbar")[0];
+    NavBar.innerHTML = NavBar.innerHTML.replace(/\s\s+/g, "");
+})();
+
 $(function () {
     var UA = AssureNote.AssureNoteUtils.UserAgant;
     if (!UA.IsBlink() && !UA.IsWebkit() && !UA.IsGecko()) {
@@ -7055,7 +7064,7 @@ var AssureNote;
             if (OldView) {
                 this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
-                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType()) {
+                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType() && !OldView.HasParameter()) {
                     this.SetShape(OldView.GetShape());
                 } else {
                     this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
@@ -7255,6 +7264,10 @@ var AssureNote;
                 return false;
             }
             return true;
+        };
+
+        NodeView.prototype.HasParameter = function () {
+            return this.NodeDoc.match(/\[([^\[\]]*)\]/) != null;
         };
         NodeView.GlobalPositionCache = null;
         return NodeView;

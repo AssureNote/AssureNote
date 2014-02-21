@@ -1,18 +1,11 @@
 ﻿/* Bootstrap 3 deprecated sub-menu */
 
-#user-info {
-  position: fixed;
-  top: 0px;
-  right: 15px;
-  left: auto;
-}
-
 .navbar {
-    margin-bottom: 0px;
     background: rgba(255, 255, 255, 0);
     border: none;
     z-index: auto;
 }
+
 .dropdown-submenu{
     position:relative;
 }
