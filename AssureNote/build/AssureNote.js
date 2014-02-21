@@ -250,6 +250,66 @@ var AssureNote;
             $("<style>").html("." + StyleName + " { " + $("span").css(StyleDef).attr("style") + " }").appendTo("head");
         }
         AssureNoteUtils.DefineColorStyle = DefineColorStyle;
+
+        function isValidURL(url) {
+            var rg_pctEncoded = "%[0-9a-fA-F]{2}";
+            var rg_protocol = "(http|https):\\/\\/";
+
+            var rg_userinfo = "([a-zA-Z0-9$\\-_.+!*'(),;:&=]|" + rg_pctEncoded + ")+" + "@";
+
+            var rg_decOctet = "(25[0-5]|2[0-4][0-9]|[0-1][0-9][0-9]|[1-9][0-9]|[0-9])";
+            var rg_ipv4address = "(" + rg_decOctet + "(\\." + rg_decOctet + "){3}" + ")";
+            var rg_hostname = "([a-zA-Z0-9\\-\\u00C0-\\u017F]+\\.)+([a-zA-Z]{2,})";
+            var rg_port = "[0-9]+";
+
+            var rg_hostport = "(" + rg_ipv4address + "|localhost|" + rg_hostname + ")(:" + rg_port + ")?";
+
+            var rg_pchar = "a-zA-Z0-9$\\-_.+!*'(),;:@&=";
+            var rg_segment = "([" + rg_pchar + "]|" + rg_pctEncoded + ")*";
+
+            var rg_path = rg_segment + "(\\/" + rg_segment + ")*";
+            var rg_query = "\\?" + "([" + rg_pchar + "/?]|" + rg_pctEncoded + ")*";
+            var rg_fragment = "\\#" + "([" + rg_pchar + "/?]|" + rg_pctEncoded + ")*";
+
+            var rgHttpUrl = new RegExp("^" + rg_protocol + "(" + rg_userinfo + ")?" + rg_hostport + "(\\/" + "(" + rg_path + ")?" + "(" + rg_query + ")?" + "(" + rg_fragment + ")?" + ")?" + "$");
+
+            if (rgHttpUrl.test(url)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        AssureNoteUtils.isValidURL = isValidURL;
+        ;
+
+        function GenerateStyleSetter(OriginalName) {
+            var CameledName = OriginalName.substring(0, 1).toUpperCase() + OriginalName.substring(1);
+            if (UserAgant.IsTrident()) {
+                CameledName = "ms" + CameledName;
+                return function (Element, Value) {
+                    Element.style[CameledName] = Value;
+                };
+            }
+            if (UserAgant.IsGecko()) {
+                CameledName = "Moz" + CameledName;
+                return function (Element, Value) {
+                    Element.style[CameledName] = Value;
+                };
+            }
+            if (UserAgant.IsWebkit() || UserAgant.IsBlink()) {
+                CameledName = "webkit" + CameledName;
+                return function (Element, Value) {
+                    Element.style[CameledName] = Value;
+                };
+            }
+            return function (Element, Value) {
+                Element.style[OriginalName] = Value;
+            };
+        }
+
+        AssureNoteUtils.SetTransformOriginToElement = GenerateStyleSetter("transformOrigin");
+
+        AssureNoteUtils.SetTransformToElement = GenerateStyleSetter("transform");
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 
@@ -305,6 +365,60 @@ var AssureNote;
         return AnimationFrameTask;
     })();
     AssureNote.AnimationFrameTask = AnimationFrameTask;
+
+    var AssureNoteEvent = (function () {
+        function AssureNoteEvent() {
+        }
+        AssureNoteEvent.prototype.PreventDefault = function () {
+            this.DefaultPrevented = true;
+        };
+        return AssureNoteEvent;
+    })();
+    AssureNote.AssureNoteEvent = AssureNoteEvent;
+
+    var EventTarget = (function () {
+        function EventTarget() {
+            this.Listeners = {};
+        }
+        EventTarget.prototype.RemoveEventListener = function (type, listener) {
+            var listeners = this.Listeners[type];
+            if (listeners != null) {
+                var i = listeners.indexOf(listener);
+                if (i !== -1) {
+                    listeners.splice(i, 1);
+                }
+            }
+        };
+
+        EventTarget.prototype.AddEventListener = function (type, listener) {
+            var listeners = this.Listeners[type];
+            if (listeners == null) {
+                this.Listeners[type] = [listener];
+            } else if (listeners.indexOf(listener) === -1) {
+                listeners.unshift(listener);
+            }
+        };
+
+        EventTarget.prototype.DispatchEvent = function (e) {
+            e.Target = this;
+            if (this["on" + e.Type] != null) {
+                this["on" + e.Type](e);
+            }
+            if (this["On" + e.Type] != null) {
+                this["On" + e.Type](e);
+            }
+            var listeners = this.Listeners[e.Type];
+            if (listeners != null) {
+                listeners = listeners.slice(0);
+                for (var i = 0, len = listeners.length; i < len; i++) {
+                    listeners[i].call(this, e);
+                }
+            }
+            return !e.DefaultPrevented;
+        };
+        return EventTarget;
+    })();
+    AssureNote.EventTarget = EventTarget;
 
     var ColorStyle = (function () {
         function ColorStyle() {
@@ -2584,7 +2698,7 @@ var AssureNote;
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
                 while (Node != null) {
-                    Node.IsFolded = false;
+                    Node.SetIsFolded(false);
                     Node = Node.Parent;
                 }
             }
@@ -2660,7 +2774,7 @@ var AssureNote;
             if (ThisNode.IsVisible) {
                 ThisNode.GetShape().PrerenderContent(this.AssureNoteApp.PluginManager);
                 ThisNode.Render(DivFrag, SvgNodeFrag, SvgConnectionFrag);
-                if (!ThisNode.IsFolded) {
+                if (!ThisNode.IsFolded()) {
                     ThisNode.ForEachVisibleAllSubNodes(function (SubNode) {
                         _this.Render(SubNode, DivFrag, SvgNodeFrag, SvgConnectionFrag);
                     });
@@ -2672,14 +2786,48 @@ var AssureNote;
             var DivFragment = document.createDocumentFragment();
             var SvgNodeFragment = document.createDocumentFragment();
             var SvgConnectionFragment = document.createDocumentFragment();
+            var Dummy = document.createDocumentFragment();
 
+            var t0 = AssureNote.AssureNoteUtils.GetTime();
             this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
+            var t1 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Render: " + (t1 - t0));
 
+            PictgramPanel.ContentLayer.appendChild(DivFragment);
+            PictgramPanel.SVGLayerConnectorGroup.appendChild(SvgConnectionFragment);
+            PictgramPanel.SVGLayerNodeGroup.appendChild(SvgNodeFragment);
+            this.PrepareNodeSize(NodeView);
+            Dummy.appendChild(DivFragment);
+            Dummy.appendChild(SvgConnectionFragment);
+            Dummy.appendChild(SvgNodeFragment);
+            var t2 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("NodeSize: " + (t2 - t1));
+
+            this.Layout(NodeView);
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
+            var t3 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Layout: " + (t3 - t2));
+        };
 
-            this.Layout(NodeView);
+        SimpleLayoutEngine.prototype.PrepareNodeSize = function (ThisNode) {
+            var _this = this;
+            var Shape = ThisNode.GetShape();
+            Shape.GetNodeWidth();
+            Shape.GetNodeHeight();
+            if (ThisNode.IsFolded()) {
+                return;
+            }
+            ThisNode.ForEachVisibleLeftNodes(function (SubNode) {
+                _this.PrepareNodeSize(SubNode);
+            });
+            ThisNode.ForEachVisibleRightNodes(function (SubNode) {
+                _this.PrepareNodeSize(SubNode);
+            });
+            ThisNode.ForEachVisibleChildren(function (SubNode) {
+                _this.PrepareNodeSize(SubNode);
+            });
         };
 
         SimpleLayoutEngine.prototype.Layout = function (ThisNode) {
@@ -2688,12 +2836,19 @@ var AssureNote;
                 return;
             }
             var Shape = ThisNode.GetShape();
+            if (!ThisNode.ShouldReLayout()) {
+                ThisNode.TraverseVisibleNode(function (Node) {
+                    Node.Shape.FitSizeToContent();
+                });
+                return;
+            }
+            ThisNode.SetShouldReLayout(false);
             Shape.FitSizeToContent();
             var TreeLeftX = 0;
             var ThisNodeWidth = Shape.GetNodeWidth();
             var TreeRightX = ThisNodeWidth;
             var TreeHeight = Shape.GetNodeHeight();
-            if (ThisNode.IsFolded) {
+            if (ThisNode.IsFolded()) {
                 Shape.SetHeadRect(0, 0, ThisNodeWidth, TreeHeight);
                 Shape.SetTreeRect(0, 0, ThisNodeWidth, TreeHeight);
                 return;
@@ -2761,15 +2916,15 @@ var AssureNote;
                     VisibleChildrenCount++;
                     _this.Layout(SubNode);
                     var ChildTreeWidth = SubNode.Shape.GetTreeWidth();
-                    var ChildHeadWidth = SubNode.IsFolded ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
-                    var ChildHeadHeight = SubNode.IsFolded ? SubNode.Shape.GetNodeHeight() : SubNode.Shape.GetHeadHeight();
+                    var ChildHeadWidth = SubNode.IsFolded() ? SubNode.Shape.GetNodeWidth() : SubNode.Shape.GetHeadWidth();
+                    var ChildHeadHeight = SubNode.IsFolded() ? SubNode.Shape.GetNodeHeight() : SubNode.Shape.GetHeadHeight();
                     var ChildHeadLeftSideMargin = SubNode.Shape.GetHeadLeftLocalX() - SubNode.Shape.GetTreeLeftLocalX();
                     var ChildHeadRightX = ChildHeadLeftSideMargin + ChildHeadWidth;
                     var ChildTreeHeight = SubNode.Shape.GetTreeHeight();
                     var HMargin = SimpleLayoutEngine.ChildrenHorizontalMargin;
 
                     var IsUndeveloped = SubNode.Children == null || SubNode.Children.length == 0;
-                    var IsFoldedLike = (SubNode.IsFolded || IsUndeveloped) && ChildHeadHeight <= FormarUnfoldedChildHeight;
+                    var IsFoldedLike = (SubNode.IsFolded() || IsUndeveloped) && ChildHeadHeight <= FormarUnfoldedChildHeight;
 
                     if (IsFoldedLike) {
                         SubNode.RelativeX = ChildrenTopWidth;
@@ -2819,7 +2974,7 @@ var AssureNote;
                 if (VisibleChildrenCount == 1) {
                     ThisNode.ForEachVisibleChildren(function (SubNode) {
                         ShiftX = -SubNode.Shape.GetTreeLeftLocalX();
-                        if (!SubNode.HasSideNode() || SubNode.IsFolded) {
+                        if (!SubNode.HasSideNode() || SubNode.IsFolded()) {
                             var ShiftY = 0;
                             var SubNodeHeight = SubNode.Shape.GetNodeHeight();
                             var ThisHeight = ThisNode.Shape.GetNodeHeight();
@@ -3570,7 +3725,7 @@ var AssureNote;
         UnfoldAllCommand.prototype.Invoke = function (CommandName, Params) {
             var TopView = this.App.PictgramPanel.MasterView;
             var unfoldAll = function (TargetView) {
-                TargetView.IsFolded = false;
+                TargetView.SetIsFolded(false);
                 TargetView.ForEachVisibleChildren(function (SubNode) {
                     unfoldAll(SubNode);
                 });
@@ -4137,13 +4292,28 @@ var AssureNote;
             var _this = this;
             _super.call(this, App);
             this.App = App;
+            this.OnScreenNodeMap = {};
+            this.HiddenNodeMap = {};
             this.FoldingAnimationTask = new AssureNote.AnimationFrameTask();
-            this.SVGLayer = document.getElementById("svg-layer");
+            this.SVGLayerBox = document.getElementById("svglayer-box");
+            this.SVGLayer = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerConnectorGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerNodeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
+            this.SVGLayer.id = "svg-layer";
+            this.SVGLayer.setAttribute("transform", "translate(0,0)");
+            this.SVGLayerBox.appendChild(this.SVGLayer);
+            this.HiddenNodeBuffer = document.createDocumentFragment();
             this.EventMapLayer = (document.getElementById("eventmap-layer"));
             this.ContentLayer = (document.getElementById("content-layer"));
             this.ControlLayer = (document.getElementById("control-layer"));
             this.Viewport = new AssureNote.ViewportManager(this.SVGLayer, this.EventMapLayer, this.ContentLayer, this.ControlLayer);
             this.LayoutEngine = new AssureNote.SimpleLayoutEngine(this.App);
+
+            this.Viewport.AddEventListener("cameramove", function () {
+                _this.UpdateHiddenNodeList();
+            });
 
             this.ContextMenu = new AssureNote.NodeMenu(App);
             this.NodeTooltip = new AssureNote.Tooltip(App);
@@ -4259,7 +4429,7 @@ var AssureNote;
                 }
                 var HitBoxCenter = new AssureNote.Point(Viewport.GXFromPageX(Viewport.GetPageCenterX()), Viewport.GYFromPageY(Viewport.GetPageHeight() / 3));
                 _this.MasterView.TraverseVisibleNode(function (Node) {
-                    if (Node.IsFolded) {
+                    if (Node.IsFolded()) {
                         var DX = HitBoxCenter.X - Node.GetCenterGX();
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
@@ -4278,6 +4448,9 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
+        PictgramPanel.prototype.OnViewportChanged = function () {
+        };
+
         PictgramPanel.prototype.OnKeyDown = function (Event) {
             var Label;
             var handled = true;
@@ -4444,7 +4617,7 @@ var AssureNote;
                 _this.FoldDeepSubGoals(SubNode);
                 if (SubNode.GetNodeType() == 0 /* Goal */ && SubNode.Children != null) {
                     if (SubNode.Children.length != 1 || SubNode.Children[0].GetNodeType() != 3 /* Evidence */) {
-                        SubNode.IsFolded = true;
+                        SubNode.SetIsFolded(true);
                     }
                 }
             });
@@ -4489,7 +4662,11 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
+            var _this = this;
+            var t0 = AssureNote.AssureNoteUtils.GetTime();
             this.Clear();
+            var t1 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Clear: " + (t1 - t0));
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
@@ -4531,15 +4708,37 @@ var AssureNote;
                 var Task = this.Viewport.CreateMoveTaskFunction(FixedNodeDX, FixedNodeDY, Scale, Duration);
                 if (Task) {
                     FoldingAnimationCallbacks.push(Task);
+                } else {
+                    FoldingAnimationCallbacks.push(function () {
+                        _this.UpdateHiddenNodeList();
+                    });
                 }
+            } else {
+                FoldingAnimationCallbacks.push(function () {
+                    _this.UpdateHiddenNodeList();
+                });
             }
 
-            TargetView.UpdateDocumentPosition(FoldingAnimationCallbacks, Duration, ScreenRect);
+            var t2 = AssureNote.AssureNoteUtils.GetTime();
+            TargetView.UpdateNodePosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
+            var t3 = AssureNote.AssureNoteUtils.GetTime();
+            console.log("Update: " + (t3 - t2));
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
             var Shape = TargetView.GetShape();
             this.Viewport.CameraLimitRect = new AssureNote.Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
+
+            var PageRect = this.Viewport.GetPageRectInGxGy();
+            this.MasterView.TraverseVisibleNode(function (Node) {
+                if (Node.IsInRect(PageRect)) {
+                    _this.OnScreenNodeMap[Node.Label] = Node;
+                } else {
+                    _this.HiddenNodeMap[Node.Label] = Node;
+                    _this.HiddenNodeBuffer.appendChild(Node.Shape.Content);
+                    _this.HiddenNodeBuffer.appendChild(Node.Shape.ShapeGroup);
+                }
+            });
 
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
@@ -4547,13 +4746,61 @@ var AssureNote;
             console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
         };
 
-        PictgramPanel.prototype.Clear = function () {
-            this.ContentLayer.innerHTML = "";
-            this.SVGLayer.style.display = "none";
-            for (var i = this.SVGLayer.childNodes.length - 1; i >= 0; i--) {
-                this.SVGLayer.removeChild(this.SVGLayer.childNodes[i]);
+        PictgramPanel.prototype.UpdateHiddenNodeList = function () {
+            var _this = this;
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
+            var PageRect = this.Viewport.GetPageRectInGxGy();
+            var UpdateArrow = function (Node) {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Node.IsConnectorInRect(PageRect)) {
+                        if (Arrow.parentNode != _this.SVGLayerConnectorGroup) {
+                            _this.SVGLayerConnectorGroup.appendChild(Arrow);
+                        }
+                    } else {
+                        if (Arrow.parentNode != _this.HiddenNodeBuffer) {
+                            _this.HiddenNodeBuffer.appendChild(Arrow);
+                        }
+                    }
+                }
+            };
+            for (var Label in this.OnScreenNodeMap) {
+                var Node = this.OnScreenNodeMap[Label];
+                if (!Node.IsInRect(PageRect)) {
+                    delete this.OnScreenNodeMap[Label];
+                    this.HiddenNodeMap[Label] = Node;
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.Content);
+                    this.HiddenNodeBuffer.appendChild(Node.Shape.ShapeGroup);
+                }
+                UpdateArrow(Node);
             }
-            this.SVGLayer.style.display = "";
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[Label];
+                if (Node.IsInRect(PageRect)) {
+                    delete this.HiddenNodeMap[Label];
+                    this.OnScreenNodeMap[Label] = Node;
+                    this.ContentLayer.appendChild(Node.Shape.Content);
+                    this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                }
+                UpdateArrow(Node);
+            }
+            AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
+        };
+
+        PictgramPanel.prototype.Clear = function () {
+            document.getElementById("assure-note").style.display = "none";
+            this.ContentLayer.innerHTML = "";
+            this.SVGLayer.removeChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.removeChild(this.SVGLayerNodeGroup);
+            this.SVGLayerConnectorGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayerNodeGroup = AssureNote.AssureNoteUtils.CreateSVGElement("g");
+            this.SVGLayer.appendChild(this.SVGLayerConnectorGroup);
+            this.SVGLayer.appendChild(this.SVGLayerNodeGroup);
+            this.Viewport.SVGLayer = this.SVGLayer;
+            this.HiddenNodeMap = {};
+            this.OnScreenNodeMap = {};
+            this.HiddenNodeBuffer = document.createDocumentFragment();
+            document.getElementById("assure-note").style.display = "";
         };
 
         PictgramPanel.prototype.DisplayPluginPanel = function (PluginName, Label) {
@@ -4639,7 +4886,8 @@ var AssureNote;
                 App.DebugP('socket.io not found');
             }
 
-            App.PictgramPanel.Viewport.OnScroll = function (Viewport) {
+            App.PictgramPanel.Viewport.AddEventListener("cameramove", function (e) {
+                var Viewport = e.Target;
                 if (_this.IsConnected() && _this.UseOnScrollEvent && (_this.App.ModeManager.GetMode() != 1 /* View */)) {
                     console.log('StartEmit');
                     var X = Viewport.GetCameraGX();
@@ -4648,7 +4896,7 @@ var AssureNote;
 
                     _this.Emit("sync", { "X": X, "Y": Y, "Scale": Scale });
                 }
-            };
+            });
             this.socket = null;
             this.handler = {};
         }
@@ -4766,7 +5014,7 @@ var AssureNote;
             }
         };
 
-        SocketManager.prototype.Connect = function (host) {
+        SocketManager.prototype.Connect = function (room, host) {
             if (!this.IsConnected()) {
                 if (host == null || host == '') {
                     this.socket = io.connect(this.DefaultChatServer);
@@ -4776,7 +5024,7 @@ var AssureNote;
                 this.App.ModeManager.Enable();
                 this.EnableListeners();
                 this.App.UserList.Show();
-                this.Emit("adduser", { User: this.App.GetUserName(), MODE: this.App.ModeManager.GetMode() });
+                this.Emit("adduser", { User: this.App.GetUserName(), Mode: this.App.ModeManager.GetMode(), Room: room });
             }
         };
 
@@ -5837,7 +6085,7 @@ var AssureNote;
                 if (NodeView) {
                     var ParentView = NodeView.Parent;
                     while (ParentView) {
-                        ParentView.IsFolded = false;
+                        ParentView.SetIsFolded(false);
                         ParentView = ParentView.Parent;
                     }
                     this.PictgramPanel.Draw();
@@ -6049,9 +6297,11 @@ var AssureNote;
     })();
     AssureNote.ScrollManager = ScrollManager;
 
-    var ViewportManager = (function () {
+    var ViewportManager = (function (_super) {
+        __extends(ViewportManager, _super);
         function ViewportManager(SVGLayer, EventMapLayer, ContentLayer, ControlLayer) {
             var _this = this;
+            _super.call(this);
             this.SVGLayer = SVGLayer;
             this.EventMapLayer = EventMapLayer;
             this.ContentLayer = ContentLayer;
@@ -6070,20 +6320,17 @@ var AssureNote;
             });
             this.UpdatePageRect();
             this.SetCameraPageCenter(this.GetPageCenterX(), this.GetPageCenterY());
-            this.SetTransformOriginToElement(this.ContentLayer, "left top");
-            this.SetTransformOriginToElement(this.ControlLayer, "left top");
+            AssureNote.AssureNoteUtils.SetTransformOriginToElement(this.ContentLayer, "left top");
+            AssureNote.AssureNoteUtils.SetTransformOriginToElement(this.ControlLayer, "left top");
             this.UpdateAttr();
             var OnPointer = function (e) {
                 if (_this.IsPointerEnabled) {
                     _this.ScrollManager.OnPointerEvent(e, _this);
                 }
             };
-            this.EventMapLayer.addEventListener("pointerdown", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointermove", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerup", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerout", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointerleave", OnPointer, false);
-            this.EventMapLayer.addEventListener("pointercancel", OnPointer, false);
+            ["down", "move", "up", "out", "leave", "cancel"].forEach(function (Name) {
+                _this.EventMapLayer.addEventListener("pointer" + Name, OnPointer, false);
+            });
 
             $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
                 if (_this.IsPointerEnabled) {
@@ -6091,20 +6338,6 @@ var AssureNote;
                 }
             });
         }
-        ViewportManager.prototype.SetTransformOriginToElement = function (Element, Value) {
-            Element.style["transformOrigin"] = Value;
-            Element.style["MozTransformOrigin"] = Value;
-            Element.style["msTransformOrigin"] = Value;
-            Element.style["webkitTransformOrigin"] = Value;
-        };
-
-        ViewportManager.prototype.SetTransformToElement = function (Element, Value) {
-            Element.style["transform"] = Value;
-            Element.style["MozTransform"] = Value;
-            Element.style["msTransform"] = Value;
-            Element.style["webkitTransform"] = Value;
-        };
-
         ViewportManager.prototype.GetCameraScale = function () {
             return this.Scale;
         };
@@ -6216,7 +6449,11 @@ var AssureNote;
         };
 
         ViewportManager.prototype.GetPageRectInGxGy = function () {
-            return this.ConvertRectGlobalXYFromPageXY(new AssureNote.Rect(0, 0, this.PageWidth, this.PageHeight));
+            var x1 = this.GXFromPageX(0);
+            var y1 = this.GYFromPageY(0);
+            var x2 = this.GXFromPageX(this.PageWidth);
+            var y2 = this.GYFromPageY(this.PageHeight);
+            return new AssureNote.Rect(x1, y1, x2 - x1, y2 - y1);
         };
 
         ViewportManager.prototype.GetPageWidth = function () {
@@ -6296,37 +6533,32 @@ var AssureNote;
             this.IsEventMapUpper = IsUpper;
         };
 
-        ViewportManager.translateA = function (x, y) {
-            return "translate(" + x + " " + y + ") ";
+        ViewportManager.CreateTranformAttr = function (x, y, scale) {
+            return "translate(" + x + " " + y + ") scale(" + scale + ")";
         };
 
-        ViewportManager.scaleA = function (scale) {
-            return "scale(" + scale + ") ";
-        };
-
-        ViewportManager.translateS = function (x, y) {
-            return "translate(" + x + "px, " + y + "px) ";
-        };
-
-        ViewportManager.scaleS = function (scale) {
-            return "scale(" + scale + ") ";
+        ViewportManager.CreateTransformStyle = function (x, y, scale) {
+            return "translate(" + x + "px, " + y + "px) scale(" + scale + ") ";
         };
 
         ViewportManager.prototype.UpdateAttr = function () {
             var OffsetPageX = this.GetOffsetPageX();
             var OffsetPageY = this.GetOffsetPageY();
-            var attr = ViewportManager.translateA(OffsetPageX, OffsetPageY) + ViewportManager.scaleA(this.Scale);
-            var style = ViewportManager.translateS(OffsetPageX, OffsetPageY) + ViewportManager.scaleS(this.Scale);
+            var attr = ViewportManager.CreateTranformAttr(OffsetPageX, OffsetPageY, this.Scale);
+            var style = ViewportManager.CreateTransformStyle(OffsetPageX, OffsetPageY, this.Scale);
             this.SVGLayer.setAttribute("transform", attr);
-            this.SetTransformToElement(this.ContentLayer, style);
-            this.SetTransformToElement(this.ControlLayer, style);
-
+            AssureNote.AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
+            AssureNote.AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
             if (this.OnScroll) {
                 this.OnScroll(this);
             }
+            var Event = new AssureNote.AssureNoteEvent();
+            Event.Type = "cameramove";
+            Event.Target = this;
+            this.DispatchEvent(Event);
         };
         return ViewportManager;
-    })();
+    })(AssureNote.EventTarget);
     AssureNote.ViewportManager = ViewportManager;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
@@ -6363,14 +6595,14 @@ var AssureNote;
             var Panel = this.App.PictgramPanel;
             var ViewPort = Panel.Viewport;
 
-            this.App.SocketManager.FoldNode({ "IsFolded": TargetView.IsFolded, "UID": TargetView.Model.UID });
+            this.App.SocketManager.FoldNode({ "IsFolded": TargetView.IsFolded(), "UID": TargetView.Model.UID });
 
             if (TargetView.GetNodeType() == 2 /* Strategy */) {
                 if (TargetView.Children != null) {
                     for (var i = 0; i < TargetView.Children.length; i++) {
                         var SubView = TargetView.Children[i];
                         if (SubView.GetNodeType() == 0 /* Goal */) {
-                            SubView.IsFolded = true;
+                            SubView.SetIsFolded(true);
                         }
                     }
                 }
@@ -6378,11 +6610,7 @@ var AssureNote;
                 this.App.DebugP("Only type 'Strategy' or 'Goal' can be allowed to fold.");
                 return;
             } else {
-                TargetView.IsFolded = TargetView.IsFolded != true;
-            }
-            var TopGoalView = TargetView;
-            while (TopGoalView.Parent != null) {
-                TopGoalView = TopGoalView.Parent;
+                TargetView.SetIsFolded(!TargetView.IsFolded());
             }
             Panel.Draw(Panel.MasterView.Label, 300, TargetView);
         };
@@ -6449,18 +6677,29 @@ var AssureNote;
         };
 
         ConnectCommand.prototype.GetHelpHTML = function () {
-            return "<code>connect [uri]</code><br>Connect to the chat server.";
+            return "<code>connect [room?] [uri?]</code><br>Connect to the chat server.";
         };
 
         ConnectCommand.prototype.Invoke = function (CommandName, Params) {
-            console.log(Params);
-            if (Params.length > 1) {
+            if (Params.length > 2) {
                 this.App.DebugP('Invalid parameter: ' + Params);
                 return;
             }
+            var room = null;
+            var url = null;
+            if (Params.length == 2) {
+                room = Params[0];
+                url = Params[1];
+            } else if (Params.length == 1) {
+                if (AssureNote.AssureNoteUtils.isValidURL(Params[0])) {
+                    url = Params[0];
+                } else {
+                    room = Params[0];
+                }
+            }
             this.App.ModeManager.SetMode(1 /* View */);
             if (this.App.SocketManager.IsOperational()) {
-                this.App.SocketManager.Connect(Params[0]);
+                this.App.SocketManager.Connect(room, url);
             }
         };
 
@@ -6651,10 +6890,11 @@ var AssureNote;
             this.Right = null;
             this.Children = null;
             this.Shape = null;
+            this.ShouldReLayoutFlag = true;
             this.Label = Model.GetLabel();
             this.NodeDoc = Model.NodeDoc;
             this.IsVisible = true;
-            this.IsFolded = false;
+            this.IsFoldedFlag = false;
             this.Status = 0 /* TreeEditable */;
             if (IsRecursive && Model.SubNodeList != null) {
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
@@ -6668,6 +6908,28 @@ var AssureNote;
                 }
             }
         }
+        NodeView.prototype.IsFolded = function () {
+            return this.IsFoldedFlag;
+        };
+
+        NodeView.prototype.SetIsFolded = function (Flag) {
+            if (this.IsFoldedFlag != Flag) {
+                this.SetShouldReLayout(true);
+            }
+            this.IsFoldedFlag = Flag;
+        };
+
+        NodeView.prototype.SetShouldReLayout = function (Flag) {
+            if (!this.ShouldReLayoutFlag && Flag && this.Parent) {
+                this.Parent.SetShouldReLayout(true);
+            }
+            this.ShouldReLayoutFlag = Flag;
+        };
+
+        NodeView.prototype.ShouldReLayout = function () {
+            return this.ShouldReLayoutFlag;
+        };
+
         NodeView.prototype.UpdateViewMap = function (ViewMap) {
             ViewMap[this.Label] = this;
             if (this.Left != null) {
@@ -6718,9 +6980,14 @@ var AssureNote;
             return this.Shape;
         };
 
-        NodeView.prototype.UpdateShape = function () {
-            this.Shape = AssureNote.AssureNoteUtils.CreateGSNShape(this);
-            return this.Shape;
+        NodeView.prototype.SetShape = function (Shape) {
+            if (this.Shape) {
+                this.Shape.NodeView = null;
+            }
+            if (Shape) {
+                Shape.NodeView = this;
+            }
+            this.Shape = Shape;
         };
 
         NodeView.prototype.GetGX = function () {
@@ -6786,9 +7053,13 @@ var AssureNote;
         NodeView.prototype.SaveFlags = function (OldViewMap) {
             var OldView = OldViewMap[this.Model.GetLabel()];
             if (OldView) {
-                this.IsFolded = OldView.IsFolded;
+                this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
-                this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
+                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType()) {
+                    this.SetShape(OldView.GetShape());
+                } else {
+                    this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
+                }
             }
 
             for (var i = 0; this.Children && i < this.Children.length; i++) {
@@ -6809,7 +7080,7 @@ var AssureNote;
             return P;
         };
 
-        NodeView.prototype.UpdateDocumentPosition = function (AnimationCallbacks, Duration, ScreenRect, UnfoldBaseNode) {
+        NodeView.prototype.UpdateNodePosition = function (AnimationCallbacks, Duration, ScreenRect, UnfoldBaseNode) {
             var _this = this;
             Duration = Duration || 0;
             if (!this.IsVisible) {
@@ -6822,9 +7093,9 @@ var AssureNote;
                 }
                 if (Base && Duration > 0) {
                     SubNode.Shape.SetFadeinBasePosition(Base.Shape.GetGXCache(), Base.Shape.GetGYCache());
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect, Base);
+                    SubNode.UpdateNodePosition(AnimationCallbacks, Duration, ScreenRect, Base);
                 } else {
-                    SubNode.UpdateDocumentPosition(AnimationCallbacks, Duration, ScreenRect);
+                    SubNode.UpdateNodePosition(AnimationCallbacks, Duration, ScreenRect);
                 }
             };
 
@@ -6840,12 +7111,13 @@ var AssureNote;
                     var P2 = SubNode.GetConnectorPosition(ArrowToDirection, SubNode.GetGlobalPosition());
                     UpdateSubNode(SubNode);
                     SubNode.Shape.MoveArrowTo(AnimationCallbacks, P1, P2, ArrowDirections[i], Duration, ScreenRect);
+                    SubNode.ParentDirection = AssureNote.ReverseDirection(ArrowDirections[i]);
                 });
             }
         };
 
         NodeView.prototype.ForEachVisibleSubNode = function (SubNodes, Action) {
-            if (SubNodes != null && !this.IsFolded) {
+            if (SubNodes != null && !this.IsFoldedFlag) {
                 for (var i = 0; i < SubNodes.length; i++) {
                     if (SubNodes[i].IsVisible) {
                         if (Action(SubNodes[i]) === false) {
@@ -6913,7 +7185,7 @@ var AssureNote;
             if (Force || !this.IsVisible) {
                 this.GetShape().ClearAnimationCache();
             }
-            if (Force || this.IsFolded) {
+            if (Force || this.IsFoldedFlag) {
                 this.ForEachAllSubNodes(function (SubNode) {
                     SubNode.ClearAnimationCache(true);
                 });
@@ -6939,6 +7211,51 @@ var AssureNote;
         NodeView.prototype.RemoveColorStyle = function (ColorStyle) {
             this.Shape.RemoveColorStyle(ColorStyle);
         };
+
+        NodeView.prototype.IsInRect = function (Target) {
+            var GXC = this.Shape.GetGXCache();
+            var GYC = this.Shape.GetGYCache();
+            var Pos;
+            if (GXC != null && GYC != null) {
+                Pos = new AssureNote.Point(GXC, GYC);
+            } else {
+                Pos = this.GetGlobalPosition();
+            }
+            if (Pos.X > Target.X + Target.Width || Pos.Y > Target.Y + Target.Height) {
+                return false;
+            }
+            Pos.X += this.Shape.GetNodeWidth();
+            Pos.Y += this.Shape.GetNodeHeight();
+            if (Pos.X < Target.X || Pos.Y < Target.Y) {
+                return false;
+            }
+            return true;
+        };
+
+        NodeView.prototype.IsConnectorInRect = function (Target) {
+            if (!this.Parent) {
+                return false;
+            }
+            var PA;
+            var PB;
+            if (this.Shape.GetGXCache() != null && this.Shape.GetGYCache() != null) {
+                PA = this.Shape.GetArrowP1Cache();
+                PB = this.Shape.GetArrowP2Cache();
+            } else {
+                PA = this.GetConnectorPosition(this.ParentDirection, this.GetGlobalPosition());
+                PB = this.Parent.GetConnectorPosition(AssureNote.ReverseDirection(this.ParentDirection), this.Parent.GetGlobalPosition());
+            }
+            var Pos = new AssureNote.Point(Math.min(PA.X, PB.X), Math.min(PA.Y, PB.Y));
+            if (Pos.X > Target.X + Target.Width || Pos.Y > Target.Y + Target.Height) {
+                return false;
+            }
+            Pos.X = Math.max(PA.X, PB.X);
+            Pos.Y = Math.max(PA.Y, PB.Y);
+            if (Pos.X < Target.X || Pos.Y < Target.Y) {
+                return false;
+            }
+            return true;
+        };
         NodeView.GlobalPositionCache = null;
         return NodeView;
     })();
@@ -6953,19 +7270,76 @@ var AssureNote;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
+    var GSNShapeSizePreFetcher = (function () {
+        function GSNShapeSizePreFetcher() {
+            var _this = this;
+            this.Queue = [];
+            this.TimerHandle = 0;
+            this.DummyDiv = document.createElement("div");
+            this.DummyDiv.style.position = "absolute";
+            this.DummyDiv.style.top = "1000%";
+            document.body.appendChild(this.DummyDiv);
+
+            setInterval(function () {
+                if (_this.Queue.length) {
+                    console.log("size prefetch: " + _this.Queue.length + " nodes left");
+                }
+            }, 1000);
+        }
+        GSNShapeSizePreFetcher.prototype.Start = function () {
+            var _this = this;
+            this.TimerHandle = setInterval(function () {
+                var StartTime = AssureNote.AssureNoteUtils.GetTime();
+                while (_this.Queue.length > 0 && AssureNote.AssureNoteUtils.GetTime() - StartTime < 16) {
+                    var Shape = _this.Queue.shift();
+                    if (Shape.NodeView && !Shape.IsSizeCached()) {
+                        Shape.PrerenderContent(AssureNote.AssureNoteApp.Current.PluginManager);
+                        if (!Shape.Content.parentElement) {
+                            _this.DummyDiv.appendChild(Shape.Content);
+                        }
+                        Shape.GetNodeWidth();
+                        Shape.GetHeadHeight();
+                        _this.DummyDiv.removeChild(Shape.Content);
+                    }
+                }
+                if (_this.Queue.length == 0) {
+                    clearInterval(_this.TimerHandle);
+                    _this.TimerHandle = 0;
+                }
+            }, 20);
+        };
+
+        GSNShapeSizePreFetcher.prototype.AddShape = function (Shape) {
+            this.Queue.push(Shape);
+            if (!this.TimerHandle) {
+                this.Start();
+            }
+        };
+        return GSNShapeSizePreFetcher;
+    })();
+    AssureNote.GSNShapeSizePreFetcher = GSNShapeSizePreFetcher;
+
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;
             this.ColorStyles = [AssureNote.ColorStyle.Default];
             this.willFadein = false;
-            this.GX = null;
-            this.GY = null;
+            this.GXCache = null;
+            this.GYCache = null;
             this.Content = null;
-            this.NodeWidth = 250;
-            this.NodeHeight = 0;
+            this.NodeWidthCache = GSNShape.DefaultWidth;
+            this.NodeHeightCache = 0;
             this.HeadBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
             this.TreeBoundingBox = new AssureNote.Rect(0, 0, 0, 0);
+            if (GSNShape.AsyncSizePrefetcher == null) {
+                GSNShape.AsyncSizePrefetcher = new GSNShapeSizePreFetcher();
+            }
+            GSNShape.AsyncSizePrefetcher.AddShape(this);
         }
+        GSNShape.prototype.IsSizeCached = function () {
+            return this.NodeHeightCache != 0 && this.NodeWidthCache != 0;
+        };
+
         GSNShape.CreateArrowPath = function () {
             return GSNShape.ArrowPathMaster.cloneNode();
         };
@@ -6991,14 +7365,19 @@ var AssureNote;
         };
 
         GSNShape.prototype.GetNodeWidth = function () {
-            return this.NodeWidth;
+            return this.NodeWidthCache;
         };
 
         GSNShape.prototype.GetNodeHeight = function () {
-            if (this.NodeHeight == 0) {
-                this.NodeHeight = this.Content.clientHeight;
+            if (this.NodeHeightCache == 0) {
+                var Cached = GSNShape.NodeHeightCache[this.Content.innerHTML];
+                if (Cached) {
+                    this.NodeHeightCache = Cached;
+                } else {
+                    GSNShape.NodeHeightCache[this.Content.innerHTML] = this.NodeHeightCache = this.Content.clientHeight;
+                }
             }
-            return this.NodeHeight;
+            return this.NodeHeightCache;
         };
 
         GSNShape.prototype.GetTreeWidth = function () {
@@ -7112,8 +7491,8 @@ var AssureNote;
                 mat.e = x;
                 mat.f = y;
             }
-            this.GX = x;
-            this.GY = y;
+            this.GXCache = x;
+            this.GYCache = y;
         };
 
         GSNShape.prototype.SetOpacity = function (Opacity) {
@@ -7138,66 +7517,70 @@ var AssureNote;
                 this.SetPosition(x, y);
                 return;
             }
+
+            if (this.WillFadein()) {
+                GSNShape.__Debug_Animation_TotalNodeCount++;
+                if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
+                    this.SetPosition(x, y);
+                    this.willFadein = false;
+                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+                    return;
+                }
+                this.Fadein(AnimationCallbacks, Duration);
+                this.willFadein = false;
+                if (this.GXCache == null || this.GYCache == null) {
+                    this.SetPosition(x, y);
+                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+                    return;
+                }
+            }
+
             if (ScreenRect) {
                 GSNShape.__Debug_Animation_TotalNodeCount++;
-                if (this.GX + this.GetNodeWidth() < ScreenRect.X || this.GX > ScreenRect.X + ScreenRect.Width) {
+                if (this.GXCache + this.GetNodeWidth() < ScreenRect.X || this.GXCache > ScreenRect.X + ScreenRect.Width) {
                     if (x + this.GetNodeWidth() < ScreenRect.X || x > ScreenRect.X + ScreenRect.Width) {
                         GSNShape.__Debug_Animation_SkippedNodeCount++;
                         this.SetPosition(x, y);
                         return;
                     }
                 }
-                if (this.GY + this.GetNodeHeight() < ScreenRect.Y || this.GY > ScreenRect.Y + ScreenRect.Height) {
+                if (this.GYCache + this.GetNodeHeight() < ScreenRect.Y || this.GYCache > ScreenRect.Y + ScreenRect.Height) {
                     GSNShape.__Debug_Animation_SkippedNodeCount++;
                     this.SetPosition(x, y);
                     return;
                 }
             }
 
-            if (this.WillFadein()) {
-                if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
-                    this.SetPosition(x, y);
-                    this.willFadein = false;
-                    return;
-                }
-                this.Fadein(AnimationCallbacks, Duration);
-                this.willFadein = false;
-                if (this.GX == null || this.GY == null) {
-                    this.SetPosition(x, y);
-                    return;
-                }
-            }
-
-            var VX = (x - this.GX) / Duration;
-            var VY = (y - this.GY) / Duration;
+            var VX = (x - this.GXCache) / Duration;
+            var VY = (y - this.GYCache) / Duration;
 
             AnimationCallbacks.push(function (deltaT) {
-                return _this.SetPosition(_this.GX + VX * deltaT, _this.GY + VY * deltaT);
+                return _this.SetPosition(_this.GXCache + VX * deltaT, _this.GYCache + VY * deltaT);
             });
         };
 
         GSNShape.prototype.SetFadeinBasePosition = function (StartGX, StartGY) {
             this.willFadein = true;
-            this.GX = StartGX;
-            this.GY = StartGY;
-            this.ArrowP1 = this.ArrowP2 = new AssureNote.Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
+            this.GXCache = StartGX;
+            this.GYCache = StartGY;
+            this.ArrowP1Cache = this.ArrowP2Cache = new AssureNote.Point(StartGX + this.GetNodeWidth() * 0.5, StartGY + this.GetNodeHeight() * 0.5);
         };
 
         GSNShape.prototype.GetGXCache = function () {
-            return this.GX;
+            return this.GXCache;
         };
 
         GSNShape.prototype.GetGYCache = function () {
-            return this.GY;
+            return this.GYCache;
         };
 
         GSNShape.prototype.WillFadein = function () {
-            return this.willFadein || this.GX == null || this.GY == null;
+            return this.willFadein || this.GXCache == null || this.GYCache == null;
         };
 
         GSNShape.prototype.ClearAnimationCache = function () {
-            this.GX = null;
-            this.GY = null;
+            this.GXCache = null;
+            this.GYCache = null;
         };
 
         GSNShape.prototype.PrerenderSVGContent = function (manager) {
@@ -7208,6 +7591,14 @@ var AssureNote;
             this.ArrowStart = this.ArrowPath.pathSegList.getItem(0);
             this.ArrowCurve = this.ArrowPath.pathSegList.getItem(1);
             manager.InvokeSVGRenderPlugin(this.ShapeGroup, this.NodeView);
+        };
+
+        GSNShape.prototype.GetArrowP1Cache = function () {
+            return this.ArrowP1Cache;
+        };
+
+        GSNShape.prototype.GetArrowP2Cache = function () {
+            return this.ArrowP2Cache;
         };
 
         GSNShape.prototype.SetArrowPosition = function (P1, P2, Dir) {
@@ -7236,8 +7627,8 @@ var AssureNote;
                 curve.x2 = (P1.X + P2.X) / 2;
                 curve.y2 = (9 * P2.Y + P1.Y) / 10;
             }
-            this.ArrowP1 = P1;
-            this.ArrowP2 = P2;
+            this.ArrowP1Cache = P1;
+            this.ArrowP2Cache = P2;
         };
 
         GSNShape.prototype.SetArrowOpacity = function (Opacity) {
@@ -7251,8 +7642,8 @@ var AssureNote;
                 return;
             }
             if (ScreenRect) {
-                var R0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP2.X : this.ArrowP1.X;
-                var L0 = this.ArrowP1.X < this.ArrowP2.X ? this.ArrowP1.X : this.ArrowP2.X;
+                var R0 = this.ArrowP1Cache.X < this.ArrowP2Cache.X ? this.ArrowP2Cache.X : this.ArrowP1Cache.X;
+                var L0 = this.ArrowP1Cache.X < this.ArrowP2Cache.X ? this.ArrowP1Cache.X : this.ArrowP2Cache.X;
                 if (R0 < ScreenRect.X || L0 > ScreenRect.X + ScreenRect.Width) {
                     var R1 = P1.X < P2.X ? P2.X : P1.X;
                     var L1 = P1.X < P2.X ? P1.X : P2.X;
@@ -7261,24 +7652,24 @@ var AssureNote;
                         return;
                     }
                 }
-                if (this.ArrowP2.Y < ScreenRect.Y || this.ArrowP1.Y > ScreenRect.Y + ScreenRect.Height) {
+                if (this.ArrowP2Cache.Y < ScreenRect.Y || this.ArrowP1Cache.Y > ScreenRect.Y + ScreenRect.Height) {
                     this.SetArrowPosition(P1, P2, Dir);
                     return;
                 }
             }
 
-            if (this.ArrowP1 == this.ArrowP2 && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
+            if (this.ArrowP1Cache == this.ArrowP2Cache && ScreenRect && (P2.Y + this.GetNodeHeight() < ScreenRect.Y || P1.Y > ScreenRect.Y + ScreenRect.Height)) {
                 this.SetArrowPosition(P1, P2, Dir);
                 return;
             }
 
-            var P1VX = (P1.X - this.ArrowP1.X) / Duration;
-            var P1VY = (P1.Y - this.ArrowP1.Y) / Duration;
-            var P2VX = (P2.X - this.ArrowP2.X) / Duration;
-            var P2VY = (P2.Y - this.ArrowP2.Y) / Duration;
+            var P1VX = (P1.X - this.ArrowP1Cache.X) / Duration;
+            var P1VY = (P1.Y - this.ArrowP1Cache.Y) / Duration;
+            var P2VX = (P2.X - this.ArrowP2Cache.X) / Duration;
+            var P2VY = (P2.Y - this.ArrowP2Cache.Y) / Duration;
 
-            var CurrentP1 = this.ArrowP1.Clone();
-            var CurrentP2 = this.ArrowP2.Clone();
+            var CurrentP1 = this.ArrowP1Cache.Clone();
+            var CurrentP2 = this.ArrowP2Cache.Clone();
 
             AnimationCallbacks.push(function (deltaT) {
                 CurrentP1.X += P1VX * deltaT;
@@ -7352,6 +7743,10 @@ var AssureNote;
                 this.ShapeGroup.setAttribute("class", this.ColorStyles.join(" "));
             }
         };
+        GSNShape.NodeHeightCache = {};
+
+        GSNShape.DefaultWidth = 250;
+
         GSNShape.ArrowPathMaster = (function () {
             var Master = AssureNote.AssureNoteUtils.CreateSVGElement("path");
             Master.setAttribute("marker-end", "url(#Triangle-black)");
@@ -7373,10 +7768,10 @@ var AssureNote;
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyRect = AssureNote.AssureNoteUtils.CreateSVGElement("rect");
             this.ShapeGroup.appendChild(this.BodyRect);
-            if (this.NodeView.IsFolded) {
+            if (this.NodeView.IsFolded()) {
                 this.ShapeGroup.appendChild(GSNGoalShape.ModuleSymbolMaster.cloneNode());
             }
-            if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
+            if (this.NodeView.Children == null && !this.NodeView.IsFolded()) {
                 this.UndevelopedSymbol = GSNGoalShape.UndevelopedSymbolMaster.cloneNode();
                 this.ShapeGroup.appendChild(this.UndevelopedSymbol);
             }
@@ -7385,7 +7780,7 @@ var AssureNote;
         GSNGoalShape.prototype.FitSizeToContent = function () {
             this.BodyRect.setAttribute("width", this.GetNodeWidth().toString());
             this.BodyRect.setAttribute("height", this.GetNodeHeight().toString());
-            if (this.NodeView.Children == null && !this.NodeView.IsFolded) {
+            if (this.NodeView.Children == null && !this.NodeView.IsFolded()) {
                 var x = (this.GetNodeWidth() / 2).toString();
                 var y = (this.GetNodeHeight() + 20).toString();
                 this.UndevelopedSymbol.setAttribute("transform", "translate(" + x + "," + y + ")");
@@ -7486,6 +7881,10 @@ var AssureNote;
             _super.prototype.PrerenderSVGContent.call(this, manager);
             this.BodyEllipse = AssureNote.AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
+
+            if (false) {
+                this.ShapeGroup.appendChild(GSNEvidenceShape.MonitorLabelMaster);
+            }
         };
 
         GSNEvidenceShape.prototype.FitSizeToContent = function () {
@@ -7498,6 +7897,18 @@ var AssureNote;
         GSNEvidenceShape.prototype.UpdateHtmlClass = function () {
             this.Content.className = "node node-evidence";
         };
+
+        GSNEvidenceShape.MonitorLabelMaster = (function () {
+            var MonitorMaster = AssureNote.AssureNoteUtils.CreateSVGElement("text");
+            MonitorMaster.setAttribute("x", "220");
+            MonitorMaster.setAttribute("y", "20");
+            MonitorMaster.setAttribute("font-size", "24px");
+            MonitorMaster.setAttribute("font-family", "Times New Roman");
+            MonitorMaster.setAttribute("fill", "#000");
+            MonitorMaster.setAttribute("stroke", "#000");
+            MonitorMaster.textContent = "M";
+            return MonitorMaster;
+        })();
         return GSNEvidenceShape;
     })(GSNShape);
     AssureNote.GSNEvidenceShape = GSNEvidenceShape;
@@ -8096,7 +8507,7 @@ var AssureNote;
             if (Model.TagMap == null) {
                 Model.TagMap = new AssureNote.HashMap();
             }
-            var Value = this.Data ? this.Data + "" : "";
+            var Value = (this.Data != null) ? this.Data + "" : "";
             Model.TagMap.put(this.Type, Value);
             Model.HasTag = true;
 

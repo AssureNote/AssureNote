@@ -119,7 +119,7 @@ var AssureNote;
             if (Model.TagMap == null) {
                 Model.TagMap = new AssureNote.HashMap();
             }
-            var Value = this.Data ? this.Data + "" : "";
+            var Value = (this.Data != null) ? this.Data + "" : "";
             Model.TagMap.put(this.Type, Value);
             Model.HasTag = true;
 
