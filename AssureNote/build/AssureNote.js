@@ -3619,6 +3619,8 @@ var AssureNote;
             var $svg = $('<svg width="' + (TopView.Shape.GetTreeWidth() + 20) + 'px" height="' + (TopView.Shape.GetTreeHeight() + 20) + 'px" version="1.1" xmlns="' + SVG_NS + '">');
             $svg.append($("svg defs").clone(false));
 
+            this.App.PictgramPanel.ForceAppendAllOutOfScreenNode();
+
             var $target = $(AssureNote.AssureNoteUtils.CreateSVGElement("g")).attr("transform", "translate(" + (10 - TopView.Shape.GetTreeLeftLocalX()) + " 10) scale(1)").appendTo($svg);
             TopView.TraverseVisibleNode(function (nodeView) {
                 var svg = nodeView.Shape.ShapeGroup;
@@ -3733,6 +3735,10 @@ var AssureNote;
             unfoldAll(TopView);
             this.App.PictgramPanel.Draw();
         };
+
+        UnfoldAllCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return UnfoldAllCommand;
     })(Command);
     AssureNote.UnfoldAllCommand = UnfoldAllCommand;
@@ -3785,6 +3791,10 @@ var AssureNote;
             if (Params.length > 0) {
                 this.App.PictgramPanel.Viewport.SetCameraScale(Params[0] - 0);
             }
+        };
+
+        SetScaleCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return SetScaleCommand;
     })(Command);
@@ -3890,6 +3900,10 @@ var AssureNote;
             }, function () {
                 _this.App.SetLoading(false);
             });
+        };
+
+        ShareCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return ShareCommand;
     })(Command);
@@ -4081,6 +4095,7 @@ var AssureNote;
             this.App = App;
             this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
+            this.SetHasDoubleClicked(true);
 
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
@@ -4092,6 +4107,15 @@ var AssureNote;
                     Command.Invoke(null, [TargetView.Label]);
                 }
             });
+        };
+
+        SingleNodeEditorPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 0 /* Edit */) {
+                var Command = this.App.FindCommandByCommandLineName("SingleEdit");
+                if (Command) {
+                    Command.Invoke(null, [NodeView.Label]);
+                }
+            }
         };
         return SingleNodeEditorPlugin;
     })(AssureNote.Plugin);
@@ -4332,6 +4356,7 @@ var AssureNote;
                 if (_this.NodeTooltip.IsEnable) {
                     _this.NodeTooltip.Remove();
                 }
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -4376,6 +4401,7 @@ var AssureNote;
                     _this.NodeTooltip.Remove();
                 }
                 _this.App.ExecDoubleClicked(NodeView);
+                event.stopPropagation();
                 event.preventDefault();
             });
 
@@ -4434,9 +4460,12 @@ var AssureNote;
                         var DY = HitBoxCenter.Y - Node.GetCenterGY();
                         var R = 150 / _this.Viewport.GetCameraScale();
                         if (DX * DX + DY * DY < R * R) {
-                            _this.App.ExecDoubleClicked(Node);
+                            var FoldCommand = _this.App.FindCommandByCommandLineName("fold");
+                            if (FoldCommand) {
+                                FoldCommand.Invoke(null, [Node.Label]);
+                            }
+                            return false;
                         }
-                        return false;
                     }
                 });
             };
@@ -4448,9 +4477,6 @@ var AssureNote;
                 $("#auto-expand-area").hide(100);
             };
         }
-        PictgramPanel.prototype.OnViewportChanged = function () {
-        };
-
         PictgramPanel.prototype.OnKeyDown = function (Event) {
             var Label;
             var handled = true;
@@ -4476,6 +4502,12 @@ var AssureNote;
                 case 13:
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
+                        Event.preventDefault();
+                    } else {
+                        var EditCommand = this.App.FindCommandByCommandLineName(Event.shiftKey ? "edit" : "singleedit");
+                        if (EditCommand && this.FocusedLabel) {
+                            EditCommand.Invoke(null, [this.FocusedLabel]);
+                        }
                         Event.preventDefault();
                     }
                     break;
@@ -4503,12 +4535,11 @@ var AssureNote;
                     this.NavigateHome();
                     Event.preventDefault();
                     break;
+                case 32:
                 case 70:
-                    if (!this.CmdLine.IsVisible) {
-                        var EditCommand = this.App.FindCommandByCommandLineName("fold");
-                        if (EditCommand && this.FocusedLabel) {
-                            EditCommand.Invoke(null, [this.FocusedLabel]);
-                        }
+                    var FoldCommand = this.App.FindCommandByCommandLineName("fold");
+                    if (FoldCommand && this.FocusedLabel) {
+                        FoldCommand.Invoke(null, [this.FocusedLabel]);
                     }
                     Event.preventDefault();
                     break;
@@ -4744,6 +4775,26 @@ var AssureNote;
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
             console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
+        };
+
+        PictgramPanel.prototype.ForceAppendAllOutOfScreenNode = function () {
+            var _this = this;
+            var UpdateArrow = function (Node) {
+                if (Node.Parent) {
+                    var Arrow = Node.Shape.ArrowPath;
+                    if (Arrow.parentNode != _this.HiddenNodeBuffer) {
+                        _this.HiddenNodeBuffer.appendChild(Arrow);
+                    }
+                }
+            };
+            for (var Label in this.HiddenNodeMap) {
+                var Node = this.HiddenNodeMap[Label];
+                delete this.HiddenNodeMap[Label];
+                this.OnScreenNodeMap[Label] = Node;
+                this.ContentLayer.appendChild(Node.Shape.Content);
+                this.SVGLayerNodeGroup.appendChild(Node.Shape.ShapeGroup);
+                UpdateArrow(Node);
+            }
         };
 
         PictgramPanel.prototype.UpdateHiddenNodeList = function () {
@@ -5800,6 +5851,10 @@ var AssureNote;
         HistoryCommand.prototype.Invoke = function (CommandName, Params) {
             this.History.Show();
         };
+
+        HistoryCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return HistoryCommand;
     })(AssureNote.Command);
     AssureNote.HistoryCommand = HistoryCommand;
@@ -6618,6 +6673,10 @@ var AssureNote;
             }
             Panel.Draw(Panel.TopNodeView.Label, 300, TargetView);
         };
+
+        FoldingCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return FoldingCommand;
     })(AssureNote.Command);
     AssureNote.FoldingCommand = FoldingCommand;
@@ -6631,7 +6690,9 @@ var AssureNote;
             AssureNoteApp.RegistCommand(this.FoldingCommand);
         }
         FoldingViewSwitchPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
-            this.FoldingCommand.Fold(NodeView);
+            if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 1 /* View */) {
+                this.FoldingCommand.Fold(NodeView);
+            }
         };
         return FoldingViewSwitchPlugin;
     })(AssureNote.Plugin);
@@ -8084,7 +8145,7 @@ var AssureNote;
                 ReturnValue = Response;
             },
             error: function (Request, Status, Error) {
-                alert("ajax error");
+                console.log("ajax error");
                 if (ErrorCallback != null) {
                     ErrorCallback(Request, Status, Error);
                 }
@@ -8580,8 +8641,10 @@ var AssureNote;
             }
 
             this.Data = LatestLog.data;
-            var Script = "var " + this.Type + "=" + this.Data + ";";
-            Script += this.Condition + ";";
+            var RecType = this.Type.replace(/[\.\/]/g, "_");
+            var RecCondition = this.Condition.replace(/[\.\/]/g, "_");
+            var Script = "var " + RecType + "=" + this.Data + ";";
+            Script += RecCondition + ";";
             var LatestStatus = eval(Script);
 
             this.SetLatestLog(LatestLog);

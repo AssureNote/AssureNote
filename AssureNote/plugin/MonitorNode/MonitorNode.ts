@@ -157,8 +157,10 @@ module AssureNote {
 
             // Check status
             this.Data = LatestLog.data;
-            var Script = "var "+this.Type+"="+this.Data+";";
-            Script += this.Condition+";";
+            var RecType = this.Type.replace(/[\.\/]/g, "_")
+            var RecCondition = this.Condition.replace(/[\.\/]/g, "_")
+            var Script = "var "+RecType+"="+this.Data+";";
+            Script += RecCondition+";";
             var LatestStatus = eval(Script);   // FIXME Don't use eval()
 
             // Update past logs & status
