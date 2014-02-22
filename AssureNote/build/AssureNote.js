@@ -5280,14 +5280,14 @@ var AssureNote;
         TopMenuItem.prototype.Enable = function () {
             this.IsEnabled = true;
             if (this.ElementId) {
-                $('#' + this.ElementId).removeClass("disabled").attr("disabled", "disabled");
+                $('#' + this.ElementId).removeClass("disabled");
             }
         };
 
         TopMenuItem.prototype.Disable = function () {
             this.IsEnabled = false;
             if (this.ElementId) {
-                $('#' + this.ElementId).addClass("disabled").removeAttr("disabled");
+                $('#' + this.ElementId).addClass("disabled");
             }
         };
 
