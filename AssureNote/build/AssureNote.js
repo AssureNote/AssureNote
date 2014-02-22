@@ -9104,6 +9104,12 @@ var AssureNote;
 </div>\n\
             ');
             $('#plugin-modal').append(Modal);
+            $('#monitorlist-modal').on('show.bs.modal', function () {
+                $(this).find('.modal-dialog').css({
+                    width: 'auto',
+                    'max-width': '80%'
+                });
+            });
 
             $('#monitorlist-modal').on('hidden.bs.modal', function () {
                 App.PictgramPanel.Activate();
