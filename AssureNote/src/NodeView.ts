@@ -470,6 +470,9 @@ module AssureNote {
             }
 
             var TagMap = ContextModel.GetTagMapWithLexicalScope();
+            if(!TagMap) {
+                return false;
+            }
             var Location = TagMap.get("Location");
             var Condition = TagMap.get("Condition");
             if(Location && Condition) {

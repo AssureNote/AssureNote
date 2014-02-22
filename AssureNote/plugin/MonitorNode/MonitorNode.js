@@ -573,7 +573,7 @@ var AssureNote;
   </div>\n\
 </div>\n\
             ');
-            $('#plugin-layer').append(Modal);
+            $('#plugin-modal').append(Modal);
 
             $('#monitorlist-modal').on('hidden.bs.modal', function () {
                 App.PictgramPanel.Activate();
