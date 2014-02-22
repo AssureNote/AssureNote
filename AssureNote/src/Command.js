@@ -356,6 +356,10 @@ var AssureNote;
                 }
             }
         };
+
+        NewCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return NewCommand;
     })(Command);
     AssureNote.NewCommand = NewCommand;
@@ -492,6 +496,10 @@ var AssureNote;
                 _this.App.LoadFiles(target.files);
             });
             $("#file-open-dialog").click();
+        };
+
+        OpenCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return OpenCommand;
     })(Command);
