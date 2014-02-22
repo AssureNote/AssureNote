@@ -25,14 +25,14 @@ module AssureNote {
         Enable(): void {
             this.IsEnabled = true;
             if(this.ElementId) {
-                $('#' + this.ElementId).removeClass("disabled").attr("disabled", "disabled");
+                $('#' + this.ElementId).removeClass("disabled");
             }
         }
 
         Disable(): void {
             this.IsEnabled = false;
             if(this.ElementId) {
-                $('#' + this.ElementId).addClass("disabled").removeAttr("disabled");
+                $('#' + this.ElementId).addClass("disabled");
             }
         }
 
