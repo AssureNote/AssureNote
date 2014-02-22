@@ -473,9 +473,12 @@ module AssureNote {
             this.ViewMap = {};
             this.TopNodeView.UpdateViewMap(this.ViewMap);
 
-            this.App.TopMenu.SubMenuMap["monitor"].Disable();
+            /* FIXME move following code to appropriate place */
             if(this.HasMonitorNode()) {
                 this.App.TopMenu.SubMenuMap["monitor"].Enable();
+            }
+            else {
+                this.App.TopMenu.SubMenuMap["monitor"].Disable();
             }
         }
 
