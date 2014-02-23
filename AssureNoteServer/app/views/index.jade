@@ -89,6 +89,16 @@ html
                 | Yokohama National Univercity
           .modal-footer
             button.btn.btn-default(type='button', data-dismiss='modal') Close
+    #welcome-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+            h4#about-modal-label.modal-title AssureNote
+          .modal-body
+            
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
     +js('/lib/jquery.min.js')
     +js('/lib/jquery.tmpl.min.js')
     +js('/lib/jquery.jqdock.min.js')

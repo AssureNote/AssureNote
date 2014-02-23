@@ -465,17 +465,16 @@ module AssureNote {
                     break;
                 }
             }
-            if(ContextModel == null) {
-                return false;
+            if (ContextModel) {
+                var TagMap = ContextModel.GetTagMapWithLexicalScope();
+                if (TagMap) {
+                    var Location = TagMap.get("Location");
+                    var Condition = TagMap.get("Condition");
+                    if (Location && Condition) {
+                        return true;
+                    }
+                }
             }
-
-            var TagMap = ContextModel.GetTagMapWithLexicalScope();
-            var Location = TagMap.get("Location");
-            var Condition = TagMap.get("Condition");
-            if(Location && Condition) {
-                return true;
-            }
-
             return false;
         }
     }
