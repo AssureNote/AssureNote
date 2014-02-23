@@ -248,22 +248,21 @@ module AssureNote {
                 case 27: /*Esc*/
                     if (this.Search.IsVisiting()) {
                         this.Search.FinishVisit();
-                        Event.preventDefault();
                     }
-                    if (this.App.HistoryPanel) {
+                    if (this.App.HistoryPanel.IsVisible) {
                         this.App.HistoryPanel.Hide();
                     }
+                    Event.preventDefault();
                     break;
                 case 13: /*Enter*/
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
-                        Event.preventDefault();
                     } else {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName((Event.shiftKey ? "edit" : "singleedit"), this.FocusedLabel);
                         }
-                        Event.preventDefault();
                     }
+                    Event.preventDefault();
                     break;
                 case 72: /*h*/
                 case 37: /*left*/

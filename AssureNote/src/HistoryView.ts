@@ -40,12 +40,16 @@ module AssureNote {
             this.Index = this.App.MasterRecord.HistoryList.length - 1;
             this.Update();
             this.Element.show();
+            this.IsVisible = true;
         }
 
         Hide(): void {
             this.Element.empty();
             this.Element.hide();
-            this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+            if (this.Index != this.App.MasterRecord.HistoryList.length - 1) {
+                this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+            }
+            this.IsVisible = false;
         }
 
         DrawGSN(TopGoal: GSNNode): void {
