@@ -164,6 +164,15 @@ module AssureNote {
             return Command;
         }
 
+        ExecCommandByName(Name: string, ...Params: any[]): boolean {
+            var Command = this.FindCommandByCommandLineName(Name);
+            if (Command) {
+                Command.Invoke(Name, Params);
+                return true;
+            }
+            return false;
+        }
+
         ExecCommand(ParsedCommand: CommandParser): void {
             var CommandName = ParsedCommand.GetMethod();
             if (CommandName == "search") {

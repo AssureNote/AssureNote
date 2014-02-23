@@ -451,16 +451,16 @@ module AssureNote {
 
         IsMonitorNode(): boolean {
             var ThisModel = this.Model;
-            if(!ThisModel.IsEvidence()) {
+            if (!ThisModel.IsEvidence()) {
                 return false;
             }
 
             var GoalModel = ThisModel.GetCloseGoal();
             var ContextModel = null;
 
-            for(var i: number = 0; i < GoalModel.SubNodeList.length; i++) {
+            for (var i: number = 0; i < GoalModel.SubNodeList.length; i++) {
                 var BroutherModel = GoalModel.SubNodeList[i];
-                if(BroutherModel.IsContext()) {
+                if (BroutherModel.IsContext()) {
                     ContextModel = BroutherModel;
                     break;
                 }

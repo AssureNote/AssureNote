@@ -341,6 +341,10 @@ module AssureNote {
                 }
             }
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class UnfoldAllCommand extends Command {
@@ -465,6 +469,10 @@ module AssureNote {
                 this.App.LoadFiles((<HTMLInputElement>target).files);
             });
             $("#file-open-dialog").click();
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
         }
     }
 
