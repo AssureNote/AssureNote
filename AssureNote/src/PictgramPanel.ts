@@ -473,12 +473,18 @@ module AssureNote {
             this.TopNodeView.UpdateViewMap(this.ViewMap);
 
             /* FIXME move following code to appropriate place */
-            if(this.HasMonitorNode()) {
-                this.App.TopMenu.SubMenuMap["monitor"].Enable();
-            }
-            else {
-                this.App.TopMenu.SubMenuMap["monitor"].Disable();
-            }
+            /*
+            plan:
+              1. Create oninitialize event on PictgramPanel
+              2. Use PictgramPanel#addEventListner from Mointor node plugin
+              3. Change menu state in the event handler
+            */
+            //if(this.HasMonitorNode()) {
+            //    this.App.TopMenu.SubMenuMap["monitor"].Enable();
+            //}
+            //else {
+            //    this.App.TopMenu.SubMenuMap["monitor"].Disable();
+            //}
         }
 
         Draw(Label?: string, Duration?: number, FixedNode?: NodeView): void {

@@ -69,6 +69,7 @@ var AssureNote;
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if (!this.IsEnabled) {
                     classes += " disabled";
+                    item.setAttribute("disabled");
                 }
                 item.className = classes;
                 item.appendChild(icon);
@@ -88,6 +89,9 @@ var AssureNote;
                 a.appendChild(icon);
                 a.appendChild(text);
                 item.appendChild(a);
+                if (!this.IsEnabled) {
+                    item.className = "disabled";
+                }
             }
             item.addEventListener("click", function (event) {
                 _this.Invoke(App);
@@ -469,7 +473,7 @@ var AssureNote;
             return "time";
         };
         ShowHistoryPanelItem.prototype.GetDisplayName = function () {
-            return "Show history panel";
+            return "History";
         };
         ShowHistoryPanelItem.prototype.Invoke = function (App) {
             App.ExecCommandByName("history");
@@ -477,5 +481,22 @@ var AssureNote;
         return ShowHistoryPanelItem;
     })(TopMenuItem);
     AssureNote.ShowHistoryPanelItem = ShowHistoryPanelItem;
+
+    var DummyMenuItem = (function (_super) {
+        __extends(DummyMenuItem, _super);
+        function DummyMenuItem(DisplayName, IconName) {
+            _super.call(this, false, "dummy-" + AssureNote.AssureNoteUtils.GenerateRandomString());
+            this.DisplayName = DisplayName;
+            this.IconName = IconName;
+        }
+        DummyMenuItem.prototype.GetIconName = function () {
+            return this.IconName;
+        };
+        DummyMenuItem.prototype.GetDisplayName = function () {
+            return this.DisplayName;
+        };
+        return DummyMenuItem;
+    })(TopMenuItem);
+    AssureNote.DummyMenuItem = DummyMenuItem;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=TopMenu.js.map

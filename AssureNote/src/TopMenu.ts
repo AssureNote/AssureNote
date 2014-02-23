@@ -67,6 +67,7 @@ module AssureNote {
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if(!this.IsEnabled) {
                     classes += " disabled";
+                    item.setAttribute("disabled");
                 }
                 item.className = classes;
                 item.appendChild(icon);
@@ -86,6 +87,9 @@ module AssureNote {
                 a.appendChild(icon);
                 a.appendChild(text);
                 item.appendChild(a);
+                if (!this.IsEnabled) {
+                    item.className = "disabled";
+                }
             }
             item.addEventListener("click", (event: MouseEvent) => {
                 this.Invoke(App);
@@ -385,10 +389,22 @@ module AssureNote {
             return "time";
         }
         GetDisplayName(): string {
-            return "Show history panel";
+            return "History";
         }
         Invoke(App: AssureNoteApp): void {
             App.ExecCommandByName("history");
+        }
+    }
+
+    export class DummyMenuItem extends TopMenuItem {
+        constructor(private DisplayName: string, private IconName: string) {
+            super(false, "dummy-" + AssureNoteUtils.GenerateRandomString());
+        }
+        GetIconName(): string {
+            return this.IconName
+        }
+        GetDisplayName(): string {
+            return this.DisplayName;
         }
     }
 }

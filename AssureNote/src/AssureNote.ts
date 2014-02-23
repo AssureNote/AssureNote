@@ -96,10 +96,32 @@ module AssureNote {
             this.UserList = new UserList(this);
 
             this.TopMenu.AppendSubMenu(
-                new SubMenuItem(true, "history", "History", "time", [
-                    new ShowHistoryPanelItem(true)
-                ])
-            );
+                new SubMenuItem(true, "view", "View", "screenshot", [
+                    new DummyMenuItem("GSN View", "unchecked"), 
+                    new DummyMenuItem("D-Case View", "check"), 
+                    new DividerMenuItem(true),
+                    new SubMenuItem(true, "zoom", "Zoom...", "zoom-in", [
+                        new DummyMenuItem("20%", "zoom-in"),
+                        new DummyMenuItem("50%", "zoom-in"),
+                        new DummyMenuItem("100%", "zoom-in"),
+                        new DummyMenuItem("150%", "zoom-in"),
+                        new DummyMenuItem("200%", "zoom-in"),
+                    ]),
+                    new DividerMenuItem(true),
+                    new ShowHistoryPanelItem(true),
+                    new ShowMonitorListMenuItem(true),
+                    new SetMonitorMenuItem(true),
+                ]) );
+            this.TopMenu.AppendSubMenu(
+                new SubMenuItem(true, "edit", "Edit", "pencil", [
+                    new DummyMenuItem("Undo", "step-backward"),
+                    new DummyMenuItem("Redo", "step-forward"),
+                    new DividerMenuItem(true),
+                    new DummyMenuItem("Copy", "file"),
+                    new DividerMenuItem(true),
+                    new DummyMenuItem("Find", "search"),
+                    new DummyMenuItem("Commit", "share-alt"),
+                ]));
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "file", "File", "file", [
                     new NewMenuItem(true),
@@ -113,8 +135,7 @@ module AssureNote {
                     new DividerMenuItem(true),
                     new HelpMenuItem(true),
                     new AboutMenuItem(true)
-                ])
-            );
+                ]) );
             this.TopMenuRight.AppendSubMenu(new UploadMenuItem(true));
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);

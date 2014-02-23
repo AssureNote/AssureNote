@@ -692,10 +692,10 @@ module AssureNote {
 
         GetDisplayName(): string {
             if(MNodeManager.IsRunning) {
-                return "Unset";
+                return "Monitor On";
             }
             else {
-                return "Set";
+                return "Monitor Off";
             }
         }
 
@@ -705,16 +705,10 @@ module AssureNote {
 
         Invoke(App: AssureNoteApp): void {
             if(MNodeManager.IsRunning) {
-                var Command = App.FindCommandByCommandLineName("unset-monitor");
-                if(Command != null) {
-                    Command.Invoke(null, ["all"]);
-                }
+                App.ExecCommandByName("unset-monitor", "all");
             }
             else {
-                var Command = App.FindCommandByCommandLineName("set-monitor");
-                if(Command != null) {
-                    Command.Invoke(null, ["all"]);
-                }
+                App.ExecCommandByName("set-monitor", "all");
             }
         }
 
@@ -727,7 +721,7 @@ module AssureNote {
         }
 
         GetDisplayName(): string {
-            return "Show monitors";
+            return "Monitor List";
         }
 
         Invoke(App: AssureNoteApp): void {
@@ -747,12 +741,6 @@ module AssureNote {
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
-            this.AssureNoteApp.TopMenu.AppendSubMenu(
-                new SubMenuItem(false, "monitor", "Monitor", "eye-open", [
-                    new SetMonitorMenuItem(true),
-                    new ShowMonitorListMenuItem(true)
-                ])
-            );
         }
 
         CreateMenuBarButton(View: NodeView): NodeMenuItem {
@@ -767,7 +755,7 @@ module AssureNote {
             if(MNode.IsValid) {
                 // If it has been already set as 'MonitorNode'
                 if(MNode.Label in MNodeManager.MonitorNodeMap) {
-                    return new NodeMenuItem("unset-monitor", "/images/monitor.png", "unset\ monitor", (event: Event, TargetView: NodeView) => {
+                    return new NodeMenuItem("unset-monitor", "/images/monitor.png", "Monitor Off", (event: Event, TargetView: NodeView) => {
                         var Command = App.FindCommandByCommandLineName("unset-monitor");
                         if(Command != null) {
                             Command.Invoke(null, [TargetView.Label]);
@@ -775,7 +763,7 @@ module AssureNote {
                     });
                 }
                 else {
-                    return new NodeMenuItem("set-monitor", "/images/monitor.png", "set\ monitor", (event: Event, TargetView: NodeView) => {
+                    return new NodeMenuItem("set-monitor", "/images/monitor.png", "Monitor On", (event: Event, TargetView: NodeView) => {
                         var Command = App.FindCommandByCommandLineName("set-monitor");
                         if(Command != null) {
                             Command.Invoke(null, [TargetView.Label]);
