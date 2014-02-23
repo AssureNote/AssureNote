@@ -680,7 +680,6 @@ module AssureNote {
     }
 
     export class SetMonitorMenuItem extends TopMenuItem {
-
         GetIconName(): string {
             if(MNodeManager.IsRunning) {
                 return "minus";
@@ -692,10 +691,10 @@ module AssureNote {
 
         GetDisplayName(): string {
             if(MNodeManager.IsRunning) {
-                return "Monitor On";
+                return "Monitor Off";
             }
             else {
-                return "Monitor Off";
+                return "Monitor On";
             }
         }
 

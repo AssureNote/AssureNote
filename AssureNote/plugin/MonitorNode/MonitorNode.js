@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -676,9 +676,9 @@ var AssureNote;
 
         SetMonitorMenuItem.prototype.GetDisplayName = function () {
             if (MNodeManager.IsRunning) {
-                return "Monitor On";
-            } else {
                 return "Monitor Off";
+            } else {
+                return "Monitor On";
             }
         };
 
