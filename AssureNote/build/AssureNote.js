@@ -3704,6 +3704,10 @@ var AssureNote;
                 }
             }
         };
+
+        NewCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return NewCommand;
     })(Command);
     AssureNote.NewCommand = NewCommand;
@@ -3840,6 +3844,10 @@ var AssureNote;
                 _this.App.LoadFiles(target.files);
             });
             $("#file-open-dialog").click();
+        };
+
+        OpenCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
         };
         return OpenCommand;
     })(Command);
@@ -4487,22 +4495,21 @@ var AssureNote;
                 case 27:
                     if (this.Search.IsVisiting()) {
                         this.Search.FinishVisit();
-                        Event.preventDefault();
                     }
-                    if (this.App.HistoryPanel) {
+                    if (this.App.HistoryPanel.IsVisible) {
                         this.App.HistoryPanel.Hide();
                     }
+                    Event.preventDefault();
                     break;
                 case 13:
                     if (this.Search.IsVisiting()) {
                         this.Search.VisitNext(event.shiftKey);
-                        Event.preventDefault();
                     } else {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName((Event.shiftKey ? "edit" : "singleedit"), this.FocusedLabel);
                         }
-                        Event.preventDefault();
                     }
+                    Event.preventDefault();
                     break;
                 case 72:
                 case 37:
@@ -4689,12 +4696,6 @@ var AssureNote;
             this.TopNodeView = NodeView;
             this.ViewMap = {};
             this.TopNodeView.UpdateViewMap(this.ViewMap);
-
-            if (this.HasMonitorNode()) {
-                this.App.TopMenu.SubMenuMap["monitor"].Enable();
-            } else {
-                this.App.TopMenu.SubMenuMap["monitor"].Disable();
-            }
         };
 
         PictgramPanel.prototype.Draw = function (Label, Duration, FixedNode) {
@@ -5315,6 +5316,7 @@ var AssureNote;
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if (!this.IsEnabled) {
                     classes += " disabled";
+                    item.setAttribute("disabled");
                 }
                 item.className = classes;
                 item.appendChild(icon);
@@ -5326,6 +5328,9 @@ var AssureNote;
                 a.appendChild(icon);
                 a.appendChild(text);
                 item.appendChild(a);
+                if (!this.IsEnabled) {
+                    item.className = "disabled";
+                }
             }
             item.addEventListener("click", function (event) {
                 _this.Invoke(App);
@@ -5691,7 +5696,7 @@ var AssureNote;
             return "time";
         };
         ShowHistoryPanelItem.prototype.GetDisplayName = function () {
-            return "Show history panel";
+            return "History";
         };
         ShowHistoryPanelItem.prototype.Invoke = function (App) {
             App.ExecCommandByName("history");
@@ -5699,6 +5704,23 @@ var AssureNote;
         return ShowHistoryPanelItem;
     })(TopMenuItem);
     AssureNote.ShowHistoryPanelItem = ShowHistoryPanelItem;
+
+    var DummyMenuItem = (function (_super) {
+        __extends(DummyMenuItem, _super);
+        function DummyMenuItem(DisplayName, IconName) {
+            _super.call(this, false, "dummy-" + AssureNote.AssureNoteUtils.GenerateRandomString());
+            this.DisplayName = DisplayName;
+            this.IconName = IconName;
+        }
+        DummyMenuItem.prototype.GetIconName = function () {
+            return this.IconName;
+        };
+        DummyMenuItem.prototype.GetDisplayName = function () {
+            return this.DisplayName;
+        };
+        return DummyMenuItem;
+    })(TopMenuItem);
+    AssureNote.DummyMenuItem = DummyMenuItem;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -5911,12 +5933,16 @@ var AssureNote;
             this.Index = this.App.MasterRecord.HistoryList.length - 1;
             this.Update();
             this.Element.show();
+            this.IsVisible = true;
         };
 
         HistoryPanel.prototype.Hide = function () {
             this.Element.empty();
             this.Element.hide();
-            this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+            if (this.Index != this.App.MasterRecord.HistoryList.length - 1) {
+                this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+            }
+            this.IsVisible = false;
         };
 
         HistoryPanel.prototype.DrawGSN = function (TopGoal) {
@@ -6051,8 +6077,30 @@ var AssureNote;
             this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
             this.UserList = new AssureNote.UserList(this);
 
-            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "history", "History", "time", [
-                new AssureNote.ShowHistoryPanelItem(true)
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "view", "View", "screenshot", [
+                new AssureNote.DummyMenuItem("GSN View", "unchecked"),
+                new AssureNote.DummyMenuItem("D-Case View", "check"),
+                new AssureNote.DividerMenuItem(true),
+                new AssureNote.SubMenuItem(true, "zoom", "Zoom...", "zoom-in", [
+                    new AssureNote.DummyMenuItem("20%", "zoom-in"),
+                    new AssureNote.DummyMenuItem("50%", "zoom-in"),
+                    new AssureNote.DummyMenuItem("100%", "zoom-in"),
+                    new AssureNote.DummyMenuItem("150%", "zoom-in"),
+                    new AssureNote.DummyMenuItem("200%", "zoom-in")
+                ]),
+                new AssureNote.DividerMenuItem(true),
+                new AssureNote.ShowHistoryPanelItem(true),
+                new AssureNote.ShowMonitorListMenuItem(true),
+                new AssureNote.SetMonitorMenuItem(true)
+            ]));
+            this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
+                new AssureNote.DummyMenuItem("Undo", "step-backward"),
+                new AssureNote.DummyMenuItem("Redo", "step-forward"),
+                new AssureNote.DividerMenuItem(true),
+                new AssureNote.DummyMenuItem("Copy", "file"),
+                new AssureNote.DividerMenuItem(true),
+                new AssureNote.DummyMenuItem("Find", "search"),
+                new AssureNote.DummyMenuItem("Commit", "share-alt")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "file", "File", "file", [
                 new AssureNote.NewMenuItem(true),
@@ -7400,20 +7448,16 @@ var AssureNote;
                     break;
                 }
             }
-            if (ContextModel == null) {
-                return false;
+            if (ContextModel) {
+                var TagMap = ContextModel.GetTagMapWithLexicalScope();
+                if (TagMap) {
+                    var Location = TagMap.get("Location");
+                    var Condition = TagMap.get("Condition");
+                    if (Location && Condition) {
+                        return true;
+                    }
+                }
             }
-
-            var TagMap = ContextModel.GetTagMapWithLexicalScope();
-            if (!TagMap) {
-                return false;
-            }
-            var Location = TagMap.get("Location");
-            var Condition = TagMap.get("Condition");
-            if (Location && Condition) {
-                return true;
-            }
-
             return false;
         };
         NodeView.GlobalPositionCache = null;
@@ -9206,9 +9250,9 @@ var AssureNote;
 
         SetMonitorMenuItem.prototype.GetDisplayName = function () {
             if (MNodeManager.IsRunning) {
-                return "Unset";
+                return "Monitor Off";
             } else {
-                return "Set";
+                return "Monitor On";
             }
         };
 
@@ -9218,15 +9262,9 @@ var AssureNote;
 
         SetMonitorMenuItem.prototype.Invoke = function (App) {
             if (MNodeManager.IsRunning) {
-                var Command = App.FindCommandByCommandLineName("unset-monitor");
-                if (Command != null) {
-                    Command.Invoke(null, ["all"]);
-                }
+                App.ExecCommandByName("unset-monitor", "all");
             } else {
-                var Command = App.FindCommandByCommandLineName("set-monitor");
-                if (Command != null) {
-                    Command.Invoke(null, ["all"]);
-                }
+                App.ExecCommandByName("set-monitor", "all");
             }
         };
         return SetMonitorMenuItem;
@@ -9243,7 +9281,7 @@ var AssureNote;
         };
 
         ShowMonitorListMenuItem.prototype.GetDisplayName = function () {
-            return "Show monitors";
+            return "Monitor List";
         };
 
         ShowMonitorListMenuItem.prototype.Invoke = function (App) {
@@ -9265,10 +9303,6 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new UnsetMonitorCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new UseRecAtCommand(this.AssureNoteApp));
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
-            this.AssureNoteApp.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(false, "monitor", "Monitor", "eye-open", [
-                new SetMonitorMenuItem(true),
-                new ShowMonitorListMenuItem(true)
-            ]));
         }
         MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
             if (!View.Model.IsEvidence()) {
@@ -9280,14 +9314,14 @@ var AssureNote;
 
             if (MNode.IsValid) {
                 if (MNode.Label in MNodeManager.MonitorNodeMap) {
-                    return new AssureNote.NodeMenuItem("unset-monitor", "/images/monitor.png", "unset\ monitor", function (event, TargetView) {
+                    return new AssureNote.NodeMenuItem("unset-monitor", "/images/monitor.png", "Monitor Off", function (event, TargetView) {
                         var Command = App.FindCommandByCommandLineName("unset-monitor");
                         if (Command != null) {
                             Command.Invoke(null, [TargetView.Label]);
                         }
                     });
                 } else {
-                    return new AssureNote.NodeMenuItem("set-monitor", "/images/monitor.png", "set\ monitor", function (event, TargetView) {
+                    return new AssureNote.NodeMenuItem("set-monitor", "/images/monitor.png", "Monitor On", function (event, TargetView) {
                         var Command = App.FindCommandByCommandLineName("set-monitor");
                         if (Command != null) {
                             Command.Invoke(null, [TargetView.Label]);
