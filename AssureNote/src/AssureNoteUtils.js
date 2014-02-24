@@ -334,6 +334,20 @@ var AssureNote;
         AssureNoteUtils.SetTransformOriginToElement = GenerateStyleSetter("transformOrigin");
 
         AssureNoteUtils.SetTransformToElement = GenerateStyleSetter("transform");
+
+        function Notify(Message, Option) {
+            if (!Option) {
+                Option = {};
+            }
+            Option["elementPosition"] = "bottom right";
+            $(".navbar")["notify"](Message, Option);
+        }
+        AssureNoteUtils.Notify = Notify;
+
+        function IsOnline() {
+            return navigator.onLine === undefined || navigator.onLine;
+        }
+        AssureNoteUtils.IsOnline = IsOnline;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

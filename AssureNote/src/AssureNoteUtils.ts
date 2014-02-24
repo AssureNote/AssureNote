@@ -363,6 +363,17 @@ module AssureNote {
 
         export var SetTransformToElement: (Element: HTMLElement, Value: string) => void = GenerateStyleSetter("transform");
 
+        export function Notify(Message: string, Option?: any) {
+            if (!Option) {
+                Option = {}
+            }
+            Option["elementPosition"] = "bottom right";
+            $(".navbar")["notify"](Message, Option);
+        }
+
+        export function IsOnline(): boolean {
+            return navigator.onLine === undefined || navigator.onLine;
+        }
     }
 
     export class AnimationFrameTask {

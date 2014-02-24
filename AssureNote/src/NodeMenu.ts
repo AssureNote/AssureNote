@@ -33,11 +33,19 @@ module AssureNote {
         }
 
         EnableEventHandler(MenuBar: NodeMenu) {
-            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + Config.BASEPATH + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
-            $("#" + this.ElementId).click((event: Event) => {
+            var IconName = this.ImagePath.split("/").pop().replace(/\..+/, "");
+            var IconData = GetImageDataURI(IconName);
+            if (IconData) {
+                MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + IconData + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            } else {
+                MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + Config.BASEPATH + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            }
+            var OnClick = (event: Event) => {
                 this.EventHandler(event, MenuBar.CurrentView);
+                $("#" + this.ElementId).off("click", OnClick);
                 MenuBar.Remove();
-            });
+            };
+            $("#" + this.ElementId).on("click", OnClick);
         }
     }
 

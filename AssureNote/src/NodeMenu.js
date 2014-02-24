@@ -40,11 +40,19 @@ var AssureNote;
         }
         NodeMenuItem.prototype.EnableEventHandler = function (MenuBar) {
             var _this = this;
-            MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + Config.BASEPATH + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
-            $("#" + this.ElementId).click(function (event) {
+            var IconName = this.ImagePath.split("/").pop().replace(/\..+/, "");
+            var IconData = AssureNote.GetImageDataURI(IconName);
+            if (IconData) {
+                MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + IconData + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            } else {
+                MenuBar.Menu.append('<a href="#" ><img id="' + this.ElementId + '" src="' + Config.BASEPATH + this.ImagePath + '" title="' + this.Title + '" alt="' + this.Title + '" /></a>');
+            }
+            var OnClick = function (event) {
                 _this.EventHandler(event, MenuBar.CurrentView);
+                $("#" + _this.ElementId).off("click", OnClick);
                 MenuBar.Remove();
-            });
+            };
+            $("#" + this.ElementId).on("click", OnClick);
         };
         return NodeMenuItem;
     })();

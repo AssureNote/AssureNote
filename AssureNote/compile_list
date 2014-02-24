@@ -21,6 +21,7 @@ src/UserList.ts
 src/Viewport.ts
 src/RecApi.ts
 src/XMIParser.ts
+src/ImageData.ts
 
 plugin/FoldingViewSwitch/FoldingViewSwitch.ts
 plugin/FullScreenEditor/FullScreenEditor.ts
