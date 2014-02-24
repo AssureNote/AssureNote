@@ -72,10 +72,10 @@ var AssureNote;
             this.UserList = new AssureNote.UserList(this);
 
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "view", "View", "screenshot", [
-                new AssureNote.DummyMenuItem("GSN View", "unchecked"),
-                new AssureNote.DummyMenuItem("D-Case View", "check"),
+                new AssureNote.DummyMenuItem("GSN View (Coming soon)", "unchecked"),
+                new AssureNote.DummyMenuItem("D-Case View (Coming soon)", "check"),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.SubMenuItem(true, "zoom", "Zoom...", "zoom-in", [
+                new AssureNote.SubMenuItem(true, "zoom", "Zoom... (Coming soon)", "zoom-in", [
                     new AssureNote.DummyMenuItem("20%", "zoom-in"),
                     new AssureNote.DummyMenuItem("50%", "zoom-in"),
                     new AssureNote.DummyMenuItem("100%", "zoom-in"),
@@ -88,13 +88,13 @@ var AssureNote;
                 new AssureNote.SetMonitorMenuItem(true)
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
-                new AssureNote.DummyMenuItem("Undo", "step-backward"),
-                new AssureNote.DummyMenuItem("Redo", "step-forward"),
+                new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
+                new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.DummyMenuItem("Copy", "file"),
+                new AssureNote.DummyMenuItem("Copy (Coming soon)", "file"),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.DummyMenuItem("Find", "search"),
-                new AssureNote.DummyMenuItem("Commit", "share-alt")
+                new AssureNote.DummyMenuItem("Find (Coming soon)", "search"),
+                new AssureNote.DummyMenuItem("Commit (Coming soon)", "share-alt")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "file", "File", "file", [
                 new AssureNote.NewMenuItem(true),

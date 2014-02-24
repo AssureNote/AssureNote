@@ -98,10 +98,10 @@ module AssureNote {
 
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "view", "View", "screenshot", [
-                    new DummyMenuItem("GSN View", "unchecked"), 
-                    new DummyMenuItem("D-Case View", "check"), 
+                    new DummyMenuItem("GSN View (Coming soon)", "unchecked"), 
+                    new DummyMenuItem("D-Case View (Coming soon)", "check"), 
                     new DividerMenuItem(true),
-                    new SubMenuItem(true, "zoom", "Zoom...", "zoom-in", [
+                    new SubMenuItem(true, "zoom", "Zoom... (Coming soon)", "zoom-in", [
                         new DummyMenuItem("20%", "zoom-in"),
                         new DummyMenuItem("50%", "zoom-in"),
                         new DummyMenuItem("100%", "zoom-in"),
@@ -115,13 +115,13 @@ module AssureNote {
                 ]) );
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "edit", "Edit", "pencil", [
-                    new DummyMenuItem("Undo", "step-backward"),
-                    new DummyMenuItem("Redo", "step-forward"),
+                    new DummyMenuItem("Undo (Coming soon)", "step-backward"),
+                    new DummyMenuItem("Redo (Coming soon)", "step-forward"),
                     new DividerMenuItem(true),
-                    new DummyMenuItem("Copy", "file"),
+                    new DummyMenuItem("Copy (Coming soon)", "file"),
                     new DividerMenuItem(true),
-                    new DummyMenuItem("Find", "search"),
-                    new DummyMenuItem("Commit", "share-alt"),
+                    new DummyMenuItem("Find (Coming soon)", "search"),
+                    new DummyMenuItem("Commit (Coming soon)", "share-alt"),
                 ]));
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "file", "File", "file", [
