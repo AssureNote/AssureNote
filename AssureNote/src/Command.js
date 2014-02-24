@@ -602,5 +602,31 @@ var AssureNote;
         return SetGuestUserNameCommand;
     })(Command);
     AssureNote.SetGuestUserNameCommand = SetGuestUserNameCommand;
+
+    var SearchCommand = (function (_super) {
+        __extends(SearchCommand, _super);
+        function SearchCommand(App) {
+            _super.call(this, App);
+        }
+        SearchCommand.prototype.GetCommandLineNames = function () {
+            return ["search", "find"];
+        };
+
+        SearchCommand.prototype.GetHelpHTML = function () {
+            return "<code>search keyword</code><br>Search nodes including keyword.";
+        };
+
+        SearchCommand.prototype.Invoke = function (CommandName, Params) {
+            if (Params.length > 0) {
+                this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, Params[0]);
+            }
+        };
+
+        SearchCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
+        return SearchCommand;
+    })(Command);
+    AssureNote.SearchCommand = SearchCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

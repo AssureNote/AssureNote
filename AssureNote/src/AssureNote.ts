@@ -88,6 +88,7 @@ module AssureNote {
             this.RegistCommand(new ShareCommand(this));
             this.RegistCommand(new HistoryCommand(this));
             this.RegistCommand(new SetGuestUserNameCommand(this));
+            this.RegistCommand(new SearchCommand(this));
 
             this.TopMenu = new TopMenuTopItem([]);
             this.TopMenuRight = new TopMenuTopItem([]);
@@ -197,10 +198,6 @@ module AssureNote {
 
         ExecCommand(ParsedCommand: CommandParser): void {
             var CommandName = ParsedCommand.GetMethod();
-            if (CommandName == "search") {
-                return;
-            }
-
             var Command = this.FindCommandByCommandLineName(CommandName);
             Command.Invoke(CommandName, ParsedCommand.GetArgs());
         }

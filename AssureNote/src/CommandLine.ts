@@ -31,7 +31,10 @@ module AssureNote {
         private Args: string[];
         private RawString: string;
 
-        constructor() {
+        constructor(line?: string) {
+            if (line) {
+                this.Parse(line);
+            }
         }
 
         Parse(line: string): void {
@@ -194,11 +197,8 @@ module AssureNote {
                     break;
                 case 13: /*Enter*/
                     Event.preventDefault();
-                    var ParsedCommand = new CommandParser();
-                    ParsedCommand.Parse(this.GetValue());
-                    if (ParsedCommand.GetMethod() == "search") {
-                        this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, ParsedCommand.GetArgs()[0]);
-                    }
+                    var ParsedCommand = new CommandParser(this.GetValue());
+                    console.log(ParsedCommand.GetMethod());
                     this.App.ExecCommand(ParsedCommand);
                     this.AddHistory(ParsedCommand.GetRawString());
                     if (this.IsActive()) {

@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -63,6 +63,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.ShareCommand(this));
             this.RegistCommand(new AssureNote.HistoryCommand(this));
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
+            this.RegistCommand(new AssureNote.SearchCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
@@ -172,10 +173,6 @@ var AssureNote;
 
         AssureNoteApp.prototype.ExecCommand = function (ParsedCommand) {
             var CommandName = ParsedCommand.GetMethod();
-            if (CommandName == "search") {
-                return;
-            }
-
             var Command = this.FindCommandByCommandLineName(CommandName);
             Command.Invoke(CommandName, ParsedCommand.GetArgs());
         };

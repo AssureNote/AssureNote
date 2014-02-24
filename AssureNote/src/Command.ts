@@ -564,4 +564,28 @@ module AssureNote {
             return true;
         }
     }
+
+    export class SearchCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["search", "find"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>search keyword</code><br>Search nodes including keyword."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            if (Params.length > 0) {
+                this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, Params[0]);
+            }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
+    }
 }
