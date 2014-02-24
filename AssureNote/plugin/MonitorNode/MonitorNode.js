@@ -731,7 +731,7 @@ var AssureNote;
             this.AssureNoteApp.RegistCommand(new ShowMonitorListCommand(this.AssureNoteApp));
         }
         MonitorNodePlugin.prototype.CreateMenuBarButton = function (View) {
-            if (!View.Model.IsEvidence()) {
+            if (!View.Model.IsEvidence() || !View.IsMonitorNode()) {
                 return null;
             }
 

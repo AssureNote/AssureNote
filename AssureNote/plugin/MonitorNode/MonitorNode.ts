@@ -743,7 +743,7 @@ module AssureNote {
         }
 
         CreateMenuBarButton(View: NodeView): NodeMenuItem {
-            if(!View.Model.IsEvidence()) {
+            if(!View.Model.IsEvidence() || !View.IsMonitorNode()) {
                 return null;
             }
 
