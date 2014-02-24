@@ -76,12 +76,12 @@ var AssureNote;
                 new AssureNote.DummyMenuItem("GSN View (Coming soon)", "unchecked"),
                 new AssureNote.DummyMenuItem("D-Case View (Coming soon)", "check"),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.SubMenuItem(true, "zoom", "Zoom... (Coming soon)", "zoom-in", [
-                    new AssureNote.DummyMenuItem("20%", "zoom-in"),
-                    new AssureNote.DummyMenuItem("50%", "zoom-in"),
-                    new AssureNote.DummyMenuItem("100%", "zoom-in"),
-                    new AssureNote.DummyMenuItem("150%", "zoom-in"),
-                    new AssureNote.DummyMenuItem("200%", "zoom-in")
+                new AssureNote.SubMenuItem(true, "zoom", "Zoom...", "zoom-in", [
+                    new AssureNote.ZoomMenuItem(true, "Zoom", 0.2),
+                    new AssureNote.ZoomMenuItem(true, "Zoom", 0.5),
+                    new AssureNote.ZoomMenuItem(true, "Zoom", 1),
+                    new AssureNote.ZoomMenuItem(true, "Zoom", 1.5),
+                    new AssureNote.ZoomMenuItem(true, "Zoom", 2)
                 ]),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.ShowHistoryPanelMenuItem(true),

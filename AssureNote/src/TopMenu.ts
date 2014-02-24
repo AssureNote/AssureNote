@@ -421,6 +421,21 @@ module AssureNote {
         }
     }
 
+    export class ZoomMenuItem extends TopMenuItem {
+        constructor(IsEnabled: boolean, ButtonId: string, private Zoom: number) {
+            super(IsEnabled, "Zoom-" + Zoom + "-" + AssureNoteUtils.GenerateRandomString());
+        }
+        GetIconName(): string {
+            return "zoom-in";
+        }
+        GetDisplayName(): string {
+            return "" + ~~(this.Zoom * 100) + "%";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("set-scale", this.Zoom);
+        }
+    }
+
     export class DummyMenuItem extends TopMenuItem {
         constructor(private DisplayName: string, private IconName: string) {
             super(false, "dummy-" + AssureNoteUtils.GenerateRandomString());

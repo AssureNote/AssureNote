@@ -472,6 +472,10 @@ var AssureNote;
                 message = Params.join(" ");
             this.App.MasterRecord.Commit(message);
         };
+
+        CommitCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return true;
+        };
         return CommitCommand;
     })(Command);
     AssureNote.CommitCommand = CommitCommand;

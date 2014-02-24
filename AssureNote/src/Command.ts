@@ -448,6 +448,10 @@ module AssureNote {
             if (Params.length >= 1) message = Params.join(" ");
             this.App.MasterRecord.Commit(message);
         }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return true;
+        }
     }
 
     export class OpenCommand extends Command {

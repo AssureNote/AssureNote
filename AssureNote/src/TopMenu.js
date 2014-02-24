@@ -519,6 +519,25 @@ var AssureNote;
     })(TopMenuItem);
     AssureNote.CommitMenuItem = CommitMenuItem;
 
+    var ZoomMenuItem = (function (_super) {
+        __extends(ZoomMenuItem, _super);
+        function ZoomMenuItem(IsEnabled, ButtonId, Zoom) {
+            _super.call(this, IsEnabled, "Zoom-" + Zoom + "-" + AssureNote.AssureNoteUtils.GenerateRandomString());
+            this.Zoom = Zoom;
+        }
+        ZoomMenuItem.prototype.GetIconName = function () {
+            return "zoom-in";
+        };
+        ZoomMenuItem.prototype.GetDisplayName = function () {
+            return "" + ~~(this.Zoom * 100) + "%";
+        };
+        ZoomMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("set-scale", this.Zoom);
+        };
+        return ZoomMenuItem;
+    })(TopMenuItem);
+    AssureNote.ZoomMenuItem = ZoomMenuItem;
+
     var DummyMenuItem = (function (_super) {
         __extends(DummyMenuItem, _super);
         function DummyMenuItem(DisplayName, IconName) {

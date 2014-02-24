@@ -102,17 +102,17 @@ module AssureNote {
                     new DummyMenuItem("GSN View (Coming soon)", "unchecked"), 
                     new DummyMenuItem("D-Case View (Coming soon)", "check"), 
                     new DividerMenuItem(true),
-                    new SubMenuItem(true, "zoom", "Zoom... (Coming soon)", "zoom-in", [
-                        new DummyMenuItem("20%", "zoom-in"),
-                        new DummyMenuItem("50%", "zoom-in"),
-                        new DummyMenuItem("100%", "zoom-in"),
-                        new DummyMenuItem("150%", "zoom-in"),
-                        new DummyMenuItem("200%", "zoom-in"),
+                    new SubMenuItem(true, "zoom", "Zoom...", "zoom-in", [
+                        new ZoomMenuItem(true, "Zoom", 0.2),
+                        new ZoomMenuItem(true, "Zoom", 0.5),
+                        new ZoomMenuItem(true, "Zoom", 1),
+                        new ZoomMenuItem(true, "Zoom", 1.5),
+                        new ZoomMenuItem(true, "Zoom", 2)
                     ]),
                     new DividerMenuItem(true),
                     new ShowHistoryPanelMenuItem(true),
                     new ShowMonitorListMenuItem(true),
-                    new SetMonitorMenuItem(true),
+                    new SetMonitorMenuItem(true)
                 ]) );
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "edit", "Edit", "pencil", [
