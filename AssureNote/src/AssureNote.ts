@@ -71,6 +71,7 @@ module AssureNote {
             this.FullScreenEditorPanel = new WGSNEditorPanel(this);
             this.SingleNodeEditorPanel = new SingleNodeEditorPanel(this);
             this.ModeManager = new ModeManager(this, AssureNoteMode.View);
+            ShapeFactory.SetFactory(new DefaultShapeFactory());
 
             this.DefaultCommand = new CommandMissingCommand(this);
             this.RegistCommand(new SaveCommand(this));

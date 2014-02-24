@@ -127,7 +127,7 @@ var AssureNote;
 
         NodeView.prototype.GetShape = function () {
             if (this.Shape == null) {
-                this.Shape = AssureNote.AssureNoteUtils.CreateGSNShape(this);
+                this.Shape = AssureNote.ShapeFactory.CreateShape(this);
             }
             return this.Shape;
         };

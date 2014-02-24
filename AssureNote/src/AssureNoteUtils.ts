@@ -69,19 +69,6 @@ module AssureNote {
             return new Point(view.left, view.top);
         }
 
-        export function CreateGSNShape(NodeView: NodeView): GSNShape {
-            switch (NodeView.GetNodeType()) {
-                case GSNType.Goal:
-                    return new GSNGoalShape(NodeView);
-                case GSNType.Context:
-                    return new GSNContextShape(NodeView);
-                case GSNType.Strategy:
-                    return new GSNStrategyShape(NodeView);
-                case GSNType.Evidence:
-                    return new GSNEvidenceShape(NodeView);
-            }
-        }
-
         export function CreateSVGElement(name: "a"): SVGAElement;
         export function CreateSVGElement(name: "circle"): SVGCircleElement;
         export function CreateSVGElement(name: "clippath"): SVGClipPathElement;

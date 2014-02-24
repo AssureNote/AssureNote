@@ -81,7 +81,38 @@ module AssureNote {
                 this.Start();
             }
         }
+    }
 
+    export class ShapeFactory {
+        private static Factory: ShapeFactory;
+
+        static SetFactory(Factory: ShapeFactory) {
+            ShapeFactory.Factory = Factory;
+        }
+
+        static CreateShape(Node: NodeView): GSNShape {
+            return ShapeFactory.Factory.CreateShape(Node);
+        }
+
+        CreateShape(Node: NodeView): GSNShape {
+            throw Error("Not impremented");
+            return null;
+        }
+    }
+
+    export class DefaultShapeFactory extends ShapeFactory {
+        CreateShape(Node: NodeView): GSNShape {
+            switch (Node.GetNodeType()) {
+                case GSNType.Goal:
+                    return new GSNGoalShape(Node);
+                case GSNType.Context:
+                    return new GSNContextShape(Node);
+                case GSNType.Strategy:
+                    return new GSNStrategyShape(Node);
+                case GSNType.Evidence:
+                    return new GSNEvidenceShape(Node);
+            }
+        }
     }
 
     export class GSNShape {

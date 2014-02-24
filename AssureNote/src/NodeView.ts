@@ -138,7 +138,7 @@ module AssureNote {
 
         GetShape(): GSNShape {
             if (this.Shape == null) {
-                this.Shape = AssureNoteUtils.CreateGSNShape(this);
+                this.Shape = ShapeFactory.CreateShape(this);
             }
             return this.Shape;
         }

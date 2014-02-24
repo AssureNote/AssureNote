@@ -46,6 +46,7 @@ var AssureNote;
             this.FullScreenEditorPanel = new AssureNote.WGSNEditorPanel(this);
             this.SingleNodeEditorPanel = new AssureNote.SingleNodeEditorPanel(this);
             this.ModeManager = new AssureNote.ModeManager(this, 1 /* View */);
+            AssureNote.ShapeFactory.SetFactory(new AssureNote.DefaultShapeFactory());
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));

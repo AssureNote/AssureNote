@@ -88,6 +88,46 @@ var AssureNote;
     })();
     AssureNote.GSNShapeSizePreFetcher = GSNShapeSizePreFetcher;
 
+    var ShapeFactory = (function () {
+        function ShapeFactory() {
+        }
+        ShapeFactory.SetFactory = function (Factory) {
+            ShapeFactory.Factory = Factory;
+        };
+
+        ShapeFactory.CreateShape = function (Node) {
+            return ShapeFactory.Factory.CreateShape(Node);
+        };
+
+        ShapeFactory.prototype.CreateShape = function (Node) {
+            throw Error("Not impremented");
+            return null;
+        };
+        return ShapeFactory;
+    })();
+    AssureNote.ShapeFactory = ShapeFactory;
+
+    var DefaultShapeFactory = (function (_super) {
+        __extends(DefaultShapeFactory, _super);
+        function DefaultShapeFactory() {
+            _super.apply(this, arguments);
+        }
+        DefaultShapeFactory.prototype.CreateShape = function (Node) {
+            switch (Node.GetNodeType()) {
+                case 0 /* Goal */:
+                    return new GSNGoalShape(Node);
+                case 1 /* Context */:
+                    return new GSNContextShape(Node);
+                case 2 /* Strategy */:
+                    return new GSNStrategyShape(Node);
+                case 3 /* Evidence */:
+                    return new GSNEvidenceShape(Node);
+            }
+        };
+        return DefaultShapeFactory;
+    })(ShapeFactory);
+    AssureNote.DefaultShapeFactory = DefaultShapeFactory;
+
     var GSNShape = (function () {
         function GSNShape(NodeView) {
             this.NodeView = NodeView;

@@ -72,20 +72,6 @@ var AssureNote;
         }
         AssureNoteUtils.GetNodePosition = GetNodePosition;
 
-        function CreateGSNShape(NodeView) {
-            switch (NodeView.GetNodeType()) {
-                case 0 /* Goal */:
-                    return new AssureNote.GSNGoalShape(NodeView);
-                case 1 /* Context */:
-                    return new AssureNote.GSNContextShape(NodeView);
-                case 2 /* Strategy */:
-                    return new AssureNote.GSNStrategyShape(NodeView);
-                case 3 /* Evidence */:
-                    return new AssureNote.GSNEvidenceShape(NodeView);
-            }
-        }
-        AssureNoteUtils.CreateGSNShape = CreateGSNShape;
-
         function CreateSVGElement(name) {
             return document.createElementNS('http://www.w3.org/2000/svg', name);
         }
