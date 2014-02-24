@@ -90,10 +90,12 @@ var AssureNote;
 
             if (this.Index == 0) {
                 $("#prev-revision").addClass("disabled");
+                $("#first-revision").addClass("disabled");
             }
 
             if (this.Index == this.App.MasterRecord.HistoryList.length - 1) {
                 $("#next-revision").addClass("disabled");
+                $("#last-revision").addClass("disabled");
             }
 
             $("#history-panel-close").click(function () {
@@ -122,6 +124,17 @@ var AssureNote;
                 }
             });
 
+            $("#first-revision").click(function () {
+                var OldIndex = _this.Index;
+                _this.Index = 0;
+                console.log(_this.Index);
+                if (OldIndex != _this.Index) {
+                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
+                    _this.DrawGSN(TopGoal);
+                    _this.Update();
+                }
+            });
+
             $("#next-revision").click(function () {
                 var length = _this.App.MasterRecord.HistoryList.length;
                 var OldIndex = _this.Index;
@@ -136,6 +149,18 @@ var AssureNote;
                         break;
                     }
                 }
+                console.log(_this.Index);
+                if (OldIndex != _this.Index) {
+                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
+                    _this.DrawGSN(TopGoal);
+                    _this.Update();
+                }
+            });
+
+            $("#last-revision").click(function () {
+                var length = _this.App.MasterRecord.HistoryList.length;
+                var OldIndex = _this.Index;
+                _this.Index = length - 1;
                 console.log(_this.Index);
                 if (OldIndex != _this.Index) {
                     var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;

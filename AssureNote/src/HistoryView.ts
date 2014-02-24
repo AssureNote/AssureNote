@@ -88,10 +88,12 @@ module AssureNote {
 
             if (this.Index == 0) {
                 $("#prev-revision").addClass("disabled");
+                $("#first-revision").addClass("disabled");
             }
 
             if (this.Index == this.App.MasterRecord.HistoryList.length - 1) {
                 $("#next-revision").addClass("disabled");
+                $("#last-revision").addClass("disabled");
             }
 
             $("#history-panel-close").click(()=>{
@@ -119,7 +121,19 @@ module AssureNote {
                     this.DrawGSN(TopGoal);
                     this.Update();
                 }
-            });
+                });
+
+            $("#first-revision")
+                .click(() => {
+                    var OldIndex = this.Index;
+                    this.Index = 0;
+                    console.log(this.Index);
+                    if (OldIndex != this.Index) {
+                        var TopGoal = this.App.MasterRecord.HistoryList[this.Index].Doc.TopNode;
+                        this.DrawGSN(TopGoal);
+                        this.Update();
+                    }
+                });
 
             $("#next-revision").click(() => {
                 var length = this.App.MasterRecord.HistoryList.length;
@@ -135,6 +149,18 @@ module AssureNote {
                         break;
                     }
                 }
+                console.log(this.Index);
+                if (OldIndex != this.Index) {
+                    var TopGoal = this.App.MasterRecord.HistoryList[this.Index].Doc.TopNode;
+                    this.DrawGSN(TopGoal);
+                    this.Update();
+                }
+            });
+
+            $("#last-revision").click(() => {
+                var length = this.App.MasterRecord.HistoryList.length;
+                var OldIndex = this.Index;
+                this.Index = length - 1;
                 console.log(this.Index);
                 if (OldIndex != this.Index) {
                     var TopGoal = this.App.MasterRecord.HistoryList[this.Index].Doc.TopNode;
