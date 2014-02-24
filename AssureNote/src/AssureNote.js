@@ -1,4 +1,4 @@
-﻿// ***************************************************************************
+// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -84,7 +84,7 @@ var AssureNote;
                     new AssureNote.DummyMenuItem("200%", "zoom-in")
                 ]),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.ShowHistoryPanelItem(true),
+                new AssureNote.ShowHistoryPanelMenuItem(true),
                 new AssureNote.ShowMonitorListMenuItem(true),
                 new AssureNote.SetMonitorMenuItem(true)
             ]));
@@ -94,8 +94,8 @@ var AssureNote;
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.DummyMenuItem("Copy (Coming soon)", "file"),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.DummyMenuItem("Find (Coming soon)", "search"),
-                new AssureNote.DummyMenuItem("Commit (Coming soon)", "share-alt")
+                new AssureNote.SearchMenuItem(true),
+                new AssureNote.CommitMenuItem(true)
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "file", "File", "file", [
                 new AssureNote.NewMenuItem(true),

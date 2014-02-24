@@ -384,7 +384,7 @@ module AssureNote {
         }
     }
 
-    export class ShowHistoryPanelItem extends TopMenuItem {
+    export class ShowHistoryPanelMenuItem extends TopMenuItem {
         GetIconName(): string {
             return "time";
         }
@@ -393,6 +393,31 @@ module AssureNote {
         }
         Invoke(App: AssureNoteApp): void {
             App.ExecCommandByName("history");
+        }
+    }
+
+    export class SearchMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "search";
+        }
+        GetDisplayName(): string {
+            return "Find";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("search");
+        }
+    }
+
+    export class CommitMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "share-alt";
+        }
+        GetDisplayName(): string {
+            return "Commit";
+        }
+        Invoke(App: AssureNoteApp): void {
+            var Message = prompt("Enter commit message");
+            App.ExecCommandByName("commit", Message);
         }
     }
 

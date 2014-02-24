@@ -579,8 +579,12 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            if (Params.length > 0) {
-                this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, Params[0]);
+            var Key = <string>Params[0];
+            if (!Key) {
+                Key = prompt("Enter the keyword");
+            }
+            if (Key) {
+                this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, Key);
             }
         }
 

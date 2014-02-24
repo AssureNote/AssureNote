@@ -464,23 +464,60 @@ var AssureNote;
     })(TopMenuItem);
     AssureNote.AboutMenuItem = AboutMenuItem;
 
-    var ShowHistoryPanelItem = (function (_super) {
-        __extends(ShowHistoryPanelItem, _super);
-        function ShowHistoryPanelItem() {
+    var ShowHistoryPanelMenuItem = (function (_super) {
+        __extends(ShowHistoryPanelMenuItem, _super);
+        function ShowHistoryPanelMenuItem() {
             _super.apply(this, arguments);
         }
-        ShowHistoryPanelItem.prototype.GetIconName = function () {
+        ShowHistoryPanelMenuItem.prototype.GetIconName = function () {
             return "time";
         };
-        ShowHistoryPanelItem.prototype.GetDisplayName = function () {
+        ShowHistoryPanelMenuItem.prototype.GetDisplayName = function () {
             return "History";
         };
-        ShowHistoryPanelItem.prototype.Invoke = function (App) {
+        ShowHistoryPanelMenuItem.prototype.Invoke = function (App) {
             App.ExecCommandByName("history");
         };
-        return ShowHistoryPanelItem;
+        return ShowHistoryPanelMenuItem;
     })(TopMenuItem);
-    AssureNote.ShowHistoryPanelItem = ShowHistoryPanelItem;
+    AssureNote.ShowHistoryPanelMenuItem = ShowHistoryPanelMenuItem;
+
+    var SearchMenuItem = (function (_super) {
+        __extends(SearchMenuItem, _super);
+        function SearchMenuItem() {
+            _super.apply(this, arguments);
+        }
+        SearchMenuItem.prototype.GetIconName = function () {
+            return "search";
+        };
+        SearchMenuItem.prototype.GetDisplayName = function () {
+            return "Find";
+        };
+        SearchMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("search");
+        };
+        return SearchMenuItem;
+    })(TopMenuItem);
+    AssureNote.SearchMenuItem = SearchMenuItem;
+
+    var CommitMenuItem = (function (_super) {
+        __extends(CommitMenuItem, _super);
+        function CommitMenuItem() {
+            _super.apply(this, arguments);
+        }
+        CommitMenuItem.prototype.GetIconName = function () {
+            return "share-alt";
+        };
+        CommitMenuItem.prototype.GetDisplayName = function () {
+            return "Commit";
+        };
+        CommitMenuItem.prototype.Invoke = function (App) {
+            var Message = prompt("Enter commit message");
+            App.ExecCommandByName("commit", Message);
+        };
+        return CommitMenuItem;
+    })(TopMenuItem);
+    AssureNote.CommitMenuItem = CommitMenuItem;
 
     var DummyMenuItem = (function (_super) {
         __extends(DummyMenuItem, _super);

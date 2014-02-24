@@ -110,7 +110,7 @@ module AssureNote {
                         new DummyMenuItem("200%", "zoom-in"),
                     ]),
                     new DividerMenuItem(true),
-                    new ShowHistoryPanelItem(true),
+                    new ShowHistoryPanelMenuItem(true),
                     new ShowMonitorListMenuItem(true),
                     new SetMonitorMenuItem(true),
                 ]) );
@@ -121,8 +121,8 @@ module AssureNote {
                     new DividerMenuItem(true),
                     new DummyMenuItem("Copy (Coming soon)", "file"),
                     new DividerMenuItem(true),
-                    new DummyMenuItem("Find (Coming soon)", "search"),
-                    new DummyMenuItem("Commit (Coming soon)", "share-alt"),
+                    new SearchMenuItem(true),
+                    new CommitMenuItem(true)
                 ]));
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "file", "File", "file", [
