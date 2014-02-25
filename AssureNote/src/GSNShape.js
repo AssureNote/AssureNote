@@ -559,7 +559,7 @@ var AssureNote;
         };
         GSNShape.NodeHeightCache = {};
 
-        GSNShape.DefaultWidth = 250;
+        GSNShape.DefaultWidth = 200;
 
         GSNShape.ArrowPathMaster = (function () {
             var Master = AssureNote.AssureNoteUtils.CreateSVGElement("path");

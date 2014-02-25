@@ -128,7 +128,7 @@ module AssureNote {
         private static AsyncSizePrefetcher: GSNShapeSizePreFetcher;
         private static NodeHeightCache: { [index: string]: number } = {};
 
-        private static DefaultWidth = 250;
+        private static DefaultWidth = 200;
 
         private static ArrowPathMaster: SVGPathElement = (() => {
             var Master = AssureNoteUtils.CreateSVGElement("path");

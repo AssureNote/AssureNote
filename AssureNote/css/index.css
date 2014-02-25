@@ -75,22 +75,22 @@ h4 {
 
 .node-goal {
 	padding: 5px 10px;
-	width : 230px;
+	width : 170px;
 }
 
 .node-context {
 	padding: 10px 10px;
-	width : 230px;
+	width : 170px;
 }
 
 .node-strategy {
 	padding: 5px 20px;
-	width : 210px;
+	width : 160px;
 }
 
 .node-evidence {
 	padding: 30px 30px;
-	width : 190px;
+	width : 140px;
 }
 
 .node-author {
@@ -103,8 +103,8 @@ h4 {
 }
 
 .node-author-evidence {
-	bottom: 5%;
-	right: 25%;
+	bottom: 10%;
+	right: 15%;
 }
 
 .node-author-strategy {
