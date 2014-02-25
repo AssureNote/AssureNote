@@ -258,6 +258,10 @@ module AssureNote {
             return "Share";
         }
         Invoke(App: AssureNoteApp): void {
+            if (App.IsUserGuest()) {
+                alert("Please login first.");
+                return;
+            }
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
                 App.ExecCommandByName("commit", "Share");
             }
@@ -294,7 +298,7 @@ module AssureNote {
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, "." + this.GetExtention());
             var Command = App.FindCommandByCommandLineName("save");
-            var Name = prompt("Enter the file name", DefaultName);
+            var Name = prompt("SaveAs: Enter the file name", DefaultName);
             if (Name == null) {
                 return;
             }
@@ -334,7 +338,7 @@ module AssureNote {
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             var Command = App.FindCommandByCommandLineName("save-as-svg");
-            var Name = prompt("Enter the file name", DefaultName);
+            var Name = prompt("SaveAs: Enter the file name", DefaultName);
             if (Name == null) {
                 return;
             }
@@ -404,7 +408,10 @@ module AssureNote {
             return "Find";
         }
         Invoke(App: AssureNoteApp): void {
-            App.ExecCommandByName("search");
+            var Key = prompt("Find: Enter the keyword");
+            if (Key && Key != "") {
+                App.ExecCommandByName("search", Key);
+            }
         }
     }
 
@@ -416,7 +423,7 @@ module AssureNote {
             return "Commit";
         }
         Invoke(App: AssureNoteApp): void {
-            var Message = prompt("Enter commit message");
+            var Message = prompt("Commit: Enter commit message");
             App.ExecCommandByName("commit", Message);
         }
     }

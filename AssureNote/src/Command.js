@@ -355,6 +355,9 @@ var AssureNote;
                     this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
+            if (history.replaceState) {
+                history.replaceState(null, null, Config.BASEPATH);
+            }
         };
 
         NewCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -467,6 +470,10 @@ var AssureNote;
         };
 
         CommitCommand.prototype.Invoke = function (CommandName, Params) {
+            if (this.App.IsUserGuest()) {
+                alert("Please login first.");
+                return;
+            }
             var message = "Default message";
             if (Params.length >= 1)
                 message = Params.join(" ");
@@ -500,6 +507,9 @@ var AssureNote;
                 _this.App.LoadFiles(target.files);
             });
             $("#file-open-dialog").click();
+            if (history.replaceState) {
+                history.replaceState(null, null, Config.BASEPATH);
+            }
         };
 
         OpenCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -553,11 +563,20 @@ var AssureNote;
 
         ShareCommand.prototype.Invoke = function (CommandName, Params) {
             var _this = this;
+            if (this.App.IsUserGuest()) {
+                alert("Please login first.");
+                return;
+            }
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             this.App.SetLoading(true);
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {
-                window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                var NewURL = Config.BASEPATH + "/file/" + result.fileId;
+                if (history.replaceState) {
+                    history.replaceState(null, null, NewURL);
+                } else {
+                    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                }
                 //this.App.SetLoading(false);
                 //if(history.pushState) {
                 //    history.pushState({fileId: result.fileId}, "", Config.BASEPATH + "/file/" + result.fileId);

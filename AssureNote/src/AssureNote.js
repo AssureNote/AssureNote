@@ -69,7 +69,9 @@ var AssureNote;
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
 
             this.PluginManager.LoadPlugin();
-            this.UserName = ($.cookie('UserName') != null) ? $.cookie('UserName') : 'Guest';
+            var Name = $.cookie('UserName');
+            this.IsGuestUser = (Name == null);
+            this.UserName = this.IsGuestUser ? 'Guest' : Name;
             this.UserList = new AssureNote.UserList(this);
 
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "view", "View", "screenshot", [
@@ -199,12 +201,18 @@ var AssureNote;
             this.SetLoading(false);
         };
 
+        AssureNoteApp.prototype.IsUserGuest = function () {
+            return this.IsGuestUser;
+        };
+
         AssureNoteApp.prototype.GetUserName = function () {
             return this.UserName;
         };
 
         AssureNoteApp.prototype.SetUserName = function (Name) {
-            this.UserName = Name;
+            if (this.IsGuestUser) {
+                this.UserName = Name;
+            }
         };
 
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {

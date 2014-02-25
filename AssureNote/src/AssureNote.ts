@@ -56,6 +56,7 @@ module AssureNote {
         TopMenu: TopMenuTopItem;
         TopMenuRight: TopMenuTopItem;
 
+        private IsGuestUser: boolean;
         private UserName: string;
         private LoadingIndicatorVisible = true;
         private LoadingIndicator: HTMLImageElement = <HTMLImageElement>document.getElementById("loading-indicator");
@@ -94,7 +95,9 @@ module AssureNote {
             this.TopMenuRight = new TopMenuTopItem([]);
 
             this.PluginManager.LoadPlugin();
-            this.UserName = ((<any>$).cookie('UserName') != null) ? (<any>$).cookie('UserName') : 'Guest';
+            var Name = (<any>$).cookie('UserName');
+            this.IsGuestUser = (Name == null);
+            this.UserName = this.IsGuestUser ? 'Guest' : Name;
             this.UserList = new UserList(this);
 
             this.TopMenu.AppendSubMenu(
@@ -226,12 +229,18 @@ module AssureNote {
             this.SetLoading(false);
         }
 
+        IsUserGuest(): boolean {
+            return this.IsGuestUser;
+        }
+
         GetUserName(): string {
             return this.UserName;
         }
 
         SetUserName(Name: string): void {
-            this.UserName = Name;
+            if (this.IsGuestUser) {
+                this.UserName = Name;
+            }
         }
 
         LoadNewWGSN(Name: string, WGSN: string): void {

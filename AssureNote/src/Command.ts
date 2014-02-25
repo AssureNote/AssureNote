@@ -340,6 +340,9 @@ module AssureNote {
                     this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
+            if (history.replaceState) {
+                history.replaceState(null, null, Config.BASEPATH);
+            }
         }
 
         public CanUseOnViewOnlyMode(): boolean {
@@ -444,6 +447,10 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
+            if (this.App.IsUserGuest()) {
+                alert("Please login first.");
+                return;
+            }
             var message: string = "Default message";
             if (Params.length >= 1) message = Params.join(" ");
             this.App.MasterRecord.Commit(message);
@@ -473,6 +480,9 @@ module AssureNote {
                 this.App.LoadFiles((<HTMLInputElement>target).files);
             });
             $("#file-open-dialog").click();
+            if (history.replaceState) {
+                history.replaceState(null, null, Config.BASEPATH);
+            }
         }
 
         public CanUseOnViewOnlyMode(): boolean {
@@ -519,11 +529,20 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
+            if (this.App.IsUserGuest()) {
+                alert("Please login first.");
+                return;
+            }
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             this.App.SetLoading(true);
             AssureNoteUtils.postJsonRPC("upload", {content: Writer.toString()}, (result: any) => {
-                window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                var NewURL = Config.BASEPATH + "/file/" + result.fileId;
+                if (history.replaceState) {
+                    history.replaceState(null, null, NewURL);
+                } else {
+                    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                }
                 //this.App.SetLoading(false);
                 //if(history.pushState) {
                 //    history.pushState({fileId: result.fileId}, "", Config.BASEPATH + "/file/" + result.fileId);

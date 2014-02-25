@@ -288,6 +288,10 @@ var AssureNote;
             return "Share";
         };
         UploadMenuItem.prototype.Invoke = function (App) {
+            if (App.IsUserGuest()) {
+                alert("Please login first.");
+                return;
+            }
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {
                 App.ExecCommandByName("commit", "Share");
             }
@@ -336,7 +340,7 @@ var AssureNote;
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, "." + this.GetExtention());
             var Command = App.FindCommandByCommandLineName("save");
-            var Name = prompt("Enter the file name", DefaultName);
+            var Name = prompt("SaveAs: Enter the file name", DefaultName);
             if (Name == null) {
                 return;
             }
@@ -394,7 +398,7 @@ var AssureNote;
             }
             var DefaultName = App.WGSNName.replace(/(\.\w+)?$/, ".svg");
             var Command = App.FindCommandByCommandLineName("save-as-svg");
-            var Name = prompt("Enter the file name", DefaultName);
+            var Name = prompt("SaveAs: Enter the file name", DefaultName);
             if (Name == null) {
                 return;
             }
@@ -494,7 +498,10 @@ var AssureNote;
             return "Find";
         };
         SearchMenuItem.prototype.Invoke = function (App) {
-            App.ExecCommandByName("search");
+            var Key = prompt("Find: Enter the keyword");
+            if (Key && Key != "") {
+                App.ExecCommandByName("search", Key);
+            }
         };
         return SearchMenuItem;
     })(TopMenuItem);
@@ -512,7 +519,7 @@ var AssureNote;
             return "Commit";
         };
         CommitMenuItem.prototype.Invoke = function (App) {
-            var Message = prompt("Enter commit message");
+            var Message = prompt("Commit: Enter commit message");
             App.ExecCommandByName("commit", Message);
         };
         return CommitMenuItem;
