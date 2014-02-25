@@ -75,12 +75,12 @@ h4 {
 
 .node-goal {
 	padding: 5px 10px;
-	width : 170px;
+	width : 180px;
 }
 
 .node-context {
 	padding: 10px 10px;
-	width : 170px;
+	width : 180px;
 }
 
 .node-strategy {
@@ -100,6 +100,11 @@ h4 {
 	right: 0%;
 	color: Gray;
 	margin-right: 5%;
+}
+
+.node h4 {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .node-author-evidence {
