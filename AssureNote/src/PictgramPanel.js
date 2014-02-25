@@ -258,7 +258,10 @@ var AssureNote;
                     break;
                 case 75:
                 case 38:
-                    this.NavigateUp();
+                    var Moved = this.NavigateUp();
+                    if (!Moved && this.FocusedLabel) {
+                        this.NavigateParent();
+                    }
                     Event.preventDefault();
                     break;
                 case 76:
@@ -319,7 +322,10 @@ var AssureNote;
         */
         PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
             var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
-            this.FocusAndMoveToNode(NextNode);
+            if (NextNode) {
+                this.FocusAndMoveToNode(NextNode);
+            }
+            return !!NextNode;
         };
 
         PictgramPanel.prototype.FocusAndMoveToNode = function (Node) {
@@ -648,18 +654,28 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.NavigateUp = function () {
-            this.MoveToNearestNode(1 /* Top */);
+            return this.MoveToNearestNode(1 /* Top */);
         };
         PictgramPanel.prototype.NavigateDown = function () {
-            this.MoveToNearestNode(3 /* Bottom */);
+            return this.MoveToNearestNode(3 /* Bottom */);
         };
         PictgramPanel.prototype.NavigateLeft = function () {
-            this.MoveToNearestNode(0 /* Left */);
+            return this.MoveToNearestNode(0 /* Left */);
         };
         PictgramPanel.prototype.NavigateRight = function () {
-            this.MoveToNearestNode(2 /* Right */);
+            return this.MoveToNearestNode(2 /* Right */);
         };
         PictgramPanel.prototype.NavigateHome = function () {
+            this.FocusAndMoveToNode(this.TopNodeView);
+        };
+        PictgramPanel.prototype.NavigateParent = function () {
+            if (this.FocusedLabel) {
+                var Parent = this.ViewMap[this.FocusedLabel].Parent;
+                if (Parent) {
+                    this.FocusAndMoveToNode(this.ViewMap[this.FocusedLabel].Parent);
+                    return;
+                }
+            }
             this.FocusAndMoveToNode(this.TopNodeView);
         };
         return PictgramPanel;

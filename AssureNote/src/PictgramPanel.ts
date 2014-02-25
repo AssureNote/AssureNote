@@ -276,7 +276,10 @@ module AssureNote {
                     break;
                 case 75: /*k*/
                 case 38: /*up*/
-                    this.NavigateUp();
+                    var Moved = this.NavigateUp();
+                    if (!Moved && this.FocusedLabel) {
+                        this.NavigateParent();
+                    }
                     Event.preventDefault();
                     break;
                 case 76: /*l*/
@@ -335,9 +338,12 @@ module AssureNote {
             @method MoveToNearestNode
             @param {AssureNote.Direction} Dir 
         */
-        MoveToNearestNode(Dir: Direction): void {
+        MoveToNearestNode(Dir: Direction): boolean {
             var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
-            this.FocusAndMoveToNode(NextNode);
+            if (NextNode) {
+                this.FocusAndMoveToNode(NextNode);
+            }
+            return !!NextNode;
         }
 
         /**
@@ -664,19 +670,29 @@ module AssureNote {
             return null;
         }
 
-        NavigateUp(): void {
-            this.MoveToNearestNode(Direction.Top);
+        NavigateUp(): boolean {
+            return this.MoveToNearestNode(Direction.Top);
         }
-        NavigateDown(): void {
-            this.MoveToNearestNode(Direction.Bottom);
+        NavigateDown(): boolean {
+            return this.MoveToNearestNode(Direction.Bottom);
         }
-        NavigateLeft(): void {
-            this.MoveToNearestNode(Direction.Left);
+        NavigateLeft(): boolean {
+            return this.MoveToNearestNode(Direction.Left);
         }
-        NavigateRight(): void {
-            this.MoveToNearestNode(Direction.Right);
+        NavigateRight(): boolean {
+            return this.MoveToNearestNode(Direction.Right);
         }
         NavigateHome(): void {
+            this.FocusAndMoveToNode(this.TopNodeView);
+        }
+        NavigateParent(): void {
+            if (this.FocusedLabel) {
+                var Parent = this.ViewMap[this.FocusedLabel].Parent;
+                if (Parent) {
+                    this.FocusAndMoveToNode(this.ViewMap[this.FocusedLabel].Parent);
+                    return;
+                }
+            }
             this.FocusAndMoveToNode(this.TopNodeView);
         }
 
