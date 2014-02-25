@@ -348,6 +348,14 @@ var AssureNote;
             return navigator.onLine === undefined || navigator.onLine;
         }
         AssureNoteUtils.IsOnline = IsOnline;
+
+        AssureNoteUtils.IsReloaded = window.name == window.location.href ? (function () {
+            return true;
+        }) : (function () {
+            return false;
+        });
+
+        window.name = window.location.href;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

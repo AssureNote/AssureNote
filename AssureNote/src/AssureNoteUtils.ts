@@ -374,6 +374,11 @@ module AssureNote {
         export function IsOnline(): boolean {
             return navigator.onLine === undefined || navigator.onLine;
         }
+
+        export var IsReloaded: () => boolean = 
+            window.name == window.location.href ? (() => { return true; }) : (() => { return false; });
+
+        window.name = window.location.href;
     }
 
     export class AnimationFrameTask {
