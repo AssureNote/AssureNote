@@ -74,7 +74,7 @@ module AssureNote {
                 this.App.SingleNodeEditorPanel.UpdateCSS(CSS);
                 this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
             } else {
-                this.App.DebugP(Label + " not found.");
+                AssureNoteUtils.Notify(Label + " is not found");
             }
         }
     }

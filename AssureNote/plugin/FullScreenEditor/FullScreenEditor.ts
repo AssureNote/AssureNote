@@ -49,14 +49,14 @@ module AssureNote {
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
                 if (TargetView.GetNodeType() == GSNType.Strategy) {
-                    this.App.DebugP("Strategy " + Label + " cannot open FullScreenEditor.");
+                    AssureNoteUtils.Notify("Subtree editor cannot open at Strategy");
                     return;
                 }
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, true);
                 this.App.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
             } else {
-                this.App.DebugP(Label + " not found.");
+                AssureNoteUtils.Notify(Label + " is not found");
             }
         }
     }

@@ -73,6 +73,7 @@ module AssureNote {
                 }
                 return;
             }
+            AssureNoteUtils.Notify(CommandName + " is not valid command or node name");
             this.App.DebugP("undefined command: " + CommandName);
         }
     }
