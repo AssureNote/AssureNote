@@ -30,7 +30,7 @@
           <textarea id="singlenode-editor" placeholder="Type something..." style="display: none;"></textarea>
         </div>
       </div>
-      <div id="fixed-control-layer" style="top: 0px; left: 0px; width: 100%; height: 0px; position: absolute;">
+      <div id="fixed-control-layer" style="width: 100%;" class="zero-size-layer">
         <div class="navbar navbar-default nonclickable">
           <div style="padding-left: 0px;" class="navbar-collapse"><a href="#" style="padding: 0px" class="navbar-brand"><img id="logo" src="./images/logo.png" alt="AssureNote"></a>
             <div id="top-menu"></div>
@@ -57,9 +57,25 @@
             </div>
           </div>
         </script>
-        <div id="history" style="position: absolute; top: 60px; left: 10px; width: 260px;"></div>
+        <div id="history" style="position: absolute; top: 60px; left: 10px; width: 260px;">
+          <div class="panel panel-default node-list-panel">
+            <div class="panel-body">
+              <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
+              <h4 class="list-group-item-heading">${Message}</h4>
+              <p class="list-group-item-text"><small><a id="nodelist-panel-count" data-toggle="tooltip" data-placement="bottom">${Count.All} Nodes</a></small></p>
+              <ol style="padding-top: 10px">
+                <li>G1</li>
+                <li>G2</li>
+                <li>E2.1</li>
+              </ol>
+              <div style="padding-top: 10px" class="list-group-item-text">
+                <div class="btn-group"><a id="prev-item" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></a><a id="next-item" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></a></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="plugin-layer" style="width: 0px; height: 0px; position: absolute;">
+      <div id="plugin-layer" class="zero-size-layer">
         <div id="editor-background" style="display: none;" class="full-size-layer"></div>
         <div id="editor-wrapper" style="border: 1px solid black">
           <textarea id="editor" placeholder="Type something..." style="display: none;"></textarea>
@@ -97,7 +113,7 @@
         </div>
       </div>
     </div>
-    <!-- Help Modal-->
+    <!-- About Modal-->
     <div id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true" class="modal fade">
       <div class="modal-dialog">
         <div class="modal-content">

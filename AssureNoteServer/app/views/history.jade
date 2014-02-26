@@ -25,3 +25,20 @@
                     a.btn.btn-default#last-revision(href='#')
                         span.glyphicon.glyphicon-fast-forward
 #history(style="position: absolute; top: 60px; left: 10px; width: 260px;")
+    .panel.panel-default.node-list-panel
+        .panel-body
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+            h4.list-group-item-heading ${Message}
+            p.list-group-item-text
+              small
+                a#nodelist-panel-count(data-toggle="tooltip", data-placement="bottom") ${Count.All} Nodes
+            ol(style="padding-top: 10px")
+                li G1
+                li G2
+                li E2.1
+            .list-group-item-text(style="padding-top: 10px")
+                .btn-group
+                    a.btn.btn-default#prev-item(href='#')
+                        span.glyphicon.glyphicon-chevron-left
+                    a.btn.btn-default#next-item(href='#')
+                        span.glyphicon.glyphicon-chevron-right
