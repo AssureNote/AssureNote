@@ -1012,6 +1012,7 @@ export class GSNNode {
 			Writer.print(this.LabelName);
 		} else {
 			Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+			Writer.print(this.AssignedLabelNumber);
 		}
 		Writer.print(" &");
 		Writer.print(Lib.DecToHex(this.UID));
@@ -1055,6 +1056,7 @@ export class GSNNode {
 			Writer.print(this.LabelName);
 		} else {
 			Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+			Writer.print(this.AssignedLabelNumber);
 		}
 		Writer.print(" &");
 		Writer.print(Lib.DecToHex(this.UID));

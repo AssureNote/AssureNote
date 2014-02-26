@@ -125,7 +125,7 @@ public class TestAssureNoteParser {
 		assertNotNull(History);
 		assertEquals(History.Author, "test");
 		assertEquals(History.Role, "-");
-		assertEquals(History.Date, "2000-01-01T00:00:00+0900");
+		assertEquals(History.DateString, "2000-01-01T00:00:00+0900");
 	}
 
 	private class WGSNFilter implements FilenameFilter {
@@ -332,7 +332,7 @@ public class TestAssureNoteParser {
 	
 	@Test
 	public void LastModified() {
-		String input = "#0::2014-01-16T18:36:03+0900;unknown;converter;-\n#1::2014-01-16T18:37:47+0900;shidasan;todo;test\nRevision:: 0\n* G &2422f9c3 #0:0\nƒS[ƒ‹: ‚ ‚é«¿‚ª¬‚è—§‚Â‚Æ‚¢‚¤å’£\n\n* C &45255f17 #0:0\n‘O’ñ: å’£‚ª¬‚è—§‚Âó‹µ\n\n* E &654abc0c #0:0\nØ‹’: ƒTƒuƒS[ƒ‹‚Ì¬—§‚ğx‚·‚é–À\n\n*=====\nRevision:: 1\n* G &2422f9c3 #0:0\nƒS[ƒ‹: ‚ ‚é«¿‚ª¬‚è—§‚Â‚Æ‚¢‚¤å’£\n\n* C &45255f17 #0:1\n‘O’ñ: å’£‚ª¬‚è—§‚Âó‹µ\nXV\n\n* E &654abc0c #0:1\nØ‹’: ƒTƒuƒS[ƒ‹‚Ì¬—§‚ğx‚·‚é–À\nXV\n";
+		String input = "#0::2014-01-16T18:36:03+0900;unknown;converter;-\n#1::2014-01-16T18:37:47+0900;shidasan;todo;test\nRevision:: 0\n* G &2422f9c3 #0:0\nï¿½Sï¿½[ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n\n* C &45255f17 #0:0\nï¿½Oï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n\n* E &654abc0c #0:0\nï¿½ï¿½ï¿½ï¿½: ï¿½Tï¿½uï¿½Sï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n\n*=====\nRevision:: 1\n* G &2422f9c3 #0:0\nï¿½Sï¿½[ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n\n* C &45255f17 #0:1\nï¿½Oï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\nï¿½Xï¿½V\n\n* E &654abc0c #0:1\nï¿½ï¿½ï¿½ï¿½: ï¿½Tï¿½uï¿½Sï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\nï¿½Xï¿½V\n";
 		
 		GSNRecord MasterRecord = new GSNRecord();
 		MasterRecord.Parse(input);
@@ -356,6 +356,7 @@ public class TestAssureNoteParser {
 		
 		MasterRecord.CloseEditor();
 		MasterRecord.Commit("test");
+		MasterRecord.RenumberAll();
 		StringWriter Writer = new StringWriter();
 		MasterRecord.FormatRecord(Writer);
 
