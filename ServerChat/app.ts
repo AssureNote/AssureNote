@@ -101,7 +101,7 @@ class AssureNoteServer {
                     socket.emit('adduser', RoomUserStatus[i]);
                 }
                 socket.emit('update', {
-                    name: this.WGSNName,
+                    name: (this.WGSNName) ? this.WGSNName : "Default",
                     WGSN: this.GetLatestWGSN(),
                 });
             }

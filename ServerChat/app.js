@@ -123,7 +123,7 @@ var AssureNoteServer = (function () {
                     socket.emit('adduser', RoomUserStatus[i]);
                 }
                 socket.emit('update', {
-                    name: _this.WGSNName,
+                    name: (_this.WGSNName) ? _this.WGSNName : "Default",
                     WGSN: _this.GetLatestWGSN()
                 });
             }
