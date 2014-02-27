@@ -62,10 +62,9 @@ var AssureNoteServer = (function () {
             socket.on('disconnect', function () {
                 socket.leave(_this.room, null);
 
-                console.log('id: ' + socket.id + ' leave');
-                console.log('close');
                 var RoomStatus = _this.GetRoomStatus(socket.id);
                 var RoomEditNodeStatus = _this.GetRoomStatus(socket.id).EditNodeStatus;
+                console.log(RoomStatus);
                 if (RoomEditNodeStatus.length != 0) {
                     for (var i = 0; i < RoomEditNodeStatus.length; i++) {
                         if (RoomEditNodeStatus[i].SID == socket.id) {
@@ -74,6 +73,8 @@ var AssureNoteServer = (function () {
                         }
                     }
                 }
+                console.log('disconnect');
+                console.log(RoomStatus);
                 socket.broadcast.to(_this.GetJoinedRoom(socket.id)).emit('close', socket.id);
                 var RoomUserStatus = RoomStatus.UserStatus;
                 for (var i = 0; i < RoomUserStatus.length; i++) {
@@ -121,6 +122,10 @@ var AssureNoteServer = (function () {
                 for (var i = 0; i < RoomUserStatus.length; i++) {
                     socket.emit('adduser', RoomUserStatus[i]);
                 }
+                socket.emit('update', {
+                    name: _this.WGSNName,
+                    WGSN: _this.GetLatestWGSN()
+                });
             }
             RoomUserStatus.push(Info);
         });

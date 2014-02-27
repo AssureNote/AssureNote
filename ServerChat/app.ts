@@ -41,10 +41,9 @@ class AssureNoteServer {
             socket.on('disconnect', () => {
                 socket.leave(this.room, null);
 
-                console.log('id: ' + socket.id + ' leave');
-                console.log('close');
                 var RoomStatus = this.GetRoomStatus(socket.id);
                 var RoomEditNodeStatus = this.GetRoomStatus(socket.id).EditNodeStatus;
+                console.log(RoomStatus);
                 if (RoomEditNodeStatus.length != 0) {
                     for (var i:number = 0; i < RoomEditNodeStatus.length; i++) {
                         if (RoomEditNodeStatus[i].SID == socket.id) {
@@ -53,6 +52,8 @@ class AssureNoteServer {
                         }
                     }
                 }
+                console.log('disconnect');
+                console.log(RoomStatus);
                 socket.broadcast.to(this.GetJoinedRoom(socket.id)).emit('close', socket.id);
                 var RoomUserStatus: UserStatus[] = RoomStatus.UserStatus;
                 for (var i: number = 0; i< RoomUserStatus.length; i++){
@@ -99,6 +100,10 @@ class AssureNoteServer {
                 for (var i:number = 0; i< RoomUserStatus.length; i++) {
                     socket.emit('adduser', RoomUserStatus[i]);
                 }
+                socket.emit('update', {
+                    name: this.WGSNName,
+                    WGSN: this.GetLatestWGSN(),
+                });
             }
             RoomUserStatus.push(Info);
         });
