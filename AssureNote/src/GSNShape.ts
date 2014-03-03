@@ -265,7 +265,11 @@ module AssureNote {
                 div.id = this.NodeView.Label;
 
                 var h4 = document.createElement("h4");
-                h4.textContent = this.NodeView.Label;
+                if(this.NodeView.IsMonitorNode()) {
+                    h4.textContent = "Monitor "+ this.NodeView.Label;
+                } else {
+                    h4.textContent = this.NodeView.Label;
+                }
 
                 var p = document.createElement("p");
                 var encoded: string = AssureNoteUtils.HTMLEncode(this.NodeView.NodeDoc.trim());
@@ -688,13 +692,6 @@ module AssureNote {
             super.PrerenderSVGContent(manager);
             this.BodyEllipse = AssureNoteUtils.CreateSVGElement("ellipse");
             this.ShapeGroup.appendChild(this.BodyEllipse);
-
-            /* FIXME change the following code to use API in common with MonitorNode plugin */
-            if (this.NodeView.IsMonitorNode()) {
-                var MonitorMaster = GSNEvidenceShape.MonitorLabelMaster.cloneNode();
-                MonitorMaster.textContent = "M";
-                this.ShapeGroup.appendChild(MonitorMaster);
-            }
         }
 
         FitSizeToContent(): void {

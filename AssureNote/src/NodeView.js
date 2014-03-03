@@ -226,10 +226,15 @@ var AssureNote;
             if (OldView) {
                 this.IsFoldedFlag = OldView.IsFoldedFlag;
                 this.Status = OldView.Status;
-                if (this.NodeDoc == OldView.NodeDoc && this.GetNodeType() == OldView.GetNodeType() && !OldView.HasParameter()) {
-                    this.SetShape(OldView.GetShape());
-                } else {
+
+                var IsContentChanged = this.NodeDoc != OldView.NodeDoc;
+                var IsTypeChanged = this.GetNodeType() != OldView.GetNodeType();
+                var IsMonitorOrNotChanged = this.IsMonitorNode() != OldView.IsMonitorNode();
+
+                if (IsContentChanged || IsTypeChanged || OldView.HasParameter() || IsMonitorOrNotChanged) {
                     this.GetShape().SetColorStyle(OldView.GetShape().GetColorStyle());
+                } else {
+                    this.SetShape(OldView.GetShape());
                 }
             }
 
