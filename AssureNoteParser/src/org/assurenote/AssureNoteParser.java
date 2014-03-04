@@ -1700,6 +1700,9 @@ class GSNDoc {
 class GSNRecord {
 	/*field*/ArrayList<GSNHistory> HistoryList;
 	/*field*/GSNDoc                EditingDoc;
+	
+	/* TODO Use this field to enable undo/redo */
+	/*field*/int                   CurrentRevision;
 
 	GSNRecord/*constructor*/() {
 		this.HistoryList = new ArrayList<GSNHistory>();
@@ -2019,7 +2022,26 @@ class GSNRecord {
 			}
 		}
 	}
-
+	/**
+	 * @method Undo
+	 */
+	public GSNHistory Undo() {
+		/*
+		 * TODO
+		 * TO enable undo/redo, GSNRecord is needed to have the current revision.
+		 */
+		return null;
+	}
+	
+	/**
+	 * @method Redo
+	 */
+	public GSNHistory Redo() {
+		/*
+		 * TODO
+		 */
+		return null;
+	}
 }
 
 /**

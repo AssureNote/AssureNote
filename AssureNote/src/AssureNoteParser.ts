@@ -1547,6 +1547,9 @@ export class GSNDoc {
 export class GSNRecord {
 	HistoryList: Array<GSNHistory>;
 	EditingDoc: GSNDoc;
+	
+	/* TODO Use this field to enable undo/redo */
+	CurrentRevision: number;
 
 	constructor() {
 		this.HistoryList = new Array<GSNHistory>();
@@ -1866,7 +1869,26 @@ export class GSNRecord {
 			}
 		}
 	}
-
+	/**
+	 * @method Undo
+	 */
+	public Undo(): GSNHistory {
+		/*
+		 * TODO
+		 * TO enable undo/redo, GSNRecord is needed to have the current revision.
+		 */
+		return null;
+	}
+	
+	/**
+	 * @method Redo
+	 */
+	public Redo(): GSNHistory {
+		/*
+		 * TODO
+		 */
+		return null;
+	}
 }
 
 /**
