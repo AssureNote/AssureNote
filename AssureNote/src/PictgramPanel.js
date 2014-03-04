@@ -321,7 +321,7 @@ var AssureNote;
         @param {AssureNote.Direction} Dir
         */
         PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
-            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
+            var NextNode = this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir);
             if (NextNode) {
                 this.FocusAndMoveToNode(NextNode);
             }
@@ -340,14 +340,11 @@ var AssureNote;
 
         /**
         @method FindNearestNode
-        @param {AssureNote.NodeView} CenterNode
+        @param {AssureNote.NodeView} CenterNode. If null is given, Camera position is used instead of the node.
         @param {AssureNote.Direction} Dir
         @return {AssureNote.NodeView} Found node. If no node is found, null is retured.
         */
         PictgramPanel.prototype.FindNearestNode = function (CenterNode, Dir) {
-            if (!CenterNode) {
-                return null;
-            }
             var RightLimitVectorX = 1;
             var RightLimitVectorY = 1;
             var LeftLimitVectorX = 1;
@@ -373,9 +370,11 @@ var AssureNote;
             }
             var NearestNode = null;
             var CurrentMinimumDistanceSquere = Infinity;
+            var CX = CenterNode ? CenterNode.GetCenterGX() : this.Viewport.GetCameraGX();
+            var CY = CenterNode ? CenterNode.GetCenterGY() : this.Viewport.GetCameraGY();
             this.TopNodeView.TraverseVisibleNode(function (Node) {
-                var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
-                var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                var DX = Node.GetCenterGX() - CX;
+                var DY = Node.GetCenterGY() - CY;
                 var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
                 var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
                 if (DDotR > 0 && DDotL > 0) {

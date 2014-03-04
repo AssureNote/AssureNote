@@ -339,7 +339,7 @@ module AssureNote {
             @param {AssureNote.Direction} Dir 
         */
         MoveToNearestNode(Dir: Direction): boolean {
-            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
+            var NextNode = this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir);
             if (NextNode) {
                 this.FocusAndMoveToNode(NextNode);
             }
@@ -363,14 +363,11 @@ module AssureNote {
 
         /**
             @method FindNearestNode
-            @param {AssureNote.NodeView} CenterNode
+            @param {AssureNote.NodeView} CenterNode. If null is given, Camera position is used instead of the node.
             @param {AssureNote.Direction} Dir 
             @return {AssureNote.NodeView} Found node. If no node is found, null is retured.
         */
         FindNearestNode(CenterNode: NodeView, Dir: Direction): NodeView {
-            if (!CenterNode) {
-                return null;
-            }
             var RightLimitVectorX: number = 1;
             var RightLimitVectorY: number = 1;
             var LeftLimitVectorX: number = 1;
@@ -396,9 +393,11 @@ module AssureNote {
             }
             var NearestNode: NodeView = null;
             var CurrentMinimumDistanceSquere = Infinity;
+            var CX = CenterNode ? CenterNode.GetCenterGX() : this.Viewport.GetCameraGX();
+            var CY = CenterNode ? CenterNode.GetCenterGY() : this.Viewport.GetCameraGY();
             this.TopNodeView.TraverseVisibleNode((Node: NodeView) => {
-                var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
-                var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                var DX = Node.GetCenterGX() - CX;
+                var DY = Node.GetCenterGY() - CY;
                 var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
                 var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
                 if (DDotR > 0 && DDotL > 0) {
