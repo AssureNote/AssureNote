@@ -65,9 +65,12 @@ module AssureNote {
         }
 
         RenderHTML(NodeDoc: string, Model: GSNNode): string {
-            var Map: HashMap<String, String> = Model.GetTagMapWithLexicalScope();
-            var LabelMap: HashMap<String, String> = Model.BaseDoc.GetLabelMap();
-            return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
+            if (NodeDoc.match(/\[([^\[\]]*)\]/)) {
+                var Map: HashMap<String, String> = Model.GetTagMapWithLexicalScope();
+                var LabelMap: HashMap<String, String> = Model.BaseDoc.GetLabelMap();
+                return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
+            }
+            return NodeDoc;
         }
     }
 }

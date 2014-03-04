@@ -73,9 +73,12 @@ var AssureNote;
         };
 
         VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc, Model) {
-            var Map = Model.GetTagMapWithLexicalScope();
-            var LabelMap = Model.BaseDoc.GetLabelMap();
-            return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
+            if (NodeDoc.match(/\[([^\[\]]*)\]/)) {
+                var Map = Model.GetTagMapWithLexicalScope();
+                var LabelMap = Model.BaseDoc.GetLabelMap();
+                return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
+            }
+            return NodeDoc;
         };
         return VariableInterpolationPlugin;
     })(AssureNote.Plugin);

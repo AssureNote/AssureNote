@@ -47,12 +47,17 @@ var AssureNote;
             this.DummyDiv.style.position = "absolute";
             this.DummyDiv.style.top = "1000%";
             document.body.appendChild(this.DummyDiv);
+            var LastQueueSize = 0;
 
             //for debug
             setInterval(function () {
-                if (_this.Queue.length) {
-                    console.log("size prefetch: " + _this.Queue.length + " nodes left");
+                if (!LastQueueSize) {
+                    LastQueueSize = _this.Queue.length;
                 }
+                if (LastQueueSize - _this.Queue.length) {
+                    console.log("size prefetch: " + _this.Queue.length + " nodes left. " + (1000 / (LastQueueSize - _this.Queue.length)) + "ms/node");
+                }
+                LastQueueSize = _this.Queue.length;
             }, 1000);
         }
         GSNShapeSizePreFetcher.prototype.Start = function () {
