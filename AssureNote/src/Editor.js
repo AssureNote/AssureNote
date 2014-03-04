@@ -93,9 +93,17 @@ var AssureNote;
             var _this = this;
             this.App.EditDocument("todo", "test", function () {
                 var WGSN = _this.Editor.getDoc().getValue();
-                var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
-                var NewNode;
-                NewNode = Node.ReplaceSubNodeAsText(WGSN, _this.IsEditRecursive);
+                if (WGSN.length == 0) {
+                    return false;
+                }
+                try  {
+                    var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+                    var NewNode;
+                    NewNode = Node.ReplaceSubNodeAsText(WGSN, _this.IsEditRecursive);
+                } catch (e) {
+                    AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
+                    return false;
+                }
                 var Writer = new AssureNote.StringWriter();
                 var WGSNChanged = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
                 if (!NewNode || !WGSNChanged) {

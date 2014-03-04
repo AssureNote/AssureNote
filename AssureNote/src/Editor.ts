@@ -88,9 +88,17 @@ module AssureNote {
         DisableEditor(OldNodeView: NodeView, OldWGSN: string): void {
             this.App.EditDocument("todo", "test", () => {
                 var WGSN: string = this.Editor.getDoc().getValue();
-                var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
-                var NewNode: GSNNode;
-                NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
+                if (WGSN.length == 0) {
+                    return false;
+                }
+                try {
+                    var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+                    var NewNode: GSNNode;
+                    NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
+                } catch (e) {
+                    AssureNoteUtils.Notify("Invalid WGSN is given");
+                    return false;
+                }
                 var Writer: StringWriter = new StringWriter();
                 var WGSNChanged: boolean = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
                 if (!NewNode || !WGSNChanged) {
