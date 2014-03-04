@@ -49,7 +49,8 @@
         <input id="command-line" type="text" style="width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large" class="form-control">
         <script id="history_tmpl" type="text/x-jquery-tmpl">
           <div class="panel panel-default history-menu">
-            <div class="panel-body"><a id="history-panel-close" style="position: absolute; top: -11px; right: -11px;" href="#" class="panel-close"><span style="font-size: 24px;" class="glyphicon glyphicon-remove-circle"></span></a>
+            <div class="panel-body">
+              <button id="history-panel-close" type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
               <h4 class="list-group-item-heading">${Message}</h4>
               <p class="list-group-item-text"><small><span class="glyphicon glyphicon-user"></span>&nbsp; ${User} &nbsp;<span class="glyphicon glyphicon-time"></span>&nbsp;<a id="history-panel-date" data-toggle="tooltip" data-placement="bottom" title="${DateTimeString}">${DateTime}</a><br><a id="history-panel-count" data-toggle="tooltip" data-placement="bottom">${Count.All} Nodes</a></small></p>
               <div style="padding-top: 10px" class="list-group-item-text">
@@ -58,7 +59,7 @@
             </div>
           </div>
         </script>
-        <div id="history" style="position: absolute; top: 60px; left: 10px; width: 260px;">
+        <div id="history" style="position: absolute; top: 60px; left: 10px; width: 260px; display: none;">
           <div class="panel panel-default node-list-panel">
             <div class="panel-body">
               <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>

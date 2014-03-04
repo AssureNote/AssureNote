@@ -1,8 +1,7 @@
 +template("history_tmpl")
     .panel.panel-default.history-menu
         .panel-body
-            a.panel-close#history-panel-close(style="position: absolute; top: -11px; right: -11px;", href="#")
-              span.glyphicon.glyphicon-remove-circle(style="font-size: 24px;")
+            button.close#history-panel-close(type='button', data-dismiss='modal', aria-hidden='true') &times;
             h4.list-group-item-heading ${Message}
             p.list-group-item-text
               small
@@ -24,7 +23,7 @@
                         span.glyphicon.glyphicon-chevron-right
                     a.btn.btn-default#last-revision(href='#')
                         span.glyphicon.glyphicon-fast-forward
-#history(style="position: absolute; top: 60px; left: 10px; width: 260px;")
+#history(style="position: absolute; top: 60px; left: 10px; width: 260px; display: none;")
     .panel.panel-default.node-list-panel
         .panel-body
             button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
