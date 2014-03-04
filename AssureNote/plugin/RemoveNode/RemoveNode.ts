@@ -43,6 +43,9 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]): void {
             if (Params.length > 0) {
                 var TargetView = this.App.GetNodeFromLabel(Params[0]);
+                if (TargetView == this.App.PictgramPanel.TopNodeView) {
+                    AssureNoteUtils.Notify("G1 cannot be removed");
+                }
                 if (TargetView) {
                     this.App.EditDocument("todo", "test", () => {
                         var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
@@ -85,6 +88,9 @@ module AssureNote {
 
         CreateMenuBarButton(View: NodeView): NodeMenuItem {
             var App = this.AssureNoteApp;
+            if (View == App.PictgramPanel.TopNodeView) {
+                return null;
+            }
             return new NodeMenuItem("remove-id", "/images/remove.png", "remove", (event: Event, TargetView: NodeView) => {
                 var Command = this.AssureNoteApp.FindCommandByCommandLineName("remove");
                 if (Command) {

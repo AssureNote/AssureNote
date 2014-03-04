@@ -48,6 +48,9 @@ var AssureNote;
             var _this = this;
             if (Params.length > 0) {
                 var TargetView = this.App.GetNodeFromLabel(Params[0]);
+                if (TargetView == this.App.PictgramPanel.TopNodeView) {
+                    AssureNote.AssureNoteUtils.Notify("G1 cannot be removed");
+                }
                 if (TargetView) {
                     this.App.EditDocument("todo", "test", function () {
                         var Node = _this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
@@ -93,6 +96,9 @@ var AssureNote;
         RemoveNodePlugin.prototype.CreateMenuBarButton = function (View) {
             var _this = this;
             var App = this.AssureNoteApp;
+            if (View == App.PictgramPanel.TopNodeView) {
+                return null;
+            }
             return new AssureNote.NodeMenuItem("remove-id", "/images/remove.png", "remove", function (event, TargetView) {
                 var Command = _this.AssureNoteApp.FindCommandByCommandLineName("remove");
                 if (Command) {
