@@ -42,35 +42,23 @@ module AssureNote {
 
         public Invoke(CommandName: string, Params: any[]): void {
             if (Params.length > 0) {
-                var Label = Params[0];
-                var TargetView = this.App.PictgramPanel.ViewMap[Label];
-                if (TargetView == null) {
-                    this.App.DebugP("Node not Found");
-                    return;
-                }
-                this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
-                var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
-                var Parent = Node.ParentNode;
-                for (var i = 0; i < Parent.SubNodeList.length; i++) {
-                    var it = Parent.SubNodeList[i];
-                    if (Node == it) {
-                        Parent.SubNodeList.splice(i, 1);
-                    }
-                }
+                var TargetView = this.App.GetNodeFromLabel(Params[0]);
+                if (TargetView) {
+                    this.App.EditDocument("todo", "test", () => {
+                        var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
+                        var Parent = Node.ParentNode;
+                        for (var i = 0; i < Parent.SubNodeList.length; i++) {
+                            var it = Parent.SubNodeList[i];
+                            if (Node == it) {
+                                Parent.SubNodeList.splice(i, 1);
+                            }
+                        }
 
-                RemoveCommand.RemoveDescendantsRecursive(Node);
-
-                var Doc = this.App.MasterRecord.EditingDoc;
-                Doc.RenumberAll();
-                var TopNode = Doc.TopNode;
-                var NewNodeView: NodeView = new NodeView(TopNode, true);
-                NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.InitializeView(NewNodeView);
-                this.App.PictgramPanel.Draw(TopNode.GetLabel());
-                this.App.SocketManager.UpdateWGSN();
-                this.App.MasterRecord.CloseEditor();
+                        RemoveCommand.RemoveDescendantsRecursive(Node);
+                    });
+                }
             } else {
-                console.log("Need paramter");
+                AssureNoteUtils.Notify("remove: need target node");
             }
         }
 

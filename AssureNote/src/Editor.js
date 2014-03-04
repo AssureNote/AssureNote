@@ -76,12 +76,6 @@ var AssureNote;
             var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
-
-            //this.Element.off("blur").on("blur", (e: JQueryEventObject) => {
-            //    e.stopPropagation();
-            //    e.preventDefault();
-            //    this.DisableEditor(NodeView, WGSN);
-            //});
             this.OnOutSideClicked = function () {
                 _this.DisableEditor(NodeView, WGSN);
             };
@@ -96,33 +90,25 @@ var AssureNote;
         };
 
         CodeMirrorEditorPanel.prototype.DisableEditor = function (OldNodeView, OldWGSN) {
-            var WGSN = this.Editor.getDoc().getValue();
-            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
-            var Node = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
-            var NewNode;
-            NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
-            var Writer = new AssureNote.StringWriter();
-            if (NewNode && NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim()) {
-                this.App.MasterRecord.EditingDoc.RenumberAll();
-                var TopGoal = this.App.MasterRecord.EditingDoc.TopNode;
+            var _this = this;
+            this.App.EditDocument("todo", "test", function () {
+                var WGSN = _this.Editor.getDoc().getValue();
+                var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+                var NewNode;
+                NewNode = Node.ReplaceSubNodeAsText(WGSN, _this.IsEditRecursive);
+                var Writer = new AssureNote.StringWriter();
+                var WGSNChanged = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
+                if (!NewNode || !WGSNChanged) {
+                    return false;
+                }
+                _this.App.FullScreenEditorPanel.IsVisible = true; // Why?
+            });
 
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.InitializeView(NewNodeView);
-                this.App.PictgramPanel.Draw(null);
-
-                this.App.FullScreenEditorPanel.IsVisible = true;
-                this.App.SocketManager.UpdateWGSN();
-                this.App.MasterRecord.CloseEditor();
-            } else {
-                this.App.MasterRecord.DiscardEditor();
-            }
             this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
             $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
 
-            var Panel = this.App.PictgramPanel;
-            Panel.Activate();
+            this.App.PictgramPanel.Activate();
         };
 
         CodeMirrorEditorPanel.prototype.OnKeyDown = function (Event) {

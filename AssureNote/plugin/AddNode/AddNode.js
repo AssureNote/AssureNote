@@ -46,24 +46,15 @@ var AssureNote;
         };
 
         AddNodeCommand.prototype.Invoke = function (CommandName, Params) {
+            var _this = this;
             var Type = this.Text2NodeTypeMap[Params[1].toLowerCase()];
-            var TargetView = this.App.PictgramPanel.ViewMap[Params[0]];
-            if (TargetView == null) {
-                this.App.DebugP("Node not Found");
-                return;
+            var TargetView = this.App.GetNodeFromLabel(Params[0]);
+            if (TargetView) {
+                this.App.EditDocument("todo", "test", function () {
+                    var Node = _this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
+                    new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
+                });
             }
-            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
-            var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
-            new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
-            var Doc = this.App.MasterRecord.EditingDoc;
-            Doc.RenumberAll();
-            var TopGoal = Doc.TopNode;
-            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-            NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-            this.App.PictgramPanel.InitializeView(NewNodeView);
-            this.App.PictgramPanel.Draw(TopGoal.GetLabel());
-            this.App.SocketManager.UpdateWGSN();
-            this.App.MasterRecord.CloseEditor();
         };
         return AddNodeCommand;
     })(AssureNote.Command);

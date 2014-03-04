@@ -264,7 +264,7 @@ var AssureNote;
 
         AssureNoteApp.prototype.LoadFiles = function (Files) {
             var _this = this;
-            if (Files[0]) {
+            if (Files.length > 0) {
                 var reader = new FileReader();
                 reader.onerror = function (event) {
                     console.log('error', event.target.error.code);
@@ -277,12 +277,47 @@ var AssureNote;
                     _this.LoadNewWGSN(Name, Contents);
 
                     /* TODO resolve conflict */
-                    if (_this.SocketManager.IsConnected()) {
-                        _this.SocketManager.UpdateWGSN();
-                    }
+                    _this.SocketManager.UpdateWGSN();
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
+        };
+
+        /**
+        @method EditDocument
+        Edit document and repaint the GSN. If Action returns 'false', changes will be discarded.
+        */
+        AssureNoteApp.prototype.EditDocument = function (Role, Process, Action) {
+            this.MasterRecord.OpenEditor(this.GetUserName(), Role, null, Process);
+
+            var ReturnCode = Action();
+
+            if (ReturnCode === false) {
+                this.MasterRecord.DiscardEditor();
+            } else {
+                var Doc = this.MasterRecord.EditingDoc;
+                Doc.RenumberAll();
+                this.MasterRecord.CloseEditor();
+
+                var TopNode = Doc.TopNode;
+                var NewNodeView = new AssureNote.NodeView(TopNode, true);
+                var OldViewMap = this.PictgramPanel.ViewMap;
+                NewNodeView.SaveFlags(OldViewMap);
+
+                this.PictgramPanel.InitializeView(NewNodeView);
+                this.PictgramPanel.Draw(TopNode.GetLabel());
+
+                //TODO: Use eventhandler
+                this.SocketManager.UpdateWGSN();
+            }
+        };
+
+        AssureNoteApp.prototype.GetNodeFromLabel = function (Label, ReportError) {
+            var Node = this.PictgramPanel.ViewMap[Label];
+            if (Node == null && (ReportError === undefined || ReportError)) {
+                AssureNote.AssureNoteUtils.Notify("Node " + Label + " is not found");
+            }
+            return Node;
         };
         return AssureNoteApp;
     })();

@@ -291,7 +291,7 @@ module AssureNote {
         }
 
         LoadFiles(Files: FileList): void {
-            if (Files[0]) {
+            if (Files.length > 0) {
                 var reader = new FileReader();
                 reader.onerror = (event: Event) => {
                     console.log('error', (<any>event.target).error.code);
@@ -304,12 +304,46 @@ module AssureNote {
                     this.LoadNewWGSN(Name, Contents);
 
                     /* TODO resolve conflict */
-                    if(this.SocketManager.IsConnected()) {
-                        this.SocketManager.UpdateWGSN();
-                    }
+                    this.SocketManager.UpdateWGSN();
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
+        }
+        
+        /**
+        @method EditDocument
+        Edit document and repaint the GSN. If Action returns 'false', changes will be discarded.
+        */
+        public EditDocument(Role: string, Process: string, Action: Function): void {
+            this.MasterRecord.OpenEditor(this.GetUserName(), Role, null, Process);
+
+            var ReturnCode = Action();
+
+            if (ReturnCode === false) {
+                this.MasterRecord.DiscardEditor();
+            } else {
+                var Doc = this.MasterRecord.EditingDoc;
+                Doc.RenumberAll();
+                this.MasterRecord.CloseEditor();
+
+                var TopNode = Doc.TopNode;
+                var NewNodeView: NodeView = new NodeView(TopNode, true);
+                var OldViewMap = this.PictgramPanel.ViewMap;
+                NewNodeView.SaveFlags(OldViewMap);
+
+                this.PictgramPanel.InitializeView(NewNodeView);
+                this.PictgramPanel.Draw(TopNode.GetLabel());
+                //TODO: Use eventhandler
+                this.SocketManager.UpdateWGSN();
+            }
+        }
+
+        public GetNodeFromLabel(Label: string, ReportError?: boolean) {
+            var Node = this.PictgramPanel.ViewMap[Label];
+            if (Node == null && (ReportError === undefined || ReportError)) {
+                AssureNoteUtils.Notify("Node " + Label + " is not found");
+            }
+            return Node;
         }
     }
 

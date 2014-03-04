@@ -72,11 +72,6 @@ module AssureNote {
             var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
-            //this.Element.off("blur").on("blur", (e: JQueryEventObject) => {
-            //    e.stopPropagation();
-            //    e.preventDefault();
-            //    this.DisableEditor(NodeView, WGSN);
-            //});
             this.OnOutSideClicked = () => {
                 this.DisableEditor(NodeView, WGSN);
             };
@@ -91,33 +86,24 @@ module AssureNote {
         }
 
         DisableEditor(OldNodeView: NodeView, OldWGSN: string): void {
-            var WGSN: string = this.Editor.getDoc().getValue();
-            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
-            var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
-            var NewNode: GSNNode;
-            NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
-            var Writer: StringWriter = new StringWriter();
-            if (NewNode && NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim()) {
-                this.App.MasterRecord.EditingDoc.RenumberAll();
-                var TopGoal = this.App.MasterRecord.EditingDoc.TopNode;
+            this.App.EditDocument("todo", "test", () => {
+                var WGSN: string = this.Editor.getDoc().getValue();
+                var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+                var NewNode: GSNNode;
+                NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
+                var Writer: StringWriter = new StringWriter();
+                var WGSNChanged: boolean = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
+                if (!NewNode || !WGSNChanged) {
+                    return false;
+                }
+                this.App.FullScreenEditorPanel.IsVisible = true; // Why?
+            });
 
-                var NewNodeView: NodeView = new NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.InitializeView(NewNodeView);
-                this.App.PictgramPanel.Draw(null);
-
-                this.App.FullScreenEditorPanel.IsVisible = true;
-                this.App.SocketManager.UpdateWGSN();
-                this.App.MasterRecord.CloseEditor();
-            } else {
-                this.App.MasterRecord.DiscardEditor();
-            }
             this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
             $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
 
-            var Panel = this.App.PictgramPanel;
-            Panel.Activate();
+            this.App.PictgramPanel.Activate();
         }
 
         OnKeyDown(Event: KeyboardEvent): void {

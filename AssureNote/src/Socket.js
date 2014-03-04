@@ -374,6 +374,9 @@ var AssureNote;
         };
 
         SocketManager.prototype.UpdateWGSN = function () {
+            if (!this.IsConnected()) {
+                return;
+            }
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             var WGSN = Writer.toString();

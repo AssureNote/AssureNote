@@ -357,6 +357,9 @@ module AssureNote {
         }
 
         UpdateWGSN() {
+            if (!this.IsConnected()) {
+                return;
+            }
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             var WGSN: string = Writer.toString();
