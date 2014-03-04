@@ -45,14 +45,6 @@ var AssureNote;
     })();
     AssureNote.EditNodeStatus = EditNodeStatus;
 
-    var FocusedLabels = (function () {
-        function FocusedLabels(SID, Label) {
-            this.SID = SID;
-            this.Label = Label;
-        }
-        return FocusedLabels;
-    })();
-    AssureNote.FocusedLabels = FocusedLabels;
     var SocketManager = (function () {
         function SocketManager(App) {
             var _this = this;
@@ -61,7 +53,7 @@ var AssureNote;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.EditNodeInfo = [];
-            this.FocusedLabels = [];
+            this.FocusedLabels = {};
             if (!this.IsOperational()) {
                 App.DebugP('socket.io not found');
             }
@@ -85,19 +77,17 @@ var AssureNote;
         };
 
         SocketManager.prototype.Emit = function (method, params) {
-            if (!this.IsConnected()) {
-                this.App.DebugP('Socket not enable.');
-                return;
+            if (this.IsConnected()) {
+                this.socket.emit(method, params);
             }
-
-            this.socket.emit(method, params);
         };
 
         SocketManager.prototype.EnableListeners = function () {
             var self = this;
             this.socket.on('disconnect', function (data) {
-                self.App.ModeManager.Disable();
                 self.socket = null;
+                self.FocusedLabels = {};
+                self.EditNodeInfo = [];
             });
             this.socket.on('close', function (SID) {
                 self.UpdateView("");
@@ -107,7 +97,7 @@ var AssureNote;
             });
 
             this.socket.on('error', function (data) {
-                $.notify('Cannot establish connection or connection closed', 'error');
+                AssureNote.AssureNoteUtils.Notify('Cannot establish connection or connection closed', 'error');
                 self.App.ModeManager.Disable();
             });
 
@@ -128,22 +118,17 @@ var AssureNote;
             this.socket.on('focusednode', function (data) {
                 var OldView;
                 var OldLabel;
-                if (data.Label == null || self.FocusedLabels.length != 0) {
-                    for (var i in self.FocusedLabels) {
-                        if (self.FocusedLabels[i].SID == data.SID) {
-                            OldLabel = self.FocusedLabels[i].Label;
-                            OldView = self.App.PictgramPanel.ViewMap[OldLabel];
-                            self.FocusedLabels.splice(i, 1);
-                            self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
-                            break;
-                        }
+                if (data.Label == null) {
+                    if (self.FocusedLabels[data.SID]) {
+                        OldLabel = self.FocusedLabels[data.SID];
+                        OldView = self.App.PictgramPanel.ViewMap[OldLabel];
+                        delete self.FocusedLabels[data.SID];
+                        self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
                     }
-                }
-
-                if (data.Label != null) {
+                } else {
                     var FocusedView = self.App.PictgramPanel.ViewMap[data.Label];
                     self.App.UserList.AddFocusedUserColor(data.SID, FocusedView);
-                    self.FocusedLabels.push(data);
+                    self.FocusedLabels[data.SID] = data.Label;
                 }
             });
 

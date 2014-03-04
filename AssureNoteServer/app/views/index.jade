@@ -26,6 +26,7 @@ html
       svg#svglayer-box.full-size-layer(xmlns='http://www.w3.org/2000/svg', version='1.1')
       #eventmap-layer.full-size-layer(touch-action='none')
       #content-layer.zero-size-layer
+      #editor-background.full-size-layer(style='display: none;')
       #control-layer.zero-size-layer
         #singlenode-editor-wrapper(style='border: 1px solid black')
           textarea#singlenode-editor(placeholder='Type something...', style='display: none;')
@@ -34,7 +35,6 @@ html
         input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')
         include history
       #plugin-layer.zero-size-layer
-        #editor-background.full-size-layer(style='display: none;')
         #editor-wrapper(style='border: 1px solid black')
           textarea#editor(placeholder='Type something...', style='display: none;')
     svg(width='0', height='0')

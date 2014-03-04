@@ -79,10 +79,12 @@ var AssureNote;
             this.OnOutSideClicked = function () {
                 _this.DisableEditor(NodeView, WGSN);
             };
-            $("#editor-background").off("click").on("click", this.OnOutSideClicked);
-            $("#editor-background").off("contextmenu").on("contextmenu", this.OnOutSideClicked);
 
-            $("#editor-background").stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
+            var BackGround = $("#editor-background");
+            BackGround.off("click").on("click", this.OnOutSideClicked);
+            BackGround.off("contextmenu").on("contextmenu", this.OnOutSideClicked);
+
+            BackGround.stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
             this.Element.stop(true, true).css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();

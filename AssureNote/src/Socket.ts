@@ -36,10 +36,6 @@ module AssureNote {
 
     }
 
-    export class FocusedLabels {
-        constructor(public SID: string, public Label: string) { }
-
-    }
     export class SocketManager {
         private DefaultChatServer: string = (!Config || !Config.DefaultChatServer) ? 'http://localhost:3002' : Config.DefaultChatServer;
         private socket: any;
@@ -47,7 +43,7 @@ module AssureNote {
         private UseOnScrollEvent: boolean = true;
         private ReceivedFoldEvent: boolean = false;
         private EditNodeInfo: EditNodeStatus[] = [];
-        private FocusedLabels: FocusedLabels[] = [];
+        private FocusedLabels: { [index: string]: string } = {};
 
         constructor(public App: AssureNoteApp) {
             if (!this.IsOperational()) {
@@ -74,20 +70,17 @@ module AssureNote {
         }
 
         Emit(method: string, params: any) {
-            if (!this.IsConnected()) {
-                this.App.DebugP('Socket not enable.');
-                return;
+            if (this.IsConnected()) {
+                this.socket.emit(method, params);
             }
-
-            this.socket.emit(method, params);
         }
 
-        EnableListeners(): void{
+        private EnableListeners(): void{
             var self = this;
             this.socket.on('disconnect', function (data) {
-                self.App.ModeManager.Disable();
                 self.socket = null;
-
+                self.FocusedLabels = {};
+                self.EditNodeInfo = [];
             });
             this.socket.on('close', function(SID: string) {
                 self.UpdateView("");
@@ -97,7 +90,7 @@ module AssureNote {
             });
 
             this.socket.on('error', function (data) {
-                (<any>$).notify('Cannot establish connection or connection closed', 'error');
+                AssureNoteUtils.Notify('Cannot establish connection or connection closed', 'error');
                 self.App.ModeManager.Disable();
             });
 
@@ -118,22 +111,17 @@ module AssureNote {
             this.socket.on('focusednode', function(data: {SID: string; Label: string}) {
                 var OldView : NodeView;
                 var OldLabel: string;
-                if (data.Label == null || self.FocusedLabels.length != 0) {
-                    for (var i in self.FocusedLabels) {
-                        if (self.FocusedLabels[i].SID == data.SID) {
-                            OldLabel = self.FocusedLabels[i].Label;
-                            OldView  = self.App.PictgramPanel.ViewMap[OldLabel];
-                            self.FocusedLabels.splice(i, 1);
-                            self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
-                            break;
-                        }
+                if (data.Label == null) {
+                    if (self.FocusedLabels[data.SID]) {
+                        OldLabel = self.FocusedLabels[data.SID];
+                        OldView = self.App.PictgramPanel.ViewMap[OldLabel];
+                        delete self.FocusedLabels[data.SID];
+                        self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
                     }
-                }
-
-                if (data.Label != null) {
+                } else {
                     var FocusedView: NodeView = self.App.PictgramPanel.ViewMap[data.Label];
                     self.App.UserList.AddFocusedUserColor(data.SID, FocusedView);
-                    self.FocusedLabels.push(data);
+                    self.FocusedLabels[data.SID] = data.Label;
                 }
             });
 
@@ -201,7 +189,7 @@ module AssureNote {
             }
         }
 
-        DisConnect() {
+        private DisConnect() {
             this.socket.disconnect();
             this.socket = null;
         }
@@ -216,7 +204,7 @@ module AssureNote {
             return io != null && io.connect != null;
         }
 
-        DeleteEditInfo(UID:number) {
+        private DeleteEditInfo(UID: number) {
             for (var i:number = 0; i < this.EditNodeInfo.length; i++) {
                 if (this.EditNodeInfo[i].UID == UID) {
                     this.EditNodeInfo.splice(i, 1);
@@ -225,13 +213,13 @@ module AssureNote {
             }
         }
 
-        UpdateParentStatus(NodeView: NodeView) {
+        private UpdateParentStatus(NodeView: NodeView) {
             if (NodeView.Parent == null) return;
             NodeView.Parent.Status = EditStatus.SingleEditable;
             this.UpdateParentStatus(NodeView.Parent);
         }
 
-        UpdateChildStatus(NodeView: NodeView) {
+        private UpdateChildStatus(NodeView: NodeView) {
             if (NodeView.Children != null){
                 for (var i: number = 0; i < NodeView.Children.length; i++) {
                     NodeView.Children[i].Status = EditStatus.Locked;
@@ -252,7 +240,7 @@ module AssureNote {
             }
         }
 
-        UpdateFlags(NodeView: NodeView) {
+        private UpdateFlags(NodeView: NodeView) {
             NodeView.Status = EditStatus.Locked;
             this.UpdateParentStatus(NodeView);
             if (NodeView.Children == null && NodeView.Left == null && NodeView.Right == null) return;
@@ -261,7 +249,7 @@ module AssureNote {
             }
         }
 
-        UpdateView(Method: string) {
+        private UpdateView(Method: string) {
             var NewNodeView: NodeView = new NodeView(this.App.MasterRecord.GetLatestDoc().TopNode, true);
             NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
             if (Method == "finishedit") {
@@ -271,7 +259,7 @@ module AssureNote {
             this.App.PictgramPanel.Draw(this.App.MasterRecord.GetLatestDoc().TopNode.GetLabel());
         }
 
-        SetDefaultFlags(NodeView: NodeView) {
+        private SetDefaultFlags(NodeView: NodeView) {
            NodeView.Status = EditStatus.TreeEditable;
             if (NodeView.Children != null) {
                 for (var i: number = 0; i < NodeView.Children.length; i++) {
@@ -290,7 +278,7 @@ module AssureNote {
             }
         }
 
-        IsEditable(UID: number) {
+        private IsEditable(UID: number) {
             var index: number = 0;
             var CurrentView: NodeView = this.App.PictgramPanel.GetNodeViewFromUID(UID).Parent;
 
@@ -312,7 +300,7 @@ module AssureNote {
             return true;
         }
 
-        AddUserNameOn(NodeView: NodeView, Data: {User: string; IsRecursive: boolean}) : void {
+        private AddUserNameOn(NodeView: NodeView, Data: {User: string; IsRecursive: boolean}) : void {
             var Label: string = NodeView.Label.replace(/\./g, "\\.");
             var topdist: string;
             var rightdist: string;

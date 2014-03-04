@@ -184,12 +184,12 @@ h4 {
     transform: translate(-50%, -50%);
 }
 
-.nonclickable {
-	pointer-events: none;
+.nonclickable .clickable, .nonclickable-one-level > * {
+	pointer-events: initial;
 }
 
-.nonclickable .clickable {
-	pointer-events: initial;
+.nonclickable, .nonclickable-one-level, .nonclickable-one-level > .nonclickable-one-level, .nonclickable-one-level > .nonclickable {
+	pointer-events: none;
 }
 
 a.panel-close {
