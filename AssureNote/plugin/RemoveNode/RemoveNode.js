@@ -47,12 +47,13 @@ var AssureNote;
         RemoveCommand.prototype.Invoke = function (CommandName, Params) {
             if (Params.length > 0) {
                 var Label = Params[0];
-                var View = this.App.PictgramPanel.ViewMap[Label];
-                if (View == null) {
+                var TargetView = this.App.PictgramPanel.ViewMap[Label];
+                if (TargetView == null) {
                     this.App.DebugP("Node not Found");
                     return;
                 }
-                var Node = this.App.PictgramPanel.ViewMap[Label].Model;
+                this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
+                var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
                 var Parent = Node.ParentNode;
                 for (var i = 0; i < Parent.SubNodeList.length; i++) {
                     var it = Parent.SubNodeList[i];
@@ -63,12 +64,15 @@ var AssureNote;
 
                 RemoveCommand.RemoveDescendantsRecursive(Node);
 
-                var TopGoal = this.App.MasterRecord.GetLatestDoc().TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
+                var Doc = this.App.MasterRecord.EditingDoc;
+                Doc.RenumberAll();
+                var TopNode = Doc.TopNode;
+                var NewNodeView = new AssureNote.NodeView(TopNode, true);
                 NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
                 this.App.PictgramPanel.InitializeView(NewNodeView);
-                this.App.PictgramPanel.Draw(TopGoal.GetLabel());
+                this.App.PictgramPanel.Draw(TopNode.GetLabel());
                 this.App.SocketManager.UpdateWGSN();
+                this.App.MasterRecord.CloseEditor();
             } else {
                 console.log("Need paramter");
             }
