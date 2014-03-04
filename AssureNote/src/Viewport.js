@@ -520,9 +520,12 @@ var AssureNote;
         ViewportManager.prototype.UpdatePageRect = function () {
             var CameraCenterXRate = this.CameraCenterPageX / this.PageWidth;
             var CameraCenterYRate = this.CameraCenterPageY / this.PageHeight;
+            var CameraPX = this.PageXFromGX(this.CameraGX);
+            var CameraPY = this.PageYFromGY(this.CameraGY);
             this.PageWidth = window.innerWidth;
             this.PageHeight = window.innerHeight;
             this.SetCameraPageCenter(this.PageWidth * CameraCenterXRate, this.PageHeight * CameraCenterYRate);
+            this.UpdateAttr();
         };
 
         ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {
