@@ -44,12 +44,16 @@ module AssureNote {
             this.DummyDiv.style.position = "absolute";
             this.DummyDiv.style.top = "1000%";
             document.body.appendChild(this.DummyDiv);
-
+            var LastQueueSize = 0;
             //for debug
             setInterval(() => {
-                if (this.Queue.length) {
-                    console.log("size prefetch: " + this.Queue.length + " nodes left");
+                if (!LastQueueSize) {
+                    LastQueueSize = this.Queue.length;
                 }
+                if (LastQueueSize - this.Queue.length) {
+                    console.log("size prefetch: " + this.Queue.length + " nodes left. " + (1000 / (LastQueueSize - this.Queue.length)) + "ms/node");
+                }
+                LastQueueSize = this.Queue.length;
             }, 1000);
         }
 
