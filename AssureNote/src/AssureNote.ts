@@ -304,7 +304,9 @@ module AssureNote {
                     this.LoadNewWGSN(Name, Contents);
 
                     /* TODO resolve conflict */
-                    this.SocketManager.UpdateWGSN();
+                    if(this.SocketManager.IsConnected()) {
+                        this.SocketManager.UpdateWGSN();
+                    }
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }

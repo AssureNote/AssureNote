@@ -277,7 +277,9 @@ var AssureNote;
                     _this.LoadNewWGSN(Name, Contents);
 
                     /* TODO resolve conflict */
-                    _this.SocketManager.UpdateWGSN();
+                    if (_this.SocketManager.IsConnected()) {
+                        _this.SocketManager.UpdateWGSN();
+                    }
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
