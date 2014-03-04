@@ -616,4 +616,46 @@ module AssureNote {
             return true;
         }
     }
+
+    export class CopyCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["copy"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>copy node</code><br>Copy the nodes."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return false;
+        }
+    }
+
+    export class PasteCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["copy"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>Paste node</code><br>Paste the nodes as the sub-tree of the specified nodes."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return false;
+        }
+    }
 }
