@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -656,5 +656,51 @@ var AssureNote;
         return SearchCommand;
     })(Command);
     AssureNote.SearchCommand = SearchCommand;
+
+    var CopyCommand = (function (_super) {
+        __extends(CopyCommand, _super);
+        function CopyCommand(App) {
+            _super.call(this, App);
+        }
+        CopyCommand.prototype.GetCommandLineNames = function () {
+            return ["copy"];
+        };
+
+        CopyCommand.prototype.GetHelpHTML = function () {
+            return "<code>copy node</code><br>Copy the nodes.";
+        };
+
+        CopyCommand.prototype.Invoke = function (CommandName, Params) {
+        };
+
+        CopyCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return CopyCommand;
+    })(Command);
+    AssureNote.CopyCommand = CopyCommand;
+
+    var PasteCommand = (function (_super) {
+        __extends(PasteCommand, _super);
+        function PasteCommand(App) {
+            _super.call(this, App);
+        }
+        PasteCommand.prototype.GetCommandLineNames = function () {
+            return ["copy"];
+        };
+
+        PasteCommand.prototype.GetHelpHTML = function () {
+            return "<code>Paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
+        };
+
+        PasteCommand.prototype.Invoke = function (CommandName, Params) {
+        };
+
+        PasteCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return PasteCommand;
+    })(Command);
+    AssureNote.PasteCommand = PasteCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

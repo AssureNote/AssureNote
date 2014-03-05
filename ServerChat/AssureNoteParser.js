@@ -1862,6 +1862,27 @@ var GSNRecord = (function () {
             }
         }
     };
+
+    /**
+    * @method Undo
+    */
+    GSNRecord.prototype.Undo = function () {
+        /*
+        * TODO
+        * TO enable undo/redo, GSNRecord is needed to have the current revision.
+        */
+        return null;
+    };
+
+    /**
+    * @method Redo
+    */
+    GSNRecord.prototype.Redo = function () {
+        /*
+        * TODO
+        */
+        return null;
+    };
     return GSNRecord;
 })();
 exports.GSNRecord = GSNRecord;
