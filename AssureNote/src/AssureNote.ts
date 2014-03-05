@@ -339,6 +339,9 @@ module AssureNote {
                 this.PictgramPanel.Draw(TopNode.GetLabel());
                 //TODO: Use eventhandler
                 this.SocketManager.UpdateWGSN();
+
+                this.TopMenu.Update();
+                this.TopMenuRight.Update();
             }
         }
 

@@ -312,6 +312,9 @@ var AssureNote;
 
                 //TODO: Use eventhandler
                 this.SocketManager.UpdateWGSN();
+
+                this.TopMenu.Update();
+                this.TopMenuRight.Update();
             }
         };
 
