@@ -86,9 +86,9 @@ var AssureNote;
                     new AssureNote.ZoomMenuItem(true, "Zoom", 2)
                 ]),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.ShowHistoryPanelMenuItem(true),
-                new AssureNote.ShowMonitorListMenuItem(true),
-                new AssureNote.SetMonitorMenuItem(true)
+                new AssureNote.ShowHistoryPanelMenuItem(true, "history"),
+                new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
+                new AssureNote.SetMonitorMenuItem(true, "setmonitor")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
                 new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
@@ -239,6 +239,8 @@ var AssureNote;
             this.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoalNode, true));
             this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.TopNodeView);
             this.PictgramPanel.Draw();
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
 
             if (location.hash != "") {
                 var label = location.hash.substring(1);

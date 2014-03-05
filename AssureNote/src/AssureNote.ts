@@ -113,9 +113,9 @@ module AssureNote {
                         new ZoomMenuItem(true, "Zoom", 2)
                     ]),
                     new DividerMenuItem(true),
-                    new ShowHistoryPanelMenuItem(true),
-                    new ShowMonitorListMenuItem(true),
-                    new SetMonitorMenuItem(true)
+                    new ShowHistoryPanelMenuItem(true, "history"),
+                    new ShowMonitorListMenuItem(true, "monitorlist"),
+                    new SetMonitorMenuItem(true, "setmonitor")
                 ]) );
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "edit", "Edit", "pencil", [
@@ -267,6 +267,8 @@ module AssureNote {
             this.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoalNode, true));
             this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.TopNodeView);
             this.PictgramPanel.Draw();
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
 
             if (location.hash != "") {
                 var label = location.hash.substring(1);

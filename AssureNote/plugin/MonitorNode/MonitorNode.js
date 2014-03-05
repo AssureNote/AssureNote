@@ -693,6 +693,15 @@ var AssureNote;
                 App.ExecCommandByName("set-monitor", "all");
             }
         };
+
+        SetMonitorMenuItem.prototype.Update = function () {
+            var HasMonitor = AssureNote.AssureNoteApp.Current.PictgramPanel.HasMonitorNode();
+            if (HasMonitor) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        };
         return SetMonitorMenuItem;
     })(AssureNote.TopMenuItem);
     AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
@@ -713,6 +722,15 @@ var AssureNote;
         ShowMonitorListMenuItem.prototype.Invoke = function (App) {
             var Command = App.FindCommandByCommandLineName("show-monitorlist");
             Command.Invoke(null, []);
+        };
+
+        ShowMonitorListMenuItem.prototype.Update = function () {
+            var HasMonitor = AssureNote.AssureNoteApp.Current.PictgramPanel.HasMonitorNode();
+            if (HasMonitor) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
         };
         return ShowMonitorListMenuItem;
     })(AssureNote.TopMenuItem);

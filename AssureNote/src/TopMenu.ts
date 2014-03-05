@@ -61,7 +61,7 @@ module AssureNote {
                 item = document.createElement("button");
                 (<HTMLButtonElement>item).type = "button";
                 if(this.ElementId) {
-                    item.setAttribute("id", this.ElementId);
+                    item.id = this.ElementId;
                 }
                 item.setAttribute("oncontextmenu", "return false");
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
@@ -82,6 +82,9 @@ module AssureNote {
                 </li>
                 */
                 item = document.createElement("li");
+                if (this.ElementId) {
+                    item.id = this.ElementId;
+                }
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
@@ -92,12 +95,17 @@ module AssureNote {
                 }
             }
             item.addEventListener("click", (event: MouseEvent) => {
-                this.Invoke(App);
+                if (this.IsEnabled) {
+                    this.Invoke(App);
+                }
             });
             Target.appendChild(item);
         }
 
         Invoke(App: AssureNoteApp): void {
+        }
+
+        Update(): void {
         }
     }
 
@@ -131,7 +139,9 @@ module AssureNote {
                 dropdown.className = "dropdown clickable navbar-left";
                 var button = document.createElement("button");
                 button.type = "button";
-                button.setAttribute("id", this.ElementId);
+                if (this.ElementId) {
+                    button.id = this.ElementId;
+                }
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
                 var classes = "btn navbar-btn btn-default dropdown-toggle";
@@ -169,6 +179,9 @@ module AssureNote {
                 */
                 var li = document.createElement("li");
                 li.className = "dropdown-submenu";
+                if (this.ElementId) {
+                    li.id = this.ElementId;
+                }
                 var a = document.createElement("a");
                 a.href = "#";
                 li.appendChild(a);
@@ -185,6 +198,12 @@ module AssureNote {
 
                 li.appendChild(ul);
                 Target.appendChild(li);
+            }
+        }
+
+        Update(): void {
+            for (var i = 0; i < this.SubMenuList.length; i++) {
+                this.SubMenuList[i].Update();
             }
         }
     }
@@ -215,6 +234,12 @@ module AssureNote {
                 this.SubMenuList[i].Render(App, Target, true);
             }
             (<any>$(".dropdown-toggle")).dropdown();
+        }
+
+        Update() {
+            for (var i = 0; i < this.SubMenuList.length; i++) {
+                this.SubMenuList[i].Update();
+            }
         }
     }
 

@@ -462,7 +462,7 @@ module AssureNote {
             return this.FocusedLabel;
         }
 
-        private HasMonitorNode(): boolean {
+        HasMonitorNode(): boolean {
             for(var Label in this.ViewMap) {
                 var View = this.ViewMap[Label];
                 if(View.IsMonitorNode()) {
@@ -476,20 +476,6 @@ module AssureNote {
             this.TopNodeView = NodeView;
             this.ViewMap = {};
             this.TopNodeView.UpdateViewMap(this.ViewMap);
-
-            /* FIXME move following code to appropriate place */
-            /*
-            plan:
-              1. Create oninitialize event on PictgramPanel
-              2. Use PictgramPanel#addEventListner from Mointor node plugin
-              3. Change menu state in the event handler
-            */
-            //if(this.HasMonitorNode()) {
-            //    this.App.TopMenu.SubMenuMap["monitor"].Enable();
-            //}
-            //else {
-            //    this.App.TopMenu.SubMenuMap["monitor"].Disable();
-            //}
         }
 
         Draw(Label?: string, Duration?: number, FixedNode?: NodeView): void {

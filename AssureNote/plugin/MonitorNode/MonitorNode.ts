@@ -711,6 +711,14 @@ module AssureNote {
             }
         }
 
+        Update() {
+            var HasMonitor = AssureNoteApp.Current.PictgramPanel.HasMonitorNode();
+            if (HasMonitor) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        }
     }
 
     export class ShowMonitorListMenuItem extends TopMenuItem {
@@ -728,6 +736,14 @@ module AssureNote {
             Command.Invoke(null, []);
         }
 
+        Update() {
+            var HasMonitor = AssureNoteApp.Current.PictgramPanel.HasMonitorNode();
+            if (HasMonitor) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        }
     }
 
     export class MonitorNodePlugin extends Plugin {

@@ -63,7 +63,7 @@ var AssureNote;
                 item = document.createElement("button");
                 item.type = "button";
                 if (this.ElementId) {
-                    item.setAttribute("id", this.ElementId);
+                    item.id = this.ElementId;
                 }
                 item.setAttribute("oncontextmenu", "return false");
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
@@ -84,6 +84,9 @@ var AssureNote;
                 </li>
                 */
                 item = document.createElement("li");
+                if (this.ElementId) {
+                    item.id = this.ElementId;
+                }
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
@@ -94,12 +97,17 @@ var AssureNote;
                 }
             }
             item.addEventListener("click", function (event) {
-                _this.Invoke(App);
+                if (_this.IsEnabled) {
+                    _this.Invoke(App);
+                }
             });
             Target.appendChild(item);
         };
 
         TopMenuItem.prototype.Invoke = function (App) {
+        };
+
+        TopMenuItem.prototype.Update = function () {
         };
         return TopMenuItem;
     })();
@@ -137,7 +145,9 @@ var AssureNote;
                 dropdown.className = "dropdown clickable navbar-left";
                 var button = document.createElement("button");
                 button.type = "button";
-                button.setAttribute("id", this.ElementId);
+                if (this.ElementId) {
+                    button.id = this.ElementId;
+                }
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
                 var classes = "btn navbar-btn btn-default dropdown-toggle";
@@ -175,6 +185,9 @@ var AssureNote;
                 */
                 var li = document.createElement("li");
                 li.className = "dropdown-submenu";
+                if (this.ElementId) {
+                    li.id = this.ElementId;
+                }
                 var a = document.createElement("a");
                 a.href = "#";
                 li.appendChild(a);
@@ -191,6 +204,12 @@ var AssureNote;
 
                 li.appendChild(ul);
                 Target.appendChild(li);
+            }
+        };
+
+        SubMenuItem.prototype.Update = function () {
+            for (var i = 0; i < this.SubMenuList.length; i++) {
+                this.SubMenuList[i].Update();
             }
         };
         return SubMenuItem;
@@ -221,6 +240,12 @@ var AssureNote;
                 this.SubMenuList[i].Render(App, Target, true);
             }
             $(".dropdown-toggle").dropdown();
+        };
+
+        TopMenuTopItem.prototype.Update = function () {
+            for (var i = 0; i < this.SubMenuList.length; i++) {
+                this.SubMenuList[i].Update();
+            }
         };
         return TopMenuTopItem;
     })(TopMenuItem);
