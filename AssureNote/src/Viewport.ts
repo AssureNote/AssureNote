@@ -236,7 +236,13 @@ module AssureNote {
             });
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
-            $(this.EventMapLayer.parentElement).on('mousewheel', (e: any) => { if (this.IsPointerEnabled) { this.ScrollManager.OnMouseWheel(e, this); } });
+            var OnWheel = (e: any) => {
+                if (this.IsPointerEnabled) {
+                    this.ScrollManager.OnMouseWheel(e, this);
+                }
+            };
+            $(this.EventMapLayer).on('mousewheel', OnWheel);;
+            $(this.ContentLayer).on('mousewheel', OnWheel);
         }
 
         /**

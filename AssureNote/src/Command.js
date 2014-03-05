@@ -1,4 +1,4 @@
-﻿// ***************************************************************************
+// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -646,7 +646,8 @@ var AssureNote;
                 Key = prompt("Enter the keyword");
             }
             if (Key) {
-                this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, Key);
+                var Result = this.App.PictgramPanel.TopNodeView.Model.SearchNode(Key);
+                this.App.NodeListPanel.StartVisit(Result, "Search: " + Key);
             }
         };
 

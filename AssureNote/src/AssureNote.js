@@ -73,6 +73,7 @@ var AssureNote;
             this.IsGuestUser = (Name == null);
             this.UserName = this.IsGuestUser ? 'Guest' : Name;
             this.UserList = new AssureNote.UserList(this);
+            this.NodeListPanel = new AssureNote.NodeListPanel(this);
 
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "view", "View", "screenshot", [
                 new AssureNote.DummyMenuItem("GSN View (Coming soon)", "unchecked"),

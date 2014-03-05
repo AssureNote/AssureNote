@@ -249,11 +249,14 @@ var AssureNote;
 
             //this.EventMapLayer.addEventListener("gesturedoubletap", (e: PointerEvent) => { this.ScrollManager.OnDoubleTap(e, this); }, false);
             //BackGroundLayer.addEventListener("gesturescale", OnPointer, false);
-            $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
+            var OnWheel = function (e) {
                 if (_this.IsPointerEnabled) {
                     _this.ScrollManager.OnMouseWheel(e, _this);
                 }
-            });
+            };
+            $(this.EventMapLayer).on('mousewheel', OnWheel);
+            ;
+            $(this.ContentLayer).on('mousewheel', OnWheel);
         }
         /**
         @method GetCameraScale

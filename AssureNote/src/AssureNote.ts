@@ -52,6 +52,7 @@ module AssureNote {
         DefaultCommand: AssureNote.CommandMissingCommand;
         UserList: UserList;
         HistoryPanel: HistoryPanel;
+        NodeListPanel: NodeListPanel;
 
         TopMenu: TopMenuTopItem;
         TopMenuRight: TopMenuTopItem;
@@ -99,6 +100,7 @@ module AssureNote {
             this.IsGuestUser = (Name == null);
             this.UserName = this.IsGuestUser ? 'Guest' : Name;
             this.UserList = new UserList(this);
+            this.NodeListPanel = new NodeListPanel(this);
 
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "view", "View", "screenshot", [

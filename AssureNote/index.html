@@ -59,22 +59,24 @@
             </div>
           </div>
         </script>
-        <div id="history" style="position: absolute; top: 60px; left: 10px; width: 260px; display: none;">
+        <script id="nodelist_tmpl" type="text/x-jquery-tmpl">
           <div class="panel panel-default node-list-panel">
             <div class="panel-body">
               <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
               <h4 class="list-group-item-heading">${Message}</h4>
-              <p class="list-group-item-text"><small><a id="nodelist-panel-count" data-toggle="tooltip" data-placement="bottom">${Count.All} Nodes</a></small></p>
-              <ol style="padding-top: 10px">
-                <li>G1</li>
-                <li>G2</li>
-                <li>E2.1</li>
-              </ol>
+              <p class="list-group-item-text"><small><a data-toggle="tooltip" data-placement="bottom" class="nodelist-panel-count">${Count.All} Nodes</a></small></p>
+              <ul class="nav nav-pills nav-stacked nav-small nodelist-listbody">{{each Nodes}}
+                <li data-index="${$index}"><a href="#">${$value.Label}: ${$value.Content}</a></li>{{/each}}
+              </ul>
               <div style="padding-top: 10px" class="list-group-item-text">
-                <div class="btn-group"><a id="prev-item" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></a><a id="next-item" href="#" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></a></div>
+                <div class="btn-group"><a href="#" class="btn btn-default prev-item"><span class="glyphicon glyphicon-chevron-left"></span></a><a href="#" class="btn btn-default next-item"><span class="glyphicon glyphicon-chevron-right"></span></a></div>
               </div>
             </div>
           </div>
+        </script>
+        <div id="sidebar" style="position: absolute; top: 60px; left: 10px; width: 260px;">
+          <div id="history"></div>
+          <div id="nodelist"></div>
         </div>
       </div>
       <div id="plugin-layer" class="zero-size-layer">

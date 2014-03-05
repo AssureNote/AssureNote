@@ -52,7 +52,6 @@ module AssureNote {
         ViewMap: { [index: string]: NodeView };
         TopNodeView: NodeView;
         CmdLine: CommandLine;
-        Search: SearchResultNodeList;
         ContextMenu: NodeMenu;
         NodeTooltip: Tooltip;
 
@@ -154,7 +153,6 @@ module AssureNote {
             });
 
             this.CmdLine = new CommandLine(App);
-            this.Search = new SearchResultNodeList(this);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", (event: MouseEvent) => {
@@ -240,14 +238,14 @@ module AssureNote {
                 case 186: /*:*/
                 case 191: /*/*/
                 case 219: /*@*/
-                    if (this.Search.IsVisiting()) {
-                        this.Search.FinishVisit();
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.FinishVisit();
                     }
                     this.CmdLine.Activate();
                     break;
                 case 27: /*Esc*/
-                    if (this.Search.IsVisiting()) {
-                        this.Search.FinishVisit();
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.FinishVisit();
                     }
                     if (this.App.HistoryPanel.IsVisible) {
                         this.App.HistoryPanel.Hide();
@@ -255,8 +253,8 @@ module AssureNote {
                     Event.preventDefault();
                     break;
                 case 13: /*Enter*/
-                    if (this.Search.IsVisiting()) {
-                        this.Search.VisitNext(event.shiftKey);
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.VisitNext(event.shiftKey);
                     } else {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName((Event.shiftKey ? "edit" : "singleedit"), this.FocusedLabel);

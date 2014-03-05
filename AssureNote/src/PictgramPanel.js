@@ -138,7 +138,6 @@ var AssureNote;
             });
 
             this.CmdLine = new AssureNote.CommandLine(App);
-            this.Search = new AssureNote.SearchResultNodeList(this);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", function (event) {
@@ -222,14 +221,14 @@ var AssureNote;
                 case 186:
                 case 191:
                 case 219:
-                    if (this.Search.IsVisiting()) {
-                        this.Search.FinishVisit();
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.FinishVisit();
                     }
                     this.CmdLine.Activate();
                     break;
                 case 27:
-                    if (this.Search.IsVisiting()) {
-                        this.Search.FinishVisit();
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.FinishVisit();
                     }
                     if (this.App.HistoryPanel.IsVisible) {
                         this.App.HistoryPanel.Hide();
@@ -237,8 +236,8 @@ var AssureNote;
                     Event.preventDefault();
                     break;
                 case 13:
-                    if (this.Search.IsVisiting()) {
-                        this.Search.VisitNext(event.shiftKey);
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.VisitNext(event.shiftKey);
                     } else {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName((Event.shiftKey ? "edit" : "singleedit"), this.FocusedLabel);

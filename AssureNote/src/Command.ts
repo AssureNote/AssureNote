@@ -608,7 +608,8 @@ module AssureNote {
                 Key = prompt("Enter the keyword");
             }
             if (Key) {
-                this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, Key);
+                var Result = this.App.PictgramPanel.TopNodeView.Model.SearchNode(Key);
+                this.App.NodeListPanel.StartVisit(Result, "Search: " + Key);
             }
         }
 

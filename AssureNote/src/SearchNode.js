@@ -30,15 +30,35 @@ var __extends = this.__extends || function (d, b) {
 ///<reference path='./AssureNoteParser.ts'/>
 var AssureNote;
 (function (AssureNote) {
-    var VisitableNodeList = (function () {
-        function VisitableNodeList(Panel) {
+    /*
+    
+    export class VisitableNodeList {
+    
+    export class SearchResultNodeList extends VisitableNodeList {
+    
+    constructor(Panel: PictgramPanel) {
+    super(Panel);
+    }
+    
+    Search(TargetView: NodeView, SearchWord: string): void {
+    this.StartVisit(TargetView.Model.SearchNode(SearchWord));
+    }
+    }
+    */
+    var NodeListPanel = (function (_super) {
+        __extends(NodeListPanel, _super);
+        function NodeListPanel(App) {
+            _super.call(this, App);
+            this.App = App;
+            this.Element = $("#nodelist");
+            this.Element.hide();
             this.NodeIndex = 0;
             this.NodeList = [];
             this.Visiting = false;
             this.ColorStyle = AssureNote.ColorStyle.Searched;
-            this.Panel = Panel;
+            this.Panel = App.PictgramPanel;
         }
-        VisitableNodeList.prototype.StartVisit = function (NodeList) {
+        NodeListPanel.prototype.StartVisit = function (NodeList, Title) {
             if (this.IsVisiting()) {
                 this.FinishVisit();
             }
@@ -47,19 +67,28 @@ var AssureNote;
                 this.Visiting = true;
                 this.UnfoldAllFoundNode();
                 this.AddColorToAllHitNodes(this.ColorStyle);
-                this.Panel.FocusAndMoveToNode(this.NodeList[0].GetLabel());
+                this.Open(Title || "");
+                this.Visit(0);
             }
         };
 
-        VisitableNodeList.prototype.VisitNext = function (IsReversed) {
-            if (this.IsVisiting() && this.NodeList.length > 1) {
-                var Length = this.NodeList.length;
-                this.NodeIndex = (Length + this.NodeIndex + (IsReversed ? -1 : 1)) % Length;
+        NodeListPanel.prototype.VisitNext = function (IsReversed) {
+            var Length = this.NodeList.length;
+            this.Visit((Length + this.NodeIndex + (IsReversed ? -1 : 1)) % Length);
+        };
+
+        NodeListPanel.prototype.Visit = function (Index) {
+            if (this.IsVisiting() && Index >= 0 && Index < this.NodeList.length) {
+                this.NodeIndex = Index;
                 this.Panel.FocusAndMoveToNode(this.NodeList[this.NodeIndex].GetLabel());
+                this.Element.find(".active").removeClass("active");
+                var li = this.Element.find(".nodelist-listbody li")[Index];
+                li.className = "active";
+                li.scrollIntoView();
             }
         };
 
-        VisitableNodeList.prototype.UnfoldAllFoundNode = function () {
+        NodeListPanel.prototype.UnfoldAllFoundNode = function () {
             var ViewMap = this.Panel.ViewMap;
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
@@ -71,18 +100,21 @@ var AssureNote;
             this.Panel.Draw(this.Panel.TopNodeView.Label, 300);
         };
 
-        VisitableNodeList.prototype.IsVisiting = function () {
+        NodeListPanel.prototype.IsVisiting = function () {
             return this.Visiting;
         };
 
-        VisitableNodeList.prototype.FinishVisit = function () {
+        NodeListPanel.prototype.FinishVisit = function () {
             this.RemoveColorFromAllHitNodes(this.ColorStyle);
             this.NodeList = [];
             this.NodeIndex = 0;
             this.Visiting = false;
+            if (this.IsVisible) {
+                this.Hide();
+            }
         };
 
-        VisitableNodeList.prototype.AddColorToAllHitNodes = function (ColorStyle) {
+        NodeListPanel.prototype.AddColorToAllHitNodes = function (ColorStyle) {
             var ViewMap = this.Panel.ViewMap;
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
@@ -92,7 +124,7 @@ var AssureNote;
             }
         };
 
-        VisitableNodeList.prototype.RemoveColorFromAllHitNodes = function (ColorStyle) {
+        NodeListPanel.prototype.RemoveColorFromAllHitNodes = function (ColorStyle) {
             var ViewMap = this.Panel.ViewMap;
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
@@ -101,20 +133,71 @@ var AssureNote;
                 }
             }
         };
-        return VisitableNodeList;
-    })();
-    AssureNote.VisitableNodeList = VisitableNodeList;
 
-    var SearchResultNodeList = (function (_super) {
-        __extends(SearchResultNodeList, _super);
-        function SearchResultNodeList(Panel) {
-            _super.call(this, Panel);
-        }
-        SearchResultNodeList.prototype.Search = function (TargetView, SearchWord) {
-            this.StartVisit(TargetView.Model.SearchNode(SearchWord));
+        NodeListPanel.prototype.Show = function () {
+            this.Element.show();
+            this.IsVisible = true;
         };
-        return SearchResultNodeList;
-    })(VisitableNodeList);
-    AssureNote.SearchResultNodeList = SearchResultNodeList;
+
+        NodeListPanel.prototype.Hide = function () {
+            this.Element.empty();
+            this.Element.hide();
+            this.IsVisible = false;
+            if (this.IsVisiting) {
+                this.FinishVisit();
+            }
+        };
+
+        NodeListPanel.prototype.Open = function (Title) {
+            var _this = this;
+            this.Element.empty();
+            var Shorten = function (Value) {
+                return Value.length > 10 ? Value.substr(0, 10) + "..." : Value;
+            };
+
+            var nodes = this.NodeList.map(function (Node) {
+                return {
+                    Label: Node.GetLabel(), Type: Node.NodeType, Content: Shorten(Node.NodeDoc)
+                };
+            });
+            var t = {
+                Message: Title,
+                Count: {
+                    All: nodes.length,
+                    Goal: 0,
+                    Evidence: 0,
+                    Context: 0,
+                    Strategy: 0
+                },
+                Nodes: nodes
+            };
+            $("#nodelist_tmpl").tmpl([t]).appendTo(this.Element);
+            this.Element.find(".nodelist-panel-count").tooltip({
+                html: true,
+                title: "Goal: " + t.Count.Goal + "" + "<br>Evidence: " + t.Count.Evidence + "" + "<br>Context: " + t.Count.Context + "" + "<br>Strategy: " + t.Count.Strategy + ""
+            });
+
+            this.Element.find(".nodelist-listbody").click(function (e) {
+                var li = e.srcElement.parentNode;
+                _this.Visit(parseInt(li.getAttribute("data-index")));
+            });
+
+            this.Element.find("button.close").click(function () {
+                _this.Hide();
+                _this.FinishVisit();
+            });
+
+            this.Element.find(".prev-item").click(function () {
+                _this.VisitNext(true);
+            });
+
+            this.Element.find(".next-item").click(function () {
+                _this.VisitNext(false);
+            });
+            this.Show();
+        };
+        return NodeListPanel;
+    })(AssureNote.Panel);
+    AssureNote.NodeListPanel = NodeListPanel;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=SearchNode.js.map
