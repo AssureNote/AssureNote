@@ -632,6 +632,25 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
+            console.log("invoke");
+            console.log(Params);
+            if (Params.length == 1) {
+                var TargetLabel = Params[0];
+                console.log(Params);
+                var Node = this.App.PictgramPanel.ViewMap[TargetLabel];
+                if (Node != null) {
+                    var Writer: StringWriter = new StringWriter();
+                    Node.Model.FormatSubNode(1, Writer, true);
+                    var Text = Writer.toString();
+
+                    /* TODO copy to the clipboard. It seems that some libraries is needed to use the clipboard. */
+                    console.log(Text);
+                } else {
+                    AssureNoteUtils.Notify("Node " + Params[0] + "not found");
+                }
+            } else {
+                AssureNoteUtils.Notify("Invalid parameters");
+            }
         }
 
         public CanUseOnViewOnlyMode(): boolean {
@@ -645,7 +664,7 @@ module AssureNote {
         }
 
         public GetCommandLineNames(): string[] {
-            return ["copy"];
+            return ["paste"];
         }
 
         public GetHelpHTML(): string {
@@ -653,6 +672,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
+            /* TODO Get WGSN from the clipboard. */
         }
 
         public CanUseOnViewOnlyMode(): boolean {

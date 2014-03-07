@@ -64,6 +64,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.HistoryCommand(this));
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
             this.RegistCommand(new AssureNote.SearchCommand(this));
+            this.RegistCommand(new AssureNote.CopyCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);

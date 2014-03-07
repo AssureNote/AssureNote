@@ -672,6 +672,25 @@ var AssureNote;
         };
 
         CopyCommand.prototype.Invoke = function (CommandName, Params) {
+            console.log("invoke");
+            console.log(Params);
+            if (Params.length == 1) {
+                var TargetLabel = Params[0];
+                console.log(Params);
+                var Node = this.App.PictgramPanel.ViewMap[TargetLabel];
+                if (Node != null) {
+                    var Writer = new AssureNote.StringWriter();
+                    Node.Model.FormatSubNode(1, Writer, true);
+                    var Text = Writer.toString();
+
+                    /* TODO copy to the clipboard. It seems that some libraries is needed to use the clipboard. */
+                    console.log(Text);
+                } else {
+                    AssureNote.AssureNoteUtils.Notify("Node " + Params[0] + "not found");
+                }
+            } else {
+                AssureNote.AssureNoteUtils.Notify("Invalid parameters");
+            }
         };
 
         CopyCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -687,7 +706,7 @@ var AssureNote;
             _super.call(this, App);
         }
         PasteCommand.prototype.GetCommandLineNames = function () {
-            return ["copy"];
+            return ["paste"];
         };
 
         PasteCommand.prototype.GetHelpHTML = function () {
@@ -695,6 +714,7 @@ var AssureNote;
         };
 
         PasteCommand.prototype.Invoke = function (CommandName, Params) {
+            /* TODO Get WGSN from the clipboard. */
         };
 
         PasteCommand.prototype.CanUseOnViewOnlyMode = function () {
