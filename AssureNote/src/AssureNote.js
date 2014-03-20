@@ -65,6 +65,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
             this.RegistCommand(new AssureNote.SearchCommand(this));
             this.RegistCommand(new AssureNote.CopyCommand(this));
+            this.RegistCommand(new AssureNote.PasteCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
@@ -97,6 +98,7 @@ var AssureNote;
                 new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.DummyMenuItem("Copy (Coming soon)", "file"),
+                new AssureNote.DummyMenuItem("Paste (Coming soon)", "file"),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.SearchMenuItem(true),
                 new AssureNote.CommitMenuItem(true)

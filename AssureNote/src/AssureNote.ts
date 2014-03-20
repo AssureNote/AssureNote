@@ -92,6 +92,7 @@ module AssureNote {
             this.RegistCommand(new SetGuestUserNameCommand(this));
             this.RegistCommand(new SearchCommand(this));
             this.RegistCommand(new CopyCommand(this));
+            this.RegistCommand(new PasteCommand(this));
 
             this.TopMenu = new TopMenuTopItem([]);
             this.TopMenuRight = new TopMenuTopItem([]);
@@ -126,6 +127,7 @@ module AssureNote {
                     new DummyMenuItem("Redo (Coming soon)", "step-forward"),
                     new DividerMenuItem(true),
                     new DummyMenuItem("Copy (Coming soon)", "file"),
+                    new DummyMenuItem("Paste (Coming soon)", "file"),
                     new DividerMenuItem(true),
                     new SearchMenuItem(true),
                     new CommitMenuItem(true)
