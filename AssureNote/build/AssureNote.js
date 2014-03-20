@@ -1841,6 +1841,14 @@ var AssureNote;
                 }
             }
         };
+
+        GSNRecord.prototype.Undo = function () {
+            return null;
+        };
+
+        GSNRecord.prototype.Redo = function () {
+            return null;
+        };
         return GSNRecord;
     })();
     AssureNote.GSNRecord = GSNRecord;
@@ -2674,15 +2682,20 @@ var AssureNote;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
-    var VisitableNodeList = (function () {
-        function VisitableNodeList(Panel) {
+    var NodeListPanel = (function (_super) {
+        __extends(NodeListPanel, _super);
+        function NodeListPanel(App) {
+            _super.call(this, App);
+            this.App = App;
+            this.Element = $("#nodelist");
+            this.Element.hide();
             this.NodeIndex = 0;
             this.NodeList = [];
             this.Visiting = false;
             this.ColorStyle = AssureNote.ColorStyle.Searched;
-            this.Panel = Panel;
+            this.Panel = App.PictgramPanel;
         }
-        VisitableNodeList.prototype.StartVisit = function (NodeList) {
+        NodeListPanel.prototype.StartVisit = function (NodeList, Title) {
             if (this.IsVisiting()) {
                 this.FinishVisit();
             }
@@ -2691,19 +2704,28 @@ var AssureNote;
                 this.Visiting = true;
                 this.UnfoldAllFoundNode();
                 this.AddColorToAllHitNodes(this.ColorStyle);
-                this.Panel.FocusAndMoveToNode(this.NodeList[0].GetLabel());
+                this.Open(Title || "");
+                this.Visit(0);
             }
         };
 
-        VisitableNodeList.prototype.VisitNext = function (IsReversed) {
-            if (this.IsVisiting() && this.NodeList.length > 1) {
-                var Length = this.NodeList.length;
-                this.NodeIndex = (Length + this.NodeIndex + (IsReversed ? -1 : 1)) % Length;
+        NodeListPanel.prototype.VisitNext = function (IsReversed) {
+            var Length = this.NodeList.length;
+            this.Visit((Length + this.NodeIndex + (IsReversed ? -1 : 1)) % Length);
+        };
+
+        NodeListPanel.prototype.Visit = function (Index) {
+            if (this.IsVisiting() && Index >= 0 && Index < this.NodeList.length) {
+                this.NodeIndex = Index;
                 this.Panel.FocusAndMoveToNode(this.NodeList[this.NodeIndex].GetLabel());
+                this.Element.find(".active").removeClass("active");
+                var li = this.Element.find(".nodelist-listbody li")[Index];
+                li.className = "active";
+                li.scrollIntoView();
             }
         };
 
-        VisitableNodeList.prototype.UnfoldAllFoundNode = function () {
+        NodeListPanel.prototype.UnfoldAllFoundNode = function () {
             var ViewMap = this.Panel.ViewMap;
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
@@ -2715,18 +2737,21 @@ var AssureNote;
             this.Panel.Draw(this.Panel.TopNodeView.Label, 300);
         };
 
-        VisitableNodeList.prototype.IsVisiting = function () {
+        NodeListPanel.prototype.IsVisiting = function () {
             return this.Visiting;
         };
 
-        VisitableNodeList.prototype.FinishVisit = function () {
+        NodeListPanel.prototype.FinishVisit = function () {
             this.RemoveColorFromAllHitNodes(this.ColorStyle);
             this.NodeList = [];
             this.NodeIndex = 0;
             this.Visiting = false;
+            if (this.IsVisible) {
+                this.Hide();
+            }
         };
 
-        VisitableNodeList.prototype.AddColorToAllHitNodes = function (ColorStyle) {
+        NodeListPanel.prototype.AddColorToAllHitNodes = function (ColorStyle) {
             var ViewMap = this.Panel.ViewMap;
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
@@ -2736,7 +2761,7 @@ var AssureNote;
             }
         };
 
-        VisitableNodeList.prototype.RemoveColorFromAllHitNodes = function (ColorStyle) {
+        NodeListPanel.prototype.RemoveColorFromAllHitNodes = function (ColorStyle) {
             var ViewMap = this.Panel.ViewMap;
             for (var i = 0; i < this.NodeList.length; i++) {
                 var Node = ViewMap[this.NodeList[i].GetLabel()];
@@ -2745,21 +2770,72 @@ var AssureNote;
                 }
             }
         };
-        return VisitableNodeList;
-    })();
-    AssureNote.VisitableNodeList = VisitableNodeList;
 
-    var SearchResultNodeList = (function (_super) {
-        __extends(SearchResultNodeList, _super);
-        function SearchResultNodeList(Panel) {
-            _super.call(this, Panel);
-        }
-        SearchResultNodeList.prototype.Search = function (TargetView, SearchWord) {
-            this.StartVisit(TargetView.Model.SearchNode(SearchWord));
+        NodeListPanel.prototype.Show = function () {
+            this.Element.show();
+            this.IsVisible = true;
         };
-        return SearchResultNodeList;
-    })(VisitableNodeList);
-    AssureNote.SearchResultNodeList = SearchResultNodeList;
+
+        NodeListPanel.prototype.Hide = function () {
+            this.Element.empty();
+            this.Element.hide();
+            this.IsVisible = false;
+            if (this.IsVisiting) {
+                this.FinishVisit();
+            }
+        };
+
+        NodeListPanel.prototype.Open = function (Title) {
+            var _this = this;
+            this.Element.empty();
+            var Shorten = function (Value) {
+                return Value.length > 10 ? Value.substr(0, 10) + "..." : Value;
+            };
+
+            var nodes = this.NodeList.map(function (Node) {
+                return {
+                    Label: Node.GetLabel(), Type: Node.NodeType, Content: Shorten(Node.NodeDoc)
+                };
+            });
+            var t = {
+                Message: Title,
+                Count: {
+                    All: nodes.length,
+                    Goal: 0,
+                    Evidence: 0,
+                    Context: 0,
+                    Strategy: 0
+                },
+                Nodes: nodes
+            };
+            $("#nodelist_tmpl").tmpl([t]).appendTo(this.Element);
+            this.Element.find(".nodelist-panel-count").tooltip({
+                html: true,
+                title: "Goal: " + t.Count.Goal + "" + "<br>Evidence: " + t.Count.Evidence + "" + "<br>Context: " + t.Count.Context + "" + "<br>Strategy: " + t.Count.Strategy + ""
+            });
+
+            this.Element.find(".nodelist-listbody").click(function (e) {
+                var li = e.srcElement.parentNode;
+                _this.Visit(parseInt(li.getAttribute("data-index")));
+            });
+
+            this.Element.find("button.close").click(function () {
+                _this.Hide();
+                _this.FinishVisit();
+            });
+
+            this.Element.find(".prev-item").click(function () {
+                _this.VisitNext(true);
+            });
+
+            this.Element.find(".next-item").click(function () {
+                _this.VisitNext(false);
+            });
+            this.Show();
+        };
+        return NodeListPanel;
+    })(AssureNote.Panel);
+    AssureNote.NodeListPanel = NodeListPanel;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -3310,14 +3386,15 @@ var AssureNote;
             var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
-
             this.OnOutSideClicked = function () {
                 _this.DisableEditor(NodeView, WGSN);
             };
-            $("#editor-background").off("click").on("click", this.OnOutSideClicked);
-            $("#editor-background").off("contextmenu").on("contextmenu", this.OnOutSideClicked);
 
-            $("#editor-background").stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
+            var BackGround = $("#editor-background");
+            BackGround.off("click").on("click", this.OnOutSideClicked);
+            BackGround.off("contextmenu").on("contextmenu", this.OnOutSideClicked);
+
+            BackGround.stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
             this.Element.stop(true, true).css("opacity", 1).show();
             this.Editor.refresh();
             this.Editor.focus();
@@ -3325,33 +3402,33 @@ var AssureNote;
         };
 
         CodeMirrorEditorPanel.prototype.DisableEditor = function (OldNodeView, OldWGSN) {
-            var WGSN = this.Editor.getDoc().getValue();
-            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
-            var Node = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
-            var NewNode;
-            NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
-            var Writer = new AssureNote.StringWriter();
-            if (NewNode && NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim()) {
-                this.App.MasterRecord.EditingDoc.RenumberAll();
-                var TopGoal = this.App.MasterRecord.EditingDoc.TopNode;
+            var _this = this;
+            this.App.EditDocument("todo", "test", function () {
+                var WGSN = _this.Editor.getDoc().getValue();
+                if (WGSN.length == 0) {
+                    return false;
+                }
+                try  {
+                    var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+                    var NewNode;
+                    NewNode = Node.ReplaceSubNodeAsText(WGSN, _this.IsEditRecursive);
+                } catch (e) {
+                    AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
+                    return false;
+                }
+                var Writer = new AssureNote.StringWriter();
+                var WGSNChanged = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
+                if (!NewNode || !WGSNChanged) {
+                    return false;
+                }
+                _this.App.FullScreenEditorPanel.IsVisible = true;
+            });
 
-                var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-                NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.InitializeView(NewNodeView);
-                this.App.PictgramPanel.Draw(null);
-
-                this.App.FullScreenEditorPanel.IsVisible = true;
-                this.App.SocketManager.UpdateWGSN();
-                this.App.MasterRecord.CloseEditor();
-            } else {
-                this.App.MasterRecord.DiscardEditor();
-            }
             this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
             $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
             $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
 
-            var Panel = this.App.PictgramPanel;
-            Panel.Activate();
+            this.App.PictgramPanel.Activate();
         };
 
         CodeMirrorEditorPanel.prototype.OnKeyDown = function (Event) {
@@ -4006,7 +4083,8 @@ var AssureNote;
                 Key = prompt("Enter the keyword");
             }
             if (Key) {
-                this.App.PictgramPanel.Search.Search(this.App.PictgramPanel.TopNodeView, Key);
+                var Result = this.App.PictgramPanel.TopNodeView.Model.SearchNode(Key);
+                this.App.NodeListPanel.StartVisit(Result, "Search: " + Key);
             }
         };
 
@@ -4016,6 +4094,70 @@ var AssureNote;
         return SearchCommand;
     })(Command);
     AssureNote.SearchCommand = SearchCommand;
+
+    var CopyCommand = (function (_super) {
+        __extends(CopyCommand, _super);
+        function CopyCommand(App) {
+            _super.call(this, App);
+        }
+        CopyCommand.prototype.GetCommandLineNames = function () {
+            return ["copy"];
+        };
+
+        CopyCommand.prototype.GetHelpHTML = function () {
+            return "<code>copy node</code><br>Copy the nodes.";
+        };
+
+        CopyCommand.prototype.Invoke = function (CommandName, Params) {
+            console.log("invoke");
+            console.log(Params);
+            if (Params.length == 1) {
+                var TargetLabel = Params[0];
+                console.log(Params);
+                var Node = this.App.PictgramPanel.ViewMap[TargetLabel];
+                if (Node != null) {
+                    var Writer = new AssureNote.StringWriter();
+                    Node.Model.FormatSubNode(1, Writer, true);
+                    var Text = Writer.toString();
+
+                    console.log(Text);
+                } else {
+                    AssureNote.AssureNoteUtils.Notify("Node " + Params[0] + "not found");
+                }
+            } else {
+                AssureNote.AssureNoteUtils.Notify("Invalid parameters");
+            }
+        };
+
+        CopyCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return CopyCommand;
+    })(Command);
+    AssureNote.CopyCommand = CopyCommand;
+
+    var PasteCommand = (function (_super) {
+        __extends(PasteCommand, _super);
+        function PasteCommand(App) {
+            _super.call(this, App);
+        }
+        PasteCommand.prototype.GetCommandLineNames = function () {
+            return ["paste"];
+        };
+
+        PasteCommand.prototype.GetHelpHTML = function () {
+            return "<code>Paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
+        };
+
+        PasteCommand.prototype.Invoke = function (CommandName, Params) {
+        };
+
+        PasteCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return PasteCommand;
+    })(Command);
+    AssureNote.PasteCommand = PasteCommand;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -4483,7 +4625,6 @@ var AssureNote;
             });
 
             this.CmdLine = new AssureNote.CommandLine(App);
-            this.Search = new AssureNote.SearchResultNodeList(this);
 
             var ToolTipFocusedLabel = null;
             this.ContentLayer.addEventListener("mouseover", function (event) {
@@ -4559,14 +4700,14 @@ var AssureNote;
                 case 186:
                 case 191:
                 case 219:
-                    if (this.Search.IsVisiting()) {
-                        this.Search.FinishVisit();
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.FinishVisit();
                     }
                     this.CmdLine.Activate();
                     break;
                 case 27:
-                    if (this.Search.IsVisiting()) {
-                        this.Search.FinishVisit();
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.FinishVisit();
                     }
                     if (this.App.HistoryPanel.IsVisible) {
                         this.App.HistoryPanel.Hide();
@@ -4574,8 +4715,8 @@ var AssureNote;
                     Event.preventDefault();
                     break;
                 case 13:
-                    if (this.Search.IsVisiting()) {
-                        this.Search.VisitNext(event.shiftKey);
+                    if (this.App.NodeListPanel.IsVisiting()) {
+                        this.App.NodeListPanel.VisitNext(event.shiftKey);
                     } else {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName((Event.shiftKey ? "edit" : "singleedit"), this.FocusedLabel);
@@ -4654,7 +4795,7 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.MoveToNearestNode = function (Dir) {
-            var NextNode = this.FocusedLabel ? this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir) : this.TopNodeView;
+            var NextNode = this.FindNearestNode(this.ViewMap[this.FocusedLabel], Dir);
             if (NextNode) {
                 this.FocusAndMoveToNode(NextNode);
             }
@@ -4672,9 +4813,6 @@ var AssureNote;
         };
 
         PictgramPanel.prototype.FindNearestNode = function (CenterNode, Dir) {
-            if (!CenterNode) {
-                return null;
-            }
             var RightLimitVectorX = 1;
             var RightLimitVectorY = 1;
             var LeftLimitVectorX = 1;
@@ -4700,9 +4838,11 @@ var AssureNote;
             }
             var NearestNode = null;
             var CurrentMinimumDistanceSquere = Infinity;
+            var CX = CenterNode ? CenterNode.GetCenterGX() : this.Viewport.GetCameraGX();
+            var CY = CenterNode ? CenterNode.GetCenterGY() : this.Viewport.GetCameraGY();
             this.TopNodeView.TraverseVisibleNode(function (Node) {
-                var DX = Node.GetCenterGX() - CenterNode.GetCenterGX();
-                var DY = Node.GetCenterGY() - CenterNode.GetCenterGY();
+                var DX = Node.GetCenterGX() - CX;
+                var DY = Node.GetCenterGY() - CY;
                 var DDotR = DX * RightLimitVectorX + DY * RightLimitVectorY;
                 var DDotL = DX * LeftLimitVectorX + DY * LeftLimitVectorY;
                 if (DDotR > 0 && DDotL > 0) {
@@ -5010,14 +5150,6 @@ var AssureNote;
     })();
     AssureNote.EditNodeStatus = EditNodeStatus;
 
-    var FocusedLabels = (function () {
-        function FocusedLabels(SID, Label) {
-            this.SID = SID;
-            this.Label = Label;
-        }
-        return FocusedLabels;
-    })();
-    AssureNote.FocusedLabels = FocusedLabels;
     var SocketManager = (function () {
         function SocketManager(App) {
             var _this = this;
@@ -5026,7 +5158,7 @@ var AssureNote;
             this.UseOnScrollEvent = true;
             this.ReceivedFoldEvent = false;
             this.EditNodeInfo = [];
-            this.FocusedLabels = [];
+            this.FocusedLabels = {};
             if (!this.IsOperational()) {
                 App.DebugP('socket.io not found');
             }
@@ -5050,19 +5182,17 @@ var AssureNote;
         };
 
         SocketManager.prototype.Emit = function (method, params) {
-            if (!this.IsConnected()) {
-                this.App.DebugP('Socket not enable.');
-                return;
+            if (this.IsConnected()) {
+                this.socket.emit(method, params);
             }
-
-            this.socket.emit(method, params);
         };
 
         SocketManager.prototype.EnableListeners = function () {
             var self = this;
             this.socket.on('disconnect', function (data) {
-                self.App.ModeManager.Disable();
                 self.socket = null;
+                self.FocusedLabels = {};
+                self.EditNodeInfo = [];
             });
             this.socket.on('close', function (SID) {
                 self.UpdateView("");
@@ -5072,7 +5202,7 @@ var AssureNote;
             });
 
             this.socket.on('error', function (data) {
-                $.notify('Cannot establish connection or connection closed', 'error');
+                AssureNote.AssureNoteUtils.Notify('Cannot establish connection or connection closed', 'error');
                 self.App.ModeManager.Disable();
             });
 
@@ -5092,22 +5222,17 @@ var AssureNote;
             this.socket.on('focusednode', function (data) {
                 var OldView;
                 var OldLabel;
-                if (data.Label == null || self.FocusedLabels.length != 0) {
-                    for (var i in self.FocusedLabels) {
-                        if (self.FocusedLabels[i].SID == data.SID) {
-                            OldLabel = self.FocusedLabels[i].Label;
-                            OldView = self.App.PictgramPanel.ViewMap[OldLabel];
-                            self.FocusedLabels.splice(i, 1);
-                            self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
-                            break;
-                        }
+                if (data.Label == null) {
+                    if (self.FocusedLabels[data.SID]) {
+                        OldLabel = self.FocusedLabels[data.SID];
+                        OldView = self.App.PictgramPanel.ViewMap[OldLabel];
+                        delete self.FocusedLabels[data.SID];
+                        self.App.UserList.RemoveFocusedUserColor(data.SID, OldView);
                     }
-                }
-
-                if (data.Label != null) {
+                } else {
                     var FocusedView = self.App.PictgramPanel.ViewMap[data.Label];
                     self.App.UserList.AddFocusedUserColor(data.SID, FocusedView);
-                    self.FocusedLabels.push(data);
+                    self.FocusedLabels[data.SID] = data.Label;
                 }
             });
 
@@ -5334,6 +5459,9 @@ var AssureNote;
         };
 
         SocketManager.prototype.UpdateWGSN = function () {
+            if (!this.IsConnected()) {
+                return;
+            }
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             var WGSN = Writer.toString();
@@ -5398,7 +5526,7 @@ var AssureNote;
                 item = document.createElement("button");
                 item.type = "button";
                 if (this.ElementId) {
-                    item.setAttribute("id", this.ElementId);
+                    item.id = this.ElementId;
                 }
                 item.setAttribute("oncontextmenu", "return false");
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
@@ -5411,6 +5539,9 @@ var AssureNote;
                 item.appendChild(text);
             } else {
                 item = document.createElement("li");
+                if (this.ElementId) {
+                    item.id = this.ElementId;
+                }
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
@@ -5421,12 +5552,17 @@ var AssureNote;
                 }
             }
             item.addEventListener("click", function (event) {
-                _this.Invoke(App);
+                if (_this.IsEnabled) {
+                    _this.Invoke(App);
+                }
             });
             Target.appendChild(item);
         };
 
         TopMenuItem.prototype.Invoke = function (App) {
+        };
+
+        TopMenuItem.prototype.Update = function () {
         };
         return TopMenuItem;
     })();
@@ -5456,7 +5592,9 @@ var AssureNote;
                 dropdown.className = "dropdown clickable navbar-left";
                 var button = document.createElement("button");
                 button.type = "button";
-                button.setAttribute("id", this.ElementId);
+                if (this.ElementId) {
+                    button.id = this.ElementId;
+                }
                 button.setAttribute("oncontextmenu", "return false");
                 button.setAttribute("data-toggle", "dropdown");
                 var classes = "btn navbar-btn btn-default dropdown-toggle";
@@ -5486,6 +5624,9 @@ var AssureNote;
             } else {
                 var li = document.createElement("li");
                 li.className = "dropdown-submenu";
+                if (this.ElementId) {
+                    li.id = this.ElementId;
+                }
                 var a = document.createElement("a");
                 a.href = "#";
                 li.appendChild(a);
@@ -5502,6 +5643,12 @@ var AssureNote;
 
                 li.appendChild(ul);
                 Target.appendChild(li);
+            }
+        };
+
+        SubMenuItem.prototype.Update = function () {
+            for (var i = 0; i < this.SubMenuList.length; i++) {
+                this.SubMenuList[i].Update();
             }
         };
         return SubMenuItem;
@@ -5532,6 +5679,12 @@ var AssureNote;
                 this.SubMenuList[i].Render(App, Target, true);
             }
             $(".dropdown-toggle").dropdown();
+        };
+
+        TopMenuTopItem.prototype.Update = function () {
+            for (var i = 0; i < this.SubMenuList.length; i++) {
+                this.SubMenuList[i].Update();
+            }
         };
         return TopMenuTopItem;
     })(TopMenuItem);
@@ -6247,6 +6400,8 @@ var AssureNote;
             this.RegistCommand(new AssureNote.HistoryCommand(this));
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
             this.RegistCommand(new AssureNote.SearchCommand(this));
+            this.RegistCommand(new AssureNote.CopyCommand(this));
+            this.RegistCommand(new AssureNote.PasteCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
@@ -6256,6 +6411,7 @@ var AssureNote;
             this.IsGuestUser = (Name == null);
             this.UserName = this.IsGuestUser ? 'Guest' : Name;
             this.UserList = new AssureNote.UserList(this);
+            this.NodeListPanel = new AssureNote.NodeListPanel(this);
 
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "view", "View", "screenshot", [
                 new AssureNote.DummyMenuItem("GSN View (Coming soon)", "unchecked"),
@@ -6269,15 +6425,16 @@ var AssureNote;
                     new AssureNote.ZoomMenuItem(true, "Zoom", 2)
                 ]),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.ShowHistoryPanelMenuItem(true),
-                new AssureNote.ShowMonitorListMenuItem(true),
-                new AssureNote.SetMonitorMenuItem(true)
+                new AssureNote.ShowHistoryPanelMenuItem(true, "history"),
+                new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
+                new AssureNote.SetMonitorMenuItem(true, "setmonitor")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
                 new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
                 new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.DummyMenuItem("Copy (Coming soon)", "file"),
+                new AssureNote.DummyMenuItem("Paste (Coming soon)", "file"),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.SearchMenuItem(true),
                 new AssureNote.CommitMenuItem(true)
@@ -6420,6 +6577,8 @@ var AssureNote;
             this.PictgramPanel.InitializeView(new AssureNote.NodeView(TopGoalNode, true));
             this.PictgramPanel.FoldDeepSubGoals(this.PictgramPanel.TopNodeView);
             this.PictgramPanel.Draw();
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
 
             if (location.hash != "") {
                 var label = location.hash.substring(1);
@@ -6445,7 +6604,7 @@ var AssureNote;
 
         AssureNoteApp.prototype.LoadFiles = function (Files) {
             var _this = this;
-            if (Files[0]) {
+            if (Files.length > 0) {
                 var reader = new FileReader();
                 reader.onerror = function (event) {
                     console.log('error', event.target.error.code);
@@ -6461,6 +6620,41 @@ var AssureNote;
                 };
                 reader.readAsText(Files[0], 'utf-8');
             }
+        };
+
+        AssureNoteApp.prototype.EditDocument = function (Role, Process, Action) {
+            this.MasterRecord.OpenEditor(this.GetUserName(), Role, null, Process);
+
+            var ReturnCode = Action();
+
+            if (ReturnCode === false) {
+                this.MasterRecord.DiscardEditor();
+            } else {
+                var Doc = this.MasterRecord.EditingDoc;
+                Doc.RenumberAll();
+                this.MasterRecord.CloseEditor();
+
+                var TopNode = Doc.TopNode;
+                var NewNodeView = new AssureNote.NodeView(TopNode, true);
+                var OldViewMap = this.PictgramPanel.ViewMap;
+                NewNodeView.SaveFlags(OldViewMap);
+
+                this.PictgramPanel.InitializeView(NewNodeView);
+                this.PictgramPanel.Draw(TopNode.GetLabel());
+
+                this.SocketManager.UpdateWGSN();
+
+                this.TopMenu.Update();
+                this.TopMenuRight.Update();
+            }
+        };
+
+        AssureNoteApp.prototype.GetNodeFromLabel = function (Label, ReportError) {
+            var Node = this.PictgramPanel.ViewMap[Label];
+            if (Node == null && (ReportError === undefined || ReportError)) {
+                AssureNote.AssureNoteUtils.Notify("Node " + Label + " is not found");
+            }
+            return Node;
         };
         return AssureNoteApp;
     })();
@@ -6674,11 +6868,14 @@ var AssureNote;
                 _this.EventMapLayer.addEventListener("pointer" + Name, OnPointer, false);
             });
 
-            $(this.EventMapLayer.parentElement).on('mousewheel', function (e) {
+            var OnWheel = function (e) {
                 if (_this.IsPointerEnabled) {
                     _this.ScrollManager.OnMouseWheel(e, _this);
                 }
-            });
+            };
+            $(this.EventMapLayer).on('mousewheel', OnWheel);
+            ;
+            $(this.ContentLayer).on('mousewheel', OnWheel);
         }
         ViewportManager.prototype.GetCameraScale = function () {
             return this.Scale;
@@ -6861,9 +7058,12 @@ var AssureNote;
         ViewportManager.prototype.UpdatePageRect = function () {
             var CameraCenterXRate = this.CameraCenterPageX / this.PageWidth;
             var CameraCenterYRate = this.CameraCenterPageY / this.PageHeight;
+            var CameraPX = this.PageXFromGX(this.CameraGX);
+            var CameraPY = this.PageYFromGY(this.CameraGY);
             this.PageWidth = window.innerWidth;
             this.PageHeight = window.innerHeight;
             this.SetCameraPageCenter(this.PageWidth * CameraCenterXRate, this.PageHeight * CameraCenterYRate);
+            this.UpdateAttr();
         };
 
         ViewportManager.prototype.SetEventMapLayerPosition = function (IsUpper) {
@@ -8643,36 +8843,28 @@ var AssureNote;
         };
 
         RemoveCommand.prototype.Invoke = function (CommandName, Params) {
+            var _this = this;
             if (Params.length > 0) {
-                var Label = Params[0];
-                var TargetView = this.App.PictgramPanel.ViewMap[Label];
-                if (TargetView == null) {
-                    this.App.DebugP("Node not Found");
-                    return;
+                var TargetView = this.App.GetNodeFromLabel(Params[0]);
+                if (TargetView == this.App.PictgramPanel.TopNodeView) {
+                    AssureNote.AssureNoteUtils.Notify("G1 cannot be removed");
                 }
-                this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
-                var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
-                var Parent = Node.ParentNode;
-                for (var i = 0; i < Parent.SubNodeList.length; i++) {
-                    var it = Parent.SubNodeList[i];
-                    if (Node == it) {
-                        Parent.SubNodeList.splice(i, 1);
-                    }
+                if (TargetView) {
+                    this.App.EditDocument("todo", "test", function () {
+                        var Node = _this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
+                        var Parent = Node.ParentNode;
+                        for (var i = 0; i < Parent.SubNodeList.length; i++) {
+                            var it = Parent.SubNodeList[i];
+                            if (Node == it) {
+                                Parent.SubNodeList.splice(i, 1);
+                            }
+                        }
+
+                        RemoveCommand.RemoveDescendantsRecursive(Node);
+                    });
                 }
-
-                RemoveCommand.RemoveDescendantsRecursive(Node);
-
-                var Doc = this.App.MasterRecord.EditingDoc;
-                Doc.RenumberAll();
-                var TopNode = Doc.TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopNode, true);
-                NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-                this.App.PictgramPanel.InitializeView(NewNodeView);
-                this.App.PictgramPanel.Draw(TopNode.GetLabel());
-                this.App.SocketManager.UpdateWGSN();
-                this.App.MasterRecord.CloseEditor();
             } else {
-                console.log("Need paramter");
+                AssureNote.AssureNoteUtils.Notify("remove: need target node");
             }
         };
 
@@ -8702,6 +8894,9 @@ var AssureNote;
         RemoveNodePlugin.prototype.CreateMenuBarButton = function (View) {
             var _this = this;
             var App = this.AssureNoteApp;
+            if (View == App.PictgramPanel.TopNodeView) {
+                return null;
+            }
             return new AssureNote.NodeMenuItem("remove-id", "/images/remove.png", "remove", function (event, TargetView) {
                 var Command = _this.AssureNoteApp.FindCommandByCommandLineName("remove");
                 if (Command) {
@@ -8735,24 +8930,15 @@ var AssureNote;
         };
 
         AddNodeCommand.prototype.Invoke = function (CommandName, Params) {
+            var _this = this;
             var Type = this.Text2NodeTypeMap[Params[1].toLowerCase()];
-            var TargetView = this.App.PictgramPanel.ViewMap[Params[0]];
-            if (TargetView == null) {
-                this.App.DebugP("Node not Found");
-                return;
+            var TargetView = this.App.GetNodeFromLabel(Params[0]);
+            if (TargetView) {
+                this.App.EditDocument("todo", "test", function () {
+                    var Node = _this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
+                    new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
+                });
             }
-            this.App.MasterRecord.OpenEditor(this.App.GetUserName(), "todo", null, "test");
-            var Node = this.App.MasterRecord.EditingDoc.GetNode(TargetView.Model.UID);
-            new AssureNote.GSNNode(Node.BaseDoc, Node, Type, null, AssureNote.AssureNoteUtils.GenerateUID(), null);
-            var Doc = this.App.MasterRecord.EditingDoc;
-            Doc.RenumberAll();
-            var TopGoal = Doc.TopNode;
-            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-            NewNodeView.SaveFlags(this.App.PictgramPanel.ViewMap);
-            this.App.PictgramPanel.InitializeView(NewNodeView);
-            this.App.PictgramPanel.Draw(TopGoal.GetLabel());
-            this.App.SocketManager.UpdateWGSN();
-            this.App.MasterRecord.CloseEditor();
         };
         return AddNodeCommand;
     })(AssureNote.Command);
@@ -9524,6 +9710,15 @@ var AssureNote;
                 App.ExecCommandByName("set-monitor", "all");
             }
         };
+
+        SetMonitorMenuItem.prototype.Update = function () {
+            var HasMonitor = AssureNote.AssureNoteApp.Current.PictgramPanel.HasMonitorNode();
+            if (HasMonitor) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        };
         return SetMonitorMenuItem;
     })(AssureNote.TopMenuItem);
     AssureNote.SetMonitorMenuItem = SetMonitorMenuItem;
@@ -9544,6 +9739,15 @@ var AssureNote;
         ShowMonitorListMenuItem.prototype.Invoke = function (App) {
             var Command = App.FindCommandByCommandLineName("show-monitorlist");
             Command.Invoke(null, []);
+        };
+
+        ShowMonitorListMenuItem.prototype.Update = function () {
+            var HasMonitor = AssureNote.AssureNoteApp.Current.PictgramPanel.HasMonitorNode();
+            if (HasMonitor) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
         };
         return ShowMonitorListMenuItem;
     })(AssureNote.TopMenuItem);
