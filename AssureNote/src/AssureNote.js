@@ -52,6 +52,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SaveCommand(this));
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
             this.RegistCommand(new AssureNote.SaveWGSNCommand(this));
+            this.RegistCommand(new AssureNote.SaveDCaseModelCommand(this));
             this.RegistCommand(new AssureNote.SaveDCaseCommand(this));
             this.RegistCommand(new AssureNote.CommitCommand(this));
             this.RegistCommand(new AssureNote.OpenCommand(this));
@@ -109,6 +110,7 @@ var AssureNote;
                 new AssureNote.SaveMenuItem(true),
                 new AssureNote.SubMenuItem(true, "save-as", "Save As", "floppy-save", [
                     new AssureNote.SaveAsWGSNMenuItem(true),
+                    new AssureNote.SaveAsDCaseModelMenuItem(true),
                     new AssureNote.SaveAsDCaseMenuItem(true),
                     new AssureNote.SaveAsSVGMenuItem(true)
                 ]),

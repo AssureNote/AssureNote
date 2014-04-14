@@ -343,9 +343,15 @@ module AssureNote {
         }
     }
 
-    export class SaveAsDCaseMenuItem extends SaveAsMenuItem {
+    export class SaveAsDCaseModelMenuItem extends SaveAsMenuItem {
         GetExtention(): string {
             return "dcase_model";
+        }
+    }
+
+    export class SaveAsDCaseMenuItem extends SaveAsMenuItem {
+        GetExtention(): string {
+            return "dcase";
         }
     }
 

@@ -393,13 +393,25 @@ var AssureNote;
     })(SaveAsMenuItem);
     AssureNote.SaveAsWGSNMenuItem = SaveAsWGSNMenuItem;
 
+    var SaveAsDCaseModelMenuItem = (function (_super) {
+        __extends(SaveAsDCaseModelMenuItem, _super);
+        function SaveAsDCaseModelMenuItem() {
+            _super.apply(this, arguments);
+        }
+        SaveAsDCaseModelMenuItem.prototype.GetExtention = function () {
+            return "dcase_model";
+        };
+        return SaveAsDCaseModelMenuItem;
+    })(SaveAsMenuItem);
+    AssureNote.SaveAsDCaseModelMenuItem = SaveAsDCaseModelMenuItem;
+
     var SaveAsDCaseMenuItem = (function (_super) {
         __extends(SaveAsDCaseMenuItem, _super);
         function SaveAsDCaseMenuItem() {
             _super.apply(this, arguments);
         }
         SaveAsDCaseMenuItem.prototype.GetExtention = function () {
-            return "dcase_model";
+            return "dcase";
         };
         return SaveAsDCaseMenuItem;
     })(SaveAsMenuItem);

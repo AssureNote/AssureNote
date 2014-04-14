@@ -79,6 +79,7 @@ module AssureNote {
             this.RegistCommand(new SaveCommand(this));
             this.RegistCommand(new SaveSVGCommand(this));
             this.RegistCommand(new SaveWGSNCommand(this));
+            this.RegistCommand(new SaveDCaseModelCommand(this));
             this.RegistCommand(new SaveDCaseCommand(this));
             this.RegistCommand(new CommitCommand(this));
             this.RegistCommand(new OpenCommand(this));
@@ -139,6 +140,7 @@ module AssureNote {
                     new SaveMenuItem(true),
                     new SubMenuItem(true, "save-as", "Save As", "floppy-save", [
                         new SaveAsWGSNMenuItem(true),
+                        new SaveAsDCaseModelMenuItem(true),
                         new SaveAsDCaseMenuItem(true),
                         new SaveAsSVGMenuItem(true)
                     ]),
