@@ -97,8 +97,7 @@ export class AssuranceCaseDAO extends model.DAO {
                             callback(err, null);
                             return;
                         }
-                        console.log("%j",result);
-                        if(result.hash_key) {
+                        if(result.length == 0) {
                             this.insert(userKey, data, meta_data, callback);
                         } else {
                             this.update(userKey, data, meta_data, fileId, callback);

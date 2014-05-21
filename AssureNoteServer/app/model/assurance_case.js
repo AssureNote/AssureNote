@@ -114,8 +114,7 @@ var AssuranceCaseDAO = (function (_super) {
                     callback(err, null);
                     return;
                 }
-                console.log("%j", result);
-                if (result.hash_key) {
+                if (result.length == 0) {
                     _this.insert(userKey, data, meta_data, callback);
                 } else {
                     _this.update(userKey, data, meta_data, fileId, callback);
