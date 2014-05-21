@@ -645,14 +645,9 @@ module AssureNote {
                 if (history.replaceState) {
                     history.replaceState(null, null, NewURL);
                 } else {
-                    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
+                    window.location.href = NewURL;
                 }
-                //this.App.SetLoading(false);
-                //if(history.pushState) {
-                //    history.pushState({fileId: result.fileId}, "", Config.BASEPATH + "/file/" + result.fileId);
-                //} else {
-                //    window.location.href = Config.BASEPATH + "/file/" + result.fileId;
-                //}
+                this.App.SetLoading(false);
             }, ()=> {
                 this.App.SetLoading(false);
             });
