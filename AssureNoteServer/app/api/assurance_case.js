@@ -26,6 +26,8 @@ function upload(params, userIdKey, callback) {
             checks.push('Parameter is required.');
         if (params && !params.content)
             checks.push('Contents is required.');
+        if (params && !params.fileId)
+            params.fileId = "";
         if (checks.length > 0) {
             callback.onFailure(new error.InvalidParamsError(checks, null));
             return false;
@@ -51,7 +53,7 @@ function upload(params, userIdKey, callback) {
             });
         },
         function (user, next) {
-            caseDAO.insert(user.key, params.content, params.meta_data, function (err, result) {
+            caseDAO.insertOrUpdate(user.key, params.content, params.meta_data, params.fileId, function (err, result) {
                 return next(err, result);
             });
         },
