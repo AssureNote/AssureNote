@@ -25,6 +25,7 @@ export function upload(params:any, userIdKey: string, callback: type.Callback) {
         var checks = [];
         if (!params) checks.push('Parameter is required.');
         if (params && !params.content) checks.push('Contents is required.');
+        if (params && !params.fileId) params.fileId = "";
         if (checks.length > 0) {
             callback.onFailure(new error.InvalidParamsError(checks, null));
             return false;
@@ -45,7 +46,7 @@ export function upload(params:any, userIdKey: string, callback: type.Callback) {
                 userDAO.select(userIdKey, (err:any, user: model_user.User) => next(err, user));
             },
             (user:model_user.User, next) => {
-                caseDAO.insert(user.key, params.content, params.meta_data, (err:any, result) => next(err, result));
+                caseDAO.insertOrUpdate(user.key, params.content, params.meta_data, params.fileId, (err:any, result) => next(err, result));
             },
             (commitResult, next) => {
                 con.commit((err, result) => next(err, commitResult));

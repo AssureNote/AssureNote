@@ -75,6 +75,38 @@ export class AssuranceCaseDAO extends model.DAO {
     }
 
     /**
+      * @method insertOrUpdate
+      * @param {String} userKey
+      * @param {String} data
+      * @param {String} meta_data
+      * @param {String} fileId
+      * @param {Function} callback
+      * @return {void}
+      */
+    insertOrUpdate(userKey: string, data: string, meta_data: string, fileId: string, callback: (err:any, hashKey: string)=>void): void {
+        if(!meta_data) {
+            meta_data = '';
+        }
+        if(fileId == null || fileId == "") {
+            this.insert(userKey, data, meta_data, callback);
+        } else {
+            this.con.query('SELECT `hash_key` FROM `assurance_case` WHERE `hash_key` = ?',
+                    [fileId],
+                    (err, result) => {
+                        if(err) {
+                            callback(err, null);
+                            return;
+                        }
+                        if(result.length == 0) {
+                            this.insert(userKey, data, meta_data, callback);
+                        } else {
+                            this.update(userKey, data, meta_data, fileId, callback);
+                        }
+            });
+        }
+    }
+
+    /**
       * @method insert
       * @param {String} userKey
       * @param {String} data
@@ -87,7 +119,6 @@ export class AssuranceCaseDAO extends model.DAO {
             meta_data = '';
         }
         var hashKey = getMd5String();
-        //async.waterfall([
         this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)'
                 , [hashKey, data, meta_data, userKey],
                 (err, result) => {
@@ -97,5 +128,29 @@ export class AssuranceCaseDAO extends model.DAO {
                     }
                     callback(err, hashKey);
                 });
+    }
+
+    /**
+      * @method update
+      * @param {String} userKey
+      * @param {String} data
+      * @param {String} meta_data
+      * @param {String} fileId
+      * @param {Function} callback
+      * @return {void}
+      */
+    update(userKey: string, data: string, meta_data: string, fileId: string, callback: (err:any, hashKey: string)=>void): void {
+        if(!meta_data) {
+            meta_data = '';
+        }
+        this.con.query('UPDATE `assurance_case` SET `data`=?, `meta_data`=?, `user_key`=? WHERE `hash_key` = ?',
+                [data, meta_data, userKey, fileId],
+                (err, result) => {
+                    if(err) {
+                        callback(err, null);
+                        return;
+                    }
+                    callback(err, fileId);
+        });
     }
 }

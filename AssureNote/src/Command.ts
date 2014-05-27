@@ -650,7 +650,9 @@ module AssureNote {
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             this.App.SetLoading(true);
-            AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, (result: any) => {
+            var paths = location.pathname.split("/");
+            var fileId = paths[paths.length -1];
+            AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString(), fileId: fileId }, (result: any) => {
                 var NewURI = Config.BASEPATH + "/file/" + result.fileId;
                 if (history.replaceState) {
                     history.replaceState(null, null, NewURI);

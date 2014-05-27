@@ -93,6 +93,37 @@ var AssuranceCaseDAO = (function (_super) {
     };
 
     /**
+    * @method insertOrUpdate
+    * @param {String} userKey
+    * @param {String} data
+    * @param {String} meta_data
+    * @param {String} fileId
+    * @param {Function} callback
+    * @return {void}
+    */
+    AssuranceCaseDAO.prototype.insertOrUpdate = function (userKey, data, meta_data, fileId, callback) {
+        var _this = this;
+        if (!meta_data) {
+            meta_data = '';
+        }
+        if (fileId == null || fileId == "") {
+            this.insert(userKey, data, meta_data, callback);
+        } else {
+            this.con.query('SELECT `hash_key` FROM `assurance_case` WHERE `hash_key` = ?', [fileId], function (err, result) {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+                if (result.length == 0) {
+                    _this.insert(userKey, data, meta_data, callback);
+                } else {
+                    _this.update(userKey, data, meta_data, fileId, callback);
+                }
+            });
+        }
+    };
+
+    /**
     * @method insert
     * @param {String} userKey
     * @param {String} data
@@ -105,14 +136,34 @@ var AssuranceCaseDAO = (function (_super) {
             meta_data = '';
         }
         var hashKey = exports.getMd5String();
-
-        //async.waterfall([
         this.con.query('INSERT INTO `assurance_case` (`hash_key`, `data`, `meta_data`, `user_key`) VALUES (?, ?, ?, ?)', [hashKey, data, meta_data, userKey], function (err, result) {
             if (err) {
                 callback(err, null);
                 return;
             }
             callback(err, hashKey);
+        });
+    };
+
+    /**
+    * @method update
+    * @param {String} userKey
+    * @param {String} data
+    * @param {String} meta_data
+    * @param {String} fileId
+    * @param {Function} callback
+    * @return {void}
+    */
+    AssuranceCaseDAO.prototype.update = function (userKey, data, meta_data, fileId, callback) {
+        if (!meta_data) {
+            meta_data = '';
+        }
+        this.con.query('UPDATE `assurance_case` SET `data`=?, `meta_data`=?, `user_key`=? WHERE `hash_key` = ?', [data, meta_data, userKey, fileId], function (err, result) {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            callback(err, fileId);
         });
     };
     return AssuranceCaseDAO;
