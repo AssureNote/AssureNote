@@ -314,7 +314,7 @@ var AssureNote;
         };
         UploadMenuItem.prototype.Invoke = function (App) {
             if (App.IsUserGuest()) {
-                alert("Please login first.");
+                AssureNote.AssureNoteUtils.Notify("Please login first");
                 return;
             }
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {

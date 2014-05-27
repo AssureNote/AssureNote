@@ -63,13 +63,8 @@ module AssureNote {
 
             this.Timeout = null;
             var Model = NodeView.Model;
-            this.App.FullScreenEditorPanel.IsVisible = false;
+            this.IsVisible = false;
             this.App.SocketManager.StartEdit({"UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName()});
-
-            var Callback = (event: MouseEvent) => {
-                this.Element.blur();
-            };
-            var App = this.App;
 
             this.Editor.getDoc().setValue(WGSN);
             this.OnOutSideClicked = () => {

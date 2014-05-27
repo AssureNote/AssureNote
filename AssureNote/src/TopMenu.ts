@@ -284,7 +284,7 @@ module AssureNote {
         }
         Invoke(App: AssureNoteApp): void {
             if (App.IsUserGuest()) {
-                alert("Please login first.");
+                AssureNoteUtils.Notify("Please login first");
                 return;
             }
             if (!App.MasterRecord.GetLatestDoc().DocHistory.IsCommitRevision) {

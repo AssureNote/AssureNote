@@ -640,7 +640,7 @@ var AssureNote;
         };
 
         HelpCommand.prototype.Invoke = function (CommandName, Params) {
-            var Helps = jQuery.map(this.App.Commands, function (Command, i) {
+            var Helps = this.App.Commands.map(function (Command) {
                 return Command.GetHelpHTML();
             }).sort();
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
@@ -668,22 +668,33 @@ var AssureNote;
             return "<code>share</code><br>Share editing GSN to the server(online version only).";
         };
 
+        ShareCommand.prototype.OpenShareModal = function (URI) {
+            var ShareModal = $("#share-modal");
+            var URIInput = ShareModal.find("input.form-control");
+            URIInput.val(URI);
+            var TopGoalText = this.App.PictgramPanel.TopNodeView.NodeDoc;
+            ShareModal.find("a.twitter-share-button").attr("href", "http://twitter.com/share?url=" + encodeURIComponent(URI) + "&text=" + encodeURIComponent(TopGoalText + " - AssureNote") + "&hashtags=assurenote");
+            ShareModal.modal();
+            URIInput.focus().select();
+        };
+
         ShareCommand.prototype.Invoke = function (CommandName, Params) {
             var _this = this;
             if (this.App.IsUserGuest()) {
-                alert("Please login first.");
+                AssureNote.AssureNoteUtils.Notify("Please login first");
                 return;
             }
             var Writer = new AssureNote.StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             this.App.SetLoading(true);
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, function (result) {
-                var NewURL = Config.BASEPATH + "/file/" + result.fileId;
+                var NewURI = Config.BASEPATH + "/file/" + result.fileId;
                 if (history.replaceState) {
-                    history.replaceState(null, null, NewURL);
+                    history.replaceState(null, null, NewURI);
                 } else {
-                    window.location.href = NewURL;
+                    window.location.href = NewURI;
                 }
+                _this.OpenShareModal(NewURI);
                 _this.App.SetLoading(false);
             }, function () {
                 _this.App.SetLoading(false);

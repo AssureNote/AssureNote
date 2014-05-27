@@ -608,7 +608,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            var Helps: string[] = jQuery.map(this.App.Commands, (Command: Command, i: number): string => { return Command.GetHelpHTML(); }).sort();
+            var Helps: string[] = this.App.Commands.map((Command) => Command.GetHelpHTML()).sort();
             $("#help-modal ul").empty().append("<li>" + Helps.join("</li><li>") + "</li>");
             $("#help-modal .modal-body").css({ "overflow-y": "scroll", "height": this.App.PictgramPanel.Viewport.GetPageHeight() * 0.6 });
             (<any>$("#help-modal")).modal();
@@ -632,21 +632,32 @@ module AssureNote {
             return "<code>share</code><br>Share editing GSN to the server(online version only)."
         }
 
+        private OpenShareModal(URI: string) {
+            var ShareModal = $("#share-modal");
+            var URIInput = ShareModal.find("input.form-control");
+            URIInput.val(URI);
+            var TopGoalText = this.App.PictgramPanel.TopNodeView.NodeDoc;
+            ShareModal.find("a.twitter-share-button").attr("href", "http://twitter.com/share?url=" + encodeURIComponent(URI) + "&text=" + encodeURIComponent(TopGoalText + " - AssureNote") + "&hashtags=assurenote");
+            (<any>ShareModal).modal();
+            URIInput.focus().select();
+        }
+
         public Invoke(CommandName: string, Params: any[]) {
             if (this.App.IsUserGuest()) {
-                alert("Please login first.");
+                AssureNoteUtils.Notify("Please login first");
                 return;
             }
             var Writer = new StringWriter();
             this.App.MasterRecord.FormatRecord(Writer);
             this.App.SetLoading(true);
-            AssureNoteUtils.postJsonRPC("upload", {content: Writer.toString()}, (result: any) => {
-                var NewURL = Config.BASEPATH + "/file/" + result.fileId;
+            AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString() }, (result: any) => {
+                var NewURI = Config.BASEPATH + "/file/" + result.fileId;
                 if (history.replaceState) {
-                    history.replaceState(null, null, NewURL);
+                    history.replaceState(null, null, NewURI);
                 } else {
-                    window.location.href = NewURL;
+                    window.location.href = NewURI;
                 }
+                this.OpenShareModal(NewURI);
                 this.App.SetLoading(false);
             }, ()=> {
                 this.App.SetLoading(false);

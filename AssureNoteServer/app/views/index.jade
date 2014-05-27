@@ -89,6 +89,23 @@ html
                 | Yokohama National Univercity
           .modal-footer
             button.btn.btn-default(type='button', data-dismiss='modal') Close
+    // Share Modal
+    #share-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+            h4#about-modal-label.modal-title Share
+          .modal-body
+            p Share this URI:
+            p
+              input.form-control(type='text', readonly="readonly", style="cursor:default;")
+            p
+              a.btn.btn-default.twitter-share-button(href="http://twitter.com/share?url=共有したいURL&text=ツイート内テキスト&hashtags=assurenote", target="_blank")
+                img(src='#{basepath}/images/Twitter_logo_blue_small.png', width='16px', height='16px')
+                | &nbsp;Tweet
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
     #welcome-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
       .modal-dialog.modal-lg
         .modal-content
