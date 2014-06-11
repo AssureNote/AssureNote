@@ -117,7 +117,7 @@ var AssureNote;
         MonitorNode.prototype.UpdateModel = function () {
             var Model = this.GetModel();
             if (Model.TagMap == null) {
-                Model.TagMap = new AssureNote.HashMap();
+                Model.TagMap = new HashMap();
             }
             var Value = (this.Data != null) ? this.Data + "" : "";
             Model.TagMap.put(this.Type, Value);

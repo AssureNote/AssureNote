@@ -96,7 +96,7 @@ var AssureNote;
                 try  {
                     var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
                     var NewNode;
-                    NewNode = Node.ReplaceSubNodeAsText(WGSN, _this.IsEditRecursive);
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, _this.IsEditRecursive);
                 } catch (e) {
                     AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
                     return false;

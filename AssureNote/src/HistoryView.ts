@@ -65,8 +65,8 @@ module AssureNote {
             var t = <any>{
                 Message: message,
                 User: h.Author,
-                DateTime: AssureNoteUtils.FormatDate(h.DateString),
-                DateTimeString: new Date(h.DateString).toLocaleString(),
+                DateTime: AssureNoteUtils.FormatDate(h.Date.toUTCString()),
+                DateTimeString: Date.toLocaleString(),
                 Count: {
                     All: h.Doc.GetNodeCount(),
                     Goal:     h.Doc.GetNodeCountTypeOf(GSNType.Goal),

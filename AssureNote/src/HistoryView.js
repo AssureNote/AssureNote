@@ -71,8 +71,8 @@ var AssureNote;
             var t = {
                 Message: message,
                 User: h.Author,
-                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString),
-                DateTimeString: new Date(h.DateString).toLocaleString(),
+                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.Date.toUTCString()),
+                DateTimeString: Date.toLocaleString(),
                 Count: {
                     All: h.Doc.GetNodeCount(),
                     Goal: h.Doc.GetNodeCountTypeOf(0 /* Goal */),
