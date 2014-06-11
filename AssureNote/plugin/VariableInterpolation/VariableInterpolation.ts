@@ -41,8 +41,10 @@ module AssureNote {
             return div.outerHTML;
         }
 
+        private static ReferenceRegExp = /\[([^\[\]]*)\]/g;
+
         Supplant(str: string, LabelMap: any, TagMap: any) {
-            return str.replace(/\[([^\[\]]*)\]/g,
+            return str.replace(VariableInterpolationPlugin.ReferenceRegExp,
                 ((v: string, ...params: string[]) => {
                     var b = params[0];
                     var value = TagMap[b];
@@ -65,10 +67,10 @@ module AssureNote {
         }
 
         RenderHTML(NodeDoc: string, Model: GSNNode): string {
-            if (NodeDoc.match(/\[([^\[\]]*)\]/)) {
-                var Map: HashMap<String, String> = Model.GetTagMapWithLexicalScope();
-                var LabelMap: HashMap<String, String> = Model.BaseDoc.GetLabelMap();
-                return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
+            if (Model.HasTagOrLabelReference) {
+                var Map = Model.GetTagMapWithLexicalScope();
+                var LabelMap = Model.BaseDoc.GetLabelMap();
+                return this.Supplant(NodeDoc, LabelMap, Map ? Map : {});
             }
             return NodeDoc;
         }

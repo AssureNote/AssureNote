@@ -239,8 +239,8 @@ var AssureNote;
                         }
                         FoldedNodeRun = [];
                         FormarUnfoldedChildHeight = ChildHeadHeight;
-                        SubNode.RelativeX += -SubNode.Shape.GetTreeLeftLocalX();
                     }
+                    SubNode.RelativeX += -SubNode.Shape.GetTreeLeftLocalX();
                     SubNode.RelativeY = TreeHeight;
 
                     IsPreviousChildFolded = IsFoldedLike;

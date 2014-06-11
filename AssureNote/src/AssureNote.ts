@@ -150,8 +150,10 @@ module AssureNote {
                     new DividerMenuItem(true),
                     new HelpMenuItem(true),
                     new AboutMenuItem(true)
-                ]) );
-            this.TopMenuRight.AppendSubMenu(new UploadMenuItem(true));
+                ]));
+            if (!this.IsUserGuest()) {
+                this.TopMenuRight.AppendSubMenu(new UploadMenuItem(true));
+            }
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
@@ -261,17 +263,19 @@ module AssureNote {
             this.SetLoading(true);
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
-            this.MasterRecord = new GSNRecord();
+            
             switch (Extention) {
                 case "dcase_model":
+                    this.MasterRecord = new GSNRecord();
                     new DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
                     break;
                 case "xmi":
+                    this.MasterRecord = new GSNRecord();
                     new XMIParser(this.MasterRecord).Parse(WGSN);
                     break;
                 default:
                 case "wgsn":
-                    this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord = Parser.ParseRecord(WGSN);
                     this.MasterRecord.RenumberAll();
                     break;
             }

@@ -96,10 +96,13 @@ var AssureNote;
                 try  {
                     var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
                     var NewNode;
-                    NewNode = Node.ReplaceSubNodeAsText(WGSN, _this.IsEditRecursive);
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, _this.IsEditRecursive);
                 } catch (e) {
-                    AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
-                    return false;
+                    if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
+                        AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
+                        return false;
+                    }
+                    throw e;
                 }
                 var Writer = new AssureNote.StringWriter();
                 var WGSNChanged = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());

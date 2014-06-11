@@ -91,10 +91,13 @@ module AssureNote {
                 try {
                     var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
                     var NewNode: GSNNode;
-                    NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, this.IsEditRecursive);
                 } catch (e) {
-                    AssureNoteUtils.Notify("Invalid WGSN is given");
-                    return false;
+                    if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
+                        AssureNoteUtils.Notify("Invalid WGSN is given");
+                        return false;
+                    }
+                    throw e;
                 }
                 var Writer: StringWriter = new StringWriter();
                 var WGSNChanged: boolean = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());

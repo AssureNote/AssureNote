@@ -121,7 +121,9 @@ var AssureNote;
                 new AssureNote.HelpMenuItem(true),
                 new AssureNote.AboutMenuItem(true)
             ]));
-            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
+            if (!this.IsUserGuest()) {
+                this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
+            }
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
@@ -232,17 +234,19 @@ var AssureNote;
             this.SetLoading(true);
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
-            this.MasterRecord = new AssureNote.GSNRecord();
+
             switch (Extention) {
                 case "dcase_model":
+                    this.MasterRecord = new AssureNote.GSNRecord();
                     new AssureNote.DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
                     break;
                 case "xmi":
+                    this.MasterRecord = new AssureNote.GSNRecord();
                     new AssureNote.XMIParser(this.MasterRecord).Parse(WGSN);
                     break;
                 default:
                 case "wgsn":
-                    this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord = AssureNote.Parser.ParseRecord(WGSN);
                     this.MasterRecord.RenumberAll();
                     break;
             }

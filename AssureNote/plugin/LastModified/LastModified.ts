@@ -49,7 +49,7 @@ module AssureNote {
                 }
                 span.textContent = Author + '&nbsp';
                 var small = document.createElement('small');
-                small.innerHTML = icon_time.outerHTML + '&nbsp' + AssureNoteUtils.FormatDate(Model.LastModified.DateString)
+                small.innerHTML = icon_time.outerHTML + '&nbsp' + AssureNoteUtils.FormatDate(Model.LastModified.Date)
                 span.innerHTML = icon_user.outerHTML + span.textContent + small.outerHTML;
                 return NodeDoc + span.outerHTML;
             } else {
@@ -57,52 +57,26 @@ module AssureNote {
             }
         }
 
+        CreateElement(Prefix: string, History: GSNHistory): HTMLLIElement {
+            var li = document.createElement('li');
+            if (History.Author == 'unknown') {
+                li.innerHTML = Prefix + ' at ' + AssureNoteUtils.FormatDateTime(History.Date);
+            } else {
+                li.innerHTML = Prefix + ' by <b>' + History.Author + '</b> at ' + AssureNoteUtils.FormatDateTime(History.Date);
+            }
+            return li;
+        }
+
         CreateTooltipContents(NodeView: NodeView): HTMLLIElement[]{
-            var res: HTMLLIElement[] = [];
-            var li: HTMLLIElement = null;
-
-            var nodeHistory: GSNHistory[] = Array<GSNHistory>();
-            var modifieds: GSNHistory[] = this.AssureNoteApp.MasterRecord.HistoryList;
-            var hashKey: string[] = modifieds[NodeView.Model.LastModified.Rev].Doc.NodeMap.keySet();
-            var prevNode: GSNNode = null;
-            var currentNode: GSNNode = null;
-
-            for (var node_i: number = 0; node_i < modifieds[NodeView.Model.LastModified.Rev].Doc.NodeMap.size(); node_i++) {
-                if (NodeView.Model.UID.toString() == hashKey[node_i]) {
-                    for (var history_i: number = NodeView.Model.Created.Rev + 1; history_i <= NodeView.Model.LastModified.Rev; history_i++) {
-                        if (history_i == NodeView.Model.Created.Rev + 1) {
-                            prevNode = modifieds[history_i].Doc.NodeMap.hash[hashKey[node_i]];
-                        }
-                        if (history_i != NodeView.Model.Created.Rev + 1) {
-                            currentNode = modifieds[history_i].Doc.NodeMap.hash[hashKey[node_i]];
-                            if (!currentNode.LastModified.EqualsHistory(prevNode.LastModified)) {
-                                nodeHistory.push(currentNode.LastModified);
-                            }
-                            prevNode = currentNode;
-                        }
-                    }
+            var ret: HTMLLIElement[] = [];
+            var isFirst = true;
+            NodeView.Model.GetNodeHistoryList().forEach(History => {
+                if (History.Author != 'unknown') {
+                    ret.push(this.CreateElement(isFirst ? "Created" : "Modified", History));;
                 }
-            }
-
-            if (NodeView.Model.Created.Author != 'unknown') {
-                li = document.createElement('li');
-                li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b> ' + NodeView.Model.Created.DateString;
-                res.push(li);
-            }
-            for (var i: number = 0; i < nodeHistory.length; i++) {
-                if (nodeHistory[i].Author != 'unknown') {
-                    li = document.createElement('li');
-                    li.innerHTML = 'Modified by <b>' + nodeHistory[i].Author + '</b> ' + nodeHistory[i].DateString;
-                    res.push(li);
-                }
-            }
-            if (NodeView.Model.LastModified.Author != 'unknown') {
-                li = document.createElement('li');
-                li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b> ' + NodeView.Model.LastModified.DateString;
-                res.push(li);
-            }
-
-            return res;
+                isFirst = false;
+            });
+            return ret;
         }
     }
 }

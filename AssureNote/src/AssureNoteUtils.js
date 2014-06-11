@@ -116,10 +116,9 @@ var AssureNote;
         var month = day * 30;
         var year = month * 365;
 
-        /**
-        Format date to 'XX ago' style.
-        @param {string} time Date and time that constructor of Date class accepts.
-        */
+        
+
+        
         function FormatDate(time) {
             var deltaTime = new Date().getTime() - new Date(time).getTime();
 
@@ -149,6 +148,29 @@ var AssureNote;
             return "error";
         }
         AssureNoteUtils.FormatDate = FormatDate;
+
+        
+
+        
+        function FormatDateTime(time) {
+            var date = new Date(time);
+
+            var fill2 = function (n) {
+                if (n < 10)
+                    return "0" + n.toString();
+                return n.toString();
+            };
+
+            var y = fill2(date.getFullYear());
+            var m = fill2(date.getMonth() + 1);
+            var d = fill2(date.getDate());
+            var hr = fill2(date.getHours());
+            var min = fill2(date.getMinutes());
+            var sec = fill2(date.getSeconds());
+
+            return [y, "/", m, "/", d, " ", hr, ":", min, ":", sec].join("");
+        }
+        AssureNoteUtils.FormatDateTime = FormatDateTime;
 
         function GenerateUID() {
             return Math.floor(Math.random() * 2147483647);
@@ -356,6 +378,16 @@ var AssureNote;
         });
 
         window.name = window.location.href;
+
+        function ChangeLocation(Location) {
+            if (AssureNote.AssureNoteApp.Current.IsOfflineVersion()) {
+                return;
+            }
+            if (history.replaceState) {
+                history.replaceState(null, null, Config.BASEPATH);
+            }
+        }
+        AssureNoteUtils.ChangeLocation = ChangeLocation;
     })(AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AssureNoteUtils = AssureNote.AssureNoteUtils;
 

@@ -110,6 +110,9 @@ module AssureNote {
                 case GSNType.Goal:
                     return new GSNGoalShape(Node);
                 case GSNType.Context:
+                case GSNType.Justification:
+                case GSNType.Assumption:
+                case GSNType.Exception:
                     return new GSNContextShape(Node);
                 case GSNType.Strategy:
                     return new GSNStrategyShape(Node);
@@ -257,7 +260,7 @@ module AssureNote {
         }
 
         private FormatNewLine(doc: string) {
-            return doc.replace(/\n/g, '<br>');
+            return doc.replace(/\r\n|\n|\r/g, '<br>');
         }
 
         private PrerenderHTMLContent(manager: PluginManager): void {

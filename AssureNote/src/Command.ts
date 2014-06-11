@@ -428,11 +428,10 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            var History: GSNHistory = new GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
+            var History: GSNHistory = new GSNHistory(0, this.App.GetUserName(), '-', new Date(), '-', null);
             var Writer: StringWriter = new StringWriter();
             TagUtils.FormatHistoryTag([History], 0, Writer);
-            console.log(Writer.toString());
-            var WGSN = Writer.toString() + 'Revision:: 0\n*G';
+            var WGSN = Writer.toString() + '\n*G';
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], WGSN);
             } else {
@@ -444,9 +443,7 @@ module AssureNote {
                     this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         }
 
         public CanUseOnViewOnlyMode(): boolean {
@@ -584,9 +581,7 @@ module AssureNote {
                 this.App.LoadFiles((<HTMLInputElement>target).files);
             });
             $("#file-open-dialog").click();
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         }
 
         public CanUseOnViewOnlyMode(): boolean {
@@ -658,11 +653,7 @@ module AssureNote {
             var fileId = paths[paths.length -1];
             AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString(), fileId: fileId }, (result: any) => {
                 var NewURI = Config.BASEPATH + "/file/" + result.fileId;
-                if (history.replaceState) {
-                    history.replaceState(null, null, NewURI);
-                } else {
-                    window.location.href = NewURI;
-                }
+                AssureNoteUtils.ChangeLocation(NewURI);
                 this.OpenShareModal(NewURI);
                 this.App.SetLoading(false);
             }, ()=> {

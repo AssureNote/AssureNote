@@ -446,11 +446,10 @@ var AssureNote;
         };
 
         NewCommand.prototype.Invoke = function (CommandName, Params) {
-            var History = new AssureNote.GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
+            var History = new AssureNote.GSNHistory(0, this.App.GetUserName(), '-', new Date(), '-', null);
             var Writer = new AssureNote.StringWriter();
             AssureNote.TagUtils.FormatHistoryTag([History], 0, Writer);
-            console.log(Writer.toString());
-            var WGSN = Writer.toString() + 'Revision:: 0\n*G';
+            var WGSN = Writer.toString() + '\n*G';
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], WGSN);
             } else {
@@ -462,9 +461,7 @@ var AssureNote;
                     this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNote.AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         };
 
         NewCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -614,9 +611,7 @@ var AssureNote;
                 _this.App.LoadFiles(target.files);
             });
             $("#file-open-dialog").click();
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNote.AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         };
 
         OpenCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -695,11 +690,7 @@ var AssureNote;
             var fileId = paths[paths.length - 1];
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString(), fileId: fileId }, function (result) {
                 var NewURI = Config.BASEPATH + "/file/" + result.fileId;
-                if (history.replaceState) {
-                    history.replaceState(null, null, NewURI);
-                } else {
-                    window.location.href = NewURI;
-                }
+                AssureNote.AssureNoteUtils.ChangeLocation(NewURI);
                 _this.OpenShareModal(NewURI);
                 _this.App.SetLoading(false);
             }, function () {

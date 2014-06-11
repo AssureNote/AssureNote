@@ -163,9 +163,15 @@ module AssureNote {
 
         /**
         Format date to 'XX ago' style.
+        @param {Date} time
+        */
+        export function FormatDate(time: Date): string;
+        /**
+        Format date to 'XX ago' style.
         @param {string} time Date and time that constructor of Date class accepts.
         */
-        export function FormatDate(time: string): string {
+        export function FormatDate(time: string): string;
+        export function FormatDate(time): string {
             var deltaTime = new Date().getTime() - new Date(time).getTime();
 
             if (deltaTime < minute) {
@@ -192,6 +198,34 @@ module AssureNote {
                 return "" + Math.floor(deltaTime / year) + " years ago";
             }
             return "error";
+        }
+
+        /**
+        Format date to 'XX ago' style.
+        @param {Date} time
+        */
+        export function FormatDateTime(time: Date): string;
+        /**
+        Format date to 'XX ago' style.
+        @param {string} time Date and time that constructor of Date class accepts.
+        */
+        export function FormatDateTime(time: string): string;
+        export function FormatDateTime(time): string {
+            var date = new Date(time);
+
+            var fill2 = (n: number) => {
+                if (n < 10) return "0" + n.toString();
+                return n.toString();
+            }
+
+            var y: string = fill2(date.getFullYear());
+            var m: string = fill2(date.getMonth() + 1);
+            var d: string = fill2(date.getDate());
+            var hr: string = fill2(date.getHours());
+            var min: string = fill2(date.getMinutes());
+            var sec: string = fill2(date.getSeconds());
+
+            return [y, "/", m, "/", d, " ", hr, ":", min, ":", sec].join("");
         }
 
         export function GenerateUID(): number {
@@ -379,6 +413,15 @@ module AssureNote {
             window.name == window.location.href ? (() => { return true; }) : (() => { return false; });
 
         window.name = window.location.href;
+
+        export function ChangeLocation(Location: string) {
+            if (AssureNoteApp.Current.IsOfflineVersion()) {
+                return;
+            }
+            if (history.replaceState) {
+                history.replaceState(null, null, Config.BASEPATH);
+            }
+        }
     }
 
     export class AnimationFrameTask {

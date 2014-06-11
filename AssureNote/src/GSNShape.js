@@ -122,6 +122,9 @@ var AssureNote;
                 case 0 /* Goal */:
                     return new GSNGoalShape(Node);
                 case 1 /* Context */:
+                case 5 /* Justification */:
+                case 6 /* Assumption */:
+                case 7 /* Exception */:
                     return new GSNContextShape(Node);
                 case 2 /* Strategy */:
                     return new GSNStrategyShape(Node);
@@ -250,7 +253,7 @@ var AssureNote;
         };
 
         GSNShape.prototype.FormatNewLine = function (doc) {
-            return doc.replace(/\n/g, '<br>');
+            return doc.replace(/\r\n|\n|\r/g, '<br>');
         };
 
         GSNShape.prototype.PrerenderHTMLContent = function (manager) {

@@ -37,8 +37,7 @@
             <div id="top-menu"></div>
             <div class="edit-mode clickable navbar-left"></div>
             <!--p.navbar-text#filename-view(style="margin-left: 10px;")--><span>
-              <div id="top-menu-right" class="navbar-right"></div>
-              <button disabled class="btn btn-default navbar-btn clickable navbar-right disable"><span class="glyphicon glyphicon-log-in"></span>&nbsp;Login<span class="caret"></span></button><span style="color: black; margin-left: 0px;" class="user-name navbar-text navbar-right">&nbsp; Guest </span><span style="color: black; margin-left: 0px; margin-right: 0px;" class="glyphicon glyphicon-user navbar-text navbar-right"></span>
+              <div id="top-menu-right" class="navbar-right"></div><span style="color: black; margin-left: 0px;" class="user-name navbar-text navbar-right">&nbsp; Guest </span><span style="color: black; margin-left: 0px; margin-right: 0px;" class="glyphicon glyphicon-user navbar-text navbar-right"></span>
               <div id="user-list" class="navbar-right"><br></div></span>
             <script id="user-list-tmpl" type="text/x-jquery-tmpl"><span style="color: ${Color}">
                 <div class="glyphicon glyphicon-user"></div>{{if IsEditMode == true}}<small style="vertical-align: super;" class="glyphicon glyphicon-pencil"></small>&nbsp;{{else}}{{/if}}
@@ -143,7 +142,7 @@
             <h4 id="about-modal-label" class="modal-title">About</h4>
           </div>
           <div style="text-align: center;" class="modal-body"><img src="./images/logo.png" alt="AssureNote" style="width: 60%">
-            <p>Version 0.2.3</p>
+            <p>Version 0.2.4</p>
             <p>Copyright &copy; 2014, AssureNote project authors. All rights reserved.</p>
             <h3>Credit</h3>
             <ul class="list-inline">
@@ -167,26 +166,6 @@
       </div>
     </div>
     <!-- Share Modal-->
-    <div id="share-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
-            <h4 id="about-modal-label" class="modal-title">Share</h4>
-          </div>
-          <div class="modal-body">
-            <p>Share this URI:</p>
-            <p>
-              <input type="text" readonly="readonly" style="cursor:default;" class="form-control">
-            </p>
-            <p><a href="http://twitter.com/share?url=共有したいURL&amp;text=ツイート内テキスト&amp;hashtags=assurenote" target="_blank" class="btn btn-default twitter-share-button"><img src="./images/Twitter_logo_blue_small.png" width="16px" height="16px">&nbsp;Tweet</a></p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
     <div id="welcome-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true" class="modal fade">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -218,6 +197,8 @@
     <script type="text/javascript" src="./lib/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./lib/bootstrap-switch/bootstrap-switch.min.js"></script>
     <script type="text/javascript" src="./lib/socket.io.min.js"></script>
+    <script type="text/javascript" src="./lib/md5.min.js"></script>
+    <script type="text/javascript" src="./lib/wgsn.min.js"></script>
     <script type="text/javascript" src="./src/AssureNoteUtils.js"></script>
     <script type="text/javascript" src="./src/AssureNoteParser.js"></script>
     <script type="text/javascript" src="./src/DCaseModelXMLParser.js"></script>
