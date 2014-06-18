@@ -72,7 +72,7 @@ var AssureNote;
             this.Tooltip.append(pre);
             this.Tooltip.appendTo(ControlLayer);
 
-            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 10;
+            var Top = this.CurrentView.GetGY() + this.CurrentView.Shape.GetNodeHeight() + 5;
             var Left = this.CurrentView.GetGX() + this.CurrentView.Shape.GetNodeWidth() / 2;
             this.Tooltip.css({
                 position: 'absolute',
