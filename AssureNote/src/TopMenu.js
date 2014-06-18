@@ -523,6 +523,24 @@ var AssureNote;
     })(TopMenuItem);
     AssureNote.ShowHistoryPanelMenuItem = ShowHistoryPanelMenuItem;
 
+    var ShowNodeCountPanelMenuItem = (function (_super) {
+        __extends(ShowNodeCountPanelMenuItem, _super);
+        function ShowNodeCountPanelMenuItem() {
+            _super.apply(this, arguments);
+        }
+        ShowNodeCountPanelMenuItem.prototype.GetIconName = function () {
+            return "signal";
+        };
+        ShowNodeCountPanelMenuItem.prototype.GetDisplayName = function () {
+            return "NodeCount";
+        };
+        ShowNodeCountPanelMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("nodecount");
+        };
+        return ShowNodeCountPanelMenuItem;
+    })(TopMenuItem);
+    AssureNote.ShowNodeCountPanelMenuItem = ShowNodeCountPanelMenuItem;
+
     var SearchMenuItem = (function (_super) {
         __extends(SearchMenuItem, _super);
         function SearchMenuItem() {

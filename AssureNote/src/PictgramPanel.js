@@ -88,6 +88,9 @@ var AssureNote;
                 if (_this.NodeTooltip.IsEnable) {
                     _this.NodeTooltip.Remove();
                 }
+                if (_this.App.NodeCountPanel.IsVisible) {
+                    _this.App.NodeCountPanel.Update();
+                }
                 event.stopPropagation();
                 event.preventDefault();
             });
@@ -232,6 +235,9 @@ var AssureNote;
                     }
                     if (this.App.HistoryPanel.IsVisible) {
                         this.App.HistoryPanel.Hide();
+                    }
+                    if (this.App.NodeCountPanel.IsVisible) {
+                        this.App.NodeCountPanel.Hide();
                     }
                     Event.preventDefault();
                     break;

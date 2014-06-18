@@ -52,6 +52,7 @@ module AssureNote {
         DefaultCommand: AssureNote.CommandMissingCommand;
         UserList: UserList;
         HistoryPanel: HistoryPanel;
+        NodeCountPanel: NodeCountPanel;
         NodeListPanel: NodeListPanel;
 
         TopMenu: TopMenuTopItem;
@@ -90,6 +91,7 @@ module AssureNote {
             this.RegistCommand(new HelpCommand(this));
             this.RegistCommand(new ShareCommand(this));
             this.RegistCommand(new HistoryCommand(this));
+            this.RegistCommand(new NodeCountCommand(this));
             this.RegistCommand(new SetGuestUserNameCommand(this));
             this.RegistCommand(new SearchCommand(this));
             this.RegistCommand(new CopyCommand(this));
@@ -120,7 +122,8 @@ module AssureNote {
                     new DividerMenuItem(true),
                     new ShowHistoryPanelMenuItem(true, "history"),
                     new ShowMonitorListMenuItem(true, "monitorlist"),
-                    new SetMonitorMenuItem(true, "setmonitor")
+                    new SetMonitorMenuItem(true, "setmonitor"),
+                    new ShowNodeCountPanelMenuItem(true, "nodecount")
                 ]) );
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "edit", "Edit", "pencil", [

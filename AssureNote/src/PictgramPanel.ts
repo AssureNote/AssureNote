@@ -103,6 +103,9 @@ module AssureNote {
                 if (this.NodeTooltip.IsEnable) {
                     this.NodeTooltip.Remove();
                 }
+                if (this.App.NodeCountPanel.IsVisible) {
+                    this.App.NodeCountPanel.Update();
+                }
                 event.stopPropagation();
                 event.preventDefault();
             });
@@ -249,6 +252,9 @@ module AssureNote {
                     }
                     if (this.App.HistoryPanel.IsVisible) {
                         this.App.HistoryPanel.Hide();
+                    }
+                    if (this.App.NodeCountPanel.IsVisible) {
+                        this.App.NodeCountPanel.Hide();
                     }
                     Event.preventDefault();
                     break;

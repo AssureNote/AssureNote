@@ -59,6 +59,23 @@
             </div>
           </div>
         </script>
+        <script id="nodecount_tmpl" type="text/x-jquery-tmpl">
+          <div class="panel panel-default history-menu">
+            <div class="panel-body">
+              <button id="nodecount-panel-close" type="button" data-dismiss="modal" aria-hidden="true" class="close">&times;</button>
+              <p class="list-group-item-text">
+                <h4>Nodes under ${Name}</h4>
+                <ul class="list-unstyled">
+                  <li>All: ${Count.All} Nodes</li>
+                  <li>Goal: ${Count.Goal} Nodes</li>
+                  <li>Evidence: ${Count.Evidence} Nodes</li>
+                  <li>Context: ${Count.Context} Nodes</li>
+                  <li>Strategy: ${Count.Strategy} Nodes</li>
+                </ul>
+              </p>
+            </div>
+          </div>
+        </script>
         <script id="nodelist_tmpl" type="text/x-jquery-tmpl">
           <div class="panel panel-default node-list-panel">
             <div class="panel-body">
@@ -76,6 +93,7 @@
         </script>
         <div id="sidebar" style="position: absolute; top: 60px; left: 10px; width: 260px;">
           <div id="history"></div>
+          <div id="nodecount"></div>
           <div id="nodelist"></div>
         </div>
       </div>
@@ -224,6 +242,7 @@
     <script type="text/javascript" src="./src/Tooltip.js"></script>
     <script type="text/javascript" src="./src/UserList.js"></script>
     <script type="text/javascript" src="./src/HistoryView.js"></script>
+    <script type="text/javascript" src="./src/NodeCountView.js"></script>
     <script type="text/javascript" src="./src/ImageData.js"></script>
     <script type="text/javascript">
       var Config = {};

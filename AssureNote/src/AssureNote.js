@@ -63,6 +63,7 @@ var AssureNote;
             this.RegistCommand(new AssureNote.HelpCommand(this));
             this.RegistCommand(new AssureNote.ShareCommand(this));
             this.RegistCommand(new AssureNote.HistoryCommand(this));
+            this.RegistCommand(new AssureNote.NodeCountCommand(this));
             this.RegistCommand(new AssureNote.SetGuestUserNameCommand(this));
             this.RegistCommand(new AssureNote.SearchCommand(this));
             this.RegistCommand(new AssureNote.CopyCommand(this));
@@ -92,7 +93,8 @@ var AssureNote;
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.ShowHistoryPanelMenuItem(true, "history"),
                 new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
-                new AssureNote.SetMonitorMenuItem(true, "setmonitor")
+                new AssureNote.SetMonitorMenuItem(true, "setmonitor"),
+                new AssureNote.ShowNodeCountPanelMenuItem(true, "nodecount")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
                 new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
