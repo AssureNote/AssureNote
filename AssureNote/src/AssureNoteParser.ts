@@ -446,7 +446,7 @@ export class WikiSyntax {
 	public static ParseHistory(LabelLine: string, BaseDoc: GSNDoc): GSNHistory[] {
 		if(BaseDoc != null) {
 			var Loc: number = LabelLine.indexOf("#");
-			try {
+            try {
 				if (Loc != -1) {
 					var HistoryTaple: GSNHistory[] = new Array<GSNHistory>(2);
 					var RevText: string = LabelLine.substring(Loc + 1).trim();
