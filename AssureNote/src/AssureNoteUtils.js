@@ -68,7 +68,7 @@ var AssureNote;
         function GetNodePosition(Label) {
             var element = document.getElementById(Label);
             var view = element.getBoundingClientRect();
-            return new AssureNote.Point(view.left, view.top);
+            return new Point(view.left, view.top);
         }
         AssureNoteUtils.GetNodePosition = GetNodePosition;
 

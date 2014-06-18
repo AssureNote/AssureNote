@@ -431,6 +431,18 @@ module AssureNote {
         }
     }
 
+    export class ShowNodeCountPanelMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "signal";
+        }
+        GetDisplayName(): string {
+            return "NodeCount";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("nodecount");
+        }
+    }
+
     export class SearchMenuItem extends TopMenuItem {
         GetIconName(): string {
             return "search";
