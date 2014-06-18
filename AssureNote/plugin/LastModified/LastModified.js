@@ -66,14 +66,45 @@ var AssureNote;
         LastModifiedPlugin.prototype.CreateTooltipContents = function (NodeView) {
             var res = [];
             var li = null;
+
+            var nodeHistory = Array();
+            var modifieds = this.AssureNoteApp.MasterRecord.HistoryList;
+            var hashKey = modifieds[NodeView.Model.LastModified.Rev].Doc.NodeMap.keySet();
+            var prevNode = null;
+            var currentNode = null;
+
+            for (var node_i = 0; node_i < modifieds[NodeView.Model.LastModified.Rev].Doc.NodeMap.size(); node_i++) {
+                if (NodeView.Model.UID.toString() == hashKey[node_i]) {
+                    for (var history_i = NodeView.Model.Created.Rev + 1; history_i <= NodeView.Model.LastModified.Rev; history_i++) {
+                        if (history_i == NodeView.Model.Created.Rev + 1) {
+                            prevNode = modifieds[history_i].Doc.NodeMap.hash[hashKey[node_i]];
+                        }
+                        if (history_i != NodeView.Model.Created.Rev + 1) {
+                            currentNode = modifieds[history_i].Doc.NodeMap.hash[hashKey[node_i]];
+                            if (!currentNode.LastModified.EqualsHistory(prevNode.LastModified)) {
+                                nodeHistory.push(currentNode.LastModified);
+                            }
+                            prevNode = currentNode;
+                        }
+                    }
+                }
+            }
+
             if (NodeView.Model.Created.Author != 'unknown') {
                 li = document.createElement('li');
-                li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b> ' + AssureNote.AssureNoteUtils.FormatDate(NodeView.Model.Created.DateString);
+                li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b> ' + NodeView.Model.Created.DateString;
                 res.push(li);
+            }
+            for (var i = 0; i < nodeHistory.length; i++) {
+                if (nodeHistory[i].Author != 'unknown') {
+                    li = document.createElement('li');
+                    li.innerHTML = 'Modified by <b>' + nodeHistory[i].Author + '</b> ' + nodeHistory[i].DateString;
+                    res.push(li);
+                }
             }
             if (NodeView.Model.LastModified.Author != 'unknown') {
                 li = document.createElement('li');
-                li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b> ' + AssureNote.AssureNoteUtils.FormatDate(NodeView.Model.LastModified.DateString);
+                li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b> ' + NodeView.Model.LastModified.DateString;
                 res.push(li);
             }
 
