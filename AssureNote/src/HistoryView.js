@@ -81,6 +81,7 @@ var AssureNote;
                     Strategy: h.Doc.GetNodeCountTypeOf(2 /* Strategy */)
                 }
             };
+
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
             $("#history-panel-date").tooltip({});
             $("#history-panel-count").tooltip({

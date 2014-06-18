@@ -1,6 +1,5 @@
 ///< reference path="../d.ts/jquery_plugins.d.ts" />
 module AssureNote {
-
     export class HistoryCommand extends Command {
         private History: HistoryPanel;
 
@@ -75,6 +74,7 @@ module AssureNote {
                     Strategy: h.Doc.GetNodeCountTypeOf(GSNType.Strategy)
                 }
             };
+
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
             $("#history-panel-date").tooltip({});
             $("#history-panel-count").tooltip({
@@ -170,4 +170,6 @@ module AssureNote {
             });
         }
     }
+
+
 }

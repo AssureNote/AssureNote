@@ -23,6 +23,18 @@
                         span.glyphicon.glyphicon-chevron-right
                     a.btn.btn-default#last-revision(href='#')
                         span.glyphicon.glyphicon-fast-forward
++template("nodecount_tmpl")
+    .panel.panel-default.history-menu
+        .panel-body
+            button.close#nodecount-panel-close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+            p.list-group-item-text
+              h4 Nodes under ${Name}
+              ul.list-unstyled
+                li All: ${Count.All} Nodes
+                li Goal: ${Count.Goal} Nodes
+                li Evidence: ${Count.Evidence} Nodes
+                li Context: ${Count.Context} Nodes
+                li Strategy: ${Count.Strategy} Nodes
 +template("nodelist_tmpl")
     .panel.panel-default.node-list-panel
         .panel-body
@@ -44,5 +56,6 @@
                         span.glyphicon.glyphicon-chevron-right
 #sidebar(style="position: absolute; top: 60px; left: 10px; width: 260px;")
     #history
+    #nodecount
     #nodelist
 
