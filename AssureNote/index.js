@@ -72,6 +72,10 @@ $(function () {
         }, 100);
     };
 
+    Debug.StartEditMode = function () {
+        App.ModeManager.SetMode(0 /* Edit */);
+    };
+
     App.LoadDefaultWGSN();
 });
 //# sourceMappingURL=index.js.map

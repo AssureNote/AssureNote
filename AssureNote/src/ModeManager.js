@@ -54,7 +54,15 @@ var AssureNote;
         };
 
         ModeManager.prototype.ReadOnly = function (b) {
-            $('#mode-switch').bootstrapSwitch('setDisabled', b);
+            if (b) {
+                this.Input.setAttribute('disabled', '');
+                this.Input.setAttribute('readonly', '');
+                this.Input.className += 'disabled';
+            } else {
+                this.Input.removeAttribute('disabled');
+                this.Input.removeAttribute('readonly');
+                $(this.Input).removeClass('disabled');
+            }
         };
 
         ModeManager.prototype.Disable = function () {
@@ -71,9 +79,18 @@ var AssureNote;
                     data[_i] = arguments[_i + 1];
                 }
                 var value = data[0].value;
-                _this.SetMode((value) ? 0 /* Edit */ : 1 /* View */);
-                _this.App.SocketManager.UpdateEditMode(_this.Mode);
+                if (_this.App.IsUserGuest() && value) {
+                    AssureNote.AssureNoteUtils.Notify("Please login first");
+                    _this.SetMode(1 /* View */);
+                    _this.ReadOnly(true);
+                } else {
+                    _this.SetMode((value) ? 0 /* Edit */ : 1 /* View */);
+                    _this.App.SocketManager.UpdateEditMode(_this.Mode);
+                }
             });
+            if (this.App.IsUserGuest()) {
+                this.ReadOnly(true);
+            }
         };
         return ModeManager;
     })();

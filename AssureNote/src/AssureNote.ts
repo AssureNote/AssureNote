@@ -58,7 +58,7 @@ module AssureNote {
         TopMenu: TopMenuTopItem;
         TopMenuRight: TopMenuTopItem;
 
-        private IsGuestUser: boolean;
+        private IsGuestUser: boolean = true;
         private UserName: string;
         private LoadingIndicatorVisible = true;
         private LoadingIndicator: HTMLImageElement = <HTMLImageElement>document.getElementById("loading-indicator");

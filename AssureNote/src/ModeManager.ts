@@ -58,7 +58,15 @@ module AssureNote {
         }
 
         ReadOnly(b: boolean) {
-            $('#mode-switch').bootstrapSwitch('setDisabled', b); 
+            if (b) {
+                this.Input.setAttribute('disabled', '');
+                this.Input.setAttribute('readonly', '');
+                this.Input.className += 'disabled';
+            } else {
+                this.Input.removeAttribute('disabled');
+                this.Input.removeAttribute('readonly');
+                $(this.Input).removeClass('disabled');
+            }
         }
 
         Disable(): void {
@@ -71,9 +79,18 @@ module AssureNote {
             $('#mode-switch').bootstrapSwitch('setSizeClass', '')
                 .on('switch-change', (e, ...data) => {
                     var value = data[0].value;
-                    this.SetMode((value) ? AssureNoteMode.Edit : AssureNoteMode.View);
-                    this.App.SocketManager.UpdateEditMode(this.Mode);
+                    if (this.App.IsUserGuest() && value) {
+                        AssureNoteUtils.Notify("Please login first");
+                        this.SetMode(AssureNoteMode.View);
+                        this.ReadOnly(true);
+                    } else {
+                        this.SetMode((value) ? AssureNoteMode.Edit : AssureNoteMode.View);
+                        this.App.SocketManager.UpdateEditMode(this.Mode);
+                    }
                 });
+            if (this.App.IsUserGuest()) {
+                this.ReadOnly(true);
+            }
         }
     }
 }
