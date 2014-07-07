@@ -79,7 +79,7 @@ var AssureNote;
                     data[_i] = arguments[_i + 1];
                 }
                 var value = data[0].value;
-                if (_this.App.IsUserGuest() && value) {
+                if (!_this.App.IsOfflineVersion() && _this.App.IsUserGuest() && value) {
                     AssureNote.AssureNoteUtils.Notify("Please login first");
                     _this.SetMode(1 /* View */);
                     _this.ReadOnly(true);
@@ -88,7 +88,7 @@ var AssureNote;
                     _this.App.SocketManager.UpdateEditMode(_this.Mode);
                 }
             });
-            if (this.App.IsUserGuest()) {
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
                 this.ReadOnly(true);
             }
         };

@@ -577,7 +577,7 @@ var AssureNote;
         };
 
         CommitCommand.prototype.Invoke = function (CommandName, Params) {
-            if (this.App.IsUserGuest()) {
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
                 alert("Please login first.");
                 return;
             }
@@ -680,6 +680,10 @@ var AssureNote;
 
         ShareCommand.prototype.Invoke = function (CommandName, Params) {
             var _this = this;
+            if (this.App.IsOfflineVersion()) {
+                AssureNote.AssureNoteUtils.Notify("This feature is not supported on offline version.");
+                return;
+            }
             if (this.App.IsUserGuest()) {
                 AssureNote.AssureNoteUtils.Notify("Please login first");
                 return;

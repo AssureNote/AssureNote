@@ -93,8 +93,8 @@ var AssureNote;
                 ]),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.ShowHistoryPanelMenuItem(true, "history"),
-                new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
-                new AssureNote.SetMonitorMenuItem(true, "setmonitor"),
+                this.IsOfflineVersion() ? null : new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
+                this.IsOfflineVersion() ? null : new AssureNote.SetMonitorMenuItem(true, "setmonitor"),
                 new AssureNote.ShowNodeCountPanelMenuItem(true, "nodecount")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
@@ -208,6 +208,10 @@ var AssureNote;
                 }
             }
             this.SetLoading(false);
+        };
+
+        AssureNoteApp.prototype.IsOfflineVersion = function () {
+            return window.location.toString().indexOf("file:///") == 0;
         };
 
         AssureNoteApp.prototype.IsUserGuest = function () {

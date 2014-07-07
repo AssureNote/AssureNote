@@ -111,8 +111,16 @@ module AssureNote {
 
     export class SubMenuItem extends TopMenuItem {
 
-        constructor(IsEnabled: boolean, ButtonId: string, private DisplayName: string, private IconName: string, public SubMenuList: TopMenuItem[]) {
+        public SubMenuList: TopMenuItem[];
+
+        constructor(IsEnabled: boolean, ButtonId: string, private DisplayName: string, private IconName: string, SubMenuList: TopMenuItem[]) {
             super(IsEnabled, ButtonId);
+            this.SubMenuList = [];
+            SubMenuList.forEach(menu => {
+                if (menu) {
+                    this.SubMenuList.push(menu);
+                }
+            });
         }
 
         GetIconName(): string {

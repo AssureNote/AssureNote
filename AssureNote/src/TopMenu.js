@@ -116,10 +116,16 @@ var AssureNote;
     var SubMenuItem = (function (_super) {
         __extends(SubMenuItem, _super);
         function SubMenuItem(IsEnabled, ButtonId, DisplayName, IconName, SubMenuList) {
+            var _this = this;
             _super.call(this, IsEnabled, ButtonId);
             this.DisplayName = DisplayName;
             this.IconName = IconName;
-            this.SubMenuList = SubMenuList;
+            this.SubMenuList = [];
+            SubMenuList.forEach(function (menu) {
+                if (menu) {
+                    _this.SubMenuList.push(menu);
+                }
+            });
         }
         SubMenuItem.prototype.GetIconName = function () {
             return this.IconName;

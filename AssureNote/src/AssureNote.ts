@@ -121,8 +121,8 @@ module AssureNote {
                     ]),
                     new DividerMenuItem(true),
                     new ShowHistoryPanelMenuItem(true, "history"),
-                    new ShowMonitorListMenuItem(true, "monitorlist"),
-                    new SetMonitorMenuItem(true, "setmonitor"),
+                    this.IsOfflineVersion() ? null : new ShowMonitorListMenuItem(true, "monitorlist"),
+                    this.IsOfflineVersion() ? null : new SetMonitorMenuItem(true, "setmonitor"),
                     new ShowNodeCountPanelMenuItem(true, "nodecount")
                 ]) );
             this.TopMenu.AppendSubMenu(
@@ -237,6 +237,10 @@ module AssureNote {
                 }
             }
             this.SetLoading(false);
+        }
+
+        IsOfflineVersion(): boolean {
+            return window.location.toString().indexOf("file:///") == 0;
         }
 
         IsUserGuest(): boolean {

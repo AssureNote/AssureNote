@@ -79,7 +79,7 @@ module AssureNote {
             $('#mode-switch').bootstrapSwitch('setSizeClass', '')
                 .on('switch-change', (e, ...data) => {
                     var value = data[0].value;
-                    if (this.App.IsUserGuest() && value) {
+                    if (!this.App.IsOfflineVersion() && this.App.IsUserGuest() && value) {
                         AssureNoteUtils.Notify("Please login first");
                         this.SetMode(AssureNoteMode.View);
                         this.ReadOnly(true);
@@ -88,7 +88,7 @@ module AssureNote {
                         this.App.SocketManager.UpdateEditMode(this.Mode);
                     }
                 });
-            if (this.App.IsUserGuest()) {
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
                 this.ReadOnly(true);
             }
         }

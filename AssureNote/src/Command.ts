@@ -551,7 +551,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            if (this.App.IsUserGuest()) {
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
                 alert("Please login first.");
                 return;
             }
@@ -643,6 +643,10 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
+            if (this.App.IsOfflineVersion()) {
+                AssureNoteUtils.Notify("This feature is not supported on offline version.");
+                return;
+            }
             if (this.App.IsUserGuest()) {
                 AssureNoteUtils.Notify("Please login first");
                 return;
