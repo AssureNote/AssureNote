@@ -1,49 +1,50 @@
-* G
+#0::2014-07-07T15:08:10+0900;unknown;converter;-
+Revision:: 0
+* G1 &5af12d6 #0:0
 [System] is dependable.
 
-* C
-System:: 
+* C1.1 &4432d060 #0:0
+System::
 
-* S
+* S1.2 &5a385a9d #0:0
 Arguing over DEOS Process
 
-** G
-Stakeholders of [System] are defined. 
+** G2 &4a3bb824 #0:0
+Stakeholders of [System] are defined.
 
-** S
+** S2.1 &3a33527f #0:0
 Accountability design
 
-** G
+** G3 &4705adf6 #0:0
 [System] can deliver correct services.
 
-** S
+** S3.1 &7fcfc10c #0:0
 Depen
 
-** G
+** G4 &dec9842 #0:0
 [System] is resilient.
 
-** S
+** S4.1 &1bfc82c #0:0
 Arguing resilience patterns.
 
-*** G
+*** G6 &49f1f823 #0:0
 [System] can detect errors
 
-*** G
+*** G7 &7f7e77ae #0:0
 [System] can prevent failures.
 
-*** G
+*** G8 &555bca8b #0:0
 [System] can recover failures.
 
-** G
+** G5 &5bb7df23 #0:0
 [System] changes.
 
-** S
+** S5.1 &3cd46fd1 #0:0
 [System] is ..
 
-*** G
+*** G9 &71e6ea97 #0:0
 [System] is scalable.
 
-*** G
+*** G10 &26cc3f9f #0:0
 [System] is sustainable.
-
 

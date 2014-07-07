@@ -1,7 +1,8 @@
-#0::2013-11-24T00:00:00+0900;deos;deos;test
-
-*G1 #0:0:0
+#1::2014-07-07T15:10:16+0900;unknown;converter;-
+Revision:: 1
+* G1 &3e49efa #0:0
 System is dependable.
-*C1.1 #0:0:0
+
+* C1.1 &605063aa #0:0
 System is aspen
 

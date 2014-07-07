@@ -1,14 +1,19 @@
-#0::2014-01-05T12:45:37+0900;unknown;converter;-
 #1::2014-01-05T12:46:09+0900;todo;todo;test
+Revision:: 1
+* G1 &7b08a2ad #1:1
+a
+
+* S1.1 &45df0dc8 #1:1
+b
+
+** G2 &7f442f1a #1:1
+c
+
+** G3 &2d7ca000 #1:1
+d
+
+*=====
+#0::2014-01-05T12:45:37+0900;unknown;converter;-
 Revision:: 0
 * G1 &74b27f81 #0:0
-*=====
-Revision:: 1
-* G &7b08a2ad #1:1
-a
-* S &45df0dc8 #1:1
-b
-** G &7f442f1a #1:1
-c
-** G &2d7ca000 #1:1
-d
+
