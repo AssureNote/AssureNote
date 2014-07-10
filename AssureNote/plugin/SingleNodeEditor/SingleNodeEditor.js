@@ -77,7 +77,7 @@ var AssureNote;
                     CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "";
                 }
                 this.App.SingleNodeEditorPanel.UpdateCSS(CSS);
-                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
+                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, true, true);
             } else {
                 AssureNote.AssureNoteUtils.Notify(Label + " is not found");
             }

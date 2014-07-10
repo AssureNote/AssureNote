@@ -39,6 +39,7 @@ var AssureNote;
             this.IsEditRecursive = IsEditRecursive;
             this.Wrapper = Wrapper;
             this.WrapperCSS = WrapperCSS;
+            this.IsEditAppendOnly = false;
             this.Editor = CodeMirror.fromTextArea(TextArea, CodeMirrorConfig);
             $(this.Editor.getWrapperElement()).css({
                 height: "100%",
@@ -53,7 +54,7 @@ var AssureNote;
             this.Element.css(CSS);
         };
 
-        CodeMirrorEditorPanel.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive) {
+        CodeMirrorEditorPanel.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive, IsAppendOnly) {
             var _this = this;
             if (this.Timeout) {
                 this.Element.removeClass();
@@ -65,10 +66,13 @@ var AssureNote;
                 return;
             }
 
+            this.IsEditRecursive = IsRecursive;
+            this.IsEditAppendOnly = IsAppendOnly;
+
             this.Timeout = null;
             var Model = NodeView.Model;
             this.IsVisible = false;
-            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName() });
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "IsAppendOnly": IsAppendOnly, "UserName": this.App.GetUserName() });
 
             this.Editor.getDoc().setValue(WGSN);
             this.OnOutSideClicked = function () {
@@ -96,7 +100,7 @@ var AssureNote;
                 try  {
                     var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
                     var NewNode;
-                    NewNode = Node.ReplaceSubNodeWithText(WGSN, _this.IsEditRecursive);
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, _this.IsEditRecursive, _this.IsEditAppendOnly);
                 } catch (e) {
                     if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
                         AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");

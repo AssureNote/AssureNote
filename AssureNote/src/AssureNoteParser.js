@@ -920,13 +920,14 @@ var AssureNote;
         * @param {Boolean} IsRecursive
         * @return {GSNNode}
         */
-        GSNNode.prototype.ReplaceSubNode = function (NewNode, IsRecursive) {
+        GSNNode.prototype.ReplaceSubNode = function (NewNode, IsRecursive, IsAppendOnly) {
             this.MergeDocHistory(NewNode);
             if (this.ParentNode != null) {
                 for (var i = 0; i < this.ParentNode.SubNodeList.length; i++) {
                     if (this.ParentNode.SubNodeList[i] == this) {
                         this.ParentNode.SubNodeList[i] = NewNode;
                         NewNode.ParentNode = this.ParentNode;
+                        break;
                     }
                 }
             } else {
@@ -934,6 +935,19 @@ var AssureNote;
             }
             if (!IsRecursive) {
                 NewNode.SubNodeList = this.SubNodeList;
+                NewNode.SubNodeList.forEach(function (Node) {
+                    return Node.ParentNode = NewNode;
+                });
+            }
+            if (IsAppendOnly) {
+                if (this.SubNodeList) {
+                    NewNode.SubNodeList = this.SubNodeList.concat(NewNode.SubNodeList);
+                    NewNode.SubNodeList.forEach(function (Node) {
+                        if (Node) {
+                            Node.ParentNode = NewNode;
+                        }
+                    });
+                }
             }
             return NewNode;
         };
@@ -944,7 +958,7 @@ var AssureNote;
         * @param {Boolean} IsRecursive
         * @return {GSNNode}
         */
-        GSNNode.prototype.ReplaceSubNodeWithText = function (DocText, IsRecursive) {
+        GSNNode.prototype.ReplaceSubNodeWithText = function (DocText, IsRecursive, IsAppendOnly) {
             if (!IsRecursive) {
                 DocText = WikiSyntax.CommentOutSubNode(DocText);
             }
@@ -957,7 +971,7 @@ var AssureNote;
                 NewNode = this;
             }
             if (NewNode != null) {
-                NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
+                NewNode = this.ReplaceSubNode(NewNode, IsRecursive, IsAppendOnly);
             }
             return NewNode;
         };

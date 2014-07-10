@@ -30,6 +30,7 @@ module AssureNote {
         Element: JQuery;
         Timeout: number;
         Editor: CodeMirror.Editor;
+        private IsEditAppendOnly: boolean = false;
 
         constructor(public App: AssureNoteApp, private IsEditRecursive: boolean, TextArea: HTMLTextAreaElement, CodeMirrorConfig: CodeMirror.EditorConfiguration, private Wrapper: HTMLElement, public WrapperCSS: any) {
             super(App);
@@ -50,7 +51,7 @@ module AssureNote {
 
         private OnOutSideClicked: () => void;
 
-        EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive: boolean): void {
+        EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive?: boolean, IsAppendOnly? :boolean): void {
             if (this.Timeout) {
                 this.Element.removeClass();
                 clearInterval(this.Timeout);
@@ -61,10 +62,13 @@ module AssureNote {
                 return;
             }
 
+            this.IsEditRecursive = IsRecursive;
+            this.IsEditAppendOnly = IsAppendOnly;
+
             this.Timeout = null;
             var Model = NodeView.Model;
             this.IsVisible = false;
-            this.App.SocketManager.StartEdit({"UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName()});
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "IsAppendOnly": IsAppendOnly, "UserName": this.App.GetUserName()});
 
             this.Editor.getDoc().setValue(WGSN);
             this.OnOutSideClicked = () => {
@@ -91,7 +95,7 @@ module AssureNote {
                 try {
                     var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
                     var NewNode: GSNNode;
-                    NewNode = Node.ReplaceSubNodeWithText(WGSN, this.IsEditRecursive);
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, this.IsEditRecursive, this.IsEditAppendOnly);
                 } catch (e) {
                     if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
                         AssureNoteUtils.Notify("Invalid WGSN is given");

@@ -930,13 +930,14 @@ module AssureNote {
          * @param {Boolean} IsRecursive
          * @return {GSNNode}
          */
-        ReplaceSubNode(NewNode: GSNNode, IsRecursive: boolean): GSNNode {
+        ReplaceSubNode(NewNode: GSNNode, IsRecursive?: boolean, IsAppendOnly?: boolean): GSNNode {
             this.MergeDocHistory(NewNode);
             if (this.ParentNode != null) {
                 for (var i: number = 0; i < this.ParentNode.SubNodeList.length; i++) {
                     if (this.ParentNode.SubNodeList[i] == this) {
                         this.ParentNode.SubNodeList[i] = NewNode;
                         NewNode.ParentNode = this.ParentNode;
+                        break;
                     }
                 }
             }
@@ -945,6 +946,13 @@ module AssureNote {
             }
             if (!IsRecursive) {
                 NewNode.SubNodeList = this.SubNodeList;
+                NewNode.SubNodeList.forEach(Node => Node.ParentNode = NewNode);
+            }
+            if (IsAppendOnly) {
+                if (this.SubNodeList) {
+                    NewNode.SubNodeList = this.SubNodeList.concat(NewNode.SubNodeList);
+                    NewNode.SubNodeList.forEach(Node => { if (Node) { Node.ParentNode = NewNode; } });
+                }
             }
             return NewNode;
         }
@@ -955,7 +963,7 @@ module AssureNote {
          * @param {Boolean} IsRecursive
          * @return {GSNNode}
          */
-        ReplaceSubNodeWithText(DocText: string, IsRecursive: boolean): GSNNode {
+        ReplaceSubNodeWithText(DocText: string, IsRecursive?: boolean, IsAppendOnly? : boolean): GSNNode {
             if (!IsRecursive) {
                 DocText = WikiSyntax.CommentOutSubNode(DocText);
             }
@@ -968,7 +976,7 @@ module AssureNote {
                 NewNode = this;
             }
             if (NewNode != null) {
-                NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
+                NewNode = this.ReplaceSubNode(NewNode, IsRecursive, IsAppendOnly);
             }
             return NewNode;
         }
