@@ -33,7 +33,7 @@ module AssureNote {
         }
         println(s: string): void {
             this.print(s);
-            this.newline;
+            this.newline();
         }
         newline(): void {
             this.print("\n");
@@ -172,17 +172,6 @@ module AssureNote {
                     break;
             }
             return "U";
-        }
-
-        /**
-         * @method FormatRefKey
-         * @static
-         * @param {GSNType} NodeType
-         * @param {String} HistoryTaple
-         * @return {String}
-         */
-        public static FormatRefKey(NodeType: GSNType, HistoryTaple: string): string {
-            return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
         }
 
         /**
@@ -343,21 +332,22 @@ module AssureNote {
                     return "";
                 }
                 return line.map((part) => {
-                    if (part.type == "text") {
-                        return part.value;
-                    } else if (part.type == "def") {
-                        Flags.HasTagDefinition = true;
-                        if (part.value) {
-                            Tags[part.name] = part.value;
-                            return part.name + ":: " + part.value;
-                        }
-                        return part.name + ":: ";
-                    } else if (part.type == "param") {
-                        Flags.HasTagReference = true;
-                        return "[" + part.ref + "]";
-                    } else if (part.type == "node") {
-                        Flags.HasNodeReference = true;
-                        return "[" + part.ref + "]";
+                    switch(part.type){
+                        case "text":
+                            return part.value;
+                        case "def":
+                            Flags.HasTagDefinition = true;
+                            if (part.value) {
+                                Tags[part.name] = part.value;
+                                return part.name + ":: " + part.value;
+                            }
+                            return part.name + ":: ";
+                        case "param":
+                            Flags.HasTagReference = true;
+                            return "[" + part.ref + "]";
+                        case "node":
+                            Flags.HasNodeReference = true;
+                            return "[" + part.ref + "]";
                     }
                 }).join("");
             }).join("\n");
@@ -373,6 +363,9 @@ module AssureNote {
 
             var ParsedNode = new GSNNode(this.BaseDoc, Parent, GSNType[Node.type], null, UID, History);
             ParsedNode.NodeDoc = this.ConvertBody(Node.body, Flags, Tags);
+            if (Node.id != null && Node.id.length > 0) {
+                ParsedNode.LabelName = NodeTypeSymbol + ":" + Node.id;
+            }
 
             if (Flags.HasTagDefinition) {
                 ParsedNode.TagMap = Tags;
@@ -555,13 +548,13 @@ module AssureNote {
             NewNode.Digest = this.Digest;
             NewNode.NodeDoc = this.NodeDoc;
             NewNode.HasTag = this.HasTag;
+            NewNode.HasTagOrLabelReference = this.HasTagOrLabelReference;
             if (BaseDoc != null) {
                 BaseDoc.AddNodeWithoutCheck(NewNode);
             }
-            for (var i: number = 0; i < this.NonNullSubNodeList().length; i++) {
-                var Node: GSNNode = this.NonNullSubNodeList()[i];
+            this.NonNullSubNodeList().forEach((Node) => {
                 Node.DeepCopy(BaseDoc, NewNode);
-            }
+            });
             return NewNode;
         }
 
@@ -737,9 +730,10 @@ module AssureNote {
          */
         AppendSubNode(Node: GSNNode): void {
             if (this.SubNodeList == null) {
-                this.SubNodeList = [];
+                this.SubNodeList = [Node];
+            } else {
+                this.SubNodeList.push(Node);
             }
-            this.SubNodeList.push(Node);
         }
 
         /**
@@ -847,16 +841,16 @@ module AssureNote {
 
         /**
          * @method FormatNode
+         * Stringfy subtree for saving WGSN file.
          * @param {StringWriter} Writer
          */
         FormatNode(Writer: StringWriter): void {
             Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
             Writer.print(" ");
+            Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+            Writer.print(this.AssignedLabelNumber);
             if (this.LabelName != null) {
-                Writer.print(this.LabelName);
-            } else {
-                Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-                Writer.print(this.AssignedLabelNumber);
+                Writer.print(this.LabelName.substr(1));
             }
             Writer.print(" &");
             Writer.print(this.UID.toString(16));
@@ -865,7 +859,7 @@ module AssureNote {
                 Writer.print(" " + HistoryTaple);
             }
             Writer.newline();
-            if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
+            if (this.NodeDoc != null && this.NodeDoc.length != 0) {
                 Writer.print(this.NodeDoc);
                 Writer.newline();
             }
@@ -886,48 +880,47 @@ module AssureNote {
 
         /**
          * @method FormatSubNode
+         * Stringfy subtree for editing.
          * @param {Number} GoalLevel
          * @param {StringWriter} Writer
          * @param {Boolean} IsRecursive
          */
-        // SubNode
         FormatSubNode(GoalLevel: number, Writer: StringWriter, IsRecursive: boolean): void {
             Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
             Writer.print(" ");
+            // "G1"
+            Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+            Writer.print(this.AssignedLabelNumber);
             if (this.LabelName != null) {
-                Writer.print(this.LabelName);
-            } else {
-                Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-                Writer.print(this.AssignedLabelNumber);
+                // ":TopGoal"
+                Writer.print(this.LabelName.substr(1));
             }
             Writer.print(" &");
             Writer.print(Lib.DecToHex(this.UID));
-            // Stream.append(" ");
-            // MD5.FormatDigest(this.Digest, Stream);
             Writer.newline();
             if (this.NodeDoc != null && this.NodeDoc.length != 0) {
                 Writer.println(this.NodeDoc);
             }
             if (!IsRecursive) return;
             Writer.newline();
-            if (this.NonNullSubNodeList() != null) {
-                this.NonNullSubNodeList().forEach((Node) => {
-                    if (Node.IsContext()) {
-                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
-                    }
-                });
-                this.NonNullSubNodeList().forEach((Node) => {
-                    if (!Node.IsContext()) {
-                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
-                    }
-                });
-            }
+            this.NonNullSubNodeList().forEach((Node) => {
+                if (Node.IsContext()) {
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
+                }
+            });
+            this.NonNullSubNodeList().forEach((Node) => {
+                if (!Node.IsContext()) {
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
+                }
+            });
         }
 
         /**
          * @method ReplaceSubNode
-         * @param {GSNNode} NewNode
-         * @param {Boolean} IsRecursive
+         * Replace this subtree with given tree.
+         * @param {GSNNode} NewNode The tree with which replace this subtree.
+         * @param {Boolean} IsRecursive If true is given, replace all nodes under this node. Otherwise, replace only this node.
+         * @param {Boolean} IsAppendOnly If true is given, append newly appeared nodes but do not remove disappeared nodes.
          * @return {GSNNode}
          */
         ReplaceSubNode(NewNode: GSNNode, IsRecursive?: boolean, IsAppendOnly?: boolean): GSNNode {
@@ -948,19 +941,26 @@ module AssureNote {
                 NewNode.SubNodeList = this.SubNodeList;
                 NewNode.SubNodeList.forEach(Node => Node.ParentNode = NewNode);
             }
-            if (IsAppendOnly) {
-                if (this.SubNodeList) {
-                    NewNode.SubNodeList = this.SubNodeList.concat(NewNode.SubNodeList);
-                    NewNode.SubNodeList.forEach(Node => { if (Node) { Node.ParentNode = NewNode; } });
+            if (IsAppendOnly && this.SubNodeList) {
+                if (NewNode.SubNodeList) {
+                    NewNode.SubNodeList.forEach(Node => {
+                        if (Node) {
+                            Node.ParentNode = NewNode;
+                            this.SubNodeList.push(Node);
+                        }
+                    });
                 }
+                NewNode.SubNodeList = this.SubNodeList;
             }
             return NewNode;
         }
 
         /**
          * @method ReplaceSubNodeWithText
-         * @param {String} DocText
-         * @param {Boolean} IsRecursive
+         * Replace this subtree with given tree.
+         * @param {String} DocText The tree in WGSN format with which replace this subtree.
+         * @param {Boolean} IsRecursive If true is given, replace all nodes under this node. Otherwise, replace only this node.
+         * @param {Boolean} IsAppendOnly If true is given, append newly appeared nodes but do not remove disappeared nodes.
          * @return {GSNNode}
          */
         ReplaceSubNodeWithText(DocText: string, IsRecursive?: boolean, IsAppendOnly? : boolean): GSNNode {
@@ -1112,7 +1112,9 @@ module AssureNote {
             var queue: GSNNode[] = [this];
             var CurrentNode: GSNNode;
             while ((CurrentNode = queue.shift()) != null) {
-                while (LabelMap[GoalCount.toString()] != null) GoalCount++;
+                while (LabelMap[GoalCount.toString()] != null) {
+                    GoalCount++;
+                }
                 CurrentNode.AssignedLabelNumber = GoalCount.toString();
                 GoalCount++;
                 var BufferList: GSNNode[] = [];
@@ -1125,13 +1127,9 @@ module AssureNote {
                     SectionNode.AssignedLabelNumber = LabelNumber;
                 }
                 BufferList = [];
-
                 CurrentNode.ListSubGoalNode(BufferList);
-                for (var i: number = 0; i < BufferList.length; i++) {
-                    var GoalNode: GSNNode = BufferList[i];
-                    queue.push(GoalNode);
-                    NextGoalCount += 1;
-                }
+                Array.prototype.push.apply(queue, BufferList);
+                NextGoalCount += BufferList.length;
             }
         }
 
@@ -1150,14 +1148,13 @@ module AssureNote {
          * @return {Array<GSNNode>}
          */
         SearchNode(SearchWord: string): Array<GSNNode> {
-            var NodeList: Array<GSNNode> = new Array<GSNNode>();
-            if (Lib.String_matches(this.NodeDoc, SearchWord)) {
-                Lib.Array_add(NodeList, this);
+            var NodeList: Array<GSNNode> = [];
+            if (this.NodeDoc.indexOf(SearchWord) >= 0) {
+                NodeList.push(this);
             }
-            for (var i: number = 0; i < this.NonNullSubNodeList().length; i++) {
-                var Node: GSNNode = this.NonNullSubNodeList()[i];
-                Lib.Array_addAll(NodeList, Node.SearchNode(SearchWord));
-            }
+            this.NonNullSubNodeList().forEach((Node) => {
+                Array.prototype.push.apply(NodeList, Node.SearchNode(SearchWord));
+            });
             return NodeList;
         }
 
@@ -1355,14 +1352,13 @@ module AssureNote {
         GetLabelMap(): { [index: string]: string } {
             var LabelMap: { [index: string]: string } = {};
             var CurrentNode: GSNNode;
-            var queue: GSNNode[] = [];
-            queue.push(this.TopNode);
+            var queue: GSNNode[] = [this.TopNode];
             while ((CurrentNode = queue.shift()) != null) {
                 if (CurrentNode.LabelName != null) {
                     LabelMap[CurrentNode.LabelName] = CurrentNode.GetLabel();
                 }
-                for (var i: number = 0; CurrentNode.SubNodeList != null && i < CurrentNode.SubNodeList.length; i++) {
-                    queue.push(CurrentNode.SubNodeList[i]);
+                if (CurrentNode.SubNodeList) {
+                    Array.prototype.push.apply(queue, CurrentNode.SubNodeList);
                 }
             }
             return LabelMap;
@@ -1417,10 +1413,7 @@ module AssureNote {
          */
         DeepCopy(): GSNRecord {
             var NewRecord: GSNRecord = new GSNRecord();
-            for (var i: number = 0; i < this.HistoryList.length; i++) {
-                var Item: GSNHistory = this.HistoryList[i];
-                NewRecord.HistoryList.push(Item);
-            }
+            NewRecord.HistoryList = this.HistoryList.map(x => x);
             NewRecord.EditingDoc = this.EditingDoc;
             return NewRecord;
         }
@@ -1461,7 +1454,7 @@ module AssureNote {
          */
         NewHistory(Author: string, Role: string, ModefiedDate: Date, Process: string, Doc: GSNDoc): GSNHistory {
             var History: GSNHistory = new GSNHistory(this.HistoryList.length, Author, Role, ModefiedDate, Process, Doc);
-            Lib.Array_add(this.HistoryList, History);
+            this.HistoryList.push(History);
             return History;
         }
 
@@ -1484,7 +1477,7 @@ module AssureNote {
                     var OldHistory: GSNHistory = this.HistoryList[Rev];
                     OldHistory.UpdateHistory(Rev, Author, Role, ModefiedDate, Process, Doc);
                 }
-                Lib.Array_set(this.HistoryList, Rev, History);
+                this.HistoryList[Rev] = History;
                 if (Doc != null) {
                     Doc.DocHistory = History;
                 }
@@ -1533,7 +1526,7 @@ module AssureNote {
          */
         public DiscardEditor(): void {
             this.EditingDoc = null;
-            Lib.Array_remove(this.HistoryList, this.HistoryList.length - 1);
+            this.HistoryList.pop();
 
         }
 
@@ -1569,7 +1562,7 @@ module AssureNote {
          * @param {Number} CommonRevision Both this and NewRecord have one or more newer revisions.
          */
         private MergeConflict(BranchRecord: GSNRecord, CommonRevision: number): void {
-            var MasterHistory: GSNHistory = Lib.Array_get(this.HistoryList, this.HistoryList.length - 1);
+            var MasterHistory: GSNHistory = this.HistoryList[this.HistoryList.length - 1];
             var BranchHistory: GSNHistory = null;
             for (var i: number = CommonRevision + 1; i < BranchRecord.HistoryList.length; i++) {
                 BranchHistory = BranchRecord.HistoryList[i];
@@ -1628,7 +1621,7 @@ module AssureNote {
                     }
                 }
                 if (History2 == null || History2.Doc == null) {
-                    if (Rev2 < Lib.Array_size(Record2.HistoryList)) {
+                    if (Rev2 < Record2.HistoryList.length) {
                         Rev2++; continue;
                     }
                 }
@@ -1673,7 +1666,7 @@ module AssureNote {
          */
         public FormatRecord(Writer: StringWriter): void {
             var DocCount: number = 0;
-            for (var i: number = Lib.Array_size(this.HistoryList) - 1; i >= 0; i--) {
+            for (var i: number = this.HistoryList.length - 1; i >= 0; i--) {
                 var Doc: GSNDoc = this.GetHistoryDoc(i);
                 if (Doc != null) {
                     if (DocCount > 0) {
@@ -1832,56 +1825,6 @@ module AssureNote {
 
         static String_matches(self: string, str: string): boolean {
             return self.match(str) != null;
-        }
-
-        static Array_get(self: any[], index: number): any {
-            if (index >= self.length) {
-                throw new RangeError("invalid array index");
-            }
-            return self[index];
-        }
-        static Array_set(self: any[], index: number, value: any): void {
-            self[index] = value;
-        }
-        static Array_add(self: any[], obj: any): void {
-            self.push(obj);
-        }
-        static Array_add2(self: any[], index: number, obj: any): void {
-            self.splice(index, 0, obj);
-        }
-        static Array_addAll(self: any[], obj: any): void {
-            Array.prototype.push.apply(self, obj);
-        }
-        static Array_size(self: any[]): number {
-            return self.length;
-        }
-        static Array_clear(self: any[]): void {
-            self.length = 0;
-        }
-        static Array_remove(self: any[], index: any): any {
-            if (typeof index == 'number') {
-                if (index >= self.length) {
-                    throw new RangeError("invalid array index");
-                }
-            } else {
-                var item = index;
-                index = 0;
-                for (var j in self) {
-                    if (self[j] === index) break;
-                }
-                if (j == self.length) return null;
-            }
-            var v = self[index];
-            self.splice(index, 1);
-            return v;
-        }
-
-        static Object_equals(self: any, obj: any): boolean {
-            return (self === obj);
-        }
-
-        static Object_InstanceOf(self: any, klass: any): boolean {
-            return (<any>self).constructor == klass;
         }
     }
 

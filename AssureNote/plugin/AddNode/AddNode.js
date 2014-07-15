@@ -107,13 +107,13 @@ var AssureNote;
             var NodeType = View.GetNodeType();
             switch (NodeType) {
                 case 0 /* Goal */:
-                    res = res.concat([
+                    res = [
                         this.CreateContextMenu(View),
                         this.CreateStrategyMenu(View),
-                        this.CreateEvidenceMenu(View)]);
+                        this.CreateEvidenceMenu(View)];
                     break;
                 case 2 /* Strategy */:
-                    res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
+                    res = [this.CreateContextMenu(View), this.CreateGoalMenu(View)];
                     break;
                 case 1 /* Context */:
                     break;

@@ -63,10 +63,10 @@ module AssureNote {
             var SvgConnectionFragment = document.createDocumentFragment();
             var Dummy = document.createDocumentFragment();
 
-            var t0 = AssureNoteUtils.GetTime();
+            //var t0 = AssureNoteUtils.GetTime();
             this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
-            var t1 = AssureNoteUtils.GetTime();
-            console.log("Render: " + (t1 - t0));
+            //var t1 = AssureNoteUtils.GetTime();
+            //console.log("Render: " + (t1 - t0));
 
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayerConnectorGroup.appendChild(SvgConnectionFragment);
@@ -75,15 +75,15 @@ module AssureNote {
             Dummy.appendChild(DivFragment);
             Dummy.appendChild(SvgConnectionFragment);
             Dummy.appendChild(SvgNodeFragment);
-            var t2 = AssureNoteUtils.GetTime();
-            console.log("NodeSize: " + (t2 - t1));
+            //var t2 = AssureNoteUtils.GetTime();
+            //console.log("NodeSize: " + (t2 - t1));
 
             this.Layout(NodeView);
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
-            var t3 = AssureNoteUtils.GetTime();
-            console.log("Layout: " + (t3 - t2));
+            //var t3 = AssureNoteUtils.GetTime();
+            //console.log("Layout: " + (t3 - t2));
         }
 
         private PrepareNodeSize(ThisNode: NodeView): void {

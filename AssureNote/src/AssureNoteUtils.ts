@@ -155,6 +155,10 @@ module AssureNote {
             Callback(rest, i);
         }
 
+        export function RemoveFirstLine(Text: string): string {
+            return Text.replace(/^.+$(\r\n|\r|\n)?/m, "");
+        }
+
         var minute: number = 60 * 1000;
         var hour: number = minute * 60;
         var day: number = hour * 24;

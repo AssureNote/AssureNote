@@ -27,8 +27,13 @@
       <div id="content-layer" class="zero-size-layer"></div>
       <div id="editor-background" style="display: none;" class="full-size-layer"></div>
       <div id="control-layer" class="zero-size-layer">
-        <div id="singlenode-editor-wrapper" style="border: 1px solid black">
-          <textarea id="singlenode-editor" placeholder="Type something..." style="display: none;"></textarea>
+        <div id="singlenode-editor-wrapper" style="border: 2px solid black; display:none;" class="node">
+          <div style="padding: 5px 10px; width: 100%; height: 100%;">
+            <h4 style="display: inline;" class="singlenode-editor nodenumber"></h4>&nbsp;:
+            <input type="text" placeholder="label" style="width: 65%; height: auto; border: 0px;" class="singlenode-editor nodelabel">
+            <textarea id="singlenode-editor" placeholder="Type something..." style="width: 100%; height: auto; resize: none; border: 0px; overflow: hidden;"></textarea>
+            <pre style="position: absolute; padding: 2px; border: 0px; width: 100%; visibility: hidden; font-size: inherit;" class="singlenode-editor dummydiv node"></pre>
+          </div>
         </div>
       </div>
       <div id="fixed-control-layer" style="width: 100%;" class="zero-size-layer">
@@ -243,37 +248,37 @@
     <script type="text/javascript" src="./plugin/LastModified/LastModified.js" async="async"></script>
     <script type="text/javascript" src="./plugin/VariableInterpolation/VariableInterpolation.js" async="async"></script>
     <script type="text/javascript" src="./plugin/MonitorNode/MonitorNode.js"></script>
-    <script id="default-case-ja" type="text/wgsn">
-      * G &2422f9c3
-      ゴール: ある性質が成り立つという主張
-      * C &45255f17
-      前提: 主張が成り立つ状況
-      * S &137c4f60
-      戦略: 主張を分解する指標
-      ** G &35938c38
-      サブゴール: 分解された主張
-      ** E &654abc0c
-      証拠: サブゴールの成立を支持する事実
-      ** C &6072c487
-      反証: 証拠に対する反例
-      ** G &152377e9
-      未達成なサブゴール
+    <script id="default-case-ja" type="text/wgsn">* G &2422f9c3
+ゴール: ある性質が成り立つという主張
+* C &45255f17
+前提: 主張が成り立つ状況
+* S &137c4f60
+戦略: 主張を分解する指標
+** G &35938c38
+サブゴール: 分解された主張
+** E &654abc0c
+証拠: サブゴールの成立を支持する事実
+** C &6072c487
+反証: 証拠に対する反例
+** G &152377e9
+未達成なサブゴール
+
     </script>
-    <script id="default-case-en" type="text/wgsn">
-      * G &2422f9c3
-      Goal: A claim that a system certainly has some desirable properties.
-      * C &45255f17
-      Context: A contextual artefact.
-      * S &137c4f60
-      Strategy: A reason for claim decomposition.
-      ** G &35938c38
-      SubGoal
-      ** E &654abc0c
-      Evidence:  A piece of materials to support that the linked claim.
-      ** C &6072c487
-      Rebuttal
-      ** G &152377e9
-      Undeveloped
+    <script id="default-case-en" type="text/wgsn">* G &2422f9c3
+Goal: A claim that a system certainly has some desirable properties.
+* C &45255f17
+Context: A contextual artefact.
+* S &137c4f60
+Strategy: A reason for claim decomposition.
+** G &35938c38
+SubGoal
+** E &654abc0c
+Evidence:  A piece of materials to support that the linked claim.
+** C &6072c487
+Rebuttal
+** G &152377e9
+Undeveloped
+
     </script>
     <script type="text/javascript" src="./index.js"></script>
   </body>

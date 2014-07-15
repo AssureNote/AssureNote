@@ -100,12 +100,12 @@ module AssureNote {
             var NodeType = View.GetNodeType();
             switch (NodeType) {
                 case GSNType.Goal:
-                    res = res.concat([this.CreateContextMenu(View),
+                    res = [this.CreateContextMenu(View),
                         this.CreateStrategyMenu(View),
-                        this.CreateEvidenceMenu(View)]);
+                        this.CreateEvidenceMenu(View)];
                     break;
                 case GSNType.Strategy:
-                    res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
+                    res = [this.CreateContextMenu(View), this.CreateGoalMenu(View)];
                     break;
                 case GSNType.Context:
                     break;

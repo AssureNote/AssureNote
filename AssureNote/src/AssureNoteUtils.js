@@ -110,6 +110,11 @@ var AssureNote;
         }
         AssureNoteUtils.ForeachLine = ForeachLine;
 
+        function RemoveFirstLine(Text) {
+            return Text.replace(/^.+$(\r\n|\r|\n)?/m, "");
+        }
+        AssureNoteUtils.RemoveFirstLine = RemoveFirstLine;
+
         var minute = 60 * 1000;
         var hour = minute * 60;
         var day = hour * 24;
