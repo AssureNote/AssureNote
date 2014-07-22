@@ -58,14 +58,24 @@ module AssureNote {
             } else {
                 head = this.App.MasterRecord.GetLatestDoc().TopNode;
             }
+
+            var Counts: any = head.GetNodeCountForEachType();
+            var AllCount = 0;
+            for (var k in Counts) {
+                AllCount += Counts[k];
+            }
+
             var t = <any>{
                 Name: head.GetLabel(),
                 Count: {
-                    All: head.GetNodeCount(),
-                    Goal: head.GetNodeCountTypeOf(GSNType.Goal),
-                    Evidence: head.GetNodeCountTypeOf(GSNType.Evidence),
-                    Context: head.GetNodeCountTypeOf(GSNType.Context),
-                    Strategy: head.GetNodeCountTypeOf(GSNType.Strategy)
+                    All: AllCount,
+                    Goal: Counts[GSNType.Goal],
+                    Evidence: Counts[GSNType.Evidence],
+                    Context: Counts[GSNType.Context],
+                    Assumption: Counts[GSNType.Assumption],
+                    Justification: Counts[GSNType.Justification],
+                    Exception: Counts[GSNType.Exception],
+                    Strategy: Counts[GSNType.Strategy]
                 }
             };
 

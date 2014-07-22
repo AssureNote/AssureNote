@@ -1171,6 +1171,26 @@ var AssureNote;
             });
             return res;
         };
+
+        GSNNode.prototype.GetNodeCountForEachType = function (map) {
+            if (!map) {
+                map = {};
+                map[6 /* Assumption */] = 0;
+                map[1 /* Context */] = 0;
+                map[8 /* Contract */] = 0;
+                map[3 /* Evidence */] = 0;
+                map[7 /* Exception */] = 0;
+                map[0 /* Goal */] = 0;
+                map[5 /* Justification */] = 0;
+                map[2 /* Strategy */] = 0;
+                map[4 /* Undefined */] = 0;
+            }
+            map[this.NodeType]++;
+            this.NonNullSubNodeList().forEach(function (Node) {
+                Node.GetNodeCountForEachType(map);
+            });
+            return map;
+        };
         return GSNNode;
     })();
     AssureNote.GSNNode = GSNNode;

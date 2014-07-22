@@ -64,14 +64,24 @@ var AssureNote;
             } else {
                 head = this.App.MasterRecord.GetLatestDoc().TopNode;
             }
+
+            var Counts = head.GetNodeCountForEachType();
+            var AllCount = 0;
+            for (var k in Counts) {
+                AllCount += Counts[k];
+            }
+
             var t = {
                 Name: head.GetLabel(),
                 Count: {
-                    All: head.GetNodeCount(),
-                    Goal: head.GetNodeCountTypeOf(0 /* Goal */),
-                    Evidence: head.GetNodeCountTypeOf(3 /* Evidence */),
-                    Context: head.GetNodeCountTypeOf(1 /* Context */),
-                    Strategy: head.GetNodeCountTypeOf(2 /* Strategy */)
+                    All: AllCount,
+                    Goal: Counts[0 /* Goal */],
+                    Evidence: Counts[3 /* Evidence */],
+                    Context: Counts[1 /* Context */],
+                    Assumption: Counts[6 /* Assumption */],
+                    Justification: Counts[5 /* Justification */],
+                    Exception: Counts[7 /* Exception */],
+                    Strategy: Counts[2 /* Strategy */]
                 }
             };
 

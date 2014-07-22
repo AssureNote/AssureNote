@@ -1178,6 +1178,26 @@ module AssureNote {
             return res;
         }
 
+        GetNodeCountForEachType(map?: { [index: number]: number }): { [index: number]: number } {
+            if (!map) {
+                map = {};
+                map[GSNType.Assumption] = 0;
+                map[GSNType.Context] = 0;
+                map[GSNType.Contract] = 0;
+                map[GSNType.Evidence] = 0;
+                map[GSNType.Exception] = 0;
+                map[GSNType.Goal] = 0;
+                map[GSNType.Justification] = 0;
+                map[GSNType.Strategy] = 0;
+                map[GSNType.Undefined] = 0;
+            }
+            map[this.NodeType]++;
+            this.NonNullSubNodeList().forEach((Node) => {
+                Node.GetNodeCountForEachType(map);
+            });
+            return map;
+        }
+
     }
 
     /**
