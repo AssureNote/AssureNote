@@ -61,17 +61,25 @@ module AssureNote {
             this.Element.empty();
             var h = this.App.MasterRecord.HistoryList[this.Index];
             var message = h.GetCommitMessage() || "(No Commit Message)";
+            var Counts: any = h.Doc.GetNodeCountForEachType();
+            var AllCount = 0;
+            for (var k in Counts) {
+                AllCount += Counts[k];
+            }
             var t = <any>{
                 Message: message,
                 User: h.Author,
                 DateTime: AssureNoteUtils.FormatDate(h.Date.toUTCString()),
                 DateTimeString: Date.toLocaleString(),
                 Count: {
-                    All: h.Doc.GetNodeCount(),
-                    Goal:     h.Doc.GetNodeCountTypeOf(GSNType.Goal),
-                    Evidence: h.Doc.GetNodeCountTypeOf(GSNType.Evidence),
-                    Context:  h.Doc.GetNodeCountTypeOf(GSNType.Context),
-                    Strategy: h.Doc.GetNodeCountTypeOf(GSNType.Strategy)
+                    All: AllCount,
+                    Goal: Counts[GSNType.Goal],
+                    Evidence: Counts[GSNType.Evidence],
+                    Context: Counts[GSNType.Context],
+                    Assumption: Counts[GSNType.Assumption],
+                    Justification: Counts[GSNType.Justification],
+                    Exception: Counts[GSNType.Exception],
+                    Strategy: Counts[GSNType.Strategy]
                 }
             };
 
@@ -80,10 +88,13 @@ module AssureNote {
             $("#history-panel-count").tooltip({
                 html: true,
                 title: 
-                      "Goal: " + t.Count.Goal + ""
-                    + "<br>Evidence: " + t.Count.Evidence + ""
-                    + "<br>Context: "  + t.Count.Context  + ""
-                    + "<br>Strategy: " + t.Count.Strategy + ""
+                      "Goal: " + t.Count.Goal
+                      + "<br>Evidence: " + t.Count.Evidence
+                      + "<br>Context: " + t.Count.Context
+                      + "<br>Assumption: " + t.Count.Assumption
+                      + "<br>Justification: " + t.Count.Justification
+                      + "<br>Exception: " + t.Count.Exception
+                      + "<br>Strategy: " + t.Count.Strategy
             });
 
             if (this.Index == 0) {

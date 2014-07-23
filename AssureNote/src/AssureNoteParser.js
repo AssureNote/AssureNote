@@ -1172,6 +1172,10 @@ var AssureNote;
             return res;
         };
 
+        /**
+        * @method GetNodeCountForEachType
+        * @return A map from GSNType to count
+        */
         GSNNode.prototype.GetNodeCountForEachType = function (map) {
             if (!map) {
                 map = {};
@@ -1185,7 +1189,7 @@ var AssureNote;
                 map[2 /* Strategy */] = 0;
                 map[4 /* Undefined */] = 0;
             }
-            map[this.NodeType]++;
+            ++map[this.NodeType];
             this.NonNullSubNodeList().forEach(function (Node) {
                 Node.GetNodeCountForEachType(map);
             });
@@ -1381,7 +1385,7 @@ var AssureNote;
         * @return {Number}
         */
         GSNDoc.prototype.GetNodeCount = function () {
-            return this.TopNode.GetNodeCount();
+            return Object.keys(this.NodeMap).length;
         };
 
         /**
@@ -1390,7 +1394,32 @@ var AssureNote;
         * @return {Number}
         */
         GSNDoc.prototype.GetNodeCountTypeOf = function (type) {
-            return this.TopNode.GetNodeCountTypeOf(type);
+            var count = 0;
+            this.ForEachNode(function (Node) {
+                count += Node.NodeType == type ? 1 : 0;
+            });
+            return count;
+        };
+
+        /**
+        * @method GetNodeCountForEachType
+        * @return A map from GSNType to count
+        */
+        GSNDoc.prototype.GetNodeCountForEachType = function () {
+            var map = {};
+            map[6 /* Assumption */] = 0;
+            map[1 /* Context */] = 0;
+            map[8 /* Contract */] = 0;
+            map[3 /* Evidence */] = 0;
+            map[7 /* Exception */] = 0;
+            map[0 /* Goal */] = 0;
+            map[5 /* Justification */] = 0;
+            map[2 /* Strategy */] = 0;
+            map[4 /* Undefined */] = 0;
+            this.ForEachNode(function (Node) {
+                ++map[Node.NodeType];
+            });
+            return map;
         };
 
         /**

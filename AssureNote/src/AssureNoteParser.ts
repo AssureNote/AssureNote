@@ -1178,6 +1178,10 @@ module AssureNote {
             return res;
         }
 
+        /**
+         * @method GetNodeCountForEachType
+         * @return A map from GSNType to count 
+         */
         GetNodeCountForEachType(map?: { [index: number]: number }): { [index: number]: number } {
             if (!map) {
                 map = {};
@@ -1191,7 +1195,7 @@ module AssureNote {
                 map[GSNType.Strategy] = 0;
                 map[GSNType.Undefined] = 0;
             }
-            map[this.NodeType]++;
+            ++map[this.NodeType];
             this.NonNullSubNodeList().forEach((Node) => {
                 Node.GetNodeCountForEachType(map);
             });
@@ -1389,7 +1393,7 @@ module AssureNote {
          * @return {Number}
          */
         GetNodeCount(): number {
-            return this.TopNode.GetNodeCount();
+            return Object.keys(this.NodeMap).length;
         }
 
         /**
@@ -1398,7 +1402,28 @@ module AssureNote {
          * @return {Number}
          */
         GetNodeCountTypeOf(type: GSNType): number {
-            return this.TopNode.GetNodeCountTypeOf(type);
+            var count = 0;
+            this.ForEachNode((Node) => { count += Node.NodeType == type ? 1 : 0; });
+            return count;
+        }
+
+        /**
+         * @method GetNodeCountForEachType
+         * @return A map from GSNType to count 
+         */
+        GetNodeCountForEachType(): { [index: number]: number } {
+            var map : any = {};
+            map[GSNType.Assumption] = 0;
+            map[GSNType.Context] = 0;
+            map[GSNType.Contract] = 0;
+            map[GSNType.Evidence] = 0;
+            map[GSNType.Exception] = 0;
+            map[GSNType.Goal] = 0;
+            map[GSNType.Justification] = 0;
+            map[GSNType.Strategy] = 0;
+            map[GSNType.Undefined] = 0;
+            this.ForEachNode((Node) => { ++map[Node.NodeType]; });
+            return map;
         }
 
         /**
