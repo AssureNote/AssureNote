@@ -53,13 +53,12 @@ var AssureNote;
             } else {
                 Label = Params[0].toUpperCase();
             }
-            var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                if (TargetView.GetNodeType() == 2 /* Strategy */) {
-                    AssureNote.AssureNoteUtils.Notify("Subtree editor cannot open at Strategy");
-                    return;
-                }
+                //if (TargetView.GetNodeType() == GSNType.Strategy) {
+                //    AssureNoteUtils.Notify("Subtree editor cannot open at Strategy");
+                //    return;
+                //}
                 var Writer = new AssureNote.StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, true);
                 this.App.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
