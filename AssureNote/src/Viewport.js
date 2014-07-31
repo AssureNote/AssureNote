@@ -551,11 +551,13 @@ var AssureNote;
         ViewportManager.prototype.UpdateAttr = function () {
             var OffsetPageX = this.GetOffsetPageX();
             var OffsetPageY = this.GetOffsetPageY();
-            var attr = ViewportManager.CreateTranformAttr(OffsetPageX, OffsetPageY, this.Scale);
-            var style = ViewportManager.CreateTransformStyle(OffsetPageX, OffsetPageY, this.Scale);
-            this.SVGLayer.setAttribute("transform", attr);
-            AssureNote.AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
-            AssureNote.AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
+            if (!isNaN(OffsetPageX) && !isNaN(OffsetPageY)) {
+                var attr = ViewportManager.CreateTranformAttr(OffsetPageX, OffsetPageY, this.Scale);
+                var style = ViewportManager.CreateTransformStyle(OffsetPageX, OffsetPageY, this.Scale);
+                this.SVGLayer.setAttribute("transform", attr);
+                AssureNote.AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
+                AssureNote.AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
+            }
             if (this.OnScroll) {
                 this.OnScroll(this);
             }
