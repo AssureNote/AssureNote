@@ -51,6 +51,8 @@ var AssureNote;
             } else {
                 this.Input.removeAttribute('checked');
             }
+            this.App.TopMenu.Update();
+            this.App.TopMenuRight.Update();
         };
 
         ModeManager.prototype.ReadOnly = function (b) {

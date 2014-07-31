@@ -133,7 +133,7 @@ module AssureNote {
                     new DummyMenuItem("Redo (Coming soon)", "step-forward"),
                     new DividerMenuItem(true),
                     new CopyMenuItem(true),
-                    new PasteMenuItem(true),
+                    new PasteMenuItem(false),
                     new DividerMenuItem(true),
                     new SearchMenuItem(true),
                     new CommitMenuItem(true)

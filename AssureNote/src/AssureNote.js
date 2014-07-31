@@ -102,7 +102,7 @@ var AssureNote;
                 new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.CopyMenuItem(true),
-                new AssureNote.PasteMenuItem(true),
+                new AssureNote.PasteMenuItem(false),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.SearchMenuItem(true),
                 new AssureNote.CommitMenuItem(true)

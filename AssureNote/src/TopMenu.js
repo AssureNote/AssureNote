@@ -11,10 +11,11 @@ var AssureNote;
             this.IsEnabled = IsEnabled;
             this.ButtonId = null;
             this.ElementId = null;
-            if (ButtonId) {
-                this.ButtonId = ButtonId;
-                this.ElementId = ButtonId + "-menu-button";
+            if (!ButtonId) {
+                ButtonId = TopMenuItem.CreateID();
             }
+            this.ButtonId = ButtonId;
+            this.ElementId = ButtonId + "-menu-button";
         }
         TopMenuItem.prototype.GetIconName = function () {
             return "";
@@ -634,6 +635,14 @@ var AssureNote;
         };
         PasteMenuItem.prototype.Invoke = function (App) {
             App.ExecCommandByName("paste", App.PictgramPanel.GetFocusedLabel());
+        };
+        PasteMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            if (Mode == 0 /* Edit */) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
         };
         return PasteMenuItem;
     })(TopMenuItem);

@@ -798,7 +798,7 @@ var AssureNote;
         };
 
         CopyCommand.prototype.CanUseOnViewOnlyMode = function () {
-            return false;
+            return true;
         };
         return CopyCommand;
     })(Command);

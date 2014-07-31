@@ -9,10 +9,11 @@ module AssureNote {
         constructor(public IsEnabled: boolean, ButtonId?: string) {
             this.ButtonId = null;
             this.ElementId = null;
-            if(ButtonId) {
-                this.ButtonId = ButtonId;
-                this.ElementId = ButtonId+"-menu-button";
+            if (!ButtonId) {
+                ButtonId = TopMenuItem.CreateID();
             }
+            this.ButtonId = ButtonId;
+            this.ElementId = ButtonId+"-menu-button";
         }
 
         GetIconName(): string {
@@ -500,6 +501,14 @@ module AssureNote {
         }
         Invoke(App: AssureNoteApp): void {
             App.ExecCommandByName("paste", App.PictgramPanel.GetFocusedLabel());
+        }
+        Update(): void {
+            var Mode = AssureNoteApp.Current.ModeManager.GetMode();
+            if (Mode == AssureNoteMode.Edit) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
         }
     }
 

@@ -55,6 +55,8 @@ module AssureNote {
             } else {
                 this.Input.removeAttribute('checked');
             }
+            this.App.TopMenu.Update();
+            this.App.TopMenuRight.Update();
         }
 
         ReadOnly(b: boolean) {

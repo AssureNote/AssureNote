@@ -755,7 +755,7 @@ module AssureNote {
         }
 
         public CanUseOnViewOnlyMode(): boolean {
-            return false;
+            return true;
         }
     }
 
