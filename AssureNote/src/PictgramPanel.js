@@ -304,6 +304,22 @@ var AssureNote;
                     }
                     Event.preventDefault();
                     break;
+                case 67:
+                    if (Event.shiftKey) {
+                        if (this.FocusedLabel) {
+                            this.App.ExecCommandByName("copy", this.GetFocusedLabel());
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 86:
+                    if (Event.shiftKey) {
+                        if (this.FocusedLabel) {
+                            this.App.ExecCommandByName("paste", this.GetFocusedLabel());
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
                 default:
                     handled = false;
                     break;

@@ -78,6 +78,20 @@ module AssureNote {
         }
     }
 
+    export class ForbiddenCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            if (CommandName == null) {
+                return;
+            }
+            AssureNoteUtils.Notify("This action is not allowed on View mode.");
+            this.App.DebugP("forbidden command: " + CommandName);
+        }
+    }
+
     export class SaveCommand extends Command {
         constructor(App: AssureNote.AssureNoteApp) {
             super(App);

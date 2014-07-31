@@ -87,6 +87,22 @@ var AssureNote;
     })(Command);
     AssureNote.CommandMissingCommand = CommandMissingCommand;
 
+    var ForbiddenCommand = (function (_super) {
+        __extends(ForbiddenCommand, _super);
+        function ForbiddenCommand(App) {
+            _super.call(this, App);
+        }
+        ForbiddenCommand.prototype.Invoke = function (CommandName, Params) {
+            if (CommandName == null) {
+                return;
+            }
+            AssureNote.AssureNoteUtils.Notify("This action is not allowed on View mode.");
+            this.App.DebugP("forbidden command: " + CommandName);
+        };
+        return ForbiddenCommand;
+    })(Command);
+    AssureNote.ForbiddenCommand = ForbiddenCommand;
+
     var SaveCommand = (function (_super) {
         __extends(SaveCommand, _super);
         function SaveCommand(App) {

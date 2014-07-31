@@ -50,6 +50,7 @@ module AssureNote {
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
+        ForbiddenCommand: AssureNote.ForbiddenCommand;
         UserList: UserList;
         HistoryPanel: HistoryPanel;
         NodeCountPanel: NodeCountPanel;
@@ -79,6 +80,7 @@ module AssureNote {
             ShapeFactory.SetFactory(new DefaultShapeFactory());
 
             this.DefaultCommand = new CommandMissingCommand(this);
+            this.ForbiddenCommand = new ForbiddenCommand(this);
             this.RegistCommand(new SaveCommand(this));
             this.RegistCommand(new SaveSVGCommand(this));
             this.RegistCommand(new SaveWGSNCommand(this));
@@ -199,7 +201,7 @@ module AssureNote {
         FindCommandByCommandLineName(Name: string): Command {
             var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
             if (this.ModeManager.GetMode() == AssureNoteMode.View && !Command.CanUseOnViewOnlyMode()) {
-                return this.DefaultCommand;
+                return this.ForbiddenCommand;
             }
             return Command;
         }

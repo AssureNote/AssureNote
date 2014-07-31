@@ -50,6 +50,7 @@ var AssureNote;
             AssureNote.ShapeFactory.SetFactory(new AssureNote.DefaultShapeFactory());
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
+            this.ForbiddenCommand = new AssureNote.ForbiddenCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
             this.RegistCommand(new AssureNote.SaveWGSNCommand(this));
@@ -166,7 +167,7 @@ var AssureNote;
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
             var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
             if (this.ModeManager.GetMode() == 1 /* View */ && !Command.CanUseOnViewOnlyMode()) {
-                return this.DefaultCommand;
+                return this.ForbiddenCommand;
             }
             return Command;
         };
