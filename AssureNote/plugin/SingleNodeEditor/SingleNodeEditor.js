@@ -90,22 +90,11 @@ var AssureNote;
         function SingleNodeEditorPlugin(App) {
             _super.call(this);
             this.App = App;
-            this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
             this.SetHasDoubleClicked(true);
 
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
-        SingleNodeEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            var _this = this;
-            return new AssureNote.NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor", function (event, TargetView) {
-                var Command = _this.App.FindCommandByCommandLineName("SingleEdit");
-                if (Command) {
-                    Command.Invoke(null, [TargetView.Label]);
-                }
-            });
-        };
-
         SingleNodeEditorPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
             if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 0 /* Edit */) {
                 var Command = this.App.FindCommandByCommandLineName("SingleEdit");

@@ -69,9 +69,6 @@ module AssureNote {
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-            if (NodeView.GetNodeType() == GSNType.Strategy) {
-                return null;
-            }
             return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
                 (event: Event, TargetView: NodeView) => {
                     var Command = this.AssureNoteApp.FindCommandByCommandLineName("edit");

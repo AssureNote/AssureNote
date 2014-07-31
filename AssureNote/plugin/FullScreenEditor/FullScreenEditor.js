@@ -81,9 +81,6 @@ var AssureNote;
         }
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
-            if (NodeView.GetNodeType() == 2 /* Strategy */) {
-                return null;
-            }
             return new AssureNote.NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Command = _this.AssureNoteApp.FindCommandByCommandLineName("edit");
                 if (Command) {
