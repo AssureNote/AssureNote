@@ -692,7 +692,7 @@ var AssureNote;
         * @param {String} TextDoc
         */
         GSNNode.prototype.UpdateContent = function (TextDoc) {
-            TextDoc.match(/^*/m);
+            TextDoc.match(/^.*/m);
             var Lines = RegExp.leftContext.match(/^.*$/mg);
             this.SetContent(Lines);
         };

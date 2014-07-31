@@ -707,7 +707,7 @@ module AssureNote {
          * @param {String} TextDoc
          */
         UpdateContent(TextDoc: string): void {
-            TextDoc.match(/^*/m)
+            TextDoc.match(/^.*/m)
             var Lines: string[] = (<any>RegExp).leftContext.match(/^.*$/mg);
             this.SetContent(Lines);
         }
