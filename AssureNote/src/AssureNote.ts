@@ -63,6 +63,8 @@ module AssureNote {
         private LoadingIndicatorVisible = true;
         private LoadingIndicator: HTMLImageElement = <HTMLImageElement>document.getElementById("loading-indicator");
 
+        Clipboard: string;
+
         constructor() {
             AssureNoteApp.Current = this;
             this.Commands = [];
@@ -130,8 +132,8 @@ module AssureNote {
                     new DummyMenuItem("Undo (Coming soon)", "step-backward"),
                     new DummyMenuItem("Redo (Coming soon)", "step-forward"),
                     new DividerMenuItem(true),
-                    new DummyMenuItem("Copy (Coming soon)", "file"),
-                    new DummyMenuItem("Paste (Coming soon)", "file"),
+                    new CopyMenuItem(true),
+                    new PasteMenuItem(true),
                     new DividerMenuItem(true),
                     new SearchMenuItem(true),
                     new CommitMenuItem(true)

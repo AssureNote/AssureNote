@@ -297,32 +297,6 @@ module AssureNote {
         constructor(private BaseDoc: GSNDoc, private Nodes: WGSNParser.Node[]) {
         }
 
-        private static IsTypeContextLike(Type: GSNType): boolean {
-            return Type == GSNType.Context || Type == GSNType.Assumption || Type == GSNType.Justification || Type == GSNType.Exception;
-        }
-
-        private static IsCollectRelation(ParentType: GSNType, ParentDepth: number, ChildType: GSNType, ChildDepth: number): boolean {
-            if (ChildDepth == ParentDepth) {
-                if (ChildType == GSNType.Goal) {
-                    return false;
-                }
-                if (ParentType != GSNType.Goal && (ChildType == GSNType.Evidence || ChildType == GSNType.Strategy)) {
-                    return false;
-                }
-                if ((ParentType == GSNType.Evidence || ParentType == GSNType.Strategy) && !TreeParser.IsTypeContextLike(ChildType)) {
-                    return false;
-                }
-                if (TreeParser.IsTypeContextLike(ParentType)) {
-                    return false;
-                }
-                return true;
-            }
-            if (ParentDepth + 1 == ChildDepth) {
-                return ParentType == GSNType.Strategy && ChildType == GSNType.Goal;
-            }
-            return false;
-        }
-
         private ConvertBody(Body: WGSNParser.NodeLinePart[][], Flags: BodyFlags, Tags: { [index: string]: string }): string {
             if (Body == null) {
                 return "";
@@ -386,11 +360,11 @@ module AssureNote {
             this.PrevNode = TopGSNNode;
             while (this.Index < this.Nodes.length) {
                 var Node = this.Nodes[this.Index];
-                if (!TreeParser.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[Node.type], Node.depth)) {
+                if (!GSNNode.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[Node.type], Node.depth)) {
                     var NextNode = this.Nodes[this.Index + 1];
                     if (Parent == null || NextNode
-                        && TreeParser.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[NextNode.type], NextNode.depth)
-                        && !TreeParser.IsCollectRelation(GSNType[Node.type], Node.depth, GSNType[NextNode.type], NextNode.depth)) {
+                        && GSNNode.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[NextNode.type], NextNode.depth)
+                        && !GSNNode.IsCollectRelation(GSNType[Node.type], Node.depth, GSNType[NextNode.type], NextNode.depth)) {
                         this.PrevNode.NodeDoc += "\n\n" + this.ConvertNode(null, Node).toString().replace(/^/mg, "# ");
                         this.Index++;
                     } else {
@@ -588,6 +562,44 @@ module AssureNote {
          */
         public IsEvidence(): boolean {
             return (this.NodeType == GSNType.Evidence);
+        }
+
+        /**
+         * @method IsTypeContextLike
+         * @return {Boolean}
+         */
+        public static IsTypeContextLike(Type: GSNType): boolean {
+            return Type == GSNType.Context || Type == GSNType.Assumption || Type == GSNType.Justification || Type == GSNType.Exception;
+        }
+
+        /**
+         * @method IsContextLike
+         * @return {Boolean}
+         */
+        public IsContextLike(): boolean {
+            return GSNNode.IsTypeContextLike(this.NodeType);
+        }
+
+        public static IsCollectRelation(ParentType: GSNType, ParentDepth: number, ChildType: GSNType, ChildDepth: number): boolean {
+            if (ChildDepth == ParentDepth) {
+                if (ChildType == GSNType.Goal) {
+                    return false;
+                }
+                if (ParentType != GSNType.Goal && (ChildType == GSNType.Evidence || ChildType == GSNType.Strategy)) {
+                    return false;
+                }
+                if ((ParentType == GSNType.Evidence || ParentType == GSNType.Strategy) && !GSNNode.IsTypeContextLike(ChildType)) {
+                    return false;
+                }
+                if (GSNNode.IsTypeContextLike(ParentType)) {
+                    return false;
+                }
+                return true;
+            }
+            if (ParentDepth + 1 == ChildDepth) {
+                return ParentType == GSNType.Strategy && ChildType == GSNType.Goal;
+            }
+            return false;
         }
 
         /**

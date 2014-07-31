@@ -116,15 +116,11 @@ var AssureNote;
     var SubMenuItem = (function (_super) {
         __extends(SubMenuItem, _super);
         function SubMenuItem(IsEnabled, ButtonId, DisplayName, IconName, SubMenuList) {
-            var _this = this;
             _super.call(this, IsEnabled, ButtonId);
             this.DisplayName = DisplayName;
             this.IconName = IconName;
-            this.SubMenuList = [];
-            SubMenuList.forEach(function (menu) {
-                if (menu) {
-                    _this.SubMenuList.push(menu);
-                }
+            this.SubMenuList = SubMenuList.filter(function (Menu) {
+                return Menu != null;
             });
         }
         SubMenuItem.prototype.GetIconName = function () {
@@ -173,9 +169,9 @@ var AssureNote;
                 ul.style.right = "auto";
                 ul.style.width = "250px";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(function (Menu) {
+                    return Menu.Render(App, ul, false);
+                });
 
                 dropdown.appendChild(button);
                 dropdown.appendChild(ul);
@@ -204,9 +200,9 @@ var AssureNote;
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(function (Menu) {
+                    return Menu.Render(App, ul, false);
+                });
 
                 li.appendChild(ul);
                 Target.appendChild(li);
@@ -214,9 +210,9 @@ var AssureNote;
         };
 
         SubMenuItem.prototype.Update = function () {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(function (Menu) {
+                return Menu.Update();
+            });
         };
         return SubMenuItem;
     })(TopMenuItem);
@@ -225,14 +221,15 @@ var AssureNote;
     var TopMenuTopItem = (function (_super) {
         __extends(TopMenuTopItem, _super);
         function TopMenuTopItem(SubMenuList) {
+            var _this = this;
             _super.call(this, true);
             this.SubMenuList = SubMenuList;
             this.SubMenuMap = {};
-            for (var i; i < SubMenuList.length; i++) {
-                if (SubMenuList[i].ButtonId) {
-                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+            this.SubMenuList.forEach(function (Menu) {
+                if (Menu.ButtonId) {
+                    _this.SubMenuMap[Menu.ButtonId] = Menu;
                 }
-            }
+            });
         }
         TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
             this.SubMenuList.unshift(SubMenu);
@@ -242,16 +239,16 @@ var AssureNote;
         };
 
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Render(App, Target, true);
-            }
+            this.SubMenuList.forEach(function (Menu) {
+                return Menu.Render(App, Target, true);
+            });
             $(".dropdown-toggle").dropdown();
         };
 
         TopMenuTopItem.prototype.Update = function () {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(function (Menu) {
+                return Menu.Update();
+            });
         };
         return TopMenuTopItem;
     })(TopMenuItem);
@@ -605,6 +602,42 @@ var AssureNote;
         return ZoomMenuItem;
     })(TopMenuItem);
     AssureNote.ZoomMenuItem = ZoomMenuItem;
+
+    var CopyMenuItem = (function (_super) {
+        __extends(CopyMenuItem, _super);
+        function CopyMenuItem() {
+            _super.apply(this, arguments);
+        }
+        CopyMenuItem.prototype.GetIconName = function () {
+            return "file";
+        };
+        CopyMenuItem.prototype.GetDisplayName = function () {
+            return "Copy";
+        };
+        CopyMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("copy", App.PictgramPanel.GetFocusedLabel());
+        };
+        return CopyMenuItem;
+    })(TopMenuItem);
+    AssureNote.CopyMenuItem = CopyMenuItem;
+
+    var PasteMenuItem = (function (_super) {
+        __extends(PasteMenuItem, _super);
+        function PasteMenuItem() {
+            _super.apply(this, arguments);
+        }
+        PasteMenuItem.prototype.GetIconName = function () {
+            return "file";
+        };
+        PasteMenuItem.prototype.GetDisplayName = function () {
+            return "Paste";
+        };
+        PasteMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("paste", App.PictgramPanel.GetFocusedLabel());
+        };
+        return PasteMenuItem;
+    })(TopMenuItem);
+    AssureNote.PasteMenuItem = PasteMenuItem;
 
     var DummyMenuItem = (function (_super) {
         __extends(DummyMenuItem, _super);

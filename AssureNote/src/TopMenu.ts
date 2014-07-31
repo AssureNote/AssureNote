@@ -115,12 +115,7 @@ module AssureNote {
 
         constructor(IsEnabled: boolean, ButtonId: string, private DisplayName: string, private IconName: string, SubMenuList: TopMenuItem[]) {
             super(IsEnabled, ButtonId);
-            this.SubMenuList = [];
-            SubMenuList.forEach(menu => {
-                if (menu) {
-                    this.SubMenuList.push(menu);
-                }
-            });
+            this.SubMenuList = SubMenuList.filter(Menu => Menu != null);
         }
 
         GetIconName(): string {
@@ -169,9 +164,7 @@ module AssureNote {
                 ul.style.right = "auto";
                 ul.style.width = "250px";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(Menu => Menu.Render(App, ul, false));
 
                 dropdown.appendChild(button);
                 dropdown.appendChild(ul);
@@ -200,9 +193,7 @@ module AssureNote {
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(Menu => Menu.Render(App, ul, false));
 
                 li.appendChild(ul);
                 Target.appendChild(li);
@@ -210,9 +201,7 @@ module AssureNote {
         }
 
         Update(): void {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(Menu => Menu.Update());
         }
     }
 
@@ -223,11 +212,11 @@ module AssureNote {
         constructor(public SubMenuList: TopMenuItem[]) {
             super(true);
             this.SubMenuMap = {};
-            for(var i: number; i < SubMenuList.length; i++) {
-                if(SubMenuList[i].ButtonId) {
-                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+            this.SubMenuList.forEach(Menu => {
+                if (Menu.ButtonId) {
+                    this.SubMenuMap[Menu.ButtonId] = Menu;
                 }
-            }
+            });
         }
 
         AppendSubMenu(SubMenu: TopMenuItem) {
@@ -238,16 +227,12 @@ module AssureNote {
         }
 
         Render(App: AssureNoteApp, Target: Element, IsTopLevel: boolean): void {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Render(App, Target, true);
-            }
+            this.SubMenuList.forEach(Menu => Menu.Render(App, Target, true));
             (<any>$(".dropdown-toggle")).dropdown();
         }
 
         Update() {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(Menu => Menu.Update());
         }
     }
 
@@ -491,6 +476,30 @@ module AssureNote {
         }
         Invoke(App: AssureNoteApp): void {
             App.ExecCommandByName("set-scale", this.Zoom);
+        }
+    }
+
+    export class CopyMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "file";
+        }
+        GetDisplayName(): string {
+            return "Copy";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("copy", App.PictgramPanel.GetFocusedLabel());
+        }
+    }
+
+    export class PasteMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "file";
+        }
+        GetDisplayName(): string {
+            return "Paste";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("paste", App.PictgramPanel.GetFocusedLabel());
         }
     }
 

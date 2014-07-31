@@ -301,32 +301,6 @@ var AssureNote;
             this.Index = 0;
             this.TopNode = null;
         }
-        TreeParser.IsTypeContextLike = function (Type) {
-            return Type == 1 /* Context */ || Type == 6 /* Assumption */ || Type == 5 /* Justification */ || Type == 7 /* Exception */;
-        };
-
-        TreeParser.IsCollectRelation = function (ParentType, ParentDepth, ChildType, ChildDepth) {
-            if (ChildDepth == ParentDepth) {
-                if (ChildType == 0 /* Goal */) {
-                    return false;
-                }
-                if (ParentType != 0 /* Goal */ && (ChildType == 3 /* Evidence */ || ChildType == 2 /* Strategy */)) {
-                    return false;
-                }
-                if ((ParentType == 3 /* Evidence */ || ParentType == 2 /* Strategy */) && !TreeParser.IsTypeContextLike(ChildType)) {
-                    return false;
-                }
-                if (TreeParser.IsTypeContextLike(ParentType)) {
-                    return false;
-                }
-                return true;
-            }
-            if (ParentDepth + 1 == ChildDepth) {
-                return ParentType == 2 /* Strategy */ && ChildType == 0 /* Goal */;
-            }
-            return false;
-        };
-
         TreeParser.prototype.ConvertBody = function (Body, Flags, Tags) {
             if (Body == null) {
                 return "";
@@ -391,9 +365,9 @@ var AssureNote;
             this.PrevNode = TopGSNNode;
             while (this.Index < this.Nodes.length) {
                 var Node = this.Nodes[this.Index];
-                if (!TreeParser.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[Node.type], Node.depth)) {
+                if (!GSNNode.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[Node.type], Node.depth)) {
                     var NextNode = this.Nodes[this.Index + 1];
-                    if (Parent == null || NextNode && TreeParser.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[NextNode.type], NextNode.depth) && !TreeParser.IsCollectRelation(GSNType[Node.type], Node.depth, GSNType[NextNode.type], NextNode.depth)) {
+                    if (Parent == null || NextNode && GSNNode.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[NextNode.type], NextNode.depth) && !GSNNode.IsCollectRelation(GSNType[Node.type], Node.depth, GSNType[NextNode.type], NextNode.depth)) {
                         this.PrevNode.NodeDoc += "\n\n" + this.ConvertNode(null, Node).toString().replace(/^/mg, "# ");
                         this.Index++;
                     } else {
@@ -573,6 +547,44 @@ var AssureNote;
         */
         GSNNode.prototype.IsEvidence = function () {
             return (this.NodeType == 3 /* Evidence */);
+        };
+
+        /**
+        * @method IsTypeContextLike
+        * @return {Boolean}
+        */
+        GSNNode.IsTypeContextLike = function (Type) {
+            return Type == 1 /* Context */ || Type == 6 /* Assumption */ || Type == 5 /* Justification */ || Type == 7 /* Exception */;
+        };
+
+        /**
+        * @method IsContextLike
+        * @return {Boolean}
+        */
+        GSNNode.prototype.IsContextLike = function () {
+            return GSNNode.IsTypeContextLike(this.NodeType);
+        };
+
+        GSNNode.IsCollectRelation = function (ParentType, ParentDepth, ChildType, ChildDepth) {
+            if (ChildDepth == ParentDepth) {
+                if (ChildType == 0 /* Goal */) {
+                    return false;
+                }
+                if (ParentType != 0 /* Goal */ && (ChildType == 3 /* Evidence */ || ChildType == 2 /* Strategy */)) {
+                    return false;
+                }
+                if ((ParentType == 3 /* Evidence */ || ParentType == 2 /* Strategy */) && !GSNNode.IsTypeContextLike(ChildType)) {
+                    return false;
+                }
+                if (GSNNode.IsTypeContextLike(ParentType)) {
+                    return false;
+                }
+                return true;
+            }
+            if (ParentDepth + 1 == ChildDepth) {
+                return ParentType == 2 /* Strategy */ && ChildType == 0 /* Goal */;
+            }
+            return false;
         };
 
         /**

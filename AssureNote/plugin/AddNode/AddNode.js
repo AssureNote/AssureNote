@@ -41,7 +41,7 @@ var AssureNote;
                 "context": 1 /* Context */,
                 "assumption": 6 /* Assumption */,
                 "exception": 7 /* Exception */,
-                "Justification": 5 /* Justification */,
+                "justification": 5 /* Justification */,
                 "evidence": 3 /* Evidence */
             };
         }

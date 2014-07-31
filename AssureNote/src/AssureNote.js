@@ -101,8 +101,8 @@ var AssureNote;
                 new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
                 new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.DummyMenuItem("Copy (Coming soon)", "file"),
-                new AssureNote.DummyMenuItem("Paste (Coming soon)", "file"),
+                new AssureNote.CopyMenuItem(true),
+                new AssureNote.PasteMenuItem(true),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.SearchMenuItem(true),
                 new AssureNote.CommitMenuItem(true)

@@ -781,19 +781,14 @@ var AssureNote;
         };
 
         CopyCommand.prototype.Invoke = function (CommandName, Params) {
-            console.log("invoke");
-            console.log(Params);
             if (Params.length == 1) {
                 var TargetLabel = Params[0];
-                console.log(Params);
                 var Node = this.App.PictgramPanel.ViewMap[TargetLabel];
                 if (Node != null) {
                     var Writer = new AssureNote.StringWriter();
                     Node.Model.FormatSubNode(1, Writer, true);
                     var Text = Writer.toString();
-
-                    /* TODO copy to the clipboard. It seems that some libraries is needed to use the clipboard. */
-                    console.log(Text);
+                    this.App.Clipboard = Text;
                 } else {
                     AssureNote.AssureNoteUtils.Notify("Node " + Params[0] + "not found");
                 }
@@ -819,11 +814,28 @@ var AssureNote;
         };
 
         PasteCommand.prototype.GetHelpHTML = function () {
-            return "<code>Paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
+            return "<code>paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
         };
 
         PasteCommand.prototype.Invoke = function (CommandName, Params) {
-            /* TODO Get WGSN from the clipboard. */
+            var _this = this;
+            var WGSN = this.App.Clipboard || "";
+            if (WGSN.length > 0) {
+                var TargetLabel = Params[0];
+                var Node = this.App.PictgramPanel.ViewMap[TargetLabel].Model;
+                var PasetedNode = AssureNote.Parser.ParseTree(Node.BaseDoc, WGSN);
+                var PasetedLevel = Node.GetGoalLevel();
+                if (PasetedNode.NodeType == 0 /* Goal */) {
+                    PasetedLevel += 1;
+                }
+                if (AssureNote.GSNNode.IsCollectRelation(Node.NodeType, Node.GetGoalLevel(), PasetedNode.NodeType, PasetedLevel)) {
+                    this.App.EditDocument("todo", "test", function () {
+                        var TargetNode = _this.App.MasterRecord.EditingDoc.GetNode(Node.UID);
+                        TargetNode.AppendSubNode(PasetedNode);
+                        PasetedNode.ParentNode = TargetNode;
+                    });
+                }
+            }
         };
 
         PasteCommand.prototype.CanUseOnViewOnlyMode = function () {

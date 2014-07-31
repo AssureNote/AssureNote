@@ -46,7 +46,7 @@ module AssureNote {
             "context": GSNType.Context,
             "assumption": GSNType.Assumption,
             "exception": GSNType.Exception,
-            "Justification": GSNType.Justification,
+            "justification": GSNType.Justification,
             "evidence": GSNType.Evidence
         };
 
