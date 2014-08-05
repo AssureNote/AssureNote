@@ -429,19 +429,17 @@ module AssureNote {
                     Doc.SetTagValue("Author", revision.header.user);
                     Doc.SetTagValue("Revision", revision.header.revision.toString());
                     Doc.SetTagValue("Date", revision.header.modified.toISOString());
-                    Doc.SetTagValue("CommitMessage", revision.header.messsage);
+                    Doc.SetTagValue("CommitMessage", revision.header.tags["CommitMessage"]);
                 }
                 Doc.UpdateDocHeader();
                 Doc.TopNode = new TreeParser(Doc, revision.nodes).Parse(); 
                 Doc.RemapNodeMap();
                 Doc.RenumberAll();
             });
-            var first = true;
             Record.HistoryList.forEach((History) => {
-                if (!first && History.Doc.GetTagValue("CommitMessage") == null) {
+                if (History.Doc.GetTagValue("CommitMessage") == null) {
                     History.IsCommitRevision = false;
                 }
-                first = false;
             });
 
             return Record;

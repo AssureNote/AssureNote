@@ -15,7 +15,7 @@ declare module AssureNote {
         }
 
         interface RevisionHeader {
-            messsage: string;
+            tags: { [index: string]: string };
             revision: number;
             modified: Date;
             user: string;
