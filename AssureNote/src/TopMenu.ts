@@ -512,6 +512,48 @@ module AssureNote {
         }
     }
 
+    export class UndoMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "step-backward";
+        }
+        GetDisplayName(): string {
+            return "Undo";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("undo");
+        }
+        Update(): void {
+            var Mode = AssureNoteApp.Current.ModeManager.GetMode();
+            var CanUndo = AssureNoteApp.Current.MasterRecord.CanUndo();
+            if (Mode == AssureNoteMode.Edit && CanUndo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        }
+    }
+
+    export class RedoMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "step-forward";
+        }
+        GetDisplayName(): string {
+            return "Redo";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("redo");
+        }
+        Update(): void {
+            var Mode = AssureNoteApp.Current.ModeManager.GetMode();
+            var CanRedo = AssureNoteApp.Current.MasterRecord.CanRedo();
+            if (Mode == AssureNoteMode.Edit && CanRedo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        }
+    }
+
     export class DummyMenuItem extends TopMenuItem {
         constructor(private DisplayName: string, private IconName: string) {
             super(false, "dummy-" + AssureNoteUtils.GenerateRandomString());

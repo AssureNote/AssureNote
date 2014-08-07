@@ -492,6 +492,12 @@ module AssureNote {
             return false;
         }
 
+        DrawGSN(Node: GSNNode): void {
+            var NewNodeView: NodeView = new NodeView(Node, true);
+            this.InitializeView(NewNodeView);
+            this.Draw();
+        }
+
         InitializeView(NodeView: NodeView): void {
             this.TopNodeView = NodeView;
             this.ViewMap = {};

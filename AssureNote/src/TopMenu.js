@@ -648,6 +648,60 @@ var AssureNote;
     })(TopMenuItem);
     AssureNote.PasteMenuItem = PasteMenuItem;
 
+    var UndoMenuItem = (function (_super) {
+        __extends(UndoMenuItem, _super);
+        function UndoMenuItem() {
+            _super.apply(this, arguments);
+        }
+        UndoMenuItem.prototype.GetIconName = function () {
+            return "step-backward";
+        };
+        UndoMenuItem.prototype.GetDisplayName = function () {
+            return "Undo";
+        };
+        UndoMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("undo");
+        };
+        UndoMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            var CanUndo = AssureNote.AssureNoteApp.Current.MasterRecord.CanUndo();
+            if (Mode == 0 /* Edit */ && CanUndo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        };
+        return UndoMenuItem;
+    })(TopMenuItem);
+    AssureNote.UndoMenuItem = UndoMenuItem;
+
+    var RedoMenuItem = (function (_super) {
+        __extends(RedoMenuItem, _super);
+        function RedoMenuItem() {
+            _super.apply(this, arguments);
+        }
+        RedoMenuItem.prototype.GetIconName = function () {
+            return "step-forward";
+        };
+        RedoMenuItem.prototype.GetDisplayName = function () {
+            return "Redo";
+        };
+        RedoMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("redo");
+        };
+        RedoMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            var CanRedo = AssureNote.AssureNoteApp.Current.MasterRecord.CanRedo();
+            if (Mode == 0 /* Edit */ && CanRedo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        };
+        return RedoMenuItem;
+    })(TopMenuItem);
+    AssureNote.RedoMenuItem = RedoMenuItem;
+
     var DummyMenuItem = (function (_super) {
         __extends(DummyMenuItem, _super);
         function DummyMenuItem(DisplayName, IconName) {

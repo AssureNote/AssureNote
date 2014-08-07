@@ -810,4 +810,54 @@ module AssureNote {
             return false;
         }
     }
+
+    export class UndoCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["undo", "u"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>undo</code><br>Undo it."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanUndo()) {
+                this.App.Undo();
+            }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return false;
+        }
+    }
+
+    export class RedoCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["redo", "u"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>redo</code><br>Redo it."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanRedo()) {
+                this.App.Redo();
+            }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return false;
+        }
+    }
 }

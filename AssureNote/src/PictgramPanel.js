@@ -471,6 +471,12 @@ var AssureNote;
             return false;
         };
 
+        PictgramPanel.prototype.DrawGSN = function (Node) {
+            var NewNodeView = new AssureNote.NodeView(Node, true);
+            this.InitializeView(NewNodeView);
+            this.Draw();
+        };
+
         PictgramPanel.prototype.InitializeView = function (NodeView) {
             this.TopNodeView = NodeView;
             this.ViewMap = {};

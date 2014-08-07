@@ -50,22 +50,16 @@ module AssureNote {
             this.Element.empty();
             this.Element.hide();
             if (this.Index != this.VisibleRevisionList.length - 1) {
-                this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+                this.App.PictgramPanel.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
             }
             this.IsVisible = false;
             this.VisibleRevisionList = null;
         }
 
-        private DrawGSN(TopGoal: GSNNode): void {
-            var NewNodeView: NodeView = new NodeView(TopGoal, true);
-            this.App.PictgramPanel.InitializeView(NewNodeView);
-            this.App.PictgramPanel.Draw();
-        }
-
         private OnRevisionChanged(OldRevision: number): void {
             if (OldRevision != this.Index) {
                 var TopGoal = this.App.MasterRecord.HistoryList[this.VisibleRevisionList[this.Index]].Doc.TopNode;
-                this.DrawGSN(TopGoal);
+                this.App.PictgramPanel.DrawGSN(TopGoal);
                 $("#history-panel-close").off("click");
                 $("#prev-revision").off("click");
                 $("#first-revision").off("click");

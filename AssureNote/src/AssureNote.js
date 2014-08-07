@@ -70,6 +70,8 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SearchCommand(this));
             this.RegistCommand(new AssureNote.CopyCommand(this));
             this.RegistCommand(new AssureNote.PasteCommand(this));
+            this.RegistCommand(new AssureNote.UndoCommand(this));
+            this.RegistCommand(new AssureNote.RedoCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
@@ -99,8 +101,8 @@ var AssureNote;
                 new AssureNote.ShowNodeCountPanelMenuItem(true, "nodecount")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
-                new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
-                new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
+                new AssureNote.UndoMenuItem(false),
+                new AssureNote.RedoMenuItem(false),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.CopyMenuItem(true),
                 new AssureNote.PasteMenuItem(false),
@@ -303,6 +305,21 @@ var AssureNote;
             }
         };
 
+        AssureNoteApp.prototype.RefreshGSN = function (Doc) {
+            var TopNode = Doc.TopNode;
+            var NewNodeView = new AssureNote.NodeView(TopNode, true);
+            var OldViewMap = this.PictgramPanel.ViewMap;
+            NewNodeView.SaveFlags(OldViewMap);
+
+            this.PictgramPanel.InitializeView(NewNodeView);
+            this.PictgramPanel.Draw(TopNode.GetLabel());
+
+            //TODO: Use eventhandler
+            //this.SocketManager.UpdateWGSN();
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
+        };
+
         /**
         @method EditDocument
         Edit document and repaint the GSN. If Action returns 'false', changes will be discarded.
@@ -318,21 +335,18 @@ var AssureNote;
                 var Doc = this.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 this.MasterRecord.CloseEditor();
-
-                var TopNode = Doc.TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopNode, true);
-                var OldViewMap = this.PictgramPanel.ViewMap;
-                NewNodeView.SaveFlags(OldViewMap);
-
-                this.PictgramPanel.InitializeView(NewNodeView);
-                this.PictgramPanel.Draw(TopNode.GetLabel());
-
-                //TODO: Use eventhandler
-                this.SocketManager.UpdateWGSN();
-
-                this.TopMenu.Update();
-                this.TopMenuRight.Update();
+                this.RefreshGSN(Doc);
             }
+        };
+
+        AssureNoteApp.prototype.Undo = function () {
+            this.MasterRecord.Undo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
+        };
+
+        AssureNoteApp.prototype.Redo = function () {
+            this.MasterRecord.Redo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
         };
 
         AssureNoteApp.prototype.GetNodeFromLabel = function (Label, ReportError) {

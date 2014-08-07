@@ -1454,6 +1454,7 @@ module AssureNote {
      */
     export class GSNRecord {
         HistoryList: GSNHistory[] = [];
+        private HistoryListToRedo: GSNHistory[] = [];
         EditingDoc: GSNDoc = null;
 
         /* TODO Use this field to enable undo/redo */
@@ -1565,24 +1566,74 @@ module AssureNote {
                     this.EditingDoc = new GSNDoc(this);
                     this.EditingDoc.DocHistory = this.NewHistory(Author, Role, ModefiedDate, Process, this.EditingDoc);
                 }
+                this.EditingDoc.DocHistory.IsCommitRevision = false;
+            } else {
+                throw new Error("OpenEditor is called before CloseEditor called.");
             }
-            this.EditingDoc.DocHistory.IsCommitRevision = false;
         }
 
         /**
          * @method CloseEditor
          */
         public CloseEditor(): void {
-            this.EditingDoc = null;
+            if (this.EditingDoc) {
+                this.EditingDoc = null;
+                this.HistoryListToRedo = [];
+            } else {
+                throw new Error("CloseEditor is called before OpenEditor called.");
+            }
         }
 
         /**
          * @method DiscardEditor
          */
         public DiscardEditor(): void {
-            this.EditingDoc = null;
-            this.HistoryList.pop();
+            if (this.EditingDoc) {
+                this.EditingDoc = null;
+                this.HistoryList.pop();
+            } else {
+                throw new Error("DiscardEditor is called before OpenEditor called.");
+            }
+        }
 
+        /**
+         * @method CanUndo
+         */
+        public CanUndo(): boolean {
+            return this.HistoryList.length > 1 && !this.GetLatestDoc().DocHistory.IsCommitRevision
+        }
+
+        /**
+         * @method CanRedo
+         */
+        public CanRedo(): boolean {
+            return this.HistoryListToRedo.length > 0;
+        }
+
+        /**
+         * @method Undo
+         */
+        public Undo(): void {
+            if (!this.EditingDoc) {
+                if (this.CanUndo()) {
+                    this.HistoryListToRedo.push(this.HistoryList.pop());
+                }
+            } else {
+                throw new Error("Undo is called while editor is opened.");
+            }
+        }
+
+        /**
+         * @method Redo
+         */
+        public Redo(): void {
+            if (!this.EditingDoc) {
+                if (this.CanRedo()) {
+                    this.HistoryList.push(this.HistoryListToRedo.pop());
+                }
+            } else {
+                throw new Error("Redo is called while editor is opened.");
+            }
         }
 
         /**
@@ -1732,26 +1783,6 @@ module AssureNote {
                     DocCount += 1;
                 }
             }
-        }
-        /**
-         * @method Undo
-         */
-        public Undo(): GSNHistory {
-            /*
-             * TODO
-             * TO enable undo/redo, GSNRecord is needed to have the current revision.
-             */
-            return null;
-        }
-
-        /**
-         * @method Redo
-         */
-        public Redo(): GSNHistory {
-            /*
-             * TODO
-             */
-            return null;
         }
     }
 

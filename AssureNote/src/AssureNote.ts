@@ -100,6 +100,8 @@ module AssureNote {
             this.RegistCommand(new SearchCommand(this));
             this.RegistCommand(new CopyCommand(this));
             this.RegistCommand(new PasteCommand(this));
+            this.RegistCommand(new UndoCommand(this));
+            this.RegistCommand(new RedoCommand(this));
 
             this.TopMenu = new TopMenuTopItem([]);
             this.TopMenuRight = new TopMenuTopItem([]);
@@ -131,8 +133,8 @@ module AssureNote {
                 ]) );
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "edit", "Edit", "pencil", [
-                    new DummyMenuItem("Undo (Coming soon)", "step-backward"),
-                    new DummyMenuItem("Redo (Coming soon)", "step-forward"),
+                    new UndoMenuItem(false),
+                    new RedoMenuItem(false),
                     new DividerMenuItem(true),
                     new CopyMenuItem(true),
                     new PasteMenuItem(false),
@@ -333,6 +335,21 @@ module AssureNote {
                 reader.readAsText(Files[0], 'utf-8');
             }
         }
+
+        private RefreshGSN(Doc: GSNDoc) {
+            var TopNode = Doc.TopNode;
+            var NewNodeView: NodeView = new NodeView(TopNode, true);
+            var OldViewMap = this.PictgramPanel.ViewMap;
+            NewNodeView.SaveFlags(OldViewMap);
+
+            this.PictgramPanel.InitializeView(NewNodeView);
+            this.PictgramPanel.Draw(TopNode.GetLabel());
+            //TODO: Use eventhandler
+            //this.SocketManager.UpdateWGSN();
+
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
+        }
         
         /**
         @method EditDocument
@@ -349,20 +366,18 @@ module AssureNote {
                 var Doc = this.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 this.MasterRecord.CloseEditor();
-
-                var TopNode = Doc.TopNode;
-                var NewNodeView: NodeView = new NodeView(TopNode, true);
-                var OldViewMap = this.PictgramPanel.ViewMap;
-                NewNodeView.SaveFlags(OldViewMap);
-
-                this.PictgramPanel.InitializeView(NewNodeView);
-                this.PictgramPanel.Draw(TopNode.GetLabel());
-                //TODO: Use eventhandler
-                this.SocketManager.UpdateWGSN();
-
-                this.TopMenu.Update();
-                this.TopMenuRight.Update();
+                this.RefreshGSN(Doc);
             }
+        }
+
+        public Undo(): void {
+            this.MasterRecord.Undo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
+        }
+
+        public Redo(): void {
+            this.MasterRecord.Redo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
         }
 
         public GetNodeFromLabel(Label: string, ReportError?: boolean) {

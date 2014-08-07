@@ -860,5 +860,59 @@ var AssureNote;
         return PasteCommand;
     })(Command);
     AssureNote.PasteCommand = PasteCommand;
+
+    var UndoCommand = (function (_super) {
+        __extends(UndoCommand, _super);
+        function UndoCommand(App) {
+            _super.call(this, App);
+        }
+        UndoCommand.prototype.GetCommandLineNames = function () {
+            return ["undo", "u"];
+        };
+
+        UndoCommand.prototype.GetHelpHTML = function () {
+            return "<code>undo</code><br>Undo it.";
+        };
+
+        UndoCommand.prototype.Invoke = function (CommandName, Params) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanUndo()) {
+                this.App.Undo();
+            }
+        };
+
+        UndoCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return UndoCommand;
+    })(Command);
+    AssureNote.UndoCommand = UndoCommand;
+
+    var RedoCommand = (function (_super) {
+        __extends(RedoCommand, _super);
+        function RedoCommand(App) {
+            _super.call(this, App);
+        }
+        RedoCommand.prototype.GetCommandLineNames = function () {
+            return ["redo", "u"];
+        };
+
+        RedoCommand.prototype.GetHelpHTML = function () {
+            return "<code>redo</code><br>Redo it.";
+        };
+
+        RedoCommand.prototype.Invoke = function (CommandName, Params) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanRedo()) {
+                this.App.Redo();
+            }
+        };
+
+        RedoCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return RedoCommand;
+    })(Command);
+    AssureNote.RedoCommand = RedoCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

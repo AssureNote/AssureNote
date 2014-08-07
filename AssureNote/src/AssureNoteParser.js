@@ -1,4 +1,4 @@
-// ***************************************************************************
+﻿// ***************************************************************************
 // Copyright (c) 2014, AssureNote project authors. All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -1452,6 +1452,7 @@ var AssureNote;
     var GSNRecord = (function () {
         function GSNRecord() {
             this.HistoryList = [];
+            this.HistoryListToRedo = [];
             this.EditingDoc = null;
         }
         /**
@@ -1559,23 +1560,74 @@ var AssureNote;
                     this.EditingDoc = new GSNDoc(this);
                     this.EditingDoc.DocHistory = this.NewHistory(Author, Role, ModefiedDate, Process, this.EditingDoc);
                 }
+                this.EditingDoc.DocHistory.IsCommitRevision = false;
+            } else {
+                throw new Error("OpenEditor is called before CloseEditor called.");
             }
-            this.EditingDoc.DocHistory.IsCommitRevision = false;
         };
 
         /**
         * @method CloseEditor
         */
         GSNRecord.prototype.CloseEditor = function () {
-            this.EditingDoc = null;
+            if (this.EditingDoc) {
+                this.EditingDoc = null;
+                this.HistoryListToRedo = [];
+            } else {
+                throw new Error("CloseEditor is called before OpenEditor called.");
+            }
         };
 
         /**
         * @method DiscardEditor
         */
         GSNRecord.prototype.DiscardEditor = function () {
-            this.EditingDoc = null;
-            this.HistoryList.pop();
+            if (this.EditingDoc) {
+                this.EditingDoc = null;
+                this.HistoryList.pop();
+            } else {
+                throw new Error("DiscardEditor is called before OpenEditor called.");
+            }
+        };
+
+        /**
+        * @method CanUndo
+        */
+        GSNRecord.prototype.CanUndo = function () {
+            return this.HistoryList.length > 1 && !this.GetLatestDoc().DocHistory.IsCommitRevision;
+        };
+
+        /**
+        * @method CanRedo
+        */
+        GSNRecord.prototype.CanRedo = function () {
+            return this.HistoryListToRedo.length > 0;
+        };
+
+        /**
+        * @method Undo
+        */
+        GSNRecord.prototype.Undo = function () {
+            if (!this.EditingDoc) {
+                if (this.CanUndo()) {
+                    this.HistoryListToRedo.push(this.HistoryList.pop());
+                }
+            } else {
+                throw new Error("Undo is called while editor is opened.");
+            }
+        };
+
+        /**
+        * @method Redo
+        */
+        GSNRecord.prototype.Redo = function () {
+            if (!this.EditingDoc) {
+                if (this.CanRedo()) {
+                    this.HistoryList.push(this.HistoryListToRedo.pop());
+                }
+            } else {
+                throw new Error("Redo is called while editor is opened.");
+            }
         };
 
         /**
@@ -1728,27 +1780,6 @@ var AssureNote;
                     DocCount += 1;
                 }
             }
-        };
-
-        /**
-        * @method Undo
-        */
-        GSNRecord.prototype.Undo = function () {
-            /*
-            * TODO
-            * TO enable undo/redo, GSNRecord is needed to have the current revision.
-            */
-            return null;
-        };
-
-        /**
-        * @method Redo
-        */
-        GSNRecord.prototype.Redo = function () {
-            /*
-            * TODO
-            */
-            return null;
         };
         return GSNRecord;
     })();
