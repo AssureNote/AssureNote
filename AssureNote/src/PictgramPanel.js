@@ -305,7 +305,7 @@ var AssureNote;
                     Event.preventDefault();
                     break;
                 case 67:
-                    if (Event.shiftKey) {
+                    if (Event.shiftKey || Event.ctrlKey) {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName("copy", this.GetFocusedLabel());
                         }
@@ -313,10 +313,22 @@ var AssureNote;
                     Event.preventDefault();
                     break;
                 case 86:
-                    if (Event.shiftKey) {
+                    if (Event.shiftKey || Event.ctrlKey) {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName("paste", this.GetFocusedLabel());
                         }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 89:
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("redo");
+                    }
+                    Event.preventDefault();
+                    break;
+                case 90:
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("undo");
                     }
                     Event.preventDefault();
                     break;

@@ -322,7 +322,7 @@ module AssureNote {
                     Event.preventDefault();
                     break;
                 case 67: /*c*/
-                    if (Event.shiftKey) {
+                    if (Event.shiftKey || Event.ctrlKey) {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName("copy", this.GetFocusedLabel());
                         }
@@ -330,10 +330,22 @@ module AssureNote {
                     Event.preventDefault();
                     break;
                 case 86: /*v*/
-                    if (Event.shiftKey) {
+                    if (Event.shiftKey || Event.ctrlKey) {
                         if (this.FocusedLabel) {
                             this.App.ExecCommandByName("paste", this.GetFocusedLabel());
                         }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 89: /*y*/
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("redo");
+                    }
+                    Event.preventDefault();
+                    break;
+                case 90: /*z*/
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("undo");
                     }
                     Event.preventDefault();
                     break;
