@@ -1413,7 +1413,7 @@ module AssureNote {
          */
         GetNodeCountTypeOf(type: GSNType): number {
             var count = 0;
-            this.ForEachNode((Node) => { count += Node.NodeType == type ? 1 : 0; });
+            this.ForEachNode(Node => count += ~~(Node.NodeType == type));
             return count;
         }
 
@@ -1432,7 +1432,7 @@ module AssureNote {
             map[GSNType.Justification] = 0;
             map[GSNType.Strategy] = 0;
             map[GSNType.Undefined] = 0;
-            this.ForEachNode((Node) => { ++map[Node.NodeType]; });
+            this.ForEachNode(Node => ++map[Node.NodeType]);
             return map;
         }
 
