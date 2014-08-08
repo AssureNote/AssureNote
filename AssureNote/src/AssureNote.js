@@ -37,6 +37,8 @@ var AssureNote;
             this.IsGuestUser = true;
             this.LoadingIndicatorVisible = true;
             this.LoadingIndicator = document.getElementById("loading-indicator");
+            // Deprecated
+            this.DebugP = console.log.bind(console);
             AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
@@ -146,11 +148,6 @@ var AssureNote;
             for (var i = 0; i < Names.length; ++i) {
                 this.CommandLineTable[Names[i].toLowerCase()] = Command;
             }
-        };
-
-        // Deprecated
-        AssureNoteApp.prototype.DebugP = function (Message) {
-            console.log(Message);
         };
 
         AssureNoteApp.Assert = function (b, message) {

@@ -520,7 +520,7 @@ module AssureNote {
             var t0 = AssureNoteUtils.GetTime();
             this.Clear();
             var t1 = AssureNoteUtils.GetTime();
-            console.log("Clear: " + (t1 - t0));
+            //console.log("Clear: " + (t1 - t0));
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
@@ -540,8 +540,8 @@ module AssureNote {
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
 
-            GSNShape.__Debug_Animation_SkippedNodeCount = 0;
-            GSNShape.__Debug_Animation_TotalNodeCount = 0;
+            //GSNShape.__Debug_Animation_SkippedNodeCount = 0;
+            //GSNShape.__Debug_Animation_TotalNodeCount = 0;
 
             this.FoldingAnimationTask.Cancel(true);
 
@@ -573,7 +573,7 @@ module AssureNote {
             TargetView.UpdateNodePosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
             var t3 = AssureNoteUtils.GetTime();
-            console.log("Update: " + (t3 - t2));
+            //console.log("Update: " + (t3 - t2));
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
             var Shape = TargetView.GetShape();
@@ -593,9 +593,9 @@ module AssureNote {
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
-            console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
-                GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
-                GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
+            //console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
+            //    GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
+            //    GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
         }
 
         public ForceAppendAllOutOfScreenNode() {
@@ -655,7 +655,7 @@ module AssureNote {
                 UpdateArrow(Node);
             }
             NodeView.SetGlobalPositionCacheEnabled(false);
-            //console.log("Visible:Hidden = " + Object.keys(this.OnScreenNodeMap).length + ":" + Object.keys(this.HiddenNodeMap).length);
+            ////console.log("Visible:Hidden = " + Object.keys(this.OnScreenNodeMap).length + ":" + Object.keys(this.HiddenNodeMap).length);
         }
 
         private Clear(): void {

@@ -183,9 +183,7 @@ module AssureNote {
         }
 
         // Deprecated
-        DebugP(Message: string): void {
-            console.log(Message);
-        }
+        DebugP = console.log.bind(console);
 
         static Assert(b: boolean, message?: string): void {
             if (b == false) {
