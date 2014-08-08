@@ -53,6 +53,10 @@ var AssureNote;
             this.Update();
             this.Element.show();
             this.IsVisible = true;
+            var ModeManager = this.App.ModeManager;
+            this.IsModeEditBeforeHistoryPanelOpened = ModeManager.GetMode() == 0 /* Edit */;
+            ModeManager.ChangeMode(1 /* View */);
+            ModeManager.SetReadOnly(true);
         };
 
         HistoryPanel.prototype.Hide = function () {
@@ -63,6 +67,11 @@ var AssureNote;
             }
             this.IsVisible = false;
             this.VisibleRevisionList = null;
+            var ModeManager = this.App.ModeManager;
+            ModeManager.SetReadOnly(false);
+            if (this.IsModeEditBeforeHistoryPanelOpened) {
+                ModeManager.ChangeMode(0 /* Edit */);
+            }
         };
 
         HistoryPanel.prototype.OnRevisionChanged = function (OldRevision) {

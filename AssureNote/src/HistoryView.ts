@@ -29,6 +29,7 @@ module AssureNote {
         private Element: JQuery;
         private Index: number;
         private VisibleRevisionList: number[];
+        private IsModeEditBeforeHistoryPanelOpened: boolean;
         constructor(public App: AssureNoteApp) {
             super(App);
             this.Element = $("#history");
@@ -44,6 +45,10 @@ module AssureNote {
             this.Update();
             this.Element.show();
             this.IsVisible = true;
+            var ModeManager = this.App.ModeManager;
+            this.IsModeEditBeforeHistoryPanelOpened = ModeManager.GetMode() == AssureNoteMode.Edit;
+            ModeManager.ChangeMode(AssureNoteMode.View);
+            ModeManager.SetReadOnly(true);
         }
 
         Hide(): void {
@@ -54,6 +59,11 @@ module AssureNote {
             }
             this.IsVisible = false;
             this.VisibleRevisionList = null;
+            var ModeManager = this.App.ModeManager;
+            ModeManager.SetReadOnly(false);
+            if (this.IsModeEditBeforeHistoryPanelOpened) {
+                ModeManager.ChangeMode(AssureNoteMode.Edit);
+            }
         }
 
         private OnRevisionChanged(OldRevision: number): void {

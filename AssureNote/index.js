@@ -73,7 +73,7 @@ $(function () {
     };
 
     Debug.StartEditMode = function () {
-        App.ModeManager.SetMode(0 /* Edit */);
+        App.ModeManager.ChangeMode(0 /* Edit */);
     };
 
     App.LoadDefaultWGSN();

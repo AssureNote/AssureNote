@@ -75,7 +75,7 @@ module AssureNote {
                     room = Params[0];
                 }
             }
-            this.App.ModeManager.SetMode(AssureNoteMode.View);
+            this.App.ModeManager.ChangeMode(AssureNoteMode.View);
             if (this.App.SocketManager.IsOperational()) {
                 this.App.SocketManager.Connect(room, url);
             }

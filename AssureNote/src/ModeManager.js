@@ -35,8 +35,8 @@ var AssureNote;
             if (Mode == 0 /* Edit */) {
                 this.Input.setAttribute('checked', '');
             }
-            this.Input.setAttribute('data-on-label', 'Edit');
-            this.Input.setAttribute('data-off-label', 'View');
+            this.Input.setAttribute('data-on-text', 'Edit');
+            this.Input.setAttribute('data-off-text', 'View');
 
             this.Enable();
         }
@@ -44,27 +44,24 @@ var AssureNote;
             return this.Mode;
         };
 
-        ModeManager.prototype.SetMode = function (Mode) {
-            this.Mode = Mode;
-            if (Mode == 0 /* Edit */) {
-                this.Input.setAttribute('checked', '');
-            } else {
-                this.Input.removeAttribute('checked');
+        ModeManager.prototype.ChangeMode = function (Mode) {
+            if (this.Mode != Mode) {
+                $('#mode-switch').bootstrapSwitch('state', Mode == 0 /* Edit */);
+                this.SetMode(Mode);
             }
-            this.App.TopMenu.Update();
-            this.App.TopMenuRight.Update();
         };
 
-        ModeManager.prototype.ReadOnly = function (b) {
-            if (b) {
-                this.Input.setAttribute('disabled', '');
-                this.Input.setAttribute('readonly', '');
-                this.Input.className += 'disabled';
-            } else {
-                this.Input.removeAttribute('disabled');
-                this.Input.removeAttribute('readonly');
-                $(this.Input).removeClass('disabled');
+        ModeManager.prototype.SetMode = function (Mode) {
+            if (this.Mode != Mode) {
+                this.Mode = Mode;
+                this.App.TopMenu.Update();
+                this.App.TopMenuRight.Update();
+                this.App.SocketManager.UpdateEditMode(this.Mode);
             }
+        };
+
+        ModeManager.prototype.SetReadOnly = function (b) {
+            $('#mode-switch').bootstrapSwitch('disabled', b).bootstrapSwitch('readonly', b);
         };
 
         ModeManager.prototype.Disable = function () {
@@ -74,24 +71,17 @@ var AssureNote;
         ModeManager.prototype.Enable = function () {
             var _this = this;
             $(this.Input).appendTo(this.WrapperElement.empty());
-            $('#mode-switch').bootstrapSwitch();
-            $('#mode-switch').bootstrapSwitch('setSizeClass', '').on('switch-change', function (e) {
-                var data = [];
-                for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                    data[_i] = arguments[_i + 1];
-                }
-                var value = data[0].value;
-                if (!_this.App.IsOfflineVersion() && _this.App.IsUserGuest() && value) {
+            $('#mode-switch').bootstrapSwitch().on('switchChange.bootstrapSwitch', function (e, state) {
+                if (!_this.App.IsOfflineVersion() && _this.App.IsUserGuest() && state) {
                     AssureNote.AssureNoteUtils.Notify("Please login first");
                     _this.SetMode(1 /* View */);
-                    _this.ReadOnly(true);
+                    _this.SetReadOnly(true);
                 } else {
-                    _this.SetMode((value) ? 0 /* Edit */ : 1 /* View */);
-                    _this.App.SocketManager.UpdateEditMode(_this.Mode);
+                    _this.SetMode(state ? 0 /* Edit */ : 1 /* View */);
                 }
             });
             if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
-                this.ReadOnly(true);
+                this.SetReadOnly(true);
             }
         };
         return ModeManager;

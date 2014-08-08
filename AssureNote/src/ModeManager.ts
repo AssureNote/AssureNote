@@ -38,8 +38,8 @@ module AssureNote {
             if (Mode == AssureNoteMode.Edit) {
                 this.Input.setAttribute('checked', '');
             }
-            this.Input.setAttribute('data-on-label', 'Edit');
-            this.Input.setAttribute('data-off-label', 'View');
+            this.Input.setAttribute('data-on-text', 'Edit');
+            this.Input.setAttribute('data-off-text', 'View');
 
             this.Enable();
         }
@@ -48,27 +48,24 @@ module AssureNote {
             return this.Mode;
         }
 
-        SetMode(Mode: AssureNoteMode): void {
-            this.Mode = Mode;
-            if (Mode == AssureNoteMode.Edit) {
-                this.Input.setAttribute('checked', '');
-            } else {
-                this.Input.removeAttribute('checked');
+        ChangeMode(Mode: AssureNoteMode): void {
+            if (this.Mode != Mode) {
+                $('#mode-switch').bootstrapSwitch('state', Mode == AssureNoteMode.Edit);
+                this.SetMode(Mode);
             }
-            this.App.TopMenu.Update();
-            this.App.TopMenuRight.Update();
         }
 
-        ReadOnly(b: boolean) {
-            if (b) {
-                this.Input.setAttribute('disabled', '');
-                this.Input.setAttribute('readonly', '');
-                this.Input.className += 'disabled';
-            } else {
-                this.Input.removeAttribute('disabled');
-                this.Input.removeAttribute('readonly');
-                $(this.Input).removeClass('disabled');
+        private SetMode(Mode: AssureNoteMode) {
+            if (this.Mode != Mode) {
+                this.Mode = Mode;
+                this.App.TopMenu.Update();
+                this.App.TopMenuRight.Update();
+                this.App.SocketManager.UpdateEditMode(this.Mode);
             }
+        }
+
+        SetReadOnly(b: boolean) {
+            $('#mode-switch').bootstrapSwitch('disabled', b).bootstrapSwitch('readonly', b);
         }
 
         Disable(): void {
@@ -77,21 +74,17 @@ module AssureNote {
 
         Enable(): void {
             $(this.Input).appendTo(this.WrapperElement.empty());
-            $('#mode-switch').bootstrapSwitch();
-            $('#mode-switch').bootstrapSwitch('setSizeClass', '')
-                .on('switch-change', (e, ...data) => {
-                    var value = data[0].value;
-                    if (!this.App.IsOfflineVersion() && this.App.IsUserGuest() && value) {
-                        AssureNoteUtils.Notify("Please login first");
-                        this.SetMode(AssureNoteMode.View);
-                        this.ReadOnly(true);
-                    } else {
-                        this.SetMode((value) ? AssureNoteMode.Edit : AssureNoteMode.View);
-                        this.App.SocketManager.UpdateEditMode(this.Mode);
-                    }
-                });
+            $('#mode-switch').bootstrapSwitch().on('switchChange.bootstrapSwitch', (e, state) => {
+                if (!this.App.IsOfflineVersion() && this.App.IsUserGuest() && state) {
+                    AssureNoteUtils.Notify("Please login first");
+                    this.SetMode(AssureNoteMode.View);
+                    this.SetReadOnly(true);
+                } else {
+                    this.SetMode(state ? AssureNoteMode.Edit : AssureNoteMode.View);
+                }
+            });
             if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
-                this.ReadOnly(true);
+                this.SetReadOnly(true);
             }
         }
     }
