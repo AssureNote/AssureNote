@@ -49,7 +49,7 @@ module AssureNote {
             var item: HTMLElement;
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
             var spaceChar = "\u00a0";
-            var text = document.createTextNode(spaceChar + this.GetDisplayName());
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode(spaceChar + this.GetDisplayName()) : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -68,11 +68,13 @@ module AssureNote {
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if(!this.IsEnabled) {
                     classes += " disabled";
-                    item.setAttribute("disabled");
+                    item.setAttribute("disabled", "");
                 }
                 item.className = classes;
                 item.appendChild(icon);
-                item.appendChild(text);
+                if (text) {
+                    item.appendChild(text);
+                }
             } else {
                 /*
                 <li>
@@ -89,7 +91,9 @@ module AssureNote {
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
-                a.appendChild(text);
+                if (text) {
+                    a.appendChild(text);
+                }
                 item.appendChild(a);
                 if (!this.IsEnabled) {
                     item.className = "disabled";
@@ -129,7 +133,7 @@ module AssureNote {
 
         Render(App: AssureNoteApp, Target: Element, IsTopLevel: boolean): void {
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
-            var text = document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0");
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0") : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -156,7 +160,9 @@ module AssureNote {
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
-                button.appendChild(text);
+                if (text) {
+                    button.appendChild(text);
+                }
                 button.appendChild(caret);
 
                 var ul = document.createElement("ul");
@@ -188,8 +194,9 @@ module AssureNote {
                 a.href = "#";
                 li.appendChild(a);
                 a.appendChild(icon);
-                a.appendChild(text);
-
+                if (text) {
+                    a.appendChild(text);
+                }
                 var ul = document.createElement("ul");
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
@@ -242,6 +249,21 @@ module AssureNote {
             var li = document.createElement("li");
             li.className = "divider";
             Target.appendChild(li);
+        }
+    }
+
+    export class UserNameMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "cog";
+        }
+        GetDisplayName(): string {
+            return "";
+        }
+        Invoke(App: AssureNoteApp): void {
+            var Name = prompt('Enter user name', App.GetUserName());
+            if (Name && Name.length > 0 && App.GetUserName() != Name) {
+                App.ExecCommandByName("set-user", Name);
+            }
         }
     }
 

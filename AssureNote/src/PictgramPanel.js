@@ -76,7 +76,8 @@ var AssureNote;
 
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
-                _this.App.DebugP("click:" + Label);
+
+                //this.App.DebugP("click:" + Label);
                 if (_this.IsActive()) {
                     _this.ChangeFocusedLabel(Label);
                 } else {
@@ -128,7 +129,8 @@ var AssureNote;
             this.ContentLayer.addEventListener("dblclick", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = _this.ViewMap[Label];
-                _this.App.DebugP("double click:" + Label);
+
+                //this.App.DebugP("double click:" + Label);
                 if (_this.ContextMenu.IsEnable) {
                     _this.ContextMenu.Remove();
                 }

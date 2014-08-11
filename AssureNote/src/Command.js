@@ -733,7 +733,7 @@ var AssureNote;
         SetGuestUserNameCommand.prototype.Invoke = function (CommandName, Params) {
             var Name = Params[0];
             if (!Name || Name == '') {
-                Name = prompt('Enter the new name for guest', '');
+                Name = prompt('Enter the new name for guest', this.App.GetUserName());
             }
             if (!Name || Name == '') {
                 Name = 'Guest';

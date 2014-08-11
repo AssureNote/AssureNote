@@ -1406,7 +1406,7 @@ var AssureNote;
         GSNDoc.prototype.GetNodeCountTypeOf = function (type) {
             var count = 0;
             this.ForEachNode(function (Node) {
-                count += Node.NodeType == type ? 1 : 0;
+                return count += ~~(Node.NodeType == type);
             });
             return count;
         };
@@ -1427,7 +1427,7 @@ var AssureNote;
             map[2 /* Strategy */] = 0;
             map[4 /* Undefined */] = 0;
             this.ForEachNode(function (Node) {
-                ++map[Node.NodeType];
+                return ++map[Node.NodeType];
             });
             return map;
         };

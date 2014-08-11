@@ -51,7 +51,7 @@ var AssureNote;
             var item;
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
             var spaceChar = "\u00a0";
-            var text = document.createTextNode(spaceChar + this.GetDisplayName());
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode(spaceChar + this.GetDisplayName()) : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -70,11 +70,13 @@ var AssureNote;
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if (!this.IsEnabled) {
                     classes += " disabled";
-                    item.setAttribute("disabled");
+                    item.setAttribute("disabled", "");
                 }
                 item.className = classes;
                 item.appendChild(icon);
-                item.appendChild(text);
+                if (text) {
+                    item.appendChild(text);
+                }
             } else {
                 /*
                 <li>
@@ -91,7 +93,9 @@ var AssureNote;
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
-                a.appendChild(text);
+                if (text) {
+                    a.appendChild(text);
+                }
                 item.appendChild(a);
                 if (!this.IsEnabled) {
                     item.className = "disabled";
@@ -134,7 +138,7 @@ var AssureNote;
 
         SubMenuItem.prototype.Render = function (App, Target, IsTopLevel) {
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
-            var text = document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0");
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0") : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -161,7 +165,9 @@ var AssureNote;
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
-                button.appendChild(text);
+                if (text) {
+                    button.appendChild(text);
+                }
                 button.appendChild(caret);
 
                 var ul = document.createElement("ul");
@@ -195,8 +201,9 @@ var AssureNote;
                 a.href = "#";
                 li.appendChild(a);
                 a.appendChild(icon);
-                a.appendChild(text);
-
+                if (text) {
+                    a.appendChild(text);
+                }
                 var ul = document.createElement("ul");
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
@@ -268,6 +275,27 @@ var AssureNote;
         return DividerMenuItem;
     })(TopMenuItem);
     AssureNote.DividerMenuItem = DividerMenuItem;
+
+    var UserNameMenuItem = (function (_super) {
+        __extends(UserNameMenuItem, _super);
+        function UserNameMenuItem() {
+            _super.apply(this, arguments);
+        }
+        UserNameMenuItem.prototype.GetIconName = function () {
+            return "cog";
+        };
+        UserNameMenuItem.prototype.GetDisplayName = function () {
+            return "";
+        };
+        UserNameMenuItem.prototype.Invoke = function (App) {
+            var Name = prompt('Enter user name', App.GetUserName());
+            if (Name && Name.length > 0 && App.GetUserName() != Name) {
+                App.ExecCommandByName("set-user", Name);
+            }
+        };
+        return UserNameMenuItem;
+    })(TopMenuItem);
+    AssureNote.UserNameMenuItem = UserNameMenuItem;
 
     var NewMenuItem = (function (_super) {
         __extends(NewMenuItem, _super);

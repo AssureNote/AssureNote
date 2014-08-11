@@ -157,6 +157,9 @@ module AssureNote {
                     new HelpMenuItem(true),
                     new AboutMenuItem(true)
                 ]));
+            if (this.IsOfflineVersion()) {
+                this.TopMenuRight.AppendSubMenu(new UserNameMenuItem(true));
+            }
             if (!this.IsUserGuest()) {
                 this.TopMenuRight.AppendSubMenu(new UploadMenuItem(true));
             }
@@ -260,6 +263,7 @@ module AssureNote {
         SetUserName(Name: string): void {
             if (this.IsGuestUser) {
                 this.UserName = Name;
+                $(".user-name").text("\u00a0" + Name);
             }
         }
 

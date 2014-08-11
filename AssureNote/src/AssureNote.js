@@ -126,6 +126,9 @@ var AssureNote;
                 new AssureNote.HelpMenuItem(true),
                 new AssureNote.AboutMenuItem(true)
             ]));
+            if (this.IsOfflineVersion()) {
+                this.TopMenuRight.AppendSubMenu(new AssureNote.UserNameMenuItem(true));
+            }
             if (!this.IsUserGuest()) {
                 this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
             }
@@ -227,6 +230,7 @@ var AssureNote;
         AssureNoteApp.prototype.SetUserName = function (Name) {
             if (this.IsGuestUser) {
                 this.UserName = Name;
+                $(".user-name").text("\u00a0" + Name);
             }
         };
 

@@ -692,7 +692,7 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]) {
             var Name = Params[0];
             if (!Name || Name == '') {
-                Name = prompt('Enter the new name for guest', '');
+                Name = prompt('Enter the new name for guest', this.App.GetUserName());
             }
             if (!Name || Name == '') {
                 Name = 'Guest';
