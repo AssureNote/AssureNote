@@ -23,6 +23,7 @@ src/RecApi.ts
 src/XMIParser.ts
 src/ImageData.ts
 
+src/NodeCountView.ts
 plugin/FoldingViewSwitch/FoldingViewSwitch.ts
 plugin/FullScreenEditor/FullScreenEditor.ts
 plugin/MessageChat/MessageChat.ts
@@ -32,4 +33,6 @@ plugin/SingleNodeEditor/SingleNodeEditor.ts
 plugin/ToDo/ToDo.ts
 plugin/AddNode/AddNode.ts
 plugin/LastModified/LastModified.ts
+plugin/MonitorNode/MonitorNode.ts
+plugin/MonitorNode/MonitorNode.ts
 plugin/MonitorNode/MonitorNode.ts
