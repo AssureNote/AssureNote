@@ -7648,6 +7648,7 @@ var AssureNote;
             }
             this.Input.setAttribute('data-on-text', 'Edit');
             this.Input.setAttribute('data-off-text', 'View');
+            this.SetReadOnly(false);
             this.Enable();
         }
         ModeManager.prototype.GetMode = function () {
