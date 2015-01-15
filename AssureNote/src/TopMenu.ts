@@ -9,10 +9,11 @@ module AssureNote {
         constructor(public IsEnabled: boolean, ButtonId?: string) {
             this.ButtonId = null;
             this.ElementId = null;
-            if(ButtonId) {
-                this.ButtonId = ButtonId;
-                this.ElementId = ButtonId+"-menu-button";
+            if (!ButtonId) {
+                ButtonId = TopMenuItem.CreateID();
             }
+            this.ButtonId = ButtonId;
+            this.ElementId = ButtonId+"-menu-button";
         }
 
         GetIconName(): string {
@@ -48,7 +49,7 @@ module AssureNote {
             var item: HTMLElement;
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
             var spaceChar = "\u00a0";
-            var text = document.createTextNode(spaceChar + this.GetDisplayName());
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode(spaceChar + this.GetDisplayName()) : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -67,11 +68,13 @@ module AssureNote {
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if(!this.IsEnabled) {
                     classes += " disabled";
-                    item.setAttribute("disabled");
+                    item.setAttribute("disabled", "");
                 }
                 item.className = classes;
                 item.appendChild(icon);
-                item.appendChild(text);
+                if (text) {
+                    item.appendChild(text);
+                }
             } else {
                 /*
                 <li>
@@ -88,7 +91,9 @@ module AssureNote {
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
-                a.appendChild(text);
+                if (text) {
+                    a.appendChild(text);
+                }
                 item.appendChild(a);
                 if (!this.IsEnabled) {
                     item.className = "disabled";
@@ -111,8 +116,11 @@ module AssureNote {
 
     export class SubMenuItem extends TopMenuItem {
 
-        constructor(IsEnabled: boolean, ButtonId: string, private DisplayName: string, private IconName: string, public SubMenuList: TopMenuItem[]) {
+        public SubMenuList: TopMenuItem[];
+
+        constructor(IsEnabled: boolean, ButtonId: string, private DisplayName: string, private IconName: string, SubMenuList: TopMenuItem[]) {
             super(IsEnabled, ButtonId);
+            this.SubMenuList = SubMenuList.filter(Menu => Menu != null);
         }
 
         GetIconName(): string {
@@ -125,7 +133,7 @@ module AssureNote {
 
         Render(App: AssureNoteApp, Target: Element, IsTopLevel: boolean): void {
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
-            var text = document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0");
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0") : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -152,7 +160,9 @@ module AssureNote {
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
-                button.appendChild(text);
+                if (text) {
+                    button.appendChild(text);
+                }
                 button.appendChild(caret);
 
                 var ul = document.createElement("ul");
@@ -161,9 +171,7 @@ module AssureNote {
                 ul.style.right = "auto";
                 ul.style.width = "250px";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(Menu => Menu.Render(App, ul, false));
 
                 dropdown.appendChild(button);
                 dropdown.appendChild(ul);
@@ -186,15 +194,14 @@ module AssureNote {
                 a.href = "#";
                 li.appendChild(a);
                 a.appendChild(icon);
-                a.appendChild(text);
-
+                if (text) {
+                    a.appendChild(text);
+                }
                 var ul = document.createElement("ul");
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(Menu => Menu.Render(App, ul, false));
 
                 li.appendChild(ul);
                 Target.appendChild(li);
@@ -202,9 +209,7 @@ module AssureNote {
         }
 
         Update(): void {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(Menu => Menu.Update());
         }
     }
 
@@ -215,11 +220,11 @@ module AssureNote {
         constructor(public SubMenuList: TopMenuItem[]) {
             super(true);
             this.SubMenuMap = {};
-            for(var i: number; i < SubMenuList.length; i++) {
-                if(SubMenuList[i].ButtonId) {
-                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+            this.SubMenuList.forEach(Menu => {
+                if (Menu.ButtonId) {
+                    this.SubMenuMap[Menu.ButtonId] = Menu;
                 }
-            }
+            });
         }
 
         AppendSubMenu(SubMenu: TopMenuItem) {
@@ -230,16 +235,12 @@ module AssureNote {
         }
 
         Render(App: AssureNoteApp, Target: Element, IsTopLevel: boolean): void {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Render(App, Target, true);
-            }
+            this.SubMenuList.forEach(Menu => Menu.Render(App, Target, true));
             (<any>$(".dropdown-toggle")).dropdown();
         }
 
         Update() {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(Menu => Menu.Update());
         }
     }
 
@@ -248,6 +249,21 @@ module AssureNote {
             var li = document.createElement("li");
             li.className = "divider";
             Target.appendChild(li);
+        }
+    }
+
+    export class UserNameMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "cog";
+        }
+        GetDisplayName(): string {
+            return "";
+        }
+        Invoke(App: AssureNoteApp): void {
+            var Name = prompt('Enter user name', App.GetUserName());
+            if (Name && Name.length > 0 && App.GetUserName() != Name) {
+                App.ExecCommandByName("set-user", Name);
+            }
         }
     }
 
@@ -483,6 +499,80 @@ module AssureNote {
         }
         Invoke(App: AssureNoteApp): void {
             App.ExecCommandByName("set-scale", this.Zoom);
+        }
+    }
+
+    export class CopyMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "file";
+        }
+        GetDisplayName(): string {
+            return "Copy";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("copy", App.PictgramPanel.GetFocusedLabel());
+        }
+    }
+
+    export class PasteMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "file";
+        }
+        GetDisplayName(): string {
+            return "Paste";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("paste", App.PictgramPanel.GetFocusedLabel());
+        }
+        Update(): void {
+            var Mode = AssureNoteApp.Current.ModeManager.GetMode();
+            if (Mode == AssureNoteMode.Edit) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        }
+    }
+
+    export class UndoMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "step-backward";
+        }
+        GetDisplayName(): string {
+            return "Undo";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("undo");
+        }
+        Update(): void {
+            var Mode = AssureNoteApp.Current.ModeManager.GetMode();
+            var CanUndo = AssureNoteApp.Current.MasterRecord.CanUndo();
+            if (Mode == AssureNoteMode.Edit && CanUndo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        }
+    }
+
+    export class RedoMenuItem extends TopMenuItem {
+        GetIconName(): string {
+            return "step-forward";
+        }
+        GetDisplayName(): string {
+            return "Redo";
+        }
+        Invoke(App: AssureNoteApp): void {
+            App.ExecCommandByName("redo");
+        }
+        Update(): void {
+            var Mode = AssureNoteApp.Current.ModeManager.GetMode();
+            var CanRedo = AssureNoteApp.Current.MasterRecord.CanRedo();
+            if (Mode == AssureNoteMode.Edit && CanRedo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
         }
     }
 

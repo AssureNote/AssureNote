@@ -78,6 +78,20 @@ module AssureNote {
         }
     }
 
+    export class ForbiddenCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            if (CommandName == null) {
+                return;
+            }
+            AssureNoteUtils.Notify("This action is not allowed on View mode.");
+            this.App.DebugP("forbidden command: " + CommandName);
+        }
+    }
+
     export class SaveCommand extends Command {
         constructor(App: AssureNote.AssureNoteApp) {
             super(App);
@@ -428,11 +442,10 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            var History: GSNHistory = new GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
+            var History: GSNHistory = new GSNHistory(0, this.App.GetUserName(), '-', new Date(), '-', null);
             var Writer: StringWriter = new StringWriter();
             TagUtils.FormatHistoryTag([History], 0, Writer);
-            console.log(Writer.toString());
-            var WGSN = Writer.toString() + 'Revision:: 0\n*G';
+            var WGSN = Writer.toString() + '\n*G';
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], WGSN);
             } else {
@@ -444,9 +457,7 @@ module AssureNote {
                     this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         }
 
         public CanUseOnViewOnlyMode(): boolean {
@@ -551,7 +562,7 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            if (this.App.IsUserGuest()) {
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
                 alert("Please login first.");
                 return;
             }
@@ -584,9 +595,7 @@ module AssureNote {
                 this.App.LoadFiles((<HTMLInputElement>target).files);
             });
             $("#file-open-dialog").click();
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         }
 
         public CanUseOnViewOnlyMode(): boolean {
@@ -643,6 +652,10 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
+            if (this.App.IsOfflineVersion()) {
+                AssureNoteUtils.Notify("This feature is not supported on offline version.");
+                return;
+            }
             if (this.App.IsUserGuest()) {
                 AssureNoteUtils.Notify("Please login first");
                 return;
@@ -654,11 +667,7 @@ module AssureNote {
             var fileId = paths[paths.length -1];
             AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString(), fileId: fileId }, (result: any) => {
                 var NewURI = Config.BASEPATH + "/file/" + result.fileId;
-                if (history.replaceState) {
-                    history.replaceState(null, null, NewURI);
-                } else {
-                    window.location.href = NewURI;
-                }
+                AssureNoteUtils.ChangeLocation(NewURI);
                 this.OpenShareModal(NewURI);
                 this.App.SetLoading(false);
             }, ()=> {
@@ -683,7 +692,7 @@ module AssureNote {
         public Invoke(CommandName: string, Params: any[]) {
             var Name = Params[0];
             if (!Name || Name == '') {
-                Name = prompt('Enter the new name for guest', '');
+                Name = prompt('Enter the new name for guest', this.App.GetUserName());
             }
             if (!Name || Name == '') {
                 Name = 'Guest';
@@ -743,19 +752,14 @@ module AssureNote {
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            console.log("invoke");
-            console.log(Params);
             if (Params.length == 1) {
                 var TargetLabel = Params[0];
-                console.log(Params);
                 var Node = this.App.PictgramPanel.ViewMap[TargetLabel];
                 if (Node != null) {
                     var Writer: StringWriter = new StringWriter();
                     Node.Model.FormatSubNode(1, Writer, true);
                     var Text = Writer.toString();
-
-                    /* TODO copy to the clipboard. It seems that some libraries is needed to use the clipboard. */
-                    console.log(Text);
+                    this.App.Clipboard = Text;
                 } else {
                     AssureNoteUtils.Notify("Node " + Params[0] + "not found");
                 }
@@ -765,7 +769,7 @@ module AssureNote {
         }
 
         public CanUseOnViewOnlyMode(): boolean {
-            return false;
+            return true;
         }
     }
 
@@ -779,11 +783,77 @@ module AssureNote {
         }
 
         public GetHelpHTML(): string {
-            return "<code>Paste node</code><br>Paste the nodes as the sub-tree of the specified nodes."
+            return "<code>paste node</code><br>Paste the nodes as the sub-tree of the specified nodes."
         }
 
         public Invoke(CommandName: string, Params: any[]) {
-            /* TODO Get WGSN from the clipboard. */
+            var WGSN = this.App.Clipboard || "";
+            if (WGSN.length > 0) {
+                var TargetLabel = Params[0];
+                var Node: GSNNode = this.App.PictgramPanel.ViewMap[TargetLabel].Model;
+                var PasetedNode: GSNNode = Parser.ParseTree(Node.BaseDoc, WGSN);
+                var PasetedLevel = Node.GetGoalLevel();
+                if (PasetedNode.NodeType == GSNType.Goal) {
+                    PasetedLevel += 1;
+                }
+                if (GSNNode.IsCollectRelation(Node.NodeType, Node.GetGoalLevel(), PasetedNode.NodeType, PasetedLevel)) {
+                    this.App.EditDocument("todo", "test", () => {
+                        var TargetNode = this.App.MasterRecord.EditingDoc.GetNode(Node.UID);
+                        TargetNode.AppendSubNode(PasetedNode);
+                        PasetedNode.ParentNode = TargetNode;
+                    });
+                }
+            }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return false;
+        }
+    }
+
+    export class UndoCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["undo", "u"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>undo</code><br>Undo it."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanUndo()) {
+                this.App.Undo();
+            }
+        }
+
+        public CanUseOnViewOnlyMode(): boolean {
+            return false;
+        }
+    }
+
+    export class RedoCommand extends Command {
+        constructor(App: AssureNote.AssureNoteApp) {
+            super(App);
+        }
+
+        public GetCommandLineNames(): string[] {
+            return ["redo", "u"];
+        }
+
+        public GetHelpHTML(): string {
+            return "<code>redo</code><br>Redo it."
+        }
+
+        public Invoke(CommandName: string, Params: any[]) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanRedo()) {
+                this.App.Redo();
+            }
         }
 
         public CanUseOnViewOnlyMode(): boolean {

@@ -92,6 +92,7 @@ module AssureNote {
                     align: 'bottom',
                     idle: 1500,
                     size: 45,
+                    sizeMax: 45,
                     distance: 60,
                     labels: 'tc',
                     duration: 200,

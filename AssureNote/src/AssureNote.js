@@ -37,6 +37,8 @@ var AssureNote;
             this.IsGuestUser = true;
             this.LoadingIndicatorVisible = true;
             this.LoadingIndicator = document.getElementById("loading-indicator");
+            // Deprecated
+            this.DebugP = console.log.bind(console);
             AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
@@ -50,6 +52,7 @@ var AssureNote;
             AssureNote.ShapeFactory.SetFactory(new AssureNote.DefaultShapeFactory());
 
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
+            this.ForbiddenCommand = new AssureNote.ForbiddenCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
             this.RegistCommand(new AssureNote.SaveWGSNCommand(this));
@@ -69,6 +72,8 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SearchCommand(this));
             this.RegistCommand(new AssureNote.CopyCommand(this));
             this.RegistCommand(new AssureNote.PasteCommand(this));
+            this.RegistCommand(new AssureNote.UndoCommand(this));
+            this.RegistCommand(new AssureNote.RedoCommand(this));
 
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
@@ -93,16 +98,16 @@ var AssureNote;
                 ]),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.ShowHistoryPanelMenuItem(true, "history"),
-                new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
-                new AssureNote.SetMonitorMenuItem(true, "setmonitor"),
+                this.IsOfflineVersion() ? null : new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
+                this.IsOfflineVersion() ? null : new AssureNote.SetMonitorMenuItem(true, "setmonitor"),
                 new AssureNote.ShowNodeCountPanelMenuItem(true, "nodecount")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
-                new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
-                new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
+                new AssureNote.UndoMenuItem(false),
+                new AssureNote.RedoMenuItem(false),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.DummyMenuItem("Copy (Coming soon)", "file"),
-                new AssureNote.DummyMenuItem("Paste (Coming soon)", "file"),
+                new AssureNote.CopyMenuItem(true),
+                new AssureNote.PasteMenuItem(false),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.SearchMenuItem(true),
                 new AssureNote.CommitMenuItem(true)
@@ -121,7 +126,12 @@ var AssureNote;
                 new AssureNote.HelpMenuItem(true),
                 new AssureNote.AboutMenuItem(true)
             ]));
-            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
+            if (this.IsOfflineVersion()) {
+                this.TopMenuRight.AppendSubMenu(new AssureNote.UserNameMenuItem(true));
+            }
+            if (!this.IsUserGuest()) {
+                this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
+            }
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
@@ -143,11 +153,6 @@ var AssureNote;
             }
         };
 
-        // Deprecated
-        AssureNoteApp.prototype.DebugP = function (Message) {
-            console.log(Message);
-        };
-
         AssureNoteApp.Assert = function (b, message) {
             if (b == false) {
                 console.log("Assert: " + message);
@@ -164,7 +169,7 @@ var AssureNote;
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
             var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
             if (this.ModeManager.GetMode() == 1 /* View */ && !Command.CanUseOnViewOnlyMode()) {
-                return this.DefaultCommand;
+                return this.ForbiddenCommand;
             }
             return Command;
         };
@@ -210,6 +215,10 @@ var AssureNote;
             this.SetLoading(false);
         };
 
+        AssureNoteApp.prototype.IsOfflineVersion = function () {
+            return window.location.toString().indexOf("file:///") == 0;
+        };
+
         AssureNoteApp.prototype.IsUserGuest = function () {
             return this.IsGuestUser;
         };
@@ -221,6 +230,7 @@ var AssureNote;
         AssureNoteApp.prototype.SetUserName = function (Name) {
             if (this.IsGuestUser) {
                 this.UserName = Name;
+                $(".user-name").text("\u00a0" + Name);
             }
         };
 
@@ -228,17 +238,19 @@ var AssureNote;
             this.SetLoading(true);
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
-            this.MasterRecord = new AssureNote.GSNRecord();
+
             switch (Extention) {
                 case "dcase_model":
+                    this.MasterRecord = new AssureNote.GSNRecord();
                     new AssureNote.DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
                     break;
                 case "xmi":
+                    this.MasterRecord = new AssureNote.GSNRecord();
                     new AssureNote.XMIParser(this.MasterRecord).Parse(WGSN);
                     break;
                 default:
                 case "wgsn":
-                    this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord = AssureNote.Parser.ParseRecord(WGSN);
                     this.MasterRecord.RenumberAll();
                     break;
             }
@@ -294,6 +306,21 @@ var AssureNote;
             }
         };
 
+        AssureNoteApp.prototype.RefreshGSN = function (Doc) {
+            var TopNode = Doc.TopNode;
+            var NewNodeView = new AssureNote.NodeView(TopNode, true);
+            var OldViewMap = this.PictgramPanel.ViewMap;
+            NewNodeView.SaveFlags(OldViewMap);
+
+            this.PictgramPanel.InitializeView(NewNodeView);
+            this.PictgramPanel.Draw(TopNode.GetLabel());
+
+            //TODO: Use eventhandler
+            //this.SocketManager.UpdateWGSN();
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
+        };
+
         /**
         @method EditDocument
         Edit document and repaint the GSN. If Action returns 'false', changes will be discarded.
@@ -309,21 +336,18 @@ var AssureNote;
                 var Doc = this.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 this.MasterRecord.CloseEditor();
-
-                var TopNode = Doc.TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopNode, true);
-                var OldViewMap = this.PictgramPanel.ViewMap;
-                NewNodeView.SaveFlags(OldViewMap);
-
-                this.PictgramPanel.InitializeView(NewNodeView);
-                this.PictgramPanel.Draw(TopNode.GetLabel());
-
-                //TODO: Use eventhandler
-                this.SocketManager.UpdateWGSN();
-
-                this.TopMenu.Update();
-                this.TopMenuRight.Update();
+                this.RefreshGSN(Doc);
             }
+        };
+
+        AssureNoteApp.prototype.Undo = function () {
+            this.MasterRecord.Undo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
+        };
+
+        AssureNoteApp.prototype.Redo = function () {
+            this.MasterRecord.Redo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
         };
 
         AssureNoteApp.prototype.GetNodeFromLabel = function (Label, ReportError) {

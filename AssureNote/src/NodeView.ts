@@ -61,7 +61,10 @@ module AssureNote {
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
                     var SubView = new NodeView(SubNode, IsRecursive);
-                    if (SubNode.NodeType == GSNType.Context) {
+                    if (SubNode.NodeType == GSNType.Assumption || SubNode.NodeType == GSNType.Exception) {
+                        // Layout Engine allowed to move a node left-side
+                        this.AppendLeftNode(SubView);
+                    }else if (SubNode.NodeType == GSNType.Context || SubNode.NodeType == GSNType.Justification) {
                         // Layout Engine allowed to move a node left-side
                         this.AppendRightNode(SubView);
                     } else {
@@ -460,8 +463,8 @@ module AssureNote {
                 return false;
             }
 
-            var GoalModel = ThisModel.GetCloseGoal();
-            var ContextModel = null;
+            var GoalModel = ThisModel.GetUpperNearestGoal();
+            var ContextModel: GSNNode = null;
 
             for (var i: number = 0; i < GoalModel.SubNodeList.length; i++) {
                 var BroutherModel = GoalModel.SubNodeList[i];
@@ -473,8 +476,8 @@ module AssureNote {
             if (ContextModel) {
                 var TagMap = ContextModel.GetTagMapWithLexicalScope();
                 if (TagMap) {
-                    var Location = TagMap.get("Location");
-                    var Condition = TagMap.get("Condition");
+                    var Location = TagMap["Location"];
+                    var Condition = TagMap["Condition"];
                     if (Location && Condition) {
                         return true;
                     }

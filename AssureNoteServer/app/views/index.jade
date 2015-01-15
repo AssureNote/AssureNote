@@ -28,8 +28,13 @@ html
       #content-layer.zero-size-layer
       #editor-background.full-size-layer(style='display: none;')
       #control-layer.zero-size-layer
-        #singlenode-editor-wrapper(style='border: 1px solid black')
-          textarea#singlenode-editor(placeholder='Type something...', style='display: none;')
+        #singlenode-editor-wrapper.node(style='border: 2px solid black; display:none;')
+          div(style='padding: 5px 10px; width: 100%; height: 100%;')
+            h4.singlenode-editor.nodenumber(style='display: inline;')
+            | &nbsp;:
+            input.singlenode-editor.nodelabel(type="text", placeholder='label', style='width: 65%; height: auto; border: 0px;')
+            textarea#singlenode-editor(placeholder='Type something...', style='width: 100%; height: auto; resize: none; border: 0px; overflow: hidden;')
+            pre.singlenode-editor.dummydiv.node(style='position: absolute; padding: 2px; border: 0px; width: 100%; visibility: hidden; font-size: inherit;' )
       #fixed-control-layer.zero-size-layer(style='width: 100%;')
         include topmenu
         input#command-line.form-control(type='text', style='width:100%; bottom:0px; left:0px; position:fixed; display: none; font-size:large')
@@ -67,7 +72,7 @@ html
             h4#about-modal-label.modal-title About
           .modal-body(style='text-align: center;')
             img(src='#{basepath}/images/logo.png', alt='AssureNote', style='width: 60%')
-            p Version 0.2.3
+            p Version 0.2.4
             p Copyright &copy; 2014, AssureNote project authors. All rights reserved.
             h3 Credit
             ul.list-inline
@@ -90,22 +95,23 @@ html
           .modal-footer
             button.btn.btn-default(type='button', data-dismiss='modal') Close
     // Share Modal
-    #share-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
-      .modal-dialog
-        .modal-content
-          .modal-header
-            button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
-            h4#about-modal-label.modal-title Share
-          .modal-body
-            p Share this URI:
-            p
-              input.form-control(type='text', readonly="readonly", style="cursor:default;")
-            p
-              a.btn.btn-default.twitter-share-button(href="http://twitter.com/share?url=共有したいURL&text=ツイート内テキスト&hashtags=assurenote", target="_blank")
-                img(src='#{basepath}/images/Twitter_logo_blue_small.png', width='16px', height='16px')
-                | &nbsp;Tweet
-          .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal') Close
+    if !isLocal
+      #share-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
+        .modal-dialog
+          .modal-content
+            .modal-header
+              button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+              h4#about-modal-label.modal-title Share
+            .modal-body
+              p Share this URI:
+              p
+                input.form-control(type='text', readonly="readonly", style="cursor:default;")
+              p
+                a.btn.btn-default.twitter-share-button(href="http://twitter.com/share?url=共有したいURL&text=ツイート内テキスト&hashtags=assurenote", target="_blank")
+                  img(src='#{basepath}/images/Twitter_logo_blue_small.png', width='16px', height='16px')
+                  | &nbsp;Tweet
+            .modal-footer
+              button.btn.btn-default(type='button', data-dismiss='modal') Close
     #welcome-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='about-modal-label', aria-hidden='true')
       .modal-dialog.modal-lg
         .modal-content
@@ -133,6 +139,8 @@ html
     +js('/lib/bootstrap/js/bootstrap.min.js')
     +js('/lib/bootstrap-switch/bootstrap-switch.min.js')
     +js('/lib/socket.io.min.js')
+    +js('/lib/md5.min.js')
+    +js('/lib/wgsn.min.js')
     if isDevelopment
       +js('/src/AssureNoteUtils.js')
       +js('/src/AssureNoteParser.js')
@@ -173,35 +181,9 @@ html
       +js_async('/plugin/VariableInterpolation/VariableInterpolation.js')
       +js('/plugin/MonitorNode/MonitorNode.js')
     script#default-case-ja(type='text/wgsn')
-      | * G &2422f9c3
-      | ゴール: ある性質が成り立つという主張
-      | * C &45255f17
-      | 前提: 主張が成り立つ状況
-      | * S &137c4f60
-      | 戦略: 主張を分解する指標
-      | ** G &35938c38
-      | サブゴール: 分解された主張
-      | ** E &654abc0c
-      | 証拠: サブゴールの成立を支持する事実
-      | ** C &6072c487
-      | 反証: 証拠に対する反例
-      | ** G &152377e9
-      | 未達成なサブゴール
+      include defaultcase_ja.wgsn
     script#default-case-en(type='text/wgsn')
-      | * G &2422f9c3
-      | Goal: A claim that a system certainly has some desirable properties.
-      | * C &45255f17
-      | Context: A contextual artefact.
-      | * S &137c4f60
-      | Strategy: A reason for claim decomposition.
-      | ** G &35938c38
-      | SubGoal
-      | ** E &654abc0c
-      | Evidence:  A piece of materials to support that the linked claim.
-      | ** C &6072c487
-      | Rebuttal
-      | ** G &152377e9
-      | Undeveloped
+      include defaultcase_en.wgsn
     if isDevelopment
       +js('/index.js')
     else

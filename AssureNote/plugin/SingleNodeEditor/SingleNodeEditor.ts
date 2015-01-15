@@ -72,7 +72,7 @@ module AssureNote {
                     CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "";
                 }
                 this.App.SingleNodeEditorPanel.UpdateCSS(CSS);
-                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
+                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, true, true);
             } else {
                 AssureNoteUtils.Notify(Label + " is not found");
             }
@@ -81,21 +81,10 @@ module AssureNote {
     export class SingleNodeEditorPlugin extends Plugin {
         constructor(public App: AssureNoteApp) {
             super();
-            this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
             this.SetHasDoubleClicked(true);
 
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
-        }
-
-        CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-            return new NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor",
-                (event: Event, TargetView: NodeView) => {
-                    var Command = this.App.FindCommandByCommandLineName("SingleEdit");
-                    if (Command) {
-                        Command.Invoke(null, [TargetView.Label]);
-                    }
-            });
         }
 
         OnNodeDoubleClicked(NodeView: NodeView): void {

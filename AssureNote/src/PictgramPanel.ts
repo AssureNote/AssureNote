@@ -91,7 +91,7 @@ module AssureNote {
 
             this.ContentLayer.addEventListener("click", (event: MouseEvent) => {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
-                this.App.DebugP("click:" + Label);
+                //this.App.DebugP("click:" + Label);
                 if (this.IsActive()) {
                     this.ChangeFocusedLabel(Label);
                 } else {
@@ -143,7 +143,7 @@ module AssureNote {
             this.ContentLayer.addEventListener("dblclick", (event: MouseEvent) => {
                 var Label: string = AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = this.ViewMap[Label];
-                this.App.DebugP("double click:" + Label);
+                //this.App.DebugP("double click:" + Label);
                 if (this.ContextMenu.IsEnable) {
                     this.ContextMenu.Remove();
                 }
@@ -321,6 +321,34 @@ module AssureNote {
                     }
                     Event.preventDefault();
                     break;
+                case 67: /*c*/
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        if (this.FocusedLabel) {
+                            this.App.ExecCommandByName("copy", this.GetFocusedLabel());
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 86: /*v*/
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        if (this.FocusedLabel) {
+                            this.App.ExecCommandByName("paste", this.GetFocusedLabel());
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 89: /*y*/
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("redo");
+                    }
+                    Event.preventDefault();
+                    break;
+                case 90: /*z*/
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("undo");
+                    }
+                    Event.preventDefault();
+                    break;
                 default:
                     handled = false;
                     break;
@@ -476,6 +504,12 @@ module AssureNote {
             return false;
         }
 
+        DrawGSN(Node: GSNNode): void {
+            var NewNodeView: NodeView = new NodeView(Node, true);
+            this.InitializeView(NewNodeView);
+            this.Draw();
+        }
+
         InitializeView(NodeView: NodeView): void {
             this.TopNodeView = NodeView;
             this.ViewMap = {};
@@ -486,7 +520,7 @@ module AssureNote {
             var t0 = AssureNoteUtils.GetTime();
             this.Clear();
             var t1 = AssureNoteUtils.GetTime();
-            console.log("Clear: " + (t1 - t0));
+            //console.log("Clear: " + (t1 - t0));
             var TargetView = this.ViewMap[Label];
 
             if (TargetView == null) {
@@ -506,8 +540,8 @@ module AssureNote {
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
 
-            GSNShape.__Debug_Animation_SkippedNodeCount = 0;
-            GSNShape.__Debug_Animation_TotalNodeCount = 0;
+            //GSNShape.__Debug_Animation_SkippedNodeCount = 0;
+            //GSNShape.__Debug_Animation_TotalNodeCount = 0;
 
             this.FoldingAnimationTask.Cancel(true);
 
@@ -539,7 +573,7 @@ module AssureNote {
             TargetView.UpdateNodePosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
             var t3 = AssureNoteUtils.GetTime();
-            console.log("Update: " + (t3 - t2));
+            //console.log("Update: " + (t3 - t2));
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
 
             var Shape = TargetView.GetShape();
@@ -559,9 +593,9 @@ module AssureNote {
             NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
-            console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
-                GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
-                GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
+            //console.log("Animation: " + GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " +
+            //    GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " +
+            //    GSNShape.__Debug_Animation_SkippedNodeCount / GSNShape.__Debug_Animation_TotalNodeCount);
         }
 
         public ForceAppendAllOutOfScreenNode() {
@@ -621,7 +655,7 @@ module AssureNote {
                 UpdateArrow(Node);
             }
             NodeView.SetGlobalPositionCacheEnabled(false);
-            //console.log("Visible:Hidden = " + Object.keys(this.OnScreenNodeMap).length + ":" + Object.keys(this.HiddenNodeMap).length);
+            ////console.log("Visible:Hidden = " + Object.keys(this.OnScreenNodeMap).length + ":" + Object.keys(this.HiddenNodeMap).length);
         }
 
         private Clear(): void {

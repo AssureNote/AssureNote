@@ -89,7 +89,7 @@ var AssureNote;
                     room = Params[0];
                 }
             }
-            this.App.ModeManager.SetMode(1 /* View */);
+            this.App.ModeManager.ChangeMode(1 /* View */);
             if (this.App.SocketManager.IsOperational()) {
                 this.App.SocketManager.Connect(room, url);
             }

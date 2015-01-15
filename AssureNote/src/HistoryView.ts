@@ -28,6 +28,8 @@ module AssureNote {
     export class HistoryPanel extends Panel {
         private Element: JQuery;
         private Index: number;
+        private VisibleRevisionList: number[];
+        private IsModeEditBeforeHistoryPanelOpened: boolean;
         constructor(public App: AssureNoteApp) {
             super(App);
             this.Element = $("#history");
@@ -36,42 +38,72 @@ module AssureNote {
         }
 
         Show(): void {
-            this.Index = this.App.MasterRecord.HistoryList.length - 1;
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            this.VisibleRevisionList = HistoryList.filter(rev => rev.IsCommitRevision).map(rev => rev.Rev);
+            this.VisibleRevisionList.push(HistoryList.length - 1);
+            this.Index = this.VisibleRevisionList.length - 1;
             this.Update();
             this.Element.show();
             this.IsVisible = true;
+            var ModeManager = this.App.ModeManager;
+            this.IsModeEditBeforeHistoryPanelOpened = ModeManager.GetMode() == AssureNoteMode.Edit;
+            ModeManager.ChangeMode(AssureNoteMode.View);
+            ModeManager.SetReadOnly(true);
         }
 
         Hide(): void {
             this.Element.empty();
             this.Element.hide();
-            if (this.Index != this.App.MasterRecord.HistoryList.length - 1) {
-                this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+            if (this.Index != this.VisibleRevisionList.length - 1) {
+                this.App.PictgramPanel.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
             }
             this.IsVisible = false;
+            this.VisibleRevisionList = null;
+            var ModeManager = this.App.ModeManager;
+            ModeManager.SetReadOnly(false);
+            if (this.IsModeEditBeforeHistoryPanelOpened) {
+                ModeManager.ChangeMode(AssureNoteMode.Edit);
+            }
         }
 
-        DrawGSN(TopGoal: GSNNode): void {
-            var NewNodeView: NodeView = new NodeView(TopGoal, true);
-            this.App.PictgramPanel.InitializeView(NewNodeView);
-            this.App.PictgramPanel.Draw();
+        private OnRevisionChanged(OldRevision: number): void {
+            if (OldRevision != this.Index) {
+                var TopGoal = this.App.MasterRecord.HistoryList[this.VisibleRevisionList[this.Index]].Doc.TopNode;
+                this.App.PictgramPanel.DrawGSN(TopGoal);
+                $("#history-panel-close").off("click");
+                $("#prev-revision").off("click");
+                $("#first-revision").off("click");
+                $("#next-revision").off("click");
+                $("#last-revision").off("click");
+                this.Update();
+            }
         }
 
         Update(): void {
             this.Element.empty();
-            var h = this.App.MasterRecord.HistoryList[this.Index];
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            var h = HistoryList[this.VisibleRevisionList[this.Index]];
             var message = h.GetCommitMessage() || "(No Commit Message)";
+            var Counts: any = h.Doc.GetNodeCountForEachType();
+            var AllCount = 0;
+            for (var k in Counts) {
+                AllCount += Counts[k];
+            }
             var t = <any>{
+                Rev: this.Index + 1,
                 Message: message,
                 User: h.Author,
-                DateTime: AssureNoteUtils.FormatDate(h.DateString),
-                DateTimeString: new Date(h.DateString).toLocaleString(),
+                DateTime: AssureNoteUtils.FormatDate(h.Date.toUTCString()),
+                DateTimeString: h.Date.toLocaleString(),
                 Count: {
-                    All: h.Doc.GetNodeCount(),
-                    Goal:     h.Doc.GetNodeCountTypeOf(GSNType.Goal),
-                    Evidence: h.Doc.GetNodeCountTypeOf(GSNType.Evidence),
-                    Context:  h.Doc.GetNodeCountTypeOf(GSNType.Context),
-                    Strategy: h.Doc.GetNodeCountTypeOf(GSNType.Strategy)
+                    All: AllCount,
+                    Goal: Counts[GSNType.Goal],
+                    Evidence: Counts[GSNType.Evidence],
+                    Context: Counts[GSNType.Context],
+                    Assumption: Counts[GSNType.Assumption],
+                    Justification: Counts[GSNType.Justification],
+                    Exception: Counts[GSNType.Exception],
+                    Strategy: Counts[GSNType.Strategy]
                 }
             };
 
@@ -80,96 +112,53 @@ module AssureNote {
             $("#history-panel-count").tooltip({
                 html: true,
                 title: 
-                      "Goal: " + t.Count.Goal + ""
-                    + "<br>Evidence: " + t.Count.Evidence + ""
-                    + "<br>Context: "  + t.Count.Context  + ""
-                    + "<br>Strategy: " + t.Count.Strategy + ""
+                      "Goal: " + t.Count.Goal
+                      + "<br>Evidence: " + t.Count.Evidence
+                      + "<br>Context: " + t.Count.Context
+                      + "<br>Assumption: " + t.Count.Assumption
+                      + "<br>Justification: " + t.Count.Justification
+                      + "<br>Exception: " + t.Count.Exception
+                      + "<br>Strategy: " + t.Count.Strategy
             });
 
-            if (this.Index == 0) {
+            if (this.Index <= 0) {
                 $("#prev-revision").addClass("disabled");
                 $("#first-revision").addClass("disabled");
-            }
-
-            if (this.Index == this.App.MasterRecord.HistoryList.length - 1) {
-                $("#next-revision").addClass("disabled");
-                $("#last-revision").addClass("disabled");
-            }
-
-            $("#history-panel-close").click(()=>{
-                this.Hide();
-            });
-
-            $("#prev-revision")
-                .click(() => {
-                var length = this.App.MasterRecord.HistoryList.length;
-                var OldIndex = this.Index;
-                this.Index--;
-                if (this.Index < 0) {
-                    this.Index = 0;
-                }
-                while (!this.App.MasterRecord.HistoryList[this.Index].IsCommitRevision) {
-                    if (this.Index < 0) {
-                        this.Index = 0;
-                        break;
-                    }
+            } else {
+                $("#prev-revision").on("click", () => {
+                    var OldIndex = this.Index;
                     this.Index--;
-                }
-                console.log(this.Index);
-                if (OldIndex != this.Index) {
-                    var TopGoal = this.App.MasterRecord.HistoryList[this.Index].Doc.TopNode;
-                    this.DrawGSN(TopGoal);
-                    this.Update();
-                }
+                    this.OnRevisionChanged(OldIndex);
                 });
 
-            $("#first-revision")
-                .click(() => {
+                $("#first-revision").on("click", () => {
                     var OldIndex = this.Index;
                     this.Index = 0;
-                    console.log(this.Index);
-                    if (OldIndex != this.Index) {
-                        var TopGoal = this.App.MasterRecord.HistoryList[this.Index].Doc.TopNode;
-                        this.DrawGSN(TopGoal);
-                        this.Update();
-                    }
+                    this.OnRevisionChanged(OldIndex);
+                });
+            }
+
+            if (this.Index >= this.VisibleRevisionList.length - 1) {
+                $("#next-revision").addClass("disabled");
+                $("#last-revision").addClass("disabled");
+            } else {
+                $("#next-revision").on("click", () => {
+                    var OldIndex = this.Index;
+                    this.Index++;
+                    this.OnRevisionChanged(OldIndex);
                 });
 
-            $("#next-revision").click(() => {
-                var length = this.App.MasterRecord.HistoryList.length;
-                var OldIndex = this.Index;
-                this.Index++;
-                if (this.Index >= length) {
+                $("#last-revision").on("click", () => {
+                    var length = this.VisibleRevisionList.length;
+                    var OldIndex = this.Index;
                     this.Index = length - 1;
-                }
-                while (!this.App.MasterRecord.HistoryList[this.Index].IsCommitRevision) {
-                    this.Index++;
-                    if (this.Index >= length) {
-                        this.Index = length - 1;
-                        break;
-                    }
-                }
-                console.log(this.Index);
-                if (OldIndex != this.Index) {
-                    var TopGoal = this.App.MasterRecord.HistoryList[this.Index].Doc.TopNode;
-                    this.DrawGSN(TopGoal);
-                    this.Update();
-                }
-            });
+                    this.OnRevisionChanged(OldIndex);
+                });
+            }
 
-            $("#last-revision").click(() => {
-                var length = this.App.MasterRecord.HistoryList.length;
-                var OldIndex = this.Index;
-                this.Index = length - 1;
-                console.log(this.Index);
-                if (OldIndex != this.Index) {
-                    var TopGoal = this.App.MasterRecord.HistoryList[this.Index].Doc.TopNode;
-                    this.DrawGSN(TopGoal);
-                    this.Update();
-                }
+            $("#history-panel-close").on("click", () => {
+                this.Hide();
             });
         }
     }
-
-
 }

@@ -50,6 +50,7 @@ module AssureNote {
         Commands: Command[];
         private CommandLineTable: { [index: string]: Command };
         DefaultCommand: AssureNote.CommandMissingCommand;
+        ForbiddenCommand: AssureNote.ForbiddenCommand;
         UserList: UserList;
         HistoryPanel: HistoryPanel;
         NodeCountPanel: NodeCountPanel;
@@ -62,6 +63,8 @@ module AssureNote {
         private UserName: string;
         private LoadingIndicatorVisible = true;
         private LoadingIndicator: HTMLImageElement = <HTMLImageElement>document.getElementById("loading-indicator");
+
+        Clipboard: string;
 
         constructor() {
             AssureNoteApp.Current = this;
@@ -77,6 +80,7 @@ module AssureNote {
             ShapeFactory.SetFactory(new DefaultShapeFactory());
 
             this.DefaultCommand = new CommandMissingCommand(this);
+            this.ForbiddenCommand = new ForbiddenCommand(this);
             this.RegistCommand(new SaveCommand(this));
             this.RegistCommand(new SaveSVGCommand(this));
             this.RegistCommand(new SaveWGSNCommand(this));
@@ -96,6 +100,8 @@ module AssureNote {
             this.RegistCommand(new SearchCommand(this));
             this.RegistCommand(new CopyCommand(this));
             this.RegistCommand(new PasteCommand(this));
+            this.RegistCommand(new UndoCommand(this));
+            this.RegistCommand(new RedoCommand(this));
 
             this.TopMenu = new TopMenuTopItem([]);
             this.TopMenuRight = new TopMenuTopItem([]);
@@ -121,17 +127,17 @@ module AssureNote {
                     ]),
                     new DividerMenuItem(true),
                     new ShowHistoryPanelMenuItem(true, "history"),
-                    new ShowMonitorListMenuItem(true, "monitorlist"),
-                    new SetMonitorMenuItem(true, "setmonitor"),
+                    this.IsOfflineVersion() ? null : new ShowMonitorListMenuItem(true, "monitorlist"),
+                    this.IsOfflineVersion() ? null : new SetMonitorMenuItem(true, "setmonitor"),
                     new ShowNodeCountPanelMenuItem(true, "nodecount")
                 ]) );
             this.TopMenu.AppendSubMenu(
                 new SubMenuItem(true, "edit", "Edit", "pencil", [
-                    new DummyMenuItem("Undo (Coming soon)", "step-backward"),
-                    new DummyMenuItem("Redo (Coming soon)", "step-forward"),
+                    new UndoMenuItem(false),
+                    new RedoMenuItem(false),
                     new DividerMenuItem(true),
-                    new DummyMenuItem("Copy (Coming soon)", "file"),
-                    new DummyMenuItem("Paste (Coming soon)", "file"),
+                    new CopyMenuItem(true),
+                    new PasteMenuItem(false),
                     new DividerMenuItem(true),
                     new SearchMenuItem(true),
                     new CommitMenuItem(true)
@@ -150,8 +156,13 @@ module AssureNote {
                     new DividerMenuItem(true),
                     new HelpMenuItem(true),
                     new AboutMenuItem(true)
-                ]) );
-            this.TopMenuRight.AppendSubMenu(new UploadMenuItem(true));
+                ]));
+            if (this.IsOfflineVersion()) {
+                this.TopMenuRight.AppendSubMenu(new UserNameMenuItem(true));
+            }
+            if (!this.IsUserGuest()) {
+                this.TopMenuRight.AppendSubMenu(new UploadMenuItem(true));
+            }
 
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
@@ -175,9 +186,7 @@ module AssureNote {
         }
 
         // Deprecated
-        DebugP(Message: string): void {
-            console.log(Message);
-        }
+        DebugP = console.log.bind(console);
 
         static Assert(b: boolean, message?: string): void {
             if (b == false) {
@@ -195,7 +204,7 @@ module AssureNote {
         FindCommandByCommandLineName(Name: string): Command {
             var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
             if (this.ModeManager.GetMode() == AssureNoteMode.View && !Command.CanUseOnViewOnlyMode()) {
-                return this.DefaultCommand;
+                return this.ForbiddenCommand;
             }
             return Command;
         }
@@ -239,6 +248,10 @@ module AssureNote {
             this.SetLoading(false);
         }
 
+        IsOfflineVersion(): boolean {
+            return window.location.toString().indexOf("file:///") == 0;
+        }
+
         IsUserGuest(): boolean {
             return this.IsGuestUser;
         }
@@ -250,6 +263,7 @@ module AssureNote {
         SetUserName(Name: string): void {
             if (this.IsGuestUser) {
                 this.UserName = Name;
+                $(".user-name").text("\u00a0" + Name);
             }
         }
 
@@ -257,17 +271,19 @@ module AssureNote {
             this.SetLoading(true);
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
-            this.MasterRecord = new GSNRecord();
+            
             switch (Extention) {
                 case "dcase_model":
+                    this.MasterRecord = new GSNRecord();
                     new DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
                     break;
                 case "xmi":
+                    this.MasterRecord = new GSNRecord();
                     new XMIParser(this.MasterRecord).Parse(WGSN);
                     break;
                 default:
                 case "wgsn":
-                    this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord = Parser.ParseRecord(WGSN);
                     this.MasterRecord.RenumberAll();
                     break;
             }
@@ -321,6 +337,21 @@ module AssureNote {
                 reader.readAsText(Files[0], 'utf-8');
             }
         }
+
+        private RefreshGSN(Doc: GSNDoc) {
+            var TopNode = Doc.TopNode;
+            var NewNodeView: NodeView = new NodeView(TopNode, true);
+            var OldViewMap = this.PictgramPanel.ViewMap;
+            NewNodeView.SaveFlags(OldViewMap);
+
+            this.PictgramPanel.InitializeView(NewNodeView);
+            this.PictgramPanel.Draw(TopNode.GetLabel());
+            //TODO: Use eventhandler
+            //this.SocketManager.UpdateWGSN();
+
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
+        }
         
         /**
         @method EditDocument
@@ -337,20 +368,18 @@ module AssureNote {
                 var Doc = this.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 this.MasterRecord.CloseEditor();
-
-                var TopNode = Doc.TopNode;
-                var NewNodeView: NodeView = new NodeView(TopNode, true);
-                var OldViewMap = this.PictgramPanel.ViewMap;
-                NewNodeView.SaveFlags(OldViewMap);
-
-                this.PictgramPanel.InitializeView(NewNodeView);
-                this.PictgramPanel.Draw(TopNode.GetLabel());
-                //TODO: Use eventhandler
-                this.SocketManager.UpdateWGSN();
-
-                this.TopMenu.Update();
-                this.TopMenuRight.Update();
+                this.RefreshGSN(Doc);
             }
+        }
+
+        public Undo(): void {
+            this.MasterRecord.Undo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
+        }
+
+        public Redo(): void {
+            this.MasterRecord.Redo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
         }
 
         public GetNodeFromLabel(Label: string, ReportError?: boolean) {

@@ -41,7 +41,7 @@ var AssureNote;
             this.PastLogs = [];
 
             var ThisModel = this.GetModel();
-            var GoalModel = ThisModel.GetCloseGoal();
+            var GoalModel = ThisModel.GetUpperNearestGoal();
             var ContextModel = null;
             for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
                 var BroutherModel = GoalModel.SubNodeList[i];
@@ -117,10 +117,10 @@ var AssureNote;
         MonitorNode.prototype.UpdateModel = function () {
             var Model = this.GetModel();
             if (Model.TagMap == null) {
-                Model.TagMap = new AssureNote.HashMap();
+                Model.TagMap = {};
             }
             var Value = (this.Data != null) ? this.Data + "" : "";
-            Model.TagMap.put(this.Type, Value);
+            Model.TagMap[this.Type] = Value;
             Model.HasTag = true;
 
             var NodeDoc = Model.NodeDoc + AssureNote.Lib.LineFeed;
@@ -250,7 +250,7 @@ var AssureNote;
                 if (Model.HasTag) {
                     // Get presumed node label name
                     var PresumedNodeLabelName = null;
-                    var TagValue = Model.GetTagMap().get("Presume");
+                    var TagValue = Model.GetTagMap()["Presume"];
                     if (TagValue != null) {
                         PresumedNodeLabelName = TagValue.replace(/\[|\]/g, "");
                     }
@@ -258,7 +258,7 @@ var AssureNote;
                     // Get presumed node label
                     var PresumedNodeLabel = null;
                     if (PresumedNodeLabelName != null) {
-                        PresumedNodeLabel = LabelMap.get(PresumedNodeLabelName);
+                        PresumedNodeLabel = LabelMap[PresumedNodeLabelName];
                     }
                     if (PresumedNodeLabel == null) {
                         PresumedNodeLabel = PresumedNodeLabelName;

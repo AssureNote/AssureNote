@@ -1,18 +1,5 @@
 
-interface PointerEvent extends MouseEvent {
-    //pointerId: number;
-    //width: number;
-    //height: number;
-    //pressure: number;
-    //tiltX: number;
-    //tiltY: number;
-    //pointerType: string;
-    //isPrimary: boolean;
-}
-
 interface Element {
-    //ongotpointercapture: (ev: PointerEvent) => any;
-    //onlostpointercapture: (ev: PointerEvent) => any;
     addEventListener(type: "gotpointercapture", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
     addEventListener(type: "lostpointercapture", listener: (ev: PointerEvent) => any, useCapture?: boolean): void;
     setPointerCapture(pointerId: number): void;

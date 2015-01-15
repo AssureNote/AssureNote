@@ -57,7 +57,7 @@ var AssureNote;
                     found = true;
                 }
             }
-            this.App.ModeManager.ReadOnly(found);
+            this.App.ModeManager.SetReadOnly(found);
             $('.user-name').text(this.App.GetUserName());
             $('#user-list-tmpl').tmpl(this.UserList).appendTo($('#user-list').empty());
         };

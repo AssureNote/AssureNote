@@ -45,13 +45,12 @@ module AssureNote {
             } else {
                 Label = Params[0].toUpperCase();
             }
-            var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                if (TargetView.GetNodeType() == GSNType.Strategy) {
-                    AssureNoteUtils.Notify("Subtree editor cannot open at Strategy");
-                    return;
-                }
+                //if (TargetView.GetNodeType() == GSNType.Strategy) {
+                //    AssureNoteUtils.Notify("Subtree editor cannot open at Strategy");
+                //    return;
+                //}
                 var Writer = new StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, true);
                 this.App.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
@@ -70,9 +69,6 @@ module AssureNote {
         }
 
         CreateMenuBarButton(NodeView: NodeView): NodeMenuItem {
-            if (NodeView.GetNodeType() == GSNType.Strategy) {
-                return null;
-            }
             return new NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor",
                 (event: Event, TargetView: NodeView) => {
                     var Command = this.AssureNoteApp.FindCommandByCommandLineName("edit");
@@ -84,23 +80,17 @@ module AssureNote {
 
         /* This focuses on the node where the cursor of CodeMirror indicate */
         MoveBackgroundNode(doc: CodeMirror.Doc) {
-            var UID: string = null;
-            var line = doc.getCursor().line;
-            while (line >= 0) {
-                var LineString: string = doc.getLine(line);
-                if (LineString.indexOf('*') == 0) {
-                    UID = WikiSyntax.ParseUID(LineString);
-                    break;
-                }
-                line -= 1;
-            }
-            if (UID != null) {
-                var Keys: string[] = Object.keys(this.AssureNoteApp.PictgramPanel.ViewMap);
-                for (var i in Keys) {
-                    var View: NodeView = this.AssureNoteApp.PictgramPanel.ViewMap[Keys[i]];
+            var Line: number = doc.getCursor().line;
+            var LineText: string = doc.getLine(Line);
+            var MatchResult = LineText.match(/^\*.*?&([0-9a-fA-F]+)/);
+            if (MatchResult && MatchResult[1]) {
+                var UID = parseInt(MatchResult[1], 16);
+                var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
+                for (var key in ViewMap) {
+                    var View: NodeView = ViewMap[key];
                     /* Node exists and visible */
-                    if (View && View.Model && Lib.DecToHex(View.Model.UID) == UID) {
-                        console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
+                    if (View && View.Model && View.Model.UID == UID) {
+                        //console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
                         this.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(View.GetCenterGX(), View.GetCenterGY());
                     }
                 }

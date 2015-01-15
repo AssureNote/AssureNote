@@ -35,7 +35,15 @@ var AssureNote;
         __extends(AddNodeCommand, _super);
         function AddNodeCommand(App) {
             _super.call(this, App);
-            this.Text2NodeTypeMap = { "goal": 0 /* Goal */, "strategy": 2 /* Strategy */, "context": 1 /* Context */, "evidence": 3 /* Evidence */ };
+            this.Text2NodeTypeMap = {
+                "goal": 0 /* Goal */,
+                "strategy": 2 /* Strategy */,
+                "context": 1 /* Context */,
+                "assumption": 6 /* Assumption */,
+                "exception": 7 /* Exception */,
+                "justification": 5 /* Justification */,
+                "evidence": 3 /* Evidence */
+            };
         }
         AddNodeCommand.prototype.GetCommandLineNames = function () {
             return ["addnode", "add-node"];
@@ -99,13 +107,13 @@ var AssureNote;
             var NodeType = View.GetNodeType();
             switch (NodeType) {
                 case 0 /* Goal */:
-                    res = res.concat([
+                    res = [
                         this.CreateContextMenu(View),
                         this.CreateStrategyMenu(View),
-                        this.CreateEvidenceMenu(View)]);
+                        this.CreateEvidenceMenu(View)];
                     break;
                 case 2 /* Strategy */:
-                    res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
+                    res = [this.CreateContextMenu(View), this.CreateGoalMenu(View)];
                     break;
                 case 1 /* Context */:
                     break;

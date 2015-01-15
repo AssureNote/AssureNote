@@ -75,7 +75,7 @@ module AssureNote {
                     room = Params[0];
                 }
             }
-            this.App.ModeManager.SetMode(AssureNoteMode.View);
+            this.App.ModeManager.ChangeMode(AssureNoteMode.View);
             if (this.App.SocketManager.IsOperational()) {
                 this.App.SocketManager.Connect(room, url);
             }
@@ -87,7 +87,7 @@ module AssureNote {
     }
 
     export class MessageChatPlugin extends Plugin {
-        public EditorUtil: CodeMirrorEditorPanel;
+        public EditorUtil: Panel;
         constructor(public AssureNoteApp: AssureNoteApp) {
             super();
             this.AssureNoteApp.SocketManager.RegisterSocketHandler('message', function (data) {

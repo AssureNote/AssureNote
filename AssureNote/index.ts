@@ -74,7 +74,7 @@ $(() => {
     }
 
     Debug.StartEditMode = () => {
-        App.ModeManager.SetMode(AssureNote.AssureNoteMode.Edit);
+        App.ModeManager.ChangeMode(AssureNote.AssureNoteMode.Edit);
     }
 
     App.LoadDefaultWGSN();

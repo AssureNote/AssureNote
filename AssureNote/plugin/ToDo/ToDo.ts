@@ -34,14 +34,13 @@ module AssureNote {
 
         RenderSVG(ShapeGroup: SVGGElement, NodeView: NodeView): void {
             NodeView.RemoveColorStyle(ColorStyle.ToDo);
-            var TagMap: HashMap<string, string> = NodeView.Model.GetTagMap();
+            var TagMap = NodeView.Model.GetTagMap();
             if (!TagMap) return;
-            if (TagMap.get('TODO') || TagMap.get('TODO') == '') {
+            if (TagMap['TODO'] || TagMap['TODO'] == '') {
                 NodeView.AddColorStyle(ColorStyle.ToDo);
             }
-            var KeySet: string[] = TagMap.keySet();
-            for (var key in KeySet) {
-                if (TagMap.get(KeySet[key]) == '') {
+            for (var key in TagMap) {
+                if (TagMap[key] == '') {
                     NodeView.AddColorStyle(ColorStyle.ToDo);
                 }
             }

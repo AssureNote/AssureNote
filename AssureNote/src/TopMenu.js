@@ -11,10 +11,11 @@ var AssureNote;
             this.IsEnabled = IsEnabled;
             this.ButtonId = null;
             this.ElementId = null;
-            if (ButtonId) {
-                this.ButtonId = ButtonId;
-                this.ElementId = ButtonId + "-menu-button";
+            if (!ButtonId) {
+                ButtonId = TopMenuItem.CreateID();
             }
+            this.ButtonId = ButtonId;
+            this.ElementId = ButtonId + "-menu-button";
         }
         TopMenuItem.prototype.GetIconName = function () {
             return "";
@@ -50,7 +51,7 @@ var AssureNote;
             var item;
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
             var spaceChar = "\u00a0";
-            var text = document.createTextNode(spaceChar + this.GetDisplayName());
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode(spaceChar + this.GetDisplayName()) : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -69,11 +70,13 @@ var AssureNote;
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if (!this.IsEnabled) {
                     classes += " disabled";
-                    item.setAttribute("disabled");
+                    item.setAttribute("disabled", "");
                 }
                 item.className = classes;
                 item.appendChild(icon);
-                item.appendChild(text);
+                if (text) {
+                    item.appendChild(text);
+                }
             } else {
                 /*
                 <li>
@@ -90,7 +93,9 @@ var AssureNote;
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
-                a.appendChild(text);
+                if (text) {
+                    a.appendChild(text);
+                }
                 item.appendChild(a);
                 if (!this.IsEnabled) {
                     item.className = "disabled";
@@ -119,7 +124,9 @@ var AssureNote;
             _super.call(this, IsEnabled, ButtonId);
             this.DisplayName = DisplayName;
             this.IconName = IconName;
-            this.SubMenuList = SubMenuList;
+            this.SubMenuList = SubMenuList.filter(function (Menu) {
+                return Menu != null;
+            });
         }
         SubMenuItem.prototype.GetIconName = function () {
             return this.IconName;
@@ -131,7 +138,7 @@ var AssureNote;
 
         SubMenuItem.prototype.Render = function (App, Target, IsTopLevel) {
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
-            var text = document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0");
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0") : null;
             if (IsTopLevel) {
                 /*
                 <button id="file-menu-button" type="button" data-toggle="dropdown" oncontextmenu="return false" class="btn navbar-btn btn-default dropdown-toggle">
@@ -158,7 +165,9 @@ var AssureNote;
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
-                button.appendChild(text);
+                if (text) {
+                    button.appendChild(text);
+                }
                 button.appendChild(caret);
 
                 var ul = document.createElement("ul");
@@ -167,9 +176,9 @@ var AssureNote;
                 ul.style.right = "auto";
                 ul.style.width = "250px";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(function (Menu) {
+                    return Menu.Render(App, ul, false);
+                });
 
                 dropdown.appendChild(button);
                 dropdown.appendChild(ul);
@@ -192,15 +201,16 @@ var AssureNote;
                 a.href = "#";
                 li.appendChild(a);
                 a.appendChild(icon);
-                a.appendChild(text);
-
+                if (text) {
+                    a.appendChild(text);
+                }
                 var ul = document.createElement("ul");
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
 
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(function (Menu) {
+                    return Menu.Render(App, ul, false);
+                });
 
                 li.appendChild(ul);
                 Target.appendChild(li);
@@ -208,9 +218,9 @@ var AssureNote;
         };
 
         SubMenuItem.prototype.Update = function () {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(function (Menu) {
+                return Menu.Update();
+            });
         };
         return SubMenuItem;
     })(TopMenuItem);
@@ -219,14 +229,15 @@ var AssureNote;
     var TopMenuTopItem = (function (_super) {
         __extends(TopMenuTopItem, _super);
         function TopMenuTopItem(SubMenuList) {
+            var _this = this;
             _super.call(this, true);
             this.SubMenuList = SubMenuList;
             this.SubMenuMap = {};
-            for (var i; i < SubMenuList.length; i++) {
-                if (SubMenuList[i].ButtonId) {
-                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+            this.SubMenuList.forEach(function (Menu) {
+                if (Menu.ButtonId) {
+                    _this.SubMenuMap[Menu.ButtonId] = Menu;
                 }
-            }
+            });
         }
         TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
             this.SubMenuList.unshift(SubMenu);
@@ -236,16 +247,16 @@ var AssureNote;
         };
 
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Render(App, Target, true);
-            }
+            this.SubMenuList.forEach(function (Menu) {
+                return Menu.Render(App, Target, true);
+            });
             $(".dropdown-toggle").dropdown();
         };
 
         TopMenuTopItem.prototype.Update = function () {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(function (Menu) {
+                return Menu.Update();
+            });
         };
         return TopMenuTopItem;
     })(TopMenuItem);
@@ -264,6 +275,27 @@ var AssureNote;
         return DividerMenuItem;
     })(TopMenuItem);
     AssureNote.DividerMenuItem = DividerMenuItem;
+
+    var UserNameMenuItem = (function (_super) {
+        __extends(UserNameMenuItem, _super);
+        function UserNameMenuItem() {
+            _super.apply(this, arguments);
+        }
+        UserNameMenuItem.prototype.GetIconName = function () {
+            return "cog";
+        };
+        UserNameMenuItem.prototype.GetDisplayName = function () {
+            return "";
+        };
+        UserNameMenuItem.prototype.Invoke = function (App) {
+            var Name = prompt('Enter user name', App.GetUserName());
+            if (Name && Name.length > 0 && App.GetUserName() != Name) {
+                App.ExecCommandByName("set-user", Name);
+            }
+        };
+        return UserNameMenuItem;
+    })(TopMenuItem);
+    AssureNote.UserNameMenuItem = UserNameMenuItem;
 
     var NewMenuItem = (function (_super) {
         __extends(NewMenuItem, _super);
@@ -599,6 +631,104 @@ var AssureNote;
         return ZoomMenuItem;
     })(TopMenuItem);
     AssureNote.ZoomMenuItem = ZoomMenuItem;
+
+    var CopyMenuItem = (function (_super) {
+        __extends(CopyMenuItem, _super);
+        function CopyMenuItem() {
+            _super.apply(this, arguments);
+        }
+        CopyMenuItem.prototype.GetIconName = function () {
+            return "file";
+        };
+        CopyMenuItem.prototype.GetDisplayName = function () {
+            return "Copy";
+        };
+        CopyMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("copy", App.PictgramPanel.GetFocusedLabel());
+        };
+        return CopyMenuItem;
+    })(TopMenuItem);
+    AssureNote.CopyMenuItem = CopyMenuItem;
+
+    var PasteMenuItem = (function (_super) {
+        __extends(PasteMenuItem, _super);
+        function PasteMenuItem() {
+            _super.apply(this, arguments);
+        }
+        PasteMenuItem.prototype.GetIconName = function () {
+            return "file";
+        };
+        PasteMenuItem.prototype.GetDisplayName = function () {
+            return "Paste";
+        };
+        PasteMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("paste", App.PictgramPanel.GetFocusedLabel());
+        };
+        PasteMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            if (Mode == 0 /* Edit */) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        };
+        return PasteMenuItem;
+    })(TopMenuItem);
+    AssureNote.PasteMenuItem = PasteMenuItem;
+
+    var UndoMenuItem = (function (_super) {
+        __extends(UndoMenuItem, _super);
+        function UndoMenuItem() {
+            _super.apply(this, arguments);
+        }
+        UndoMenuItem.prototype.GetIconName = function () {
+            return "step-backward";
+        };
+        UndoMenuItem.prototype.GetDisplayName = function () {
+            return "Undo";
+        };
+        UndoMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("undo");
+        };
+        UndoMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            var CanUndo = AssureNote.AssureNoteApp.Current.MasterRecord.CanUndo();
+            if (Mode == 0 /* Edit */ && CanUndo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        };
+        return UndoMenuItem;
+    })(TopMenuItem);
+    AssureNote.UndoMenuItem = UndoMenuItem;
+
+    var RedoMenuItem = (function (_super) {
+        __extends(RedoMenuItem, _super);
+        function RedoMenuItem() {
+            _super.apply(this, arguments);
+        }
+        RedoMenuItem.prototype.GetIconName = function () {
+            return "step-forward";
+        };
+        RedoMenuItem.prototype.GetDisplayName = function () {
+            return "Redo";
+        };
+        RedoMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("redo");
+        };
+        RedoMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            var CanRedo = AssureNote.AssureNoteApp.Current.MasterRecord.CanRedo();
+            if (Mode == 0 /* Edit */ && CanRedo) {
+                this.Enable();
+            } else {
+                this.Disable();
+            }
+        };
+        return RedoMenuItem;
+    })(TopMenuItem);
+    AssureNote.RedoMenuItem = RedoMenuItem;
 
     var DummyMenuItem = (function (_super) {
         __extends(DummyMenuItem, _super);

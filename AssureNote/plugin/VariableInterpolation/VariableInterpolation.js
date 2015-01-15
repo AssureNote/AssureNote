@@ -48,7 +48,7 @@ var AssureNote;
 
         VariableInterpolationPlugin.prototype.Supplant = function (str, LabelMap, TagMap) {
             var _this = this;
-            return str.replace(/\[([^\[\]]*)\]/g, (function (v) {
+            return str.replace(VariableInterpolationPlugin.ReferenceRegExp, (function (v) {
                 var params = [];
                 for (var _i = 0; _i < (arguments.length - 1); _i++) {
                     params[_i] = arguments[_i + 1];
@@ -73,13 +73,14 @@ var AssureNote;
         };
 
         VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc, Model) {
-            if (NodeDoc.match(/\[([^\[\]]*)\]/)) {
+            if (Model.HasTagOrLabelReference) {
                 var Map = Model.GetTagMapWithLexicalScope();
                 var LabelMap = Model.BaseDoc.GetLabelMap();
-                return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
+                return this.Supplant(NodeDoc, LabelMap, Map ? Map : {});
             }
             return NodeDoc;
         };
+        VariableInterpolationPlugin.ReferenceRegExp = /\[([^\[\]]*)\]/g;
         return VariableInterpolationPlugin;
     })(AssureNote.Plugin);
     AssureNote.VariableInterpolationPlugin = VariableInterpolationPlugin;

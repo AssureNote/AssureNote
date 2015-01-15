@@ -143,7 +143,7 @@ module AssureNote {
                     }
                     var Buttons = value.CreateMenuBarButtons(TargetView);
                     if (Buttons != null) {
-                        ret = ret.concat(Buttons);
+                        Array.prototype.push.apply(ret, Buttons);
                     }
                 }
             });
@@ -154,7 +154,7 @@ module AssureNote {
             var ret: HTMLLIElement[] = [];
             $.each(this.PluginMap, (key, value: Plugin) => {
                 var Tooltip = value.CreateTooltipContents(TargetView);
-                if (Tooltip) ret = ret.concat(Tooltip);
+                if (Tooltip) Array.prototype.push.apply(ret, Tooltip);
             });
             return ret;
         }

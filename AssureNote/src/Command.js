@@ -87,6 +87,22 @@ var AssureNote;
     })(Command);
     AssureNote.CommandMissingCommand = CommandMissingCommand;
 
+    var ForbiddenCommand = (function (_super) {
+        __extends(ForbiddenCommand, _super);
+        function ForbiddenCommand(App) {
+            _super.call(this, App);
+        }
+        ForbiddenCommand.prototype.Invoke = function (CommandName, Params) {
+            if (CommandName == null) {
+                return;
+            }
+            AssureNote.AssureNoteUtils.Notify("This action is not allowed on View mode.");
+            this.App.DebugP("forbidden command: " + CommandName);
+        };
+        return ForbiddenCommand;
+    })(Command);
+    AssureNote.ForbiddenCommand = ForbiddenCommand;
+
     var SaveCommand = (function (_super) {
         __extends(SaveCommand, _super);
         function SaveCommand(App) {
@@ -446,11 +462,10 @@ var AssureNote;
         };
 
         NewCommand.prototype.Invoke = function (CommandName, Params) {
-            var History = new AssureNote.GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
+            var History = new AssureNote.GSNHistory(0, this.App.GetUserName(), '-', new Date(), '-', null);
             var Writer = new AssureNote.StringWriter();
             AssureNote.TagUtils.FormatHistoryTag([History], 0, Writer);
-            console.log(Writer.toString());
-            var WGSN = Writer.toString() + 'Revision:: 0\n*G';
+            var WGSN = Writer.toString() + '\n*G';
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], WGSN);
             } else {
@@ -462,9 +477,7 @@ var AssureNote;
                     this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNote.AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         };
 
         NewCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -577,7 +590,7 @@ var AssureNote;
         };
 
         CommitCommand.prototype.Invoke = function (CommandName, Params) {
-            if (this.App.IsUserGuest()) {
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
                 alert("Please login first.");
                 return;
             }
@@ -614,9 +627,7 @@ var AssureNote;
                 _this.App.LoadFiles(target.files);
             });
             $("#file-open-dialog").click();
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNote.AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         };
 
         OpenCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -680,6 +691,10 @@ var AssureNote;
 
         ShareCommand.prototype.Invoke = function (CommandName, Params) {
             var _this = this;
+            if (this.App.IsOfflineVersion()) {
+                AssureNote.AssureNoteUtils.Notify("This feature is not supported on offline version.");
+                return;
+            }
             if (this.App.IsUserGuest()) {
                 AssureNote.AssureNoteUtils.Notify("Please login first");
                 return;
@@ -691,11 +706,7 @@ var AssureNote;
             var fileId = paths[paths.length - 1];
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString(), fileId: fileId }, function (result) {
                 var NewURI = Config.BASEPATH + "/file/" + result.fileId;
-                if (history.replaceState) {
-                    history.replaceState(null, null, NewURI);
-                } else {
-                    window.location.href = NewURI;
-                }
+                AssureNote.AssureNoteUtils.ChangeLocation(NewURI);
                 _this.OpenShareModal(NewURI);
                 _this.App.SetLoading(false);
             }, function () {
@@ -722,7 +733,7 @@ var AssureNote;
         SetGuestUserNameCommand.prototype.Invoke = function (CommandName, Params) {
             var Name = Params[0];
             if (!Name || Name == '') {
-                Name = prompt('Enter the new name for guest', '');
+                Name = prompt('Enter the new name for guest', this.App.GetUserName());
             }
             if (!Name || Name == '') {
                 Name = 'Guest';
@@ -786,19 +797,14 @@ var AssureNote;
         };
 
         CopyCommand.prototype.Invoke = function (CommandName, Params) {
-            console.log("invoke");
-            console.log(Params);
             if (Params.length == 1) {
                 var TargetLabel = Params[0];
-                console.log(Params);
                 var Node = this.App.PictgramPanel.ViewMap[TargetLabel];
                 if (Node != null) {
                     var Writer = new AssureNote.StringWriter();
                     Node.Model.FormatSubNode(1, Writer, true);
                     var Text = Writer.toString();
-
-                    /* TODO copy to the clipboard. It seems that some libraries is needed to use the clipboard. */
-                    console.log(Text);
+                    this.App.Clipboard = Text;
                 } else {
                     AssureNote.AssureNoteUtils.Notify("Node " + Params[0] + "not found");
                 }
@@ -808,7 +814,7 @@ var AssureNote;
         };
 
         CopyCommand.prototype.CanUseOnViewOnlyMode = function () {
-            return false;
+            return true;
         };
         return CopyCommand;
     })(Command);
@@ -824,11 +830,28 @@ var AssureNote;
         };
 
         PasteCommand.prototype.GetHelpHTML = function () {
-            return "<code>Paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
+            return "<code>paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
         };
 
         PasteCommand.prototype.Invoke = function (CommandName, Params) {
-            /* TODO Get WGSN from the clipboard. */
+            var _this = this;
+            var WGSN = this.App.Clipboard || "";
+            if (WGSN.length > 0) {
+                var TargetLabel = Params[0];
+                var Node = this.App.PictgramPanel.ViewMap[TargetLabel].Model;
+                var PasetedNode = AssureNote.Parser.ParseTree(Node.BaseDoc, WGSN);
+                var PasetedLevel = Node.GetGoalLevel();
+                if (PasetedNode.NodeType == 0 /* Goal */) {
+                    PasetedLevel += 1;
+                }
+                if (AssureNote.GSNNode.IsCollectRelation(Node.NodeType, Node.GetGoalLevel(), PasetedNode.NodeType, PasetedLevel)) {
+                    this.App.EditDocument("todo", "test", function () {
+                        var TargetNode = _this.App.MasterRecord.EditingDoc.GetNode(Node.UID);
+                        TargetNode.AppendSubNode(PasetedNode);
+                        PasetedNode.ParentNode = TargetNode;
+                    });
+                }
+            }
         };
 
         PasteCommand.prototype.CanUseOnViewOnlyMode = function () {
@@ -837,5 +860,59 @@ var AssureNote;
         return PasteCommand;
     })(Command);
     AssureNote.PasteCommand = PasteCommand;
+
+    var UndoCommand = (function (_super) {
+        __extends(UndoCommand, _super);
+        function UndoCommand(App) {
+            _super.call(this, App);
+        }
+        UndoCommand.prototype.GetCommandLineNames = function () {
+            return ["undo", "u"];
+        };
+
+        UndoCommand.prototype.GetHelpHTML = function () {
+            return "<code>undo</code><br>Undo it.";
+        };
+
+        UndoCommand.prototype.Invoke = function (CommandName, Params) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanUndo()) {
+                this.App.Undo();
+            }
+        };
+
+        UndoCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return UndoCommand;
+    })(Command);
+    AssureNote.UndoCommand = UndoCommand;
+
+    var RedoCommand = (function (_super) {
+        __extends(RedoCommand, _super);
+        function RedoCommand(App) {
+            _super.call(this, App);
+        }
+        RedoCommand.prototype.GetCommandLineNames = function () {
+            return ["redo", "u"];
+        };
+
+        RedoCommand.prototype.GetHelpHTML = function () {
+            return "<code>redo</code><br>Redo it.";
+        };
+
+        RedoCommand.prototype.Invoke = function (CommandName, Params) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanRedo()) {
+                this.App.Redo();
+            }
+        };
+
+        RedoCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return RedoCommand;
+    })(Command);
+    AssureNote.RedoCommand = RedoCommand;
 })(AssureNote || (AssureNote = {}));
 //# sourceMappingURL=Command.js.map

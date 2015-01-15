@@ -42,43 +42,77 @@ var AssureNote;
             this.App.HistoryPanel = this; //FIXME
         }
         HistoryPanel.prototype.Show = function () {
-            this.Index = this.App.MasterRecord.HistoryList.length - 1;
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            this.VisibleRevisionList = HistoryList.filter(function (rev) {
+                return rev.IsCommitRevision;
+            }).map(function (rev) {
+                return rev.Rev;
+            });
+            this.VisibleRevisionList.push(HistoryList.length - 1);
+            this.Index = this.VisibleRevisionList.length - 1;
             this.Update();
             this.Element.show();
             this.IsVisible = true;
+            var ModeManager = this.App.ModeManager;
+            this.IsModeEditBeforeHistoryPanelOpened = ModeManager.GetMode() == 0 /* Edit */;
+            ModeManager.ChangeMode(1 /* View */);
+            ModeManager.SetReadOnly(true);
         };
 
         HistoryPanel.prototype.Hide = function () {
             this.Element.empty();
             this.Element.hide();
-            if (this.Index != this.App.MasterRecord.HistoryList.length - 1) {
-                this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+            if (this.Index != this.VisibleRevisionList.length - 1) {
+                this.App.PictgramPanel.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
             }
             this.IsVisible = false;
+            this.VisibleRevisionList = null;
+            var ModeManager = this.App.ModeManager;
+            ModeManager.SetReadOnly(false);
+            if (this.IsModeEditBeforeHistoryPanelOpened) {
+                ModeManager.ChangeMode(0 /* Edit */);
+            }
         };
 
-        HistoryPanel.prototype.DrawGSN = function (TopGoal) {
-            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-            this.App.PictgramPanel.InitializeView(NewNodeView);
-            this.App.PictgramPanel.Draw();
+        HistoryPanel.prototype.OnRevisionChanged = function (OldRevision) {
+            if (OldRevision != this.Index) {
+                var TopGoal = this.App.MasterRecord.HistoryList[this.VisibleRevisionList[this.Index]].Doc.TopNode;
+                this.App.PictgramPanel.DrawGSN(TopGoal);
+                $("#history-panel-close").off("click");
+                $("#prev-revision").off("click");
+                $("#first-revision").off("click");
+                $("#next-revision").off("click");
+                $("#last-revision").off("click");
+                this.Update();
+            }
         };
 
         HistoryPanel.prototype.Update = function () {
             var _this = this;
             this.Element.empty();
-            var h = this.App.MasterRecord.HistoryList[this.Index];
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            var h = HistoryList[this.VisibleRevisionList[this.Index]];
             var message = h.GetCommitMessage() || "(No Commit Message)";
+            var Counts = h.Doc.GetNodeCountForEachType();
+            var AllCount = 0;
+            for (var k in Counts) {
+                AllCount += Counts[k];
+            }
             var t = {
+                Rev: this.Index + 1,
                 Message: message,
                 User: h.Author,
-                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString),
-                DateTimeString: new Date(h.DateString).toLocaleString(),
+                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.Date.toUTCString()),
+                DateTimeString: h.Date.toLocaleString(),
                 Count: {
-                    All: h.Doc.GetNodeCount(),
-                    Goal: h.Doc.GetNodeCountTypeOf(0 /* Goal */),
-                    Evidence: h.Doc.GetNodeCountTypeOf(3 /* Evidence */),
-                    Context: h.Doc.GetNodeCountTypeOf(1 /* Context */),
-                    Strategy: h.Doc.GetNodeCountTypeOf(2 /* Strategy */)
+                    All: AllCount,
+                    Goal: Counts[0 /* Goal */],
+                    Evidence: Counts[3 /* Evidence */],
+                    Context: Counts[1 /* Context */],
+                    Assumption: Counts[6 /* Assumption */],
+                    Justification: Counts[5 /* Justification */],
+                    Exception: Counts[7 /* Exception */],
+                    Strategy: Counts[2 /* Strategy */]
                 }
             };
 
@@ -86,88 +120,46 @@ var AssureNote;
             $("#history-panel-date").tooltip({});
             $("#history-panel-count").tooltip({
                 html: true,
-                title: "Goal: " + t.Count.Goal + "" + "<br>Evidence: " + t.Count.Evidence + "" + "<br>Context: " + t.Count.Context + "" + "<br>Strategy: " + t.Count.Strategy + ""
+                title: "Goal: " + t.Count.Goal + "<br>Evidence: " + t.Count.Evidence + "<br>Context: " + t.Count.Context + "<br>Assumption: " + t.Count.Assumption + "<br>Justification: " + t.Count.Justification + "<br>Exception: " + t.Count.Exception + "<br>Strategy: " + t.Count.Strategy
             });
 
-            if (this.Index == 0) {
+            if (this.Index <= 0) {
                 $("#prev-revision").addClass("disabled");
                 $("#first-revision").addClass("disabled");
+            } else {
+                $("#prev-revision").on("click", function () {
+                    var OldIndex = _this.Index;
+                    _this.Index--;
+                    _this.OnRevisionChanged(OldIndex);
+                });
+
+                $("#first-revision").on("click", function () {
+                    var OldIndex = _this.Index;
+                    _this.Index = 0;
+                    _this.OnRevisionChanged(OldIndex);
+                });
             }
 
-            if (this.Index == this.App.MasterRecord.HistoryList.length - 1) {
+            if (this.Index >= this.VisibleRevisionList.length - 1) {
                 $("#next-revision").addClass("disabled");
                 $("#last-revision").addClass("disabled");
+            } else {
+                $("#next-revision").on("click", function () {
+                    var OldIndex = _this.Index;
+                    _this.Index++;
+                    _this.OnRevisionChanged(OldIndex);
+                });
+
+                $("#last-revision").on("click", function () {
+                    var length = _this.VisibleRevisionList.length;
+                    var OldIndex = _this.Index;
+                    _this.Index = length - 1;
+                    _this.OnRevisionChanged(OldIndex);
+                });
             }
 
-            $("#history-panel-close").click(function () {
+            $("#history-panel-close").on("click", function () {
                 _this.Hide();
-            });
-
-            $("#prev-revision").click(function () {
-                var length = _this.App.MasterRecord.HistoryList.length;
-                var OldIndex = _this.Index;
-                _this.Index--;
-                if (_this.Index < 0) {
-                    _this.Index = 0;
-                }
-                while (!_this.App.MasterRecord.HistoryList[_this.Index].IsCommitRevision) {
-                    if (_this.Index < 0) {
-                        _this.Index = 0;
-                        break;
-                    }
-                    _this.Index--;
-                }
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
-            });
-
-            $("#first-revision").click(function () {
-                var OldIndex = _this.Index;
-                _this.Index = 0;
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
-            });
-
-            $("#next-revision").click(function () {
-                var length = _this.App.MasterRecord.HistoryList.length;
-                var OldIndex = _this.Index;
-                _this.Index++;
-                if (_this.Index >= length) {
-                    _this.Index = length - 1;
-                }
-                while (!_this.App.MasterRecord.HistoryList[_this.Index].IsCommitRevision) {
-                    _this.Index++;
-                    if (_this.Index >= length) {
-                        _this.Index = length - 1;
-                        break;
-                    }
-                }
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
-            });
-
-            $("#last-revision").click(function () {
-                var length = _this.App.MasterRecord.HistoryList.length;
-                var OldIndex = _this.Index;
-                _this.Index = length - 1;
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
             });
         };
         return HistoryPanel;

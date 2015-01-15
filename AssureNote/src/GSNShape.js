@@ -122,6 +122,9 @@ var AssureNote;
                 case 0 /* Goal */:
                     return new GSNGoalShape(Node);
                 case 1 /* Context */:
+                case 5 /* Justification */:
+                case 6 /* Assumption */:
+                case 7 /* Exception */:
                     return new GSNContextShape(Node);
                 case 2 /* Strategy */:
                     return new GSNStrategyShape(Node);
@@ -250,7 +253,7 @@ var AssureNote;
         };
 
         GSNShape.prototype.FormatNewLine = function (doc) {
-            return doc.replace(/\n/g, '<br>');
+            return doc.replace(/\r\n|\n|\r/g, '<br>');
         };
 
         GSNShape.prototype.PrerenderHTMLContent = function (manager) {
@@ -342,18 +345,20 @@ var AssureNote;
             }
 
             if (this.WillFadein()) {
-                GSNShape.__Debug_Animation_TotalNodeCount++;
+                //GSNShape.__Debug_Animation_TotalNodeCount++;
                 if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
                     this.SetPosition(x, y);
                     this.willFadein = false;
-                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+
+                    //GSNShape.__Debug_Animation_SkippedNodeCount++;
                     return;
                 }
                 this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GXCache == null || this.GYCache == null) {
                     this.SetPosition(x, y);
-                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+
+                    //GSNShape.__Debug_Animation_SkippedNodeCount++;
                     return;
                 }
             }
@@ -362,13 +367,13 @@ var AssureNote;
                 GSNShape.__Debug_Animation_TotalNodeCount++;
                 if (this.GXCache + this.GetNodeWidth() < ScreenRect.X || this.GXCache > ScreenRect.X + ScreenRect.Width) {
                     if (x + this.GetNodeWidth() < ScreenRect.X || x > ScreenRect.X + ScreenRect.Width) {
-                        GSNShape.__Debug_Animation_SkippedNodeCount++;
+                        //GSNShape.__Debug_Animation_SkippedNodeCount++;
                         this.SetPosition(x, y);
                         return;
                     }
                 }
                 if (this.GYCache + this.GetNodeHeight() < ScreenRect.Y || this.GYCache > ScreenRect.Y + ScreenRect.Height) {
-                    GSNShape.__Debug_Animation_SkippedNodeCount++;
+                    //GSNShape.__Debug_Animation_SkippedNodeCount++;
                     this.SetPosition(x, y);
                     return;
                 }

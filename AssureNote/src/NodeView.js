@@ -51,7 +51,10 @@ var AssureNote;
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
                     var SubView = new NodeView(SubNode, IsRecursive);
-                    if (SubNode.NodeType == 1 /* Context */) {
+                    if (SubNode.NodeType == 6 /* Assumption */ || SubNode.NodeType == 7 /* Exception */) {
+                        // Layout Engine allowed to move a node left-side
+                        this.AppendLeftNode(SubView);
+                    } else if (SubNode.NodeType == 1 /* Context */ || SubNode.NodeType == 5 /* Justification */) {
                         // Layout Engine allowed to move a node left-side
                         this.AppendRightNode(SubView);
                     } else {
@@ -451,7 +454,7 @@ var AssureNote;
                 return false;
             }
 
-            var GoalModel = ThisModel.GetCloseGoal();
+            var GoalModel = ThisModel.GetUpperNearestGoal();
             var ContextModel = null;
 
             for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
@@ -464,8 +467,8 @@ var AssureNote;
             if (ContextModel) {
                 var TagMap = ContextModel.GetTagMapWithLexicalScope();
                 if (TagMap) {
-                    var Location = TagMap.get("Location");
-                    var Condition = TagMap.get("Condition");
+                    var Location = TagMap["Location"];
+                    var Condition = TagMap["Condition"];
                     if (Location && Condition) {
                         return true;
                     }

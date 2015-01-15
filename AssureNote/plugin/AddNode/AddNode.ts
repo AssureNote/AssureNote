@@ -40,7 +40,15 @@ module AssureNote {
             return "<code>add-node node type</code><br>Add new node."
         }
 
-        private Text2NodeTypeMap: any = { "goal": GSNType.Goal, "strategy": GSNType.Strategy, "context": GSNType.Context, "evidence": GSNType.Evidence };
+        private Text2NodeTypeMap: { [index: string]: GSNType } = {
+            "goal": GSNType.Goal,
+            "strategy": GSNType.Strategy,
+            "context": GSNType.Context,
+            "assumption": GSNType.Assumption,
+            "exception": GSNType.Exception,
+            "justification": GSNType.Justification,
+            "evidence": GSNType.Evidence
+        };
 
         public Invoke(CommandName: string, Params: any[]): void {
             var Type: GSNType = this.Text2NodeTypeMap[(<string>Params[1]).toLowerCase()];
@@ -92,12 +100,12 @@ module AssureNote {
             var NodeType = View.GetNodeType();
             switch (NodeType) {
                 case GSNType.Goal:
-                    res = res.concat([this.CreateContextMenu(View),
+                    res = [this.CreateContextMenu(View),
                         this.CreateStrategyMenu(View),
-                        this.CreateEvidenceMenu(View)]);
+                        this.CreateEvidenceMenu(View)];
                     break;
                 case GSNType.Strategy:
-                    res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
+                    res = [this.CreateContextMenu(View), this.CreateGoalMenu(View)];
                     break;
                 case GSNType.Context:
                     break;

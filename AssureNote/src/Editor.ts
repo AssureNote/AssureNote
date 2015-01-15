@@ -26,21 +26,30 @@
 ///<reference path='../d.ts/codemirror.d.ts'/>
 
 module AssureNote {
-    export class CodeMirrorEditorPanel extends Panel {
+    export class WGSNEditorPanel extends Panel {
         Element: JQuery;
         Timeout: number;
         Editor: CodeMirror.Editor;
+        private IsEditAppendOnly: boolean = false;
+        private Wrapper: HTMLElement;
+        public WrapperCSS: any;
+        private IsEditRecursive: boolean;
 
-        constructor(public App: AssureNoteApp, private IsEditRecursive: boolean, TextArea: HTMLTextAreaElement, CodeMirrorConfig: CodeMirror.EditorConfiguration, private Wrapper: HTMLElement, public WrapperCSS: any) {
+        constructor(public App: AssureNoteApp) {
             super(App);
+            var TextArea = <HTMLTextAreaElement>document.getElementById('editor');
+            this.Wrapper = document.getElementById('editor-wrapper');
+            var CodeMirrorConfig = { lineNumbers: true, mode: 'wgsn', lineWrapping: true, extraKeys: { "Shift-Space": "autocomplete" } };
+            this.WrapperCSS = { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" };
+            this.IsEditRecursive = true;
             this.Editor = CodeMirror.fromTextArea(TextArea, CodeMirrorConfig);
             $(this.Editor.getWrapperElement()).css({
                 height: "100%",
                 width: "100%",
                 background: "rgba(255, 255, 255, 0.85)"
             });
-            this.Element = $(Wrapper);
-            this.Element.css(WrapperCSS);
+            this.Element = $(this.Wrapper);
+            this.Element.css(this.WrapperCSS);
             this.Element.css({ display: "none" });
         }
 
@@ -50,7 +59,7 @@ module AssureNote {
 
         private OnOutSideClicked: () => void;
 
-        EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive: boolean): void {
+        EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive?: boolean, IsAppendOnly? :boolean): void {
             if (this.Timeout) {
                 this.Element.removeClass();
                 clearInterval(this.Timeout);
@@ -61,10 +70,13 @@ module AssureNote {
                 return;
             }
 
+            this.IsEditRecursive = IsRecursive;
+            this.IsEditAppendOnly = IsAppendOnly;
+
             this.Timeout = null;
             var Model = NodeView.Model;
             this.IsVisible = false;
-            this.App.SocketManager.StartEdit({"UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName()});
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "IsAppendOnly": IsAppendOnly, "UserName": this.App.GetUserName()});
 
             this.Editor.getDoc().setValue(WGSN);
             this.OnOutSideClicked = () => {
@@ -91,10 +103,13 @@ module AssureNote {
                 try {
                     var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
                     var NewNode: GSNNode;
-                    NewNode = Node.ReplaceSubNodeAsText(WGSN, this.IsEditRecursive);
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, this.IsEditRecursive, this.IsEditAppendOnly);
                 } catch (e) {
-                    AssureNoteUtils.Notify("Invalid WGSN is given");
-                    return false;
+                    if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
+                        AssureNoteUtils.Notify("Invalid WGSN is given");
+                        return false;
+                    }
+                    throw e;
                 }
                 var Writer: StringWriter = new StringWriter();
                 var WGSNChanged: boolean = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
@@ -124,22 +139,141 @@ module AssureNote {
         }
     }
 
-    export class SingleNodeEditorPanel extends CodeMirrorEditorPanel {
+    export class SingleNodeEditorPanel extends Panel {
+        public WrapperCSS: any;
+        private Element: JQuery;
+        private Editor: HTMLTextAreaElement;
+        private LabelEditor: HTMLInputElement;
+        private NodeNumber: HTMLSpanElement;
+        private Wrapper: HTMLElement;
+        private DummyDiv: HTMLDivElement;
+        private OnOutSideClicked: () => void;
+        private EditorMinimumHeight: number;
+        private WrapperMinimumHeight: number;
+        private OnKeyUp: (e: KeyboardEvent) => any;
+
         constructor(App: AssureNoteApp) {
+            super(App);
             var TextArea = <HTMLTextAreaElement>document.getElementById('singlenode-editor');
-            var Wrapper = document.getElementById('singlenode-editor-wrapper');
-            super(App, false, TextArea, { lineNumbers: false, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "absolute" });
+            this.Wrapper = document.getElementById('singlenode-editor-wrapper');
+            this.Editor = TextArea;
+            this.Element = $(this.Wrapper);
+            this.Element.css({ position: "absolute" });
+            this.LabelEditor = <HTMLInputElement>document.querySelector(".singlenode-editor.nodelabel");
+            this.NodeNumber = <HTMLSpanElement>document.querySelector(".singlenode-editor.nodenumber");
+            this.DummyDiv = <HTMLDivElement>document.querySelector(".singlenode-editor.dummydiv");
         }
+
+        UpdateCSS(CSS: any) {
+            this.Element.css(CSS);
+        }
+
+        EnableEditor(WGSN: string, NodeView: NodeView, IsRecursive?: boolean, IsAppendOnly?: boolean): void {
+            /* TODO Remove this */
+            if (IsRecursive && (NodeView.Status == EditStatus.SingleEditable)) {
+                return;
+            }
+
+            var Model = NodeView.Model;
+            this.IsVisible = false;
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "IsAppendOnly": IsAppendOnly, "UserName": this.App.GetUserName() });
+
+            this.Editor.value = AssureNoteUtils.RemoveFirstLine(WGSN).trim();
+            this.LabelEditor.value = Model.LabelName != null ? Model.LabelName.split(":")[1] : "";
+            this.NodeNumber.textContent = "*" + Model.GetLabel();
+
+            this.OnOutSideClicked = () => {
+                this.DisableEditor(NodeView, WGSN);
+            };
+
+            var BackGround = $("#editor-background");
+            BackGround.off("click").on("click", this.OnOutSideClicked);
+            BackGround.off("contextmenu").on("contextmenu", this.OnOutSideClicked);
+
+            BackGround.stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
+            this.Element.stop(true, true).css("opacity", 1).show();
+
+            var Style = window.getComputedStyle(this.NodeNumber, null);
+            this.WrapperMinimumHeight = this.Wrapper.clientHeight;
+            this.EditorMinimumHeight = this.WrapperMinimumHeight - parseFloat(Style.lineHeight) - 15;
+            this.Editor.style.height = this.EditorMinimumHeight.toString() + "px";
+            this.DummyDiv.style.width = this.Editor.clientWidth.toString() + "px";
+
+            this.OnKeyUp = () => {
+                // Dummy Divに編集中のテキストを追加し、高さを計算する
+                this.DummyDiv.textContent = this.Editor.value.replace(/^$/mg, "@");
+                var height = Math.max(this.EditorMinimumHeight, this.DummyDiv.clientHeight);
+                this.Editor.style.height = height.toString() + "px";
+                this.Wrapper.style.height = (this.WrapperMinimumHeight - this.EditorMinimumHeight + height).toString() + "px";
+            };
+
+            this.Editor.addEventListener("keyup", this.OnKeyUp);
+
+            this.Editor.focus()
+            this.Activate();
+        }
+
+        DisableEditor(OldNodeView: NodeView, OldWGSN: string): void {
+            this.App.EditDocument("todo", "test", () => {
+                var Label = this.LabelEditor.value;
+                
+                var OldModel = OldNodeView.Model;
+                var Writer = new StringWriter();
+                Writer.print("* ");
+                Writer.print(WikiSyntax.FormatNodeType(OldModel.NodeType));
+                Writer.print(OldModel.AssignedLabelNumber);
+                if (Label && Label.length > 0) {
+                    Writer.print(":");
+                    Writer.print(Label);
+                }
+                Writer.print(" &");
+                Writer.print(Lib.DecToHex(OldModel.UID));
+                var Header = Writer.toString();
+
+                var WGSN: string = Header + "\n" + this.Editor.value;
+                if (WGSN.length == 0) {
+                    return false;
+                }
+                try {
+                    var Node: GSNNode = this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+                    var NewNode: GSNNode;
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, true, true);
+                } catch (e) {
+                    if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
+                        AssureNoteUtils.Notify("Invalid WGSN is given");
+                        return false;
+                    }
+                    throw e;
+                }
+                var Writer: StringWriter = new StringWriter();
+                var WGSNChanged: boolean = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
+                if (!NewNode || !WGSNChanged) {
+                    return false;
+                }
+                this.App.FullScreenEditorPanel.IsVisible = true; // Why?
+            });
+
+            this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
+            $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
+            $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
+
+            this.Editor.removeEventListener("keyup", this.OnKeyUp);
+
+            this.App.PictgramPanel.Activate();
+        }
+
+        OnKeyDown(Event: KeyboardEvent): void {
+            //this.Editor.focus();
+            if (Event.keyCode == 27 /* Esc */) {
+                Event.stopPropagation();
+                this.OnOutSideClicked();
+            }
+        }
+
         DarkenBackGround(): boolean {
             return false;
         }
+
     }
 
-    export class WGSNEditorPanel extends CodeMirrorEditorPanel {
-        constructor(App: AssureNoteApp) {
-            var TextArea = <HTMLTextAreaElement>document.getElementById('editor');
-            var Wrapper = document.getElementById('editor-wrapper');
-            super(App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true, extraKeys: { "Shift-Space": "autocomplete" } }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
-        }
-    }
 }

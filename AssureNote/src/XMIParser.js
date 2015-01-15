@@ -17,7 +17,7 @@ var AssureNote;
             this.Doc = new AssureNote.GSNDoc(this.Record);
 
             // TODO: set real date
-            this.Record.AddHistory(0, "unknown", "converter", "2013-12-09T13:16:18+0900", "-", this.Doc);
+            this.Record.AddHistory(0, "unknown", "converter", new Date(), "-", this.Doc);
         }
         XMIParser.prototype.MakeTree = function (Id) {
             var ThisNode = this.nodes[Id];

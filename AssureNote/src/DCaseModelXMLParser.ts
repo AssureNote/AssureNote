@@ -41,7 +41,7 @@ module AssureNote {
         constructor(private Record: GSNRecord) {
             this.Doc = new GSNDoc(this.Record);
             // TODO: set real date
-            this.Record.AddHistory(0, "unknown", "converter", "2013-12-09T13:16:18+0900", "-", this.Doc);
+            this.Record.AddHistory(0, "unknown", "converter", new Date(), "-", this.Doc);
         }
 
         MakeTree(Id: string): GSNNode {
