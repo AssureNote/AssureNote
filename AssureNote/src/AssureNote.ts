@@ -59,7 +59,7 @@ module AssureNote {
         TopMenu: TopMenuTopItem;
         TopMenuRight: TopMenuTopItem;
 
-        private IsGuestUser: boolean = true;
+        private IsGuestUser: boolean;
         private UserName: string;
         private LoadingIndicatorVisible = true;
         private LoadingIndicator: HTMLImageElement = <HTMLImageElement>document.getElementById("loading-indicator");
@@ -70,6 +70,10 @@ module AssureNote {
             AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
+
+            var Name = (<any>$).cookie('UserName');
+            this.IsGuestUser = (Name == null);
+            this.UserName = this.IsGuestUser ? 'Guest' : Name;
 
             this.PluginManager = new PluginManager(this);
             this.PictgramPanel = new PictgramPanel(this);
@@ -107,9 +111,7 @@ module AssureNote {
             this.TopMenuRight = new TopMenuTopItem([]);
 
             this.PluginManager.LoadPlugin();
-            var Name = (<any>$).cookie('UserName');
-            this.IsGuestUser = (Name == null);
-            this.UserName = this.IsGuestUser ? 'Guest' : Name;
+
             this.UserList = new UserList(this);
             this.NodeListPanel = new NodeListPanel(this);
 

@@ -5637,13 +5637,15 @@ var AssureNote;
 (function (AssureNote) {
     var AssureNoteApp = (function () {
         function AssureNoteApp() {
-            this.IsGuestUser = true;
             this.LoadingIndicatorVisible = true;
             this.LoadingIndicator = document.getElementById("loading-indicator");
             this.DebugP = console.log.bind(console);
             AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
+            var Name = $.cookie('UserName');
+            this.IsGuestUser = (Name == null);
+            this.UserName = this.IsGuestUser ? 'Guest' : Name;
             this.PluginManager = new AssureNote.PluginManager(this);
             this.PictgramPanel = new AssureNote.PictgramPanel(this);
             this.SocketManager = new AssureNote.SocketManager(this);
@@ -5677,9 +5679,6 @@ var AssureNote;
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
             this.PluginManager.LoadPlugin();
-            var Name = $.cookie('UserName');
-            this.IsGuestUser = (Name == null);
-            this.UserName = this.IsGuestUser ? 'Guest' : Name;
             this.UserList = new AssureNote.UserList(this);
             this.NodeListPanel = new AssureNote.NodeListPanel(this);
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "view", "View", "screenshot", [
