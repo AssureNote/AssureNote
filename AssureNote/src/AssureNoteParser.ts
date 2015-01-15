@@ -23,6 +23,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // **************************************************************************
 
+///<reference path='../d.ts/ASNParser.d.ts'/>
+
 module AssureNote {
     export class StringWriter {
         private parts: string[] = [];

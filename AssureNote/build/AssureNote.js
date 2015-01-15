@@ -80,6 +80,10 @@ var AssureNote;
             Callback(rest, i);
         }
         AssureNoteUtils.ForeachLine = ForeachLine;
+        function RemoveFirstLine(Text) {
+            return Text.replace(/^.+$(\r\n|\r|\n)?/m, "");
+        }
+        AssureNoteUtils.RemoveFirstLine = RemoveFirstLine;
         var minute = 60 * 1000;
         var hour = minute * 60;
         var day = hour * 24;
@@ -123,6 +127,22 @@ var AssureNote;
             return "error";
         }
         AssureNoteUtils.FormatDate = FormatDate;
+        function FormatDateTime(time) {
+            var date = new Date(time);
+            var fill2 = function (n) {
+                if (n < 10)
+                    return "0" + n.toString();
+                return n.toString();
+            };
+            var y = fill2(date.getFullYear());
+            var m = fill2(date.getMonth() + 1);
+            var d = fill2(date.getDate());
+            var hr = fill2(date.getHours());
+            var min = fill2(date.getMinutes());
+            var sec = fill2(date.getSeconds());
+            return [y, "/", m, "/", d, " ", hr, ":", min, ":", sec].join("");
+        }
+        AssureNoteUtils.FormatDateTime = FormatDateTime;
         function GenerateUID() {
             return Math.floor(Math.random() * 2147483647);
         }
@@ -286,6 +306,15 @@ var AssureNote;
             return false;
         });
         window.name = window.location.href;
+        function ChangeLocation(Location) {
+            if (AssureNote.AssureNoteApp.Current.IsOfflineVersion()) {
+                return;
+            }
+            if (history.replaceState) {
+                history.replaceState(null, null, Config.BASEPATH);
+            }
+        }
+        AssureNoteUtils.ChangeLocation = ChangeLocation;
     })(AssureNoteUtils = AssureNote.AssureNoteUtils || (AssureNote.AssureNoteUtils = {}));
     var AnimationFrameTask = (function () {
         function AnimationFrameTask() {
@@ -493,97 +522,24 @@ var AssureNote;
     })();
     AssureNote.Panel = Panel;
 })(AssureNote || (AssureNote = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var AssureNote;
 (function (AssureNote) {
-    var StringReader = (function () {
-        function StringReader(Text) {
-            this.Text = Text;
-            this.CurrentPos = 0;
-            this.PreviousPos = 0;
-            this.Linenum = 0;
-        }
-        StringReader.prototype.HasNext = function () {
-            return this.CurrentPos < this.Text.length;
-        };
-        StringReader.prototype.ReadLine = function () {
-            var StartPos = this.CurrentPos;
-            var i;
-            this.PreviousPos = this.CurrentPos;
-            for (i = this.CurrentPos; i < this.Text.length; i++) {
-                var ch = this.Text.charCodeAt(i);
-                if (ch == 10) {
-                    var EndPos = i;
-                    this.CurrentPos = i + 1;
-                    this.Linenum += 1;
-                    return this.Text.substring(StartPos, EndPos).trim();
-                }
-                if (ch == 92) {
-                    var EndPos = i;
-                    if (i + 1 < this.Text.length && this.Text.charCodeAt(i + 1) == 10) {
-                        i++;
-                    }
-                    this.Linenum += 1;
-                    this.CurrentPos = i + 1;
-                    return this.Text.substring(StartPos, EndPos).trim();
-                }
-            }
-            this.CurrentPos = i;
-            if (StartPos == this.CurrentPos) {
-                return null;
-            }
-            this.Linenum += 1;
-            return this.Text.substring(StartPos, this.CurrentPos).trim();
-        };
-        StringReader.prototype.RollbackLineFeed = function () {
-            this.CurrentPos = this.PreviousPos;
-            this.Linenum -= 1;
-        };
-        StringReader.prototype.ReadLineList = function (LineList, UntilSection) {
-            while (this.HasNext()) {
-                var Line = this.ReadLine();
-                if (UntilSection && Lib.String_startsWith(Line, "*")) {
-                    this.RollbackLineFeed();
-                    break;
-                }
-                Lib.Array_add(LineList, Line);
-            }
-        };
-        StringReader.prototype.GetLineList = function (UntilSection) {
-            var LineList = new Array();
-            this.ReadLineList(LineList, UntilSection);
-            return LineList;
-        };
-        StringReader.prototype.LogError = function (Message, Line) {
-            console.log("(error:" + this.Linenum + ") " + Message + ": " + Line);
-        };
-        StringReader.prototype.LogWarning = function (Message, Line) {
-            console.log("(warning:" + this.Linenum + ") " + Message + ": " + Line);
-        };
-        return StringReader;
-    })();
-    AssureNote.StringReader = StringReader;
     var StringWriter = (function () {
         function StringWriter() {
-            this.sb = new StringBuilder();
+            this.parts = [];
         }
         StringWriter.prototype.print = function (s) {
-            this.sb.append(s);
+            this.parts.push(s);
         };
         StringWriter.prototype.println = function (s) {
-            this.sb.append(s);
-            this.sb.append(Lib.LineFeed);
+            this.print(s);
+            this.newline();
         };
         StringWriter.prototype.newline = function () {
-            this.sb.append(Lib.LineFeed);
+            this.print("\n");
         };
         StringWriter.prototype.toString = function () {
-            return this.sb.toString();
+            return this.parts.join("");
         };
         return StringWriter;
     })();
@@ -594,32 +550,39 @@ var AssureNote;
         GSNType[GSNType["Strategy"] = 2] = "Strategy";
         GSNType[GSNType["Evidence"] = 3] = "Evidence";
         GSNType[GSNType["Undefined"] = 4] = "Undefined";
+        GSNType[GSNType["Justification"] = 5] = "Justification";
+        GSNType[GSNType["Assumption"] = 6] = "Assumption";
+        GSNType[GSNType["Exception"] = 7] = "Exception";
+        GSNType[GSNType["Contract"] = 8] = "Contract";
     })(AssureNote.GSNType || (AssureNote.GSNType = {}));
     var GSNType = AssureNote.GSNType;
     var GSNHistory = (function () {
-        function GSNHistory(Rev, Author, Role, DateString, Process, Doc) {
-            this.UpdateHistory(Rev, Author, Role, DateString, Process, Doc);
+        function GSNHistory(Rev, Author, Role, ModifiedDate, Process, Doc) {
+            if (ModifiedDate == null) {
+                ModifiedDate = new Date();
+            }
+            this.UpdateHistory(Rev, Author, Role, ModifiedDate, Process, Doc);
             this.IsCommitRevision = true;
         }
         GSNHistory.prototype.toString = function () {
-            return this.DateString + ";" + this.Author + ";" + this.Role + ";" + this.Process;
+            return (new SimpleDateFormat("").format(this.Date)) + ";" + this.Author + ";" + this.Role + ";" + this.Process;
         };
-        GSNHistory.prototype.EqualsHistory = function (aHistory) {
-            return (Lib.Object_equals(this.DateString, aHistory.DateString) && Lib.Object_equals(this.Author, aHistory.Author));
+        GSNHistory.prototype.Equals = function (aHistory) {
+            return this.Date == aHistory.Date && this.Author == aHistory.Author;
         };
         GSNHistory.prototype.CompareDate = function (aHistory) {
-            return (Lib.String_compareTo(this.DateString, aHistory.DateString));
+            return this.Date.getTime() - aHistory.Date.getTime();
         };
-        GSNHistory.prototype.UpdateHistory = function (Rev, Author, Role, DateString, Process, Doc) {
+        GSNHistory.prototype.UpdateHistory = function (Rev, Author, Role, ModifiedDate, Process, Doc) {
             this.Rev = Rev;
             this.Author = Author;
             this.Role = Role;
             this.Process = Process;
             this.Doc = Doc;
-            this.DateString = WikiSyntax.FormatDateString(DateString);
+            this.Date = ModifiedDate;
         };
         GSNHistory.prototype.GetCommitMessage = function () {
-            return TagUtils.GetString(this.Doc.DocTagMap, "CommitMessage", "");
+            return this.Doc.GetTagValue("CommitMessage") || "";
         };
         return GSNHistory;
     })();
@@ -627,73 +590,15 @@ var AssureNote;
     var WikiSyntax = (function () {
         function WikiSyntax() {
         }
-        WikiSyntax.ParseInt = function (NumText, DefVal) {
-            try {
-                return Lib.parseInt(NumText);
-            }
-            catch (e) {
-            }
-            return DefVal;
-        };
-        WikiSyntax.ParseGoalLevel = function (LabelLine) {
-            var GoalLevel = 0;
-            for (var i = 0; i < LabelLine.length; i++) {
-                if (LabelLine.charCodeAt(i) != 42)
-                    break;
-                GoalLevel++;
-            }
-            return GoalLevel;
-        };
         WikiSyntax.FormatGoalLevel = function (GoalLevel) {
-            var sb = new StringBuilder();
-            for (var i = 0; i < GoalLevel; i++) {
-                sb.append("*");
+            var N = WikiSyntax.GoalLevelString.length;
+            if (N < GoalLevel) {
+                return WikiSyntax.GoalLevelString = new Array(GoalLevel + 1).join("*");
             }
-            return sb.toString();
-        };
-        WikiSyntax.GetLabelPos = function (LabelLine) {
-            var i;
-            for (i = 0; i < LabelLine.length; i++) {
-                if (LabelLine.charCodeAt(i) != 42)
-                    break;
+            else if (N == GoalLevel) {
+                return WikiSyntax.GoalLevelString;
             }
-            for (; i < LabelLine.length; i++) {
-                if (LabelLine.charCodeAt(i) != 32)
-                    break;
-            }
-            return i;
-        };
-        WikiSyntax.ParseNodeType = function (LabelLine) {
-            var i = WikiSyntax.GetLabelPos(LabelLine);
-            if (i < LabelLine.length) {
-                var ch = LabelLine.charCodeAt(i);
-                if (ch == 71) {
-                    return 0 /* Goal */;
-                }
-                if (ch == 83) {
-                    return 2 /* Strategy */;
-                }
-                if (ch == 69 || ch == 77 || ch == 65) {
-                    return 3 /* Evidence */;
-                }
-                if (ch == 67 || ch == 74 || ch == 82) {
-                    return 1 /* Context */;
-                }
-            }
-            return 4 /* Undefined */;
-        };
-        WikiSyntax.ParseLabelName = function (LabelLine) {
-            var i = WikiSyntax.GetLabelPos(LabelLine);
-            var sb = new StringBuilder();
-            i = i + 1;
-            if (i >= LabelLine.length || LabelLine.charCodeAt(i) != 58)
-                return null;
-            sb.append(LabelLine.substring(i - 1, i));
-            while (i < LabelLine.length && LabelLine.charCodeAt(i) != 32) {
-                sb.append(LabelLine.substring(i, i + 1));
-                i = i + 1;
-            }
-            return sb.toString();
+            return WikiSyntax.GoalLevelString.substr(0, GoalLevel);
         };
         WikiSyntax.FormatNodeType = function (NodeType) {
             switch (NodeType) {
@@ -705,101 +610,30 @@ var AssureNote;
                     return "S";
                 case 3 /* Evidence */:
                     return "E";
-                case 4 /* Undefined */:
+                case 5 /* Justification */:
+                    return "J";
+                case 6 /* Assumption */:
+                    return "A";
+                case 7 /* Exception */:
+                    return "X";
+                case 8 /* Contract */:
+                    return "T";
+                default:
+                    break;
             }
             return "U";
         };
-        WikiSyntax.ParseLabelNumber = function (LabelLine) {
-            var StartIdx = WikiSyntax.GetLabelPos(LabelLine) + 1;
-            if (StartIdx >= LabelLine.length || LabelLine.charCodeAt(StartIdx) == 58)
-                return null;
-            for (var i = StartIdx; i < LabelLine.length; i++) {
-                if (Character.isWhitespace(LabelLine.charCodeAt(i)))
-                    continue;
-                if (LabelLine.charCodeAt(i) == 38)
-                    return null;
-                if (Character.isDigit(LabelLine.charCodeAt(i))) {
-                    StartIdx = i;
-                    break;
-                }
-            }
-            if (StartIdx != -1) {
-                for (var i = StartIdx + 1; i < LabelLine.length; i++) {
-                    if (Character.isWhitespace(LabelLine.charCodeAt(i))) {
-                        return LabelLine.substring(StartIdx, i);
-                    }
-                }
-                return LabelLine.substring(StartIdx);
-            }
-            return null;
-        };
-        WikiSyntax.ParseUID = function (LabelLine) {
-            var StartIdx = LabelLine.indexOf("&") + 1;
-            if (StartIdx == 0)
-                return null;
-            var EndIdx = StartIdx;
-            while (EndIdx < LabelLine.length && LabelLine.charCodeAt(EndIdx) != 32)
-                EndIdx++;
-            var UID = LabelLine.substring(StartIdx, EndIdx);
-            return UID;
-        };
-        WikiSyntax.ParseRevisionHistory = function (LabelLine) {
-            var Loc = LabelLine.indexOf("#");
-            if (Loc != -1) {
-                return LabelLine.substring(Loc).trim();
-            }
-            return null;
-        };
-        WikiSyntax.ParseHistory = function (LabelLine, BaseDoc) {
-            if (BaseDoc != null) {
-                var Loc = LabelLine.indexOf("#");
-                try {
-                    if (Loc != -1) {
-                        var HistoryTaple = new Array(2);
-                        var RevText = LabelLine.substring(Loc + 1).trim();
-                        var RevSet = RevText.split(":");
-                        HistoryTaple[0] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[0], -1));
-                        HistoryTaple[1] = BaseDoc.Record.GetHistory(WikiSyntax.ParseInt(RevSet[1], -1));
-                        if (HistoryTaple[0] == null || HistoryTaple[1] == null) {
-                            return null;
-                        }
-                        return HistoryTaple;
-                    }
-                }
-                catch (e) {
-                }
-            }
-            return null;
-        };
-        WikiSyntax.FormatRefKey = function (NodeType, HistoryTaple) {
-            return WikiSyntax.FormatNodeType(NodeType) + HistoryTaple;
-        };
         WikiSyntax.CommentOutAll = function (DocText) {
-            var Reader = new StringReader(DocText);
-            var Writer = new StringWriter();
-            while (Reader.HasNext()) {
-                var line = Reader.ReadLine();
-                line = "#" + line;
-                Writer.print(line);
-                Writer.newline();
-            }
-            return Writer.toString();
+            return DocText.replace(/^/mg, "# ");
         };
         WikiSyntax.CommentOutSubNode = function (DocText) {
-            var Reader = new StringReader(DocText);
-            var Writer = new StringWriter();
-            var NodeCount = 0;
-            while (Reader.HasNext()) {
-                var line = Reader.ReadLine();
-                if (Lib.String_startsWith(line, "*"))
-                    NodeCount++;
-                if (NodeCount >= 2) {
-                    line = "#" + line;
-                }
-                Writer.print(line);
-                Writer.newline();
+            DocText.match(/^\*/m);
+            var beforeFirstNode = RegExp.leftContext + RegExp.lastMatch;
+            if (RegExp.rightContext.match(/^\*/m)) {
+                var beforeSecondNode = beforeFirstNode + RegExp.leftContext;
+                return beforeSecondNode + this.CommentOutAll(RegExp.lastMatch + RegExp.rightContext);
             }
-            return Writer.toString();
+            return DocText;
         };
         WikiSyntax.FormatDateString = function (DateString) {
             var Format = new SimpleDateFormat("yyyy-MM-dd84HH:mm:ssZ");
@@ -814,38 +648,29 @@ var AssureNote;
             var d = new Date();
             return Format.format(d);
         };
+        WikiSyntax.GoalLevelString = "";
         return WikiSyntax;
     })();
     AssureNote.WikiSyntax = WikiSyntax;
     var TagUtils = (function () {
         function TagUtils() {
         }
-        TagUtils.ParseTag = function (TagMap, Line) {
-            var loc = Line.indexOf("::");
-            if (loc != -1) {
-                var Key = Line.substring(0, loc).trim();
-                var Value = Line.substring(loc + 2).trim();
-                TagMap.put(Key, Value);
-            }
-        };
         TagUtils.FormatTag = function (TagMap, Writer) {
             if (TagMap != null) {
-                var keyArray = TagMap.keySet();
-                for (var i = 0; i < keyArray.length; i++) {
-                    var Key = keyArray[i];
-                    Writer.println(Key + ":: " + TagMap.get(Key));
+                for (var Key in TagMap) {
+                    Writer.println(Key + ":: " + TagMap[Key]);
                 }
             }
         };
         TagUtils.FormatHistoryTag = function (HistoryList, i, Writer) {
-            var History = Lib.Array_get(HistoryList, i);
+            var History = HistoryList[i];
             if (History != null) {
                 Writer.println("#" + i + "::" + History);
             }
         };
         TagUtils.GetString = function (TagMap, Key, DefValue) {
             if (TagMap != null) {
-                var Value = TagMap.get(Key);
+                var Value = TagMap[Key];
                 if (Value != null) {
                     return Value;
                 }
@@ -853,14 +678,160 @@ var AssureNote;
             return DefValue;
         };
         TagUtils.GetInteger = function (TagMap, Key, DefValue) {
-            if (TagMap != null) {
-                return WikiSyntax.ParseInt(TagMap.get(Key), DefValue);
+            if (TagMap != null && TagMap[Key] != null) {
+                return parseInt(TagMap[Key]);
             }
             return DefValue;
         };
         return TagUtils;
     })();
     AssureNote.TagUtils = TagUtils;
+    ;
+    var TreeParser = (function () {
+        function TreeParser(BaseDoc, Nodes) {
+            this.BaseDoc = BaseDoc;
+            this.Nodes = Nodes;
+            this.Index = 0;
+            this.TopNode = null;
+        }
+        TreeParser.prototype.ConvertBody = function (Body, Flags, Tags) {
+            if (Body == null) {
+                return "";
+            }
+            return Body.map(function (line) {
+                if (line == null) {
+                    return "";
+                }
+                return line.map(function (part) {
+                    switch (part.type) {
+                        case "text":
+                            return part.value;
+                        case "def":
+                            Flags.HasTagDefinition = true;
+                            if (part.value) {
+                                Tags[part.name] = part.value;
+                                return part.name + ":: " + part.value;
+                            }
+                            return part.name + ":: ";
+                        case "param":
+                            Flags.HasTagReference = true;
+                            return "[" + part.ref + "]";
+                        case "node":
+                            Flags.HasNodeReference = true;
+                            return "[" + part.ref + "]";
+                    }
+                }).join("");
+            }).join("\n");
+        };
+        TreeParser.prototype.ConvertNode = function (Parent, Node) {
+            var _this = this;
+            var NodeTypeSymbol = Node.type == "Exception" ? "X" : Node.type.charAt(0);
+            var Revision = Node.revision ? [Node.revision.created, Node.revision.modified] : [0, 0];
+            var History = Revision.map(function (rev) { return _this.BaseDoc.Record.GetHistory(rev); });
+            var Flags = { HasNodeReference: false, HasTagReference: false, HasTagDefinition: false };
+            var Tags = {};
+            var UID = Node.key ? parseInt(Node.key, 16) : AssureNote.AssureNoteUtils.GenerateUID();
+            var ParsedNode = new GSNNode(this.BaseDoc, Parent, GSNType[Node.type], null, UID, History);
+            ParsedNode.NodeDoc = this.ConvertBody(Node.body, Flags, Tags);
+            if (Node.id != null && Node.id.length > 0) {
+                ParsedNode.LabelName = NodeTypeSymbol + ":" + Node.id;
+            }
+            if (Flags.HasTagDefinition) {
+                ParsedNode.TagMap = Tags;
+                ParsedNode.HasTag = true;
+            }
+            if (Flags.HasNodeReference || Flags.HasTagReference) {
+                ParsedNode.HasTagOrLabelReference = true;
+            }
+            return ParsedNode;
+        };
+        TreeParser.prototype.ParseTree = function (Parent) {
+            var TopNode = this.Nodes[this.Index++];
+            var TopGSNNode = this.ConvertNode(Parent, TopNode);
+            this.PrevNode = TopGSNNode;
+            while (this.Index < this.Nodes.length) {
+                var Node = this.Nodes[this.Index];
+                if (!GSNNode.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[Node.type], Node.depth)) {
+                    var NextNode = this.Nodes[this.Index + 1];
+                    if (Parent == null || NextNode && GSNNode.IsCollectRelation(TopGSNNode.NodeType, TopNode.depth, GSNType[NextNode.type], NextNode.depth) && !GSNNode.IsCollectRelation(GSNType[Node.type], Node.depth, GSNType[NextNode.type], NextNode.depth)) {
+                        this.PrevNode.NodeDoc += "\n\n" + this.ConvertNode(null, Node).toString().replace(/^/mg, "# ");
+                        this.Index++;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                else {
+                    this.ParseTree(TopGSNNode);
+                }
+            }
+            return TopGSNNode;
+        };
+        TreeParser.prototype.Parse = function () {
+            if (this.TopNode == null) {
+                this.Index = 0;
+                this.TopNode = this.ParseTree(null);
+            }
+            if (this.Index < this.Nodes.length) {
+                throw new Error("WGSNSyntaxError");
+            }
+            return this.TopNode;
+        };
+        TreeParser.Parse = function (BaseDoc, Nodes) {
+            return new TreeParser(BaseDoc, Nodes).Parse();
+        };
+        return TreeParser;
+    })();
+    var Parser = (function () {
+        function Parser() {
+        }
+        Parser.InvokePegJSParser = function (Source) {
+            while (true) {
+                try {
+                    return WGSN.parse(Source);
+                }
+                catch (e) {
+                    if (e.constructor.name == "SyntaxError") {
+                        var splitPoint = e.offset - e.column + 1;
+                        Source = Source.substr(0, splitPoint) + "# " + Source.substr(splitPoint);
+                    }
+                    else {
+                        throw e;
+                    }
+                }
+            }
+        };
+        Parser.ParseTree = function (BaseDoc, Source) {
+            var ParseResult = Parser.InvokePegJSParser(Source);
+            var Nodes = ParseResult.revisions[0].nodes;
+            return new TreeParser(BaseDoc, Nodes).Parse();
+        };
+        Parser.ParseRecord = function (TextDoc) {
+            var Record = new GSNRecord();
+            var ParseResult = Parser.InvokePegJSParser(TextDoc.replace(/^\s+/mg, ""));
+            ParseResult.revisions.forEach(function (revision) {
+                var Doc = new GSNDoc(Record);
+                if (revision.header) {
+                    Doc.SetTagValue("Author", revision.header.user);
+                    Doc.SetTagValue("Revision", revision.header.revision.toString());
+                    Doc.SetTagValue("Date", revision.header.modified.toISOString());
+                    Doc.SetTagValue("CommitMessage", revision.header.tags["CommitMessage"]);
+                }
+                Doc.UpdateDocHeader();
+                Doc.TopNode = new TreeParser(Doc, revision.nodes).Parse();
+                Doc.RemapNodeMap();
+                Doc.RenumberAll();
+            });
+            Record.HistoryList.forEach(function (History) {
+                if (History.Doc.GetTagValue("CommitMessage") == null) {
+                    History.IsCommitRevision = false;
+                }
+            });
+            return Record;
+        };
+        return Parser;
+    })();
+    AssureNote.Parser = Parser;
     var GSNNode = (function () {
         function GSNNode(BaseDoc, ParentNode, NodeType, LabelName, UID, HistoryTaple) {
             this.BaseDoc = BaseDoc;
@@ -871,6 +842,7 @@ var AssureNote;
             this.UID = UID;
             this.SectionCount = 0;
             this.SubNodeList = null;
+            this.HasTagOrLabelReference = false;
             if (HistoryTaple != null) {
                 this.Created = HistoryTaple[0];
                 this.LastModified = HistoryTaple[1];
@@ -885,12 +857,17 @@ var AssureNote;
                 this.LastModified = this.Created;
             }
             this.Digest = null;
-            this.NodeDoc = Lib.LineFeed.trim();
+            this.NodeDoc = "";
             this.HasTag = false;
             if (this.ParentNode != null) {
                 ParentNode.AppendSubNode(this);
             }
         }
+        GSNNode.prototype.toString = function () {
+            var Writer = new StringWriter();
+            this.FormatNode(Writer);
+            return Writer.toString();
+        };
         GSNNode.prototype.DeepCopy = function (BaseDoc, ParentNode) {
             var NewNode = new GSNNode(BaseDoc, ParentNode, this.NodeType, this.LabelName, this.UID, null);
             NewNode.Created = this.Created;
@@ -898,13 +875,13 @@ var AssureNote;
             NewNode.Digest = this.Digest;
             NewNode.NodeDoc = this.NodeDoc;
             NewNode.HasTag = this.HasTag;
+            NewNode.HasTagOrLabelReference = this.HasTagOrLabelReference;
             if (BaseDoc != null) {
-                BaseDoc.UncheckAddNode(NewNode);
+                BaseDoc.AddNodeWithoutCheck(NewNode);
             }
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+            this.NonNullSubNodeList().forEach(function (Node) {
                 Node.DeepCopy(BaseDoc, NewNode);
-            }
+            });
             return NewNode;
         };
         GSNNode.prototype.IsGoal = function () {
@@ -919,13 +896,41 @@ var AssureNote;
         GSNNode.prototype.IsEvidence = function () {
             return (this.NodeType == 3 /* Evidence */);
         };
+        GSNNode.IsTypeContextLike = function (Type) {
+            return Type == 1 /* Context */ || Type == 6 /* Assumption */ || Type == 5 /* Justification */ || Type == 7 /* Exception */;
+        };
+        GSNNode.prototype.IsContextLike = function () {
+            return GSNNode.IsTypeContextLike(this.NodeType);
+        };
+        GSNNode.IsCollectRelation = function (ParentType, ParentDepth, ChildType, ChildDepth) {
+            if (ChildDepth == ParentDepth) {
+                if (ChildType == 0 /* Goal */) {
+                    return false;
+                }
+                if (ParentType != 0 /* Goal */ && (ChildType == 3 /* Evidence */ || ChildType == 2 /* Strategy */)) {
+                    return false;
+                }
+                if ((ParentType == 3 /* Evidence */ || ParentType == 2 /* Strategy */) && !GSNNode.IsTypeContextLike(ChildType)) {
+                    return false;
+                }
+                if (GSNNode.IsTypeContextLike(ParentType)) {
+                    return false;
+                }
+                return true;
+            }
+            if (ParentDepth + 1 == ChildDepth) {
+                return ParentType == 2 /* Strategy */ && ChildType == 0 /* Goal */;
+            }
+            return false;
+        };
         GSNNode.prototype.NonNullSubNodeList = function () {
             return this.SubNodeList == null ? Lib.EmptyNodeList : this.SubNodeList;
         };
         GSNNode.prototype.Remap = function (NodeMap) {
-            NodeMap.put(this.UID, this);
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+            NodeMap[this.UID] = this;
+            var List = this.NonNullSubNodeList();
+            for (var i = 0; i < List.length; i++) {
+                var Node = List[i];
                 Node.Remap(NodeMap);
             }
         };
@@ -957,8 +962,8 @@ var AssureNote;
             var LineCount = 0;
             var Writer = new StringWriter();
             var md = Lib.GetMD5();
-            for (var i = 0; i < Lib.Array_size(LineList); i++) {
-                var Line = Lib.Array_get(LineList, i);
+            for (var i = 0; i < LineList.length; i++) {
+                var Line = LineList[i];
                 var Loc = Line.indexOf("::");
                 if (Loc > 0) {
                     this.HasTag = true;
@@ -980,64 +985,44 @@ var AssureNote;
             }
         };
         GSNNode.prototype.UpdateContent = function (TextDoc) {
-            this.SetContent(new StringReader(TextDoc).GetLineList(true));
-        };
-        GSNNode.prototype.GetHtmlContent = function () {
-            if (this.Digest != null) {
-                var Reader = new StringReader(this.NodeDoc);
-                var Writer = new StringWriter();
-                var Paragraph = "";
-                while (Reader.HasNext()) {
-                    var Line = Reader.ReadLine();
-                    Paragraph += Line;
-                    if (Line.length == 0 && Paragraph.length > 0) {
-                        Writer.println("<p>" + Paragraph + "</p>");
-                        continue;
-                    }
-                    var Loc = Line.indexOf("::");
-                    if (Loc > 0) {
-                        Writer.println("<p class='tag'>" + Line + "</p>");
-                        continue;
-                    }
-                }
-            }
+            TextDoc.match(/^.*/m);
+            var Lines = RegExp.leftContext.match(/^.*$/mg);
+            this.SetContent(Lines);
         };
         GSNNode.prototype.GetNodeHistoryList = function () {
-            var NodeList = new Array();
-            var LastNode = null;
-            for (var i = 0; i < Lib.Array_size(this.BaseDoc.Record.HistoryList); i++) {
-                var NodeHistory = Lib.Array_get(this.BaseDoc.Record.HistoryList, i);
-                if (NodeHistory.Doc != null) {
-                    var Node = NodeHistory.Doc.GetNode(this.UID);
-                    if (Node != null) {
-                        if (Node.Created == this.Created) {
-                            if (LastNode == null || LastNode.LastModified != this.LastModified) {
-                                Lib.Array_add(NodeList, Node);
-                                LastNode = Node;
-                            }
-                        }
-                    }
+            var Revisions = this.BaseDoc.Record.HistoryList;
+            var PrevRev = this.Created.Rev;
+            var LastRev = this.LastModified.Rev;
+            var HistoryList = [this.Created];
+            for (var rev = this.Created.Rev + 1; rev <= LastRev && rev < Revisions.length; rev++) {
+                var FormarNodeModel = Revisions[rev].Doc.GetNode(this.UID);
+                var FormarHistory = FormarNodeModel ? FormarNodeModel.LastModified : null;
+                if (FormarHistory && FormarHistory.Rev != PrevRev) {
+                    HistoryList.push(FormarHistory);
+                    PrevRev = FormarHistory.Rev;
                 }
             }
-            return NodeList;
+            return HistoryList;
         };
         GSNNode.prototype.AppendSubNode = function (Node) {
-            (Node.BaseDoc == this.BaseDoc);
             if (this.SubNodeList == null) {
-                this.SubNodeList = new Array();
+                this.SubNodeList = [Node];
             }
-            Lib.Array_add(this.SubNodeList, Node);
+            else {
+                this.SubNodeList.push(Node);
+            }
         };
         GSNNode.prototype.HasSubNode = function (NodeType) {
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+            var SubNodes = this.NonNullSubNodeList();
+            for (var i = 0; i < SubNodes.length; i++) {
+                var Node = SubNodes[i];
                 if (Node.NodeType == NodeType) {
                     return true;
                 }
             }
             return false;
         };
-        GSNNode.prototype.GetCloseGoal = function () {
+        GSNNode.prototype.GetUpperNearestGoal = function () {
             var Node = this;
             while (Node.NodeType != 0 /* Goal */) {
                 Node = Node.ParentNode;
@@ -1046,15 +1031,7 @@ var AssureNote;
         };
         GSNNode.prototype.GetTagMap = function () {
             if (this.TagMap == null && this.HasTag) {
-                this.TagMap = new HashMap();
-                var Reader = new StringReader(this.NodeDoc);
-                while (Reader.HasNext()) {
-                    var Line = Reader.ReadLine();
-                    var Loc = Line.indexOf("::");
-                    if (Loc > 0) {
-                        TagUtils.ParseTag(this.TagMap, Line);
-                    }
-                }
+                this.TagMap = {};
             }
             return this.TagMap;
         };
@@ -1063,14 +1040,10 @@ var AssureNote;
                 return NewMap;
             if (NewMap == null)
                 return BaseMap;
-            var Result = new HashMap();
-            var KeySet = BaseMap.keySet();
-            for (var i = 0; i < KeySet.length; i++) {
-                Result.put(KeySet[i], BaseMap.get(KeySet[i]));
-            }
-            KeySet = NewMap.keySet();
-            for (var i = 0; i < KeySet.length; i++) {
-                Result.put(KeySet[i], NewMap.get(KeySet[i]));
+            var Result = {};
+            Result.__proto__ = BaseMap;
+            for (var key in NewMap) {
+                Result[key] = NewMap[key];
             }
             return Result;
         };
@@ -1083,8 +1056,8 @@ var AssureNote;
                 Result = this.GetTagMap();
             }
             if (this.SubNodeList != null) {
-                for (var i = 0; i < Lib.Array_size(this.SubNodeList); i++) {
-                    var Node = Lib.Array_get(this.SubNodeList, i);
+                for (var i = 0; i < this.SubNodeList.length; i++) {
+                    var Node = this.SubNodeList[i];
                     if (Node.IsContext()) {
                         Result = this.MergeTagMap(Result, Node.GetTagMap());
                     }
@@ -1094,8 +1067,8 @@ var AssureNote;
         };
         GSNNode.prototype.GetLastNode = function (NodeType, Creation) {
             if (this.SubNodeList != null) {
-                for (var i = Lib.Array_size(this.SubNodeList) - 1; i >= 0; i--) {
-                    var Node = Lib.Array_get(this.SubNodeList, i);
+                for (var i = this.SubNodeList.length - 1; i >= 0; i--) {
+                    var Node = this.SubNodeList[i];
                     if (Node.NodeType == NodeType) {
                         return Node;
                     }
@@ -1109,33 +1082,31 @@ var AssureNote;
         GSNNode.prototype.FormatNode = function (Writer) {
             Writer.print(WikiSyntax.FormatGoalLevel(this.GetGoalLevel()));
             Writer.print(" ");
+            Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+            Writer.print(this.AssignedLabelNumber);
             if (this.LabelName != null) {
-                Writer.print(this.LabelName);
-            }
-            else {
-                Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-                Writer.print(this.AssignedLabelNumber);
+                Writer.print(this.LabelName.substr(1));
             }
             Writer.print(" &");
-            Writer.print(Lib.DecToHex(this.UID));
+            Writer.print(this.UID.toString(16));
             if (this.Created != null) {
                 var HistoryTaple = this.GetHistoryTaple();
                 Writer.print(" " + HistoryTaple);
             }
             Writer.newline();
-            if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
+            if (this.NodeDoc != null && this.NodeDoc.length != 0) {
                 Writer.print(this.NodeDoc);
                 Writer.newline();
             }
             Writer.newline();
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+            for (var i = 0; i < this.NonNullSubNodeList().length; i++) {
+                var Node = this.NonNullSubNodeList()[i];
                 if (Node.IsContext()) {
                     Node.FormatNode(Writer);
                 }
             }
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+            for (var i = 0; i < this.NonNullSubNodeList().length; i++) {
+                var Node = this.NonNullSubNodeList()[i];
                 if (!Node.IsContext()) {
                     Node.FormatNode(Writer);
                 }
@@ -1144,64 +1115,68 @@ var AssureNote;
         GSNNode.prototype.FormatSubNode = function (GoalLevel, Writer, IsRecursive) {
             Writer.print(WikiSyntax.FormatGoalLevel(GoalLevel));
             Writer.print(" ");
+            Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
+            Writer.print(this.AssignedLabelNumber);
             if (this.LabelName != null) {
-                Writer.print(this.LabelName);
-            }
-            else {
-                Writer.print(WikiSyntax.FormatNodeType(this.NodeType));
-                Writer.print(this.AssignedLabelNumber);
+                Writer.print(this.LabelName.substr(1));
             }
             Writer.print(" &");
             Writer.print(Lib.DecToHex(this.UID));
             Writer.newline();
-            if (this.NodeDoc != null && !Lib.Object_equals(this.NodeDoc, "")) {
-                Writer.print(this.NodeDoc);
-                Writer.newline();
+            if (this.NodeDoc != null && this.NodeDoc.length != 0) {
+                Writer.println(this.NodeDoc);
             }
             if (!IsRecursive)
                 return;
             Writer.newline();
-            if (this.NonNullSubNodeList() != null) {
-                for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                    var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-                    if (Node.IsContext()) {
-                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
-                    }
+            this.NonNullSubNodeList().forEach(function (Node) {
+                if (Node.IsContext()) {
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
                 }
-                for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                    var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-                    if (!Node.IsContext()) {
-                        Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
-                    }
+            });
+            this.NonNullSubNodeList().forEach(function (Node) {
+                if (!Node.IsContext()) {
+                    Node.FormatSubNode(Node.IsGoal() ? GoalLevel + 1 : GoalLevel, Writer, IsRecursive);
                 }
-            }
+            });
         };
-        GSNNode.prototype.ReplaceSubNode = function (NewNode, IsRecursive) {
+        GSNNode.prototype.ReplaceSubNode = function (NewNode, IsRecursive, IsAppendOnly) {
+            var _this = this;
             this.MergeDocHistory(NewNode);
             if (this.ParentNode != null) {
-                for (var i = 0; i < Lib.Array_size(this.ParentNode.SubNodeList); i++) {
-                    if (Lib.Array_get(this.ParentNode.SubNodeList, i) == this) {
-                        Lib.Array_set(this.ParentNode.SubNodeList, i, NewNode);
+                for (var i = 0; i < this.ParentNode.SubNodeList.length; i++) {
+                    if (this.ParentNode.SubNodeList[i] == this) {
+                        this.ParentNode.SubNodeList[i] = NewNode;
                         NewNode.ParentNode = this.ParentNode;
+                        break;
                     }
                 }
             }
             else {
-                (NewNode.IsGoal());
                 this.BaseDoc.TopNode = NewNode;
             }
             if (!IsRecursive) {
                 NewNode.SubNodeList = this.SubNodeList;
+                NewNode.SubNodeList.forEach(function (Node) { return Node.ParentNode = NewNode; });
+            }
+            if (IsAppendOnly && this.SubNodeList) {
+                if (NewNode.SubNodeList) {
+                    NewNode.SubNodeList.forEach(function (Node) {
+                        if (Node) {
+                            Node.ParentNode = NewNode;
+                            _this.SubNodeList.push(Node);
+                        }
+                    });
+                }
+                NewNode.SubNodeList = this.SubNodeList;
             }
             return NewNode;
         };
-        GSNNode.prototype.ReplaceSubNodeAsText = function (DocText, IsRecursive) {
+        GSNNode.prototype.ReplaceSubNodeWithText = function (DocText, IsRecursive, IsAppendOnly) {
             if (!IsRecursive) {
                 DocText = WikiSyntax.CommentOutSubNode(DocText);
             }
-            var Reader = new StringReader(DocText);
-            var Parser = new ParserContext(null);
-            var NewNode = Parser.ParseNode(Reader);
+            var NewNode = Parser.ParseTree(this.BaseDoc, DocText);
             if (NewNode.NodeType != this.NodeType) {
                 var Writer = new StringWriter();
                 NewNode.FormatNode(Writer);
@@ -1209,7 +1184,7 @@ var AssureNote;
                 NewNode = this;
             }
             if (NewNode != null) {
-                NewNode = this.ReplaceSubNode(NewNode, IsRecursive);
+                NewNode = this.ReplaceSubNode(NewNode, IsRecursive, IsAppendOnly);
             }
             return NewNode;
         };
@@ -1217,8 +1192,8 @@ var AssureNote;
             if (UID == this.UID) {
                 return true;
             }
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var SubNode = Lib.Array_get(this.NonNullSubNodeList(), i);
+            for (var i = 0; i < this.NonNullSubNodeList().length; i++) {
+                var SubNode = this.NonNullSubNodeList()[i];
                 if (SubNode.HasSubNodeUID(UID))
                     return true;
             }
@@ -1229,17 +1204,17 @@ var AssureNote;
                 this.ReplaceSubNode(NewNode, true);
                 return this;
             }
-            for (var i = 0, j = 0; NewNode.SubNodeList != null && i < Lib.Array_size(NewNode.SubNodeList); i++) {
-                var SubNewNode = Lib.Array_get(NewNode.SubNodeList, i);
-                for (; this.SubNodeList != null && j < Lib.Array_size(this.SubNodeList); j++) {
-                    var SubMasterNode = Lib.Array_get(this.SubNodeList, j);
+            for (var i = 0, j = 0; NewNode.SubNodeList != null && i < NewNode.SubNodeList.length; i++) {
+                var SubNewNode = NewNode.SubNodeList[i];
+                for (; this.SubNodeList != null && j < this.SubNodeList.length; j++) {
+                    var SubMasterNode = this.SubNodeList[j];
                     if (SubMasterNode.UID == SubNewNode.UID) {
                         SubMasterNode.Merge(SubNewNode, CommonRevision);
                         break;
                     }
                 }
-                if (j == Lib.Array_size(this.SubNodeList)) {
-                    Lib.Array_add(this.SubNodeList, SubNewNode);
+                if (j == this.SubNodeList.length) {
+                    this.SubNodeList.push(SubNewNode);
                 }
             }
             return this;
@@ -1263,15 +1238,15 @@ var AssureNote;
                 NewNode.LastModified = this.BaseDoc.DocHistory;
             }
             NewNode.BaseDoc = this.BaseDoc;
-            for (var i = 0; i < Lib.Array_size(NewNode.NonNullSubNodeList()); i++) {
-                var SubNode = Lib.Array_get(NewNode.NonNullSubNodeList(), i);
+            for (var i = 0; i < NewNode.NonNullSubNodeList().length; i++) {
+                var SubNode = NewNode.NonNullSubNodeList()[i];
                 this.MergeDocHistory(SubNode);
             }
         };
         GSNNode.prototype.IsNewerTree = function (ModifiedRev) {
             if (ModifiedRev <= this.LastModified.Rev) {
-                for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                    var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+                for (var i = 0; i < this.NonNullSubNodeList().length; i++) {
+                    var Node = this.NonNullSubNodeList()[i];
                     if (!Node.IsNewerTree(ModifiedRev)) {
                         return false;
                     }
@@ -1281,114 +1256,142 @@ var AssureNote;
             return false;
         };
         GSNNode.prototype.ListSubGoalNode = function (BufferList) {
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+            this.NonNullSubNodeList().forEach(function (Node) {
                 if (Node.IsGoal()) {
-                    Lib.Array_add(BufferList, Node);
+                    BufferList.push(Node);
                 }
                 if (Node.IsStrategy()) {
                     Node.ListSubGoalNode(BufferList);
                 }
-            }
+            });
         };
         GSNNode.prototype.ListSectionNode = function (BufferList) {
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
+            this.NonNullSubNodeList().forEach(function (Node) {
                 if (!Node.IsGoal()) {
-                    Lib.Array_add(BufferList, Node);
+                    BufferList.push(Node);
                 }
                 if (Node.IsStrategy() || Node.IsEvidence()) {
                     Node.ListSectionNode(BufferList);
                 }
-            }
+            });
         };
         GSNNode.prototype.RenumberGoalRecursive = function (GoalCount, NextGoalCount, LabelMap) {
-            (this.IsGoal());
-            var queue = new LinkedList();
-            queue.add(this);
+            var queue = [this];
             var CurrentNode;
-            while ((CurrentNode = queue.poll()) != null) {
-                while (LabelMap.get("" + GoalCount) != null)
+            while ((CurrentNode = queue.shift()) != null) {
+                while (LabelMap[GoalCount.toString()] != null) {
                     GoalCount++;
-                CurrentNode.AssignedLabelNumber = "" + GoalCount;
+                }
+                CurrentNode.AssignedLabelNumber = GoalCount.toString();
                 GoalCount++;
-                var BufferList = new Array();
+                var BufferList = [];
                 CurrentNode.ListSectionNode(BufferList);
                 var SectionCount = 1;
-                for (var i = 0; i < Lib.Array_size(BufferList); i++, SectionCount += 1) {
-                    var SectionNode = Lib.Array_get(BufferList, i);
+                for (var i = 0; i < BufferList.length; i++, SectionCount += 1) {
+                    var SectionNode = BufferList[i];
                     var LabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
-                    if (LabelMap.get(LabelNumber) != null)
+                    if (LabelMap[LabelNumber] != null)
                         continue;
-                    SectionNode.AssignedLabelNumber = CurrentNode.GetLabelNumber() + "." + SectionCount;
+                    SectionNode.AssignedLabelNumber = LabelNumber;
                 }
-                Lib.Array_clear(BufferList);
+                BufferList = [];
                 CurrentNode.ListSubGoalNode(BufferList);
-                for (var i = 0; i < Lib.Array_size(BufferList); i++) {
-                    var GoalNode = Lib.Array_get(BufferList, i);
-                    queue.add(GoalNode);
-                    NextGoalCount += 1;
-                }
+                Array.prototype.push.apply(queue, BufferList);
+                NextGoalCount += BufferList.length;
             }
         };
         GSNNode.prototype.RenumberGoal = function (GoalCount, NextGoalCount) {
-            var LabelMap = new HashMap();
-            this.RenumberGoalRecursive(GoalCount, NextGoalCount, LabelMap);
+            this.RenumberGoalRecursive(GoalCount, NextGoalCount, {});
         };
         GSNNode.prototype.SearchNode = function (SearchWord) {
-            var NodeList = new Array();
-            if (Lib.String_matches(this.NodeDoc, SearchWord)) {
-                Lib.Array_add(NodeList, this);
+            var NodeList = [];
+            if (this.NodeDoc.indexOf(SearchWord) >= 0) {
+                NodeList.push(this);
             }
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                var Node = Lib.Array_get(this.NonNullSubNodeList(), i);
-                Lib.Array_addAll(NodeList, Node.SearchNode(SearchWord));
-            }
+            this.NonNullSubNodeList().forEach(function (Node) {
+                Array.prototype.push.apply(NodeList, Node.SearchNode(SearchWord));
+            });
             return NodeList;
         };
         GSNNode.prototype.GetNodeCount = function () {
             var res = 1;
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCount();
-            }
+            this.NonNullSubNodeList().forEach(function (Node) {
+                res += Node.GetNodeCount();
+            });
             return res;
         };
         GSNNode.prototype.GetNodeCountTypeOf = function (type) {
             var res = this.NodeType == type ? 1 : 0;
-            for (var i = 0; i < Lib.Array_size(this.NonNullSubNodeList()); i++) {
-                res += Lib.Array_get(this.NonNullSubNodeList(), i).GetNodeCountTypeOf(type);
-            }
+            this.NonNullSubNodeList().forEach(function (Node) {
+                res += Node.GetNodeCountTypeOf(type);
+            });
             return res;
+        };
+        GSNNode.prototype.GetNodeCountForEachType = function (map) {
+            if (!map) {
+                map = {};
+                map[6 /* Assumption */] = 0;
+                map[1 /* Context */] = 0;
+                map[8 /* Contract */] = 0;
+                map[3 /* Evidence */] = 0;
+                map[7 /* Exception */] = 0;
+                map[0 /* Goal */] = 0;
+                map[5 /* Justification */] = 0;
+                map[2 /* Strategy */] = 0;
+                map[4 /* Undefined */] = 0;
+            }
+            ++map[this.NodeType];
+            this.NonNullSubNodeList().forEach(function (Node) {
+                Node.GetNodeCountForEachType(map);
+            });
+            return map;
         };
         return GSNNode;
     })();
     AssureNote.GSNNode = GSNNode;
     var GSNDoc = (function () {
         function GSNDoc(Record) {
-            this.Record = Record;
             this.TopNode = null;
-            this.NodeMap = new HashMap();
-            this.DocTagMap = new HashMap();
+            this.NodeMap = {};
+            this.DocTagMap = {};
             this.DocHistory = null;
             this.GoalCount = 0;
+            this.Record = Record;
         }
-        GSNDoc.prototype.DeepCopy = function (Author, Role, Date, Process) {
+        GSNDoc.prototype.GetTagValue = function (Key) {
+            return this.DocTagMap[Key];
+        };
+        GSNDoc.prototype.SetTagValue = function (Key, Value) {
+            this.DocTagMap[Key] = Value;
+        };
+        GSNDoc.prototype.ForEachNode = function (Action) {
+            if (Action) {
+                for (var key in this.NodeMap) {
+                    Action(this.NodeMap[key]);
+                }
+            }
+        };
+        GSNDoc.prototype.DeepCopy = function (Author, Role, ModefiedDate, Process) {
             var NewDoc = new GSNDoc(this.Record);
             NewDoc.GoalCount = this.GoalCount;
-            NewDoc.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, NewDoc);
-            NewDoc.DocTagMap = this.DuplicateTagMap(this.DocTagMap);
+            NewDoc.DocHistory = this.Record.NewHistory(Author, Role, ModefiedDate, Process, NewDoc);
+            NewDoc.DocTagMap = this.CloneTagMap(this.DocTagMap);
             if (this.TopNode != null) {
                 NewDoc.TopNode = this.TopNode.DeepCopy(NewDoc, null);
             }
             return NewDoc;
         };
-        GSNDoc.prototype.DuplicateTagMap = function (TagMap) {
+        GSNDoc.prototype.CloneTagMap = function (TagMap) {
             if (TagMap != null) {
-                return new HashMap(TagMap);
+                var NewMap = {};
+                for (var key in TagMap) {
+                    NewMap[key] = TagMap[key];
+                }
+                return NewMap;
             }
             return null;
         };
-        GSNDoc.prototype.UpdateDocHeader = function (Reader) {
+        GSNDoc.prototype.UpdateDocHeader = function () {
             var Revision = TagUtils.GetInteger(this.DocTagMap, "Revision", -1);
             if (Revision != -1) {
                 this.DocHistory = this.Record.GetHistory(Revision);
@@ -1399,26 +1402,26 @@ var AssureNote;
             if (this.DocHistory == null) {
                 var Author = TagUtils.GetString(this.DocTagMap, "Author", "unknown");
                 var Role = TagUtils.GetString(this.DocTagMap, "Role", "converter");
-                var Date = TagUtils.GetString(this.DocTagMap, "Date", null);
+                var ModefiedDate = new Date(TagUtils.GetString(this.DocTagMap, "Date", null));
                 var Process = TagUtils.GetString(this.DocTagMap, "Process", "-");
-                this.DocHistory = this.Record.NewHistory(Author, Role, Date, Process, this);
+                this.DocHistory = this.Record.NewHistory(Author, Role, ModefiedDate, Process, this);
             }
         };
         GSNDoc.prototype.GetNode = function (UID) {
-            return this.NodeMap.get(UID);
+            return this.NodeMap[UID];
         };
-        GSNDoc.prototype.UncheckAddNode = function (Node) {
-            this.NodeMap.put(Node.UID, Node);
+        GSNDoc.prototype.AddNodeWithoutCheck = function (Node) {
+            this.NodeMap[Node.UID] = Node;
         };
         GSNDoc.prototype.AddNode = function (Node) {
             var Key = Node.UID;
-            var OldNode = this.NodeMap.get(Key);
+            var OldNode = this.NodeMap[Key];
             if (OldNode != null) {
-                if (Lib.EqualsDigest(OldNode.Digest, Node.Digest)) {
+                if (OldNode.Digest == Node.Digest) {
                     Node.Created = OldNode.Created;
                 }
             }
-            this.NodeMap.put(Key, Node);
+            this.NodeMap[Key] = Node;
             if (Node.NodeType == 0 /* Goal */) {
                 if (Node.GetGoalLevel() == 1) {
                     this.TopNode = Node;
@@ -1426,7 +1429,7 @@ var AssureNote;
             }
         };
         GSNDoc.prototype.RemapNodeMap = function () {
-            var NodeMap = new HashMap();
+            var NodeMap = {};
             if (this.TopNode != null) {
                 this.TopNode.Remap(NodeMap);
             }
@@ -1435,7 +1438,8 @@ var AssureNote;
         GSNDoc.prototype.RemoveNode = function (Node) {
             (this == Node.BaseDoc);
             if (Node.ParentNode != null) {
-                Lib.Array_remove(Node.ParentNode.SubNodeList, Node);
+                var index = Node.ParentNode.SubNodeList.indexOf(Node);
+                Node.ParentNode.SubNodeList.splice(index, 1);
             }
             this.RemapNodeMap();
         };
@@ -1449,25 +1453,40 @@ var AssureNote;
             }
         };
         GSNDoc.prototype.GetLabelMap = function () {
-            var LabelMap = new HashMap();
+            var LabelMap = {};
             var CurrentNode;
-            var queue = new LinkedList();
-            queue.add(this.TopNode);
-            while ((CurrentNode = queue.poll()) != null) {
+            var queue = [this.TopNode];
+            while ((CurrentNode = queue.shift()) != null) {
                 if (CurrentNode.LabelName != null) {
-                    LabelMap.put(CurrentNode.LabelName, CurrentNode.GetLabel());
+                    LabelMap[CurrentNode.LabelName] = CurrentNode.GetLabel();
                 }
-                for (var i = 0; CurrentNode.SubNodeList != null && i < Lib.Array_size(CurrentNode.SubNodeList); i++) {
-                    queue.add(Lib.Array_get(CurrentNode.SubNodeList, i));
+                if (CurrentNode.SubNodeList) {
+                    Array.prototype.push.apply(queue, CurrentNode.SubNodeList);
                 }
             }
             return LabelMap;
         };
         GSNDoc.prototype.GetNodeCount = function () {
-            return this.TopNode.GetNodeCount();
+            return Object.keys(this.NodeMap).length;
         };
         GSNDoc.prototype.GetNodeCountTypeOf = function (type) {
-            return this.TopNode.GetNodeCountTypeOf(type);
+            var count = 0;
+            this.ForEachNode(function (Node) { return count += ~~(Node.NodeType == type); });
+            return count;
+        };
+        GSNDoc.prototype.GetNodeCountForEachType = function () {
+            var map = {};
+            map[6 /* Assumption */] = 0;
+            map[1 /* Context */] = 0;
+            map[8 /* Contract */] = 0;
+            map[3 /* Evidence */] = 0;
+            map[7 /* Exception */] = 0;
+            map[0 /* Goal */] = 0;
+            map[5 /* Justification */] = 0;
+            map[2 /* Strategy */] = 0;
+            map[4 /* Undefined */] = 0;
+            this.ForEachNode(function (Node) { return ++map[Node.NodeType]; });
+            return map;
         };
         GSNDoc.prototype.RenumberAll = function () {
             if (this.TopNode != null) {
@@ -1479,21 +1498,19 @@ var AssureNote;
     AssureNote.GSNDoc = GSNDoc;
     var GSNRecord = (function () {
         function GSNRecord() {
-            this.HistoryList = new Array();
+            this.HistoryList = [];
+            this.HistoryListToRedo = [];
             this.EditingDoc = null;
         }
         GSNRecord.prototype.DeepCopy = function () {
             var NewRecord = new GSNRecord();
-            for (var i = 0; i < Lib.Array_size(this.HistoryList); i++) {
-                var Item = Lib.Array_get(this.HistoryList, i);
-                Lib.Array_add(NewRecord.HistoryList, Item);
-            }
+            NewRecord.HistoryList = this.HistoryList.map(function (x) { return x; });
             NewRecord.EditingDoc = this.EditingDoc;
             return NewRecord;
         };
         GSNRecord.prototype.GetHistory = function (Rev) {
-            if (Rev < Lib.Array_size(this.HistoryList)) {
-                return Lib.Array_get(this.HistoryList, Rev);
+            if (Rev < this.HistoryList.length) {
+                return this.HistoryList[Rev];
             }
             return null;
         };
@@ -1504,53 +1521,24 @@ var AssureNote;
             }
             return null;
         };
-        GSNRecord.prototype.NewHistory = function (Author, Role, Date, Process, Doc) {
-            var History = new GSNHistory(Lib.Array_size(this.HistoryList), Author, Role, Date, Process, Doc);
-            Lib.Array_add(this.HistoryList, History);
+        GSNRecord.prototype.NewHistory = function (Author, Role, ModefiedDate, Process, Doc) {
+            var History = new GSNHistory(this.HistoryList.length, Author, Role, ModefiedDate, Process, Doc);
+            this.HistoryList.push(History);
             return History;
         };
-        GSNRecord.prototype.AddHistory = function (Rev, Author, Role, Date, Process, Doc) {
+        GSNRecord.prototype.AddHistory = function (Rev, Author, Role, ModefiedDate, Process, Doc) {
             if (Rev >= 0) {
-                var History = new GSNHistory(Rev, Author, Role, Date, Process, Doc);
-                while (!(Rev < Lib.Array_size(this.HistoryList))) {
-                    Lib.Array_add(this.HistoryList, new GSNHistory(Rev, Author, Role, Date, Process, Doc));
+                var History = new GSNHistory(Rev, Author, Role, ModefiedDate, Process, Doc);
+                while (Rev >= this.HistoryList.length) {
+                    this.HistoryList.push(new GSNHistory(Rev, Author, Role, ModefiedDate, Process, Doc));
                 }
-                if (0 <= Rev && Rev < Lib.Array_size(this.HistoryList)) {
-                    var OldHistory = Lib.Array_get(this.HistoryList, Rev);
-                    OldHistory.UpdateHistory(Rev, Author, Role, Date, Process, Doc);
+                if (0 <= Rev && Rev < this.HistoryList.length) {
+                    var OldHistory = this.HistoryList[Rev];
+                    OldHistory.UpdateHistory(Rev, Author, Role, ModefiedDate, Process, Doc);
                 }
-                Lib.Array_set(this.HistoryList, Rev, History);
+                this.HistoryList[Rev] = History;
                 if (Doc != null) {
                     Doc.DocHistory = History;
-                }
-            }
-        };
-        GSNRecord.prototype.ParseHistoryTag = function (Line, Reader) {
-            var loc = Line.indexOf("::");
-            if (loc != -1) {
-                var Key = Line.substring(0, loc).trim();
-                try {
-                    var Value = Line.substring(loc + 2).trim();
-                    var Records = Value.split(";");
-                    this.AddHistory(WikiSyntax.ParseInt(Key.substring(1), -1), Records[1], Records[2], Records[0], Records[3], null);
-                }
-                catch (e) {
-                    Reader.LogError("Invalid format of history tag", e.getMessage());
-                }
-            }
-        };
-        GSNRecord.prototype.Parse = function (TextDoc) {
-            var Reader = new StringReader(TextDoc);
-            while (Reader.HasNext()) {
-                var Doc = new GSNDoc(this);
-                var Parser = new ParserContext(Doc);
-                Doc.TopNode = Parser.ParseNode(Reader);
-                Doc.RenumberAll();
-            }
-            for (var i = 0; i < Lib.Array_size(this.HistoryList); i++) {
-                var History = Lib.Array_get(this.HistoryList, i);
-                if (i != 0 && TagUtils.GetString(History.Doc.DocTagMap, "CommitMessage", null) == null) {
-                    History.IsCommitRevision = false;
                 }
             }
         };
@@ -1560,32 +1548,72 @@ var AssureNote;
                 LatestDoc.RenumberAll();
             }
         };
-        GSNRecord.prototype.OpenEditor = function (Author, Role, Date, Process) {
+        GSNRecord.prototype.OpenEditor = function (Author, Role, ModefiedDate, Process) {
             if (this.EditingDoc == null) {
                 var Doc = this.GetLatestDoc();
                 if (Doc != null) {
-                    this.EditingDoc = Doc.DeepCopy(Author, Role, Date, Process);
+                    this.EditingDoc = Doc.DeepCopy(Author, Role, ModefiedDate, Process);
                 }
                 else {
                     this.EditingDoc = new GSNDoc(this);
-                    this.EditingDoc.DocHistory = this.NewHistory(Author, Role, Date, Process, this.EditingDoc);
+                    this.EditingDoc.DocHistory = this.NewHistory(Author, Role, ModefiedDate, Process, this.EditingDoc);
                 }
+                this.EditingDoc.DocHistory.IsCommitRevision = false;
             }
-            this.EditingDoc.DocHistory.IsCommitRevision = false;
+            else {
+                throw new Error("OpenEditor is called before CloseEditor called.");
+            }
         };
         GSNRecord.prototype.CloseEditor = function () {
-            this.EditingDoc = null;
+            if (this.EditingDoc) {
+                this.EditingDoc = null;
+                this.HistoryListToRedo = [];
+            }
+            else {
+                throw new Error("CloseEditor is called before OpenEditor called.");
+            }
         };
         GSNRecord.prototype.DiscardEditor = function () {
-            this.EditingDoc = null;
-            Lib.Array_remove(this.HistoryList, Lib.Array_size(this.HistoryList) - 1);
+            if (this.EditingDoc) {
+                this.EditingDoc = null;
+                this.HistoryList.pop();
+            }
+            else {
+                throw new Error("DiscardEditor is called before OpenEditor called.");
+            }
+        };
+        GSNRecord.prototype.CanUndo = function () {
+            return this.HistoryList.length > 1 && !this.GetLatestDoc().DocHistory.IsCommitRevision;
+        };
+        GSNRecord.prototype.CanRedo = function () {
+            return this.HistoryListToRedo.length > 0;
+        };
+        GSNRecord.prototype.Undo = function () {
+            if (!this.EditingDoc) {
+                if (this.CanUndo()) {
+                    this.HistoryListToRedo.push(this.HistoryList.pop());
+                }
+            }
+            else {
+                throw new Error("Undo is called while editor is opened.");
+            }
+        };
+        GSNRecord.prototype.Redo = function () {
+            if (!this.EditingDoc) {
+                if (this.CanRedo()) {
+                    this.HistoryList.push(this.HistoryListToRedo.pop());
+                }
+            }
+            else {
+                throw new Error("Redo is called while editor is opened.");
+            }
         };
         GSNRecord.prototype.Merge = function (NewRecord) {
             var CommonRevision = -1;
-            for (var Rev = 0; Rev < Lib.Array_size(this.HistoryList); Rev++) {
+            for (var Rev = 0; Rev < this.HistoryList.length; Rev++) {
                 var MasterHistory = this.GetHistory(Rev);
                 var NewHistory = NewRecord.GetHistory(Rev);
-                if (NewHistory != null && MasterHistory.EqualsHistory(NewHistory)) {
+                if (NewHistory != null && MasterHistory.Equals(NewHistory)) {
                     CommonRevision = Rev;
                     continue;
                 }
@@ -1594,68 +1622,68 @@ var AssureNote;
             if (CommonRevision == -1) {
                 this.MergeAsReplaceTopGoal(NewRecord);
             }
-            else if (CommonRevision == Lib.Array_size(this.HistoryList) - 1) {
+            else if (CommonRevision == this.HistoryList.length - 1) {
                 this.MergeAsFastFoward(NewRecord);
             }
-            else if (CommonRevision != Lib.Array_size(NewRecord.HistoryList) - 1) {
+            else if (CommonRevision != NewRecord.HistoryList.length - 1) {
                 this.MergeConflict(NewRecord, CommonRevision);
             }
         };
         GSNRecord.prototype.MergeConflict = function (BranchRecord, CommonRevision) {
-            var MasterHistory = Lib.Array_get(this.HistoryList, Lib.Array_size(this.HistoryList) - 1);
+            var MasterHistory = this.HistoryList[this.HistoryList.length - 1];
             var BranchHistory = null;
-            for (var i = CommonRevision + 1; i < Lib.Array_size(BranchRecord.HistoryList); i++) {
-                BranchHistory = Lib.Array_get(BranchRecord.HistoryList, i);
-                Lib.Array_add(this.HistoryList, BranchHistory);
+            for (var i = CommonRevision + 1; i < BranchRecord.HistoryList.length; i++) {
+                BranchHistory = BranchRecord.HistoryList[i];
+                this.HistoryList.push(BranchHistory);
             }
             var MergeDoc = new GSNDoc(this);
             MergeDoc.TopNode = MasterHistory.Doc.TopNode.Merge(BranchHistory.Doc.TopNode, CommonRevision);
             MergeDoc.DocHistory = this.NewHistory(BranchHistory.Author, BranchHistory.Role, null, "merge", MergeDoc);
         };
         GSNRecord.prototype.MergeAsFastFoward = function (NewRecord) {
-            for (var i = Lib.Array_size(this.HistoryList); i < Lib.Array_size(NewRecord.HistoryList); i++) {
+            for (var i = this.HistoryList.length; i < NewRecord.HistoryList.length; i++) {
                 var BranchDoc = NewRecord.GetHistoryDoc(i);
                 if (BranchDoc != null) {
                     BranchDoc.Record = this;
-                    Lib.Array_add(this.HistoryList, BranchDoc.DocHistory);
+                    this.HistoryList.push(BranchDoc.DocHistory);
                 }
             }
         };
         GSNRecord.prototype.MergeAsReplaceTopGoal = function (NewRecord) {
-            for (var i = 0; i < Lib.Array_size(NewRecord.HistoryList); i++) {
-                var NewHistory = Lib.Array_get(NewRecord.HistoryList, i);
+            for (var i = 0; i < NewRecord.HistoryList.length; i++) {
+                var NewHistory = NewRecord.HistoryList[i];
                 var Doc = NewHistory != null ? NewHistory.Doc : null;
                 if (Doc != null) {
-                    this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.DateString, NewHistory.Process);
+                    this.OpenEditor(NewHistory.Author, NewHistory.Role, NewHistory.Date, NewHistory.Process);
                     this.EditingDoc.TopNode.ReplaceSubNode(Doc.TopNode, true);
                     this.CloseEditor();
                 }
             }
         };
         GSNRecord.prototype.MergeAsIncrementalAddition = function (Rev1, Record1, Rev2, Record2) {
-            while (Rev1 < Lib.Array_size(Record1.HistoryList) && Rev2 < Lib.Array_size(Record2.HistoryList)) {
+            while (Rev1 < Record1.HistoryList.length && Rev2 < Record2.HistoryList.length) {
                 var History1 = Record1.GetHistory(Rev1);
                 var History2 = Record2.GetHistory(Rev2);
                 if (History1 == null || History1.Doc == null) {
-                    if (Rev1 < Lib.Array_size(Record1.HistoryList)) {
+                    if (Rev1 < Record1.HistoryList.length) {
                         Rev1++;
                         continue;
                     }
                 }
                 if (History2 == null || History2.Doc == null) {
-                    if (Rev2 < Lib.Array_size(Record2.HistoryList)) {
+                    if (Rev2 < Record2.HistoryList.length) {
                         Rev2++;
                         continue;
                     }
                 }
                 if (History1.CompareDate(History2) < 0) {
-                    this.OpenEditor(History1.Author, History1.Role, History1.DateString, History1.Process);
+                    this.OpenEditor(History1.Author, History1.Role, History1.Date, History1.Process);
                     Rev1++;
                     this.EditingDoc.TopNode.ReplaceSubNode(History1.Doc.TopNode, true);
                     this.CloseEditor();
                 }
                 else {
-                    this.OpenEditor(History2.Author, History2.Role, History2.DateString, History2.Process);
+                    this.OpenEditor(History2.Author, History2.Role, History2.Date, History2.Process);
                     Rev2++;
                     this.EditingDoc.TopNode.ReplaceSubNode(History2.Doc.TopNode, true);
                     this.CloseEditor();
@@ -1663,7 +1691,7 @@ var AssureNote;
             }
         };
         GSNRecord.prototype.GetLatestDoc = function () {
-            for (var i = Lib.Array_size(this.HistoryList) - 1; i >= 0; i++) {
+            for (var i = this.HistoryList.length - 1; i >= 0; i++) {
                 var Doc = this.GetHistoryDoc(i);
                 if (Doc != null) {
                     return Doc;
@@ -1673,11 +1701,11 @@ var AssureNote;
         };
         GSNRecord.prototype.Commit = function (message) {
             this.GetLatestDoc().DocHistory.IsCommitRevision = true;
-            this.GetLatestDoc().DocTagMap.put("CommitMessage", message);
+            this.GetLatestDoc().SetTagValue("CommitMessage", message);
         };
         GSNRecord.prototype.FormatRecord = function (Writer) {
             var DocCount = 0;
-            for (var i = Lib.Array_size(this.HistoryList) - 1; i >= 0; i--) {
+            for (var i = this.HistoryList.length - 1; i >= 0; i--) {
                 var Doc = this.GetHistoryDoc(i);
                 if (Doc != null) {
                     if (DocCount > 0) {
@@ -1689,211 +1717,9 @@ var AssureNote;
                 }
             }
         };
-        GSNRecord.prototype.Undo = function () {
-            return null;
-        };
-        GSNRecord.prototype.Redo = function () {
-            return null;
-        };
         return GSNRecord;
     })();
     AssureNote.GSNRecord = GSNRecord;
-    var ParserContext = (function () {
-        function ParserContext(NullableDoc) {
-            var ParentNode = new GSNNode(NullableDoc, null, 0 /* Goal */, null, -1, null);
-            this.NullableDoc = NullableDoc;
-            this.FirstNode = null;
-            this.LastGoalNode = null;
-            this.LastNonContextNode = null;
-            this.GoalStack = new Array();
-            this.random = new Random(System.currentTimeMillis());
-            this.SetGoalStackAt(ParentNode);
-        }
-        ParserContext.prototype.SetLastNode = function (Node) {
-            if (Node.IsGoal()) {
-                this.LastGoalNode = Node;
-                this.SetGoalStackAt(Node);
-            }
-            if (!Node.IsContext()) {
-                this.LastNonContextNode = Node;
-            }
-        };
-        ParserContext.prototype.GetStrategyOfGoal = function (Level) {
-            if (Level - 1 < Lib.Array_size(this.GoalStack)) {
-                var ParentGoal = this.GetGoalStackAt(Level - 1);
-                if (ParentGoal != null) {
-                    return ParentGoal.GetLastNode(2 /* Strategy */, true);
-                }
-            }
-            return null;
-        };
-        ParserContext.prototype.GetGoalStackAt = function (Level) {
-            if (Level >= 0 && Level < Lib.Array_size(this.GoalStack)) {
-                return Lib.Array_get(this.GoalStack, Level);
-            }
-            return null;
-        };
-        ParserContext.prototype.SetGoalStackAt = function (Node) {
-            var GoalLevel = Node.GetGoalLevel();
-            while (!(GoalLevel - 1 < Lib.Array_size(this.GoalStack))) {
-                Lib.Array_add(this.GoalStack, null);
-            }
-            Lib.Array_set(this.GoalStack, GoalLevel - 1, Node);
-        };
-        ParserContext.prototype.IsValidSection = function (Line, Reader) {
-            var NodeType = WikiSyntax.ParseNodeType(Line);
-            var Level = WikiSyntax.ParseGoalLevel(Line);
-            if (NodeType == 0 /* Goal */) {
-                var ParentNode = this.GetStrategyOfGoal(Level);
-                if (ParentNode != null) {
-                    return true;
-                }
-                Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
-                return false;
-            }
-            if (this.LastGoalNode != null && Lib.Array_size(this.GoalStack) <= Level) {
-                Reader.LogError("Mismatched goal level < " + Lib.Array_size(this.GoalStack), Line);
-                return false;
-            }
-            return true;
-        };
-        ParserContext.prototype.CreateNewNode = function (LabelLine, Reader) {
-            var NodeType = WikiSyntax.ParseNodeType(LabelLine);
-            var LabelName = WikiSyntax.ParseLabelName(LabelLine);
-            var LabelNumber = WikiSyntax.ParseLabelNumber(LabelLine);
-            var UID = (WikiSyntax.ParseUID(LabelLine) == null) ? this.random.nextInt() : Lib.HexToDec(WikiSyntax.ParseUID(LabelLine));
-            var NewNode = null;
-            var ParentNode = null;
-            var HistoryTaple = WikiSyntax.ParseHistory(LabelLine, this.NullableDoc);
-            var Level = WikiSyntax.ParseGoalLevel(LabelLine);
-            if (NodeType == 0 /* Goal */) {
-                ParentNode = this.GetStrategyOfGoal(Level);
-            }
-            else {
-                ParentNode = (NodeType == 1 /* Context */) ? this.LastNonContextNode : this.GetGoalStackAt(Level);
-            }
-            NewNode = new GSNNode(this.NullableDoc, ParentNode, NodeType, LabelName, UID, HistoryTaple);
-            if (this.FirstNode == null) {
-                this.FirstNode = NewNode;
-            }
-            this.SetLastNode(NewNode);
-            if (this.NullableDoc != null) {
-                this.NullableDoc.AddNode(NewNode);
-            }
-            return NewNode;
-        };
-        ParserContext.prototype.RemoveSentinel = function () {
-            if (this.FirstNode != null && this.FirstNode.ParentNode != null) {
-                this.FirstNode.ParentNode = null;
-            }
-        };
-        ParserContext.prototype.ParseNode = function (Reader) {
-            while (Reader.HasNext()) {
-                var Line = Reader.ReadLine();
-                if (Lib.String_startsWith(Line, "*")) {
-                    Reader.RollbackLineFeed();
-                    break;
-                }
-                if (this.NullableDoc != null) {
-                    if (Lib.String_startsWith(Line, "#")) {
-                        this.NullableDoc.Record.ParseHistoryTag(Line, Reader);
-                    }
-                    else {
-                        TagUtils.ParseTag(this.NullableDoc.DocTagMap, Line);
-                    }
-                }
-            }
-            if (this.NullableDoc != null) {
-                this.NullableDoc.UpdateDocHeader(Reader);
-            }
-            var LastNode = null;
-            var LineList = new Array();
-            while (Reader.HasNext()) {
-                var Line = Reader.ReadLine();
-                if (Lib.String_startsWith(Line, "*")) {
-                    if (Lib.String_startsWith(Line, Lib.VersionDelim)) {
-                        break;
-                    }
-                    if (this.IsValidSection(Line, Reader)) {
-                        this.UpdateContent(LastNode, LineList);
-                        LastNode = this.CreateNewNode(Line, Reader);
-                        continue;
-                    }
-                }
-                Lib.Array_add(LineList, Line);
-            }
-            this.UpdateContent(LastNode, LineList);
-            this.RemoveSentinel();
-            return this.FirstNode;
-        };
-        ParserContext.prototype.UpdateContent = function (LastNode, LineList) {
-            if (LastNode != null) {
-                LastNode.SetContent(LineList);
-            }
-            Lib.Array_clear(LineList);
-        };
-        return ParserContext;
-    })();
-    AssureNote.ParserContext = ParserContext;
-    var AssureNoteParser = (function () {
-        function AssureNoteParser() {
-        }
-        AssureNoteParser.merge = function (MasterFile, BranchFile) {
-            var MasterRecord = new GSNRecord();
-            MasterRecord.Parse(Lib.ReadFile(MasterFile));
-            if (BranchFile != null) {
-                var BranchRecord = new GSNRecord();
-                BranchRecord.Parse(Lib.ReadFile(BranchFile));
-                MasterRecord.Merge(BranchRecord);
-            }
-            else {
-            }
-            var Writer = new StringWriter();
-            MasterRecord.FormatRecord(Writer);
-            console.log(Writer.toString());
-        };
-        AssureNoteParser.ts_merge = function () {
-            var MasterFile = (Lib.Input.length > 0) ? Lib.Input[0] : null;
-            var BranchFile = (Lib.Input.length > 1) ? Lib.Input[1] : null;
-            var MasterRecord = new GSNRecord();
-            MasterRecord.Parse(MasterFile);
-            if (BranchFile != null) {
-                var BranchRecord = new GSNRecord();
-                BranchRecord.Parse(Lib.ReadFile(BranchFile));
-                MasterRecord.Merge(BranchRecord);
-            }
-            else {
-                MasterRecord.RenumberAll();
-            }
-            var Writer = new StringWriter();
-            MasterRecord.FormatRecord(Writer);
-            console.log(Writer.toString());
-        };
-        AssureNoteParser.main = function (argv) {
-            if (argv.length == 2) {
-                var MasterRecord = new GSNRecord();
-                MasterRecord.Parse(Lib.ReadFile(argv[0]));
-                var NewNode = MasterRecord.GetLatestDoc().TopNode.ReplaceSubNodeAsText(Lib.ReadFile(argv[1]), true);
-                var Writer = new StringWriter();
-                NewNode.FormatNode(Writer);
-                console.log(Writer.toString());
-            }
-            if (argv.length == 1) {
-                AssureNoteParser.merge(argv[0], null);
-            }
-            console.log("Usage: AssureNoteParser file [margingfile]");
-        };
-        return AssureNoteParser;
-    })();
-    AssureNote.AssureNoteParser = AssureNoteParser;
-    var PdfConverter = (function () {
-        function PdfConverter() {
-        }
-        PdfConverter.main = function (args) {
-        };
-        return PdfConverter;
-    })();
-    AssureNote.PdfConverter = PdfConverter;
     var Random = (function () {
         function Random(seed) {
         }
@@ -1912,32 +1738,6 @@ var AssureNote;
         return System;
     })();
     AssureNote.System = System;
-    var StringBuilder = (function () {
-        function StringBuilder() {
-            this.str = "";
-        }
-        StringBuilder.prototype.append = function (str) {
-            this.str += str;
-        };
-        StringBuilder.prototype.toString = function () {
-            return this.str;
-        };
-        return StringBuilder;
-    })();
-    AssureNote.StringBuilder = StringBuilder;
-    var Character = (function () {
-        function Character() {
-        }
-        Character.isDigit = function (c) {
-            return 48 <= c && c <= 57;
-        };
-        Character.isWhitespace = function (c) {
-            return c == 9 || c == 10 || c == 12 || c == 13 || c == 32;
-            ;
-        };
-        return Character;
-    })();
-    AssureNote.Character = Character;
     var SimpleDateFormat = (function () {
         function SimpleDateFormat(format) {
         }
@@ -1981,66 +1781,6 @@ var AssureNote;
         return SimpleDateFormat;
     })();
     AssureNote.SimpleDateFormat = SimpleDateFormat;
-    var Queue = (function () {
-        function Queue() {
-            this.list = [];
-        }
-        Queue.prototype.add = function (elem) {
-            this.list.push(elem);
-        };
-        Queue.prototype.poll = function () {
-            if (this.list.length == 0)
-                return null;
-            var res = this.list[0];
-            this.list = this.list.slice(1);
-            return res;
-        };
-        return Queue;
-    })();
-    AssureNote.Queue = Queue;
-    var LinkedList = (function (_super) {
-        __extends(LinkedList, _super);
-        function LinkedList() {
-            _super.apply(this, arguments);
-        }
-        return LinkedList;
-    })(Queue);
-    AssureNote.LinkedList = LinkedList;
-    var HashMap = (function () {
-        function HashMap(map) {
-            this.hash = {};
-            if (map != null) {
-                var keySet = map.keySet();
-                for (var i = 0; i < keySet.length; i++) {
-                    this.hash[keySet[i]] = map[keySet[i]];
-                }
-            }
-        }
-        HashMap.prototype.put = function (key, value) {
-            this.hash[String(key)] = value;
-        };
-        HashMap.prototype.get = function (key) {
-            return this.hash[String(key)];
-        };
-        HashMap.prototype.size = function () {
-            return Object.keys(this.hash).length;
-        };
-        HashMap.prototype.clear = function () {
-            this.hash = {};
-        };
-        HashMap.prototype.keySet = function () {
-            return Object.keys(this.hash);
-        };
-        HashMap.prototype.toArray = function () {
-            var res = [];
-            for (var key in Object.keys(this.hash)) {
-                res.push(this.hash[key]);
-            }
-            return res;
-        };
-        return HashMap;
-    })();
-    AssureNote.HashMap = HashMap;
     var MessageDigest = (function () {
         function MessageDigest() {
             this.digestString = null;
@@ -2062,12 +1802,6 @@ var AssureNote;
         };
         Lib.EqualsDigest = function (digest1, digest2) {
             return digest1 == digest2;
-        };
-        Lib.ReadFile = function (file) {
-            return "";
-        };
-        Lib.parseInt = function (numText) {
-            return Number(numText);
         };
         Lib.HexToDec = function (v) {
             return parseInt(v, 16);
@@ -2095,56 +1829,6 @@ var AssureNote;
         Lib.String_matches = function (self, str) {
             return self.match(str) != null;
         };
-        Lib.Array_get = function (self, index) {
-            if (index >= self.length) {
-                throw new RangeError("invalid array index");
-            }
-            return self[index];
-        };
-        Lib.Array_set = function (self, index, value) {
-            self[index] = value;
-        };
-        Lib.Array_add = function (self, obj) {
-            self.push(obj);
-        };
-        Lib.Array_add2 = function (self, index, obj) {
-            self.splice(index, 0, obj);
-        };
-        Lib.Array_addAll = function (self, obj) {
-            Array.prototype.push.apply(self, obj);
-        };
-        Lib.Array_size = function (self) {
-            return self.length;
-        };
-        Lib.Array_clear = function (self) {
-            self.length = 0;
-        };
-        Lib.Array_remove = function (self, index) {
-            if (typeof index == 'number') {
-                if (index >= self.length) {
-                    throw new RangeError("invalid array index");
-                }
-            }
-            else {
-                var item = index;
-                index = 0;
-                for (var j in self) {
-                    if (self[j] === index)
-                        break;
-                }
-                if (j == self.length)
-                    return null;
-            }
-            var v = self[index];
-            self.splice(index, 1);
-            return v;
-        };
-        Lib.Object_equals = function (self, obj) {
-            return (self === obj);
-        };
-        Lib.Object_InstanceOf = function (self, klass) {
-            return self.constructor == klass;
-        };
         Lib.Input = [];
         Lib.EmptyNodeList = new Array();
         Lib.LineFeed = "\n";
@@ -2152,306 +1836,13 @@ var AssureNote;
         return Lib;
     })();
     AssureNote.Lib = Lib;
-    var Iterator = (function () {
-        function Iterator() {
-        }
-        return Iterator;
-    })();
-    AssureNote.Iterator = Iterator;
-    Object.defineProperty(Array.prototype, "addAll", {
-        enumerable: false,
-        value: function (obj) {
-            Array.prototype.push.apply(this, obj);
-        }
-    });
-    Object.defineProperty(Array.prototype, "size", {
-        enumerable: false,
-        value: function () {
-            return this.length;
-        }
-    });
-    Object.defineProperty(Array.prototype, "add", {
-        enumerable: false,
-        value: function (arg1) {
-            if (arguments.length == 1) {
-                this.push(arg1);
-            }
-            else {
-                var arg2 = arguments[1];
-                this.splice(arg1, 0, arg2);
-            }
-        }
-    });
-    Object.defineProperty(Array.prototype, "get", {
-        enumerable: false,
-        value: function (i) {
-            if (i >= this.length) {
-                throw new RangeError("invalid array index");
-            }
-            return this[i];
-        }
-    });
-    Object.defineProperty(Array.prototype, "set", {
-        enumerable: false,
-        value: function (i, v) {
-            this[i] = v;
-        }
-    });
-    Object.defineProperty(Array.prototype, "remove", {
-        enumerable: false,
-        value: function (i) {
-            if (typeof i == 'number') {
-                if (i >= this.length) {
-                    throw new RangeError("invalid array index");
-                }
-            }
-            else {
-                var item = i;
-                i = 0;
-                for (var j in this) {
-                    if (this[j] === i)
-                        break;
-                }
-                if (j == this.length)
-                    return null;
-            }
-            var v = this[i];
-            this.splice(i, 1);
-            return v;
-        }
-    });
-    Object.defineProperty(Array.prototype, "clear", {
-        enumerable: false,
-        value: function () {
-            this.length = 0;
-        }
-    });
-    Object.defineProperty(Object.prototype, "equals", {
-        enumerable: false,
-        value: function (other) {
-            return (this === other);
-        }
-    });
-    Object.defineProperty(Object.prototype, "InstanceOf", {
-        enumerable: false,
-        value: function (klass) {
-            return this.constructor == klass;
-        }
-    });
-    Object.defineProperty(String.prototype, "compareTo", {
-        enumerable: false,
-        value: function (anotherString) {
-            if (this < anotherString) {
-                return -1;
-            }
-            else if (this > anotherString) {
-                return 1;
-            }
-            else {
-                return 0;
-            }
-        }
-    });
-    Object.defineProperty(String.prototype, "startsWith", {
-        enumerable: false,
-        value: function (key) {
-            return this.indexOf(key, 0) == 0;
-        }
-    });
-    Object.defineProperty(String.prototype, "endsWith", {
-        enumerable: false,
-        value: function (key) {
-            return this.lastIndexOf(key, 0) == 0;
-        }
-    });
-    Object.defineProperty(String.prototype, "equals", {
-        enumerable: false,
-        value: function (other) {
-            return (this == other);
-        }
-    });
-    Object.defineProperty(String.prototype, "matches", {
-        enumerable: false,
-        value: function (str) {
-            return this.match(str) != null;
-        }
-    });
-    (function ($) {
-        'use strict';
-        function safe_add(x, y) {
-            var lsw = (x & 0xFFFF) + (y & 0xFFFF), msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-            return (msw << 16) | (lsw & 0xFFFF);
-        }
-        function bit_rol(num, cnt) {
-            return (num << cnt) | (num >>> (32 - cnt));
-        }
-        function md5_cmn(q, a, b, x, s, t) {
-            return safe_add(bit_rol(safe_add(safe_add(a, q), safe_add(x, t)), s), b);
-        }
-        function md5_ff(a, b, c, d, x, s, t) {
-            return md5_cmn((b & c) | ((~b) & d), a, b, x, s, t);
-        }
-        function md5_gg(a, b, c, d, x, s, t) {
-            return md5_cmn((b & d) | (c & (~d)), a, b, x, s, t);
-        }
-        function md5_hh(a, b, c, d, x, s, t) {
-            return md5_cmn(b ^ c ^ d, a, b, x, s, t);
-        }
-        function md5_ii(a, b, c, d, x, s, t) {
-            return md5_cmn(c ^ (b | (~d)), a, b, x, s, t);
-        }
-        function binl_md5(x, len) {
-            x[len >> 5] |= 0x80 << (len % 32);
-            x[(((len + 64) >>> 9) << 4) + 14] = len;
-            var i, olda, oldb, oldc, oldd, a = 1732584193, b = -271733879, c = -1732584194, d = 271733878;
-            for (i = 0; i < x.length; i += 16) {
-                olda = a;
-                oldb = b;
-                oldc = c;
-                oldd = d;
-                a = md5_ff(a, b, c, d, x[i], 7, -680876936);
-                d = md5_ff(d, a, b, c, x[i + 1], 12, -389564586);
-                c = md5_ff(c, d, a, b, x[i + 2], 17, 606105819);
-                b = md5_ff(b, c, d, a, x[i + 3], 22, -1044525330);
-                a = md5_ff(a, b, c, d, x[i + 4], 7, -176418897);
-                d = md5_ff(d, a, b, c, x[i + 5], 12, 1200080426);
-                c = md5_ff(c, d, a, b, x[i + 6], 17, -1473231341);
-                b = md5_ff(b, c, d, a, x[i + 7], 22, -45705983);
-                a = md5_ff(a, b, c, d, x[i + 8], 7, 1770035416);
-                d = md5_ff(d, a, b, c, x[i + 9], 12, -1958414417);
-                c = md5_ff(c, d, a, b, x[i + 10], 17, -42063);
-                b = md5_ff(b, c, d, a, x[i + 11], 22, -1990404162);
-                a = md5_ff(a, b, c, d, x[i + 12], 7, 1804603682);
-                d = md5_ff(d, a, b, c, x[i + 13], 12, -40341101);
-                c = md5_ff(c, d, a, b, x[i + 14], 17, -1502002290);
-                b = md5_ff(b, c, d, a, x[i + 15], 22, 1236535329);
-                a = md5_gg(a, b, c, d, x[i + 1], 5, -165796510);
-                d = md5_gg(d, a, b, c, x[i + 6], 9, -1069501632);
-                c = md5_gg(c, d, a, b, x[i + 11], 14, 643717713);
-                b = md5_gg(b, c, d, a, x[i], 20, -373897302);
-                a = md5_gg(a, b, c, d, x[i + 5], 5, -701558691);
-                d = md5_gg(d, a, b, c, x[i + 10], 9, 38016083);
-                c = md5_gg(c, d, a, b, x[i + 15], 14, -660478335);
-                b = md5_gg(b, c, d, a, x[i + 4], 20, -405537848);
-                a = md5_gg(a, b, c, d, x[i + 9], 5, 568446438);
-                d = md5_gg(d, a, b, c, x[i + 14], 9, -1019803690);
-                c = md5_gg(c, d, a, b, x[i + 3], 14, -187363961);
-                b = md5_gg(b, c, d, a, x[i + 8], 20, 1163531501);
-                a = md5_gg(a, b, c, d, x[i + 13], 5, -1444681467);
-                d = md5_gg(d, a, b, c, x[i + 2], 9, -51403784);
-                c = md5_gg(c, d, a, b, x[i + 7], 14, 1735328473);
-                b = md5_gg(b, c, d, a, x[i + 12], 20, -1926607734);
-                a = md5_hh(a, b, c, d, x[i + 5], 4, -378558);
-                d = md5_hh(d, a, b, c, x[i + 8], 11, -2022574463);
-                c = md5_hh(c, d, a, b, x[i + 11], 16, 1839030562);
-                b = md5_hh(b, c, d, a, x[i + 14], 23, -35309556);
-                a = md5_hh(a, b, c, d, x[i + 1], 4, -1530992060);
-                d = md5_hh(d, a, b, c, x[i + 4], 11, 1272893353);
-                c = md5_hh(c, d, a, b, x[i + 7], 16, -155497632);
-                b = md5_hh(b, c, d, a, x[i + 10], 23, -1094730640);
-                a = md5_hh(a, b, c, d, x[i + 13], 4, 681279174);
-                d = md5_hh(d, a, b, c, x[i], 11, -358537222);
-                c = md5_hh(c, d, a, b, x[i + 3], 16, -722521979);
-                b = md5_hh(b, c, d, a, x[i + 6], 23, 76029189);
-                a = md5_hh(a, b, c, d, x[i + 9], 4, -640364487);
-                d = md5_hh(d, a, b, c, x[i + 12], 11, -421815835);
-                c = md5_hh(c, d, a, b, x[i + 15], 16, 530742520);
-                b = md5_hh(b, c, d, a, x[i + 2], 23, -995338651);
-                a = md5_ii(a, b, c, d, x[i], 6, -198630844);
-                d = md5_ii(d, a, b, c, x[i + 7], 10, 1126891415);
-                c = md5_ii(c, d, a, b, x[i + 14], 15, -1416354905);
-                b = md5_ii(b, c, d, a, x[i + 5], 21, -57434055);
-                a = md5_ii(a, b, c, d, x[i + 12], 6, 1700485571);
-                d = md5_ii(d, a, b, c, x[i + 3], 10, -1894986606);
-                c = md5_ii(c, d, a, b, x[i + 10], 15, -1051523);
-                b = md5_ii(b, c, d, a, x[i + 1], 21, -2054922799);
-                a = md5_ii(a, b, c, d, x[i + 8], 6, 1873313359);
-                d = md5_ii(d, a, b, c, x[i + 15], 10, -30611744);
-                c = md5_ii(c, d, a, b, x[i + 6], 15, -1560198380);
-                b = md5_ii(b, c, d, a, x[i + 13], 21, 1309151649);
-                a = md5_ii(a, b, c, d, x[i + 4], 6, -145523070);
-                d = md5_ii(d, a, b, c, x[i + 11], 10, -1120210379);
-                c = md5_ii(c, d, a, b, x[i + 2], 15, 718787259);
-                b = md5_ii(b, c, d, a, x[i + 9], 21, -343485551);
-                a = safe_add(a, olda);
-                b = safe_add(b, oldb);
-                c = safe_add(c, oldc);
-                d = safe_add(d, oldd);
-            }
-            return [a, b, c, d];
-        }
-        function binl2rstr(input) {
-            var i, output = '';
-            for (i = 0; i < input.length * 32; i += 8) {
-                output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xFF);
-            }
-            return output;
-        }
-        function rstr2binl(input) {
-            var i, output = [];
-            output[(input.length >> 2) - 1] = undefined;
-            for (i = 0; i < output.length; i += 1) {
-                output[i] = 0;
-            }
-            for (i = 0; i < input.length * 8; i += 8) {
-                output[i >> 5] |= (input.charCodeAt(i / 8) & 0xFF) << (i % 32);
-            }
-            return output;
-        }
-        function rstr_md5(s) {
-            return binl2rstr(binl_md5(rstr2binl(s), s.length * 8));
-        }
-        function rstr_hmac_md5(key, data) {
-            var i, bkey = rstr2binl(key), ipad = [], opad = [], hash;
-            ipad[15] = opad[15] = undefined;
-            if (bkey.length > 16) {
-                bkey = binl_md5(bkey, key.length * 8);
-            }
-            for (i = 0; i < 16; i += 1) {
-                ipad[i] = bkey[i] ^ 0x36363636;
-                opad[i] = bkey[i] ^ 0x5C5C5C5C;
-            }
-            hash = binl_md5(ipad.concat(rstr2binl(data)), 512 + data.length * 8);
-            return binl2rstr(binl_md5(opad.concat(hash), 512 + 128));
-        }
-        function rstr2hex(input) {
-            var hex_tab = '0123456789abcdef', output = '', x, i;
-            for (i = 0; i < input.length; i += 1) {
-                x = input.charCodeAt(i);
-                output += hex_tab.charAt((x >>> 4) & 0x0F) + hex_tab.charAt(x & 0x0F);
-            }
-            return output;
-        }
-        function str2rstr_utf8(input) {
-            return unescape(encodeURIComponent(input));
-        }
-        function raw_md5(s) {
-            return rstr_md5(str2rstr_utf8(s));
-        }
-        function hex_md5(s) {
-            return rstr2hex(raw_md5(s));
-        }
-        function raw_hmac_md5(k, d) {
-            return rstr_hmac_md5(str2rstr_utf8(k), str2rstr_utf8(d));
-        }
-        function hex_hmac_md5(k, d) {
-            return rstr2hex(raw_hmac_md5(k, d));
-        }
-        function md5(string, key, raw) {
-            if (!key) {
-                if (!raw) {
-                    return hex_md5(string);
-                }
-                return raw_md5(string);
-            }
-            if (!raw) {
-                return hex_hmac_md5(key, string);
-            }
-            return raw_hmac_md5(key, string);
-        }
-        $.md5 = md5;
-    }(Lib));
 })(AssureNote || (AssureNote = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var AssureNote;
 (function (AssureNote) {
     var NodeListPanel = (function (_super) {
@@ -2630,10 +2021,7 @@ var AssureNote;
             var SvgNodeFragment = document.createDocumentFragment();
             var SvgConnectionFragment = document.createDocumentFragment();
             var Dummy = document.createDocumentFragment();
-            var t0 = AssureNote.AssureNoteUtils.GetTime();
             this.Render(NodeView, DivFragment, SvgNodeFragment, SvgConnectionFragment);
-            var t1 = AssureNote.AssureNoteUtils.GetTime();
-            console.log("Render: " + (t1 - t0));
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayerConnectorGroup.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayerNodeGroup.appendChild(SvgNodeFragment);
@@ -2641,14 +2029,10 @@ var AssureNote;
             Dummy.appendChild(DivFragment);
             Dummy.appendChild(SvgConnectionFragment);
             Dummy.appendChild(SvgNodeFragment);
-            var t2 = AssureNote.AssureNoteUtils.GetTime();
-            console.log("NodeSize: " + (t2 - t1));
             this.Layout(NodeView);
             PictgramPanel.ContentLayer.appendChild(DivFragment);
             PictgramPanel.SVGLayer.appendChild(SvgConnectionFragment);
             PictgramPanel.SVGLayer.appendChild(SvgNodeFragment);
-            var t3 = AssureNote.AssureNoteUtils.GetTime();
-            console.log("Layout: " + (t3 - t2));
         };
         SimpleLayoutEngine.prototype.PrepareNodeSize = function (ThisNode) {
             var _this = this;
@@ -2797,8 +2181,8 @@ var AssureNote;
                         }
                         FoldedNodeRun = [];
                         FormarUnfoldedChildHeight = ChildHeadHeight;
-                        SubNode.RelativeX += -SubNode.Shape.GetTreeLeftLocalX();
                     }
+                    SubNode.RelativeX += -SubNode.Shape.GetTreeLeftLocalX();
                     SubNode.RelativeY = TreeHeight;
                     IsPreviousChildFolded = IsFoldedLike;
                     ChildrenHeight = Math.max(ChildrenHeight, ChildTreeHeight);
@@ -2910,6 +2294,7 @@ var AssureNote;
                     align: 'bottom',
                     idle: 1500,
                     size: 45,
+                    sizeMax: 45,
                     distance: 60,
                     labels: 'tc',
                     duration: 200,
@@ -3023,7 +2408,7 @@ var AssureNote;
                     }
                     var Buttons = value.CreateMenuBarButtons(TargetView);
                     if (Buttons != null) {
-                        ret = ret.concat(Buttons);
+                        Array.prototype.push.apply(ret, Buttons);
                     }
                 }
             });
@@ -3034,7 +2419,7 @@ var AssureNote;
             $.each(this.PluginMap, function (key, value) {
                 var Tooltip = value.CreateTooltipContents(TargetView);
                 if (Tooltip)
-                    ret = ret.concat(Tooltip);
+                    Array.prototype.push.apply(ret, Tooltip);
             });
             return ret;
         };
@@ -3065,28 +2450,31 @@ var AssureNote;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
-    var CodeMirrorEditorPanel = (function (_super) {
-        __extends(CodeMirrorEditorPanel, _super);
-        function CodeMirrorEditorPanel(App, IsEditRecursive, TextArea, CodeMirrorConfig, Wrapper, WrapperCSS) {
+    var WGSNEditorPanel = (function (_super) {
+        __extends(WGSNEditorPanel, _super);
+        function WGSNEditorPanel(App) {
             _super.call(this, App);
             this.App = App;
-            this.IsEditRecursive = IsEditRecursive;
-            this.Wrapper = Wrapper;
-            this.WrapperCSS = WrapperCSS;
+            this.IsEditAppendOnly = false;
+            var TextArea = document.getElementById('editor');
+            this.Wrapper = document.getElementById('editor-wrapper');
+            var CodeMirrorConfig = { lineNumbers: true, mode: 'wgsn', lineWrapping: true, extraKeys: { "Shift-Space": "autocomplete" } };
+            this.WrapperCSS = { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" };
+            this.IsEditRecursive = true;
             this.Editor = CodeMirror.fromTextArea(TextArea, CodeMirrorConfig);
             $(this.Editor.getWrapperElement()).css({
                 height: "100%",
                 width: "100%",
                 background: "rgba(255, 255, 255, 0.85)"
             });
-            this.Element = $(Wrapper);
-            this.Element.css(WrapperCSS);
+            this.Element = $(this.Wrapper);
+            this.Element.css(this.WrapperCSS);
             this.Element.css({ display: "none" });
         }
-        CodeMirrorEditorPanel.prototype.UpdateCSS = function (CSS) {
+        WGSNEditorPanel.prototype.UpdateCSS = function (CSS) {
             this.Element.css(CSS);
         };
-        CodeMirrorEditorPanel.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive) {
+        WGSNEditorPanel.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive, IsAppendOnly) {
             var _this = this;
             if (this.Timeout) {
                 this.Element.removeClass();
@@ -3095,10 +2483,12 @@ var AssureNote;
             if (IsRecursive && (NodeView.Status == 1 /* SingleEditable */)) {
                 return;
             }
+            this.IsEditRecursive = IsRecursive;
+            this.IsEditAppendOnly = IsAppendOnly;
             this.Timeout = null;
             var Model = NodeView.Model;
             this.IsVisible = false;
-            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "UserName": this.App.GetUserName() });
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "IsAppendOnly": IsAppendOnly, "UserName": this.App.GetUserName() });
             this.Editor.getDoc().setValue(WGSN);
             this.OnOutSideClicked = function () {
                 _this.DisableEditor(NodeView, WGSN);
@@ -3112,7 +2502,7 @@ var AssureNote;
             this.Editor.focus();
             this.Activate();
         };
-        CodeMirrorEditorPanel.prototype.DisableEditor = function (OldNodeView, OldWGSN) {
+        WGSNEditorPanel.prototype.DisableEditor = function (OldNodeView, OldWGSN) {
             var _this = this;
             this.App.EditDocument("todo", "test", function () {
                 var WGSN = _this.Editor.getDoc().getValue();
@@ -3122,11 +2512,14 @@ var AssureNote;
                 try {
                     var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
                     var NewNode;
-                    NewNode = Node.ReplaceSubNodeAsText(WGSN, _this.IsEditRecursive);
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, _this.IsEditRecursive, _this.IsEditAppendOnly);
                 }
                 catch (e) {
-                    AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
-                    return false;
+                    if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
+                        AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
+                        return false;
+                    }
+                    throw e;
                 }
                 var Writer = new AssureNote.StringWriter();
                 var WGSNChanged = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
@@ -3140,42 +2533,126 @@ var AssureNote;
             $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
             this.App.PictgramPanel.Activate();
         };
-        CodeMirrorEditorPanel.prototype.OnKeyDown = function (Event) {
+        WGSNEditorPanel.prototype.OnKeyDown = function (Event) {
             this.Editor.focus();
             if (Event.keyCode == 27) {
                 Event.stopPropagation();
                 this.OnOutSideClicked();
             }
         };
-        CodeMirrorEditorPanel.prototype.DarkenBackGround = function () {
+        WGSNEditorPanel.prototype.DarkenBackGround = function () {
             return true;
         };
-        return CodeMirrorEditorPanel;
+        return WGSNEditorPanel;
     })(AssureNote.Panel);
-    AssureNote.CodeMirrorEditorPanel = CodeMirrorEditorPanel;
+    AssureNote.WGSNEditorPanel = WGSNEditorPanel;
     var SingleNodeEditorPanel = (function (_super) {
         __extends(SingleNodeEditorPanel, _super);
         function SingleNodeEditorPanel(App) {
+            _super.call(this, App);
             var TextArea = document.getElementById('singlenode-editor');
-            var Wrapper = document.getElementById('singlenode-editor-wrapper');
-            _super.call(this, App, false, TextArea, { lineNumbers: false, mode: 'wgsn', lineWrapping: true }, Wrapper, { position: "absolute" });
+            this.Wrapper = document.getElementById('singlenode-editor-wrapper');
+            this.Editor = TextArea;
+            this.Element = $(this.Wrapper);
+            this.Element.css({ position: "absolute" });
+            this.LabelEditor = document.querySelector(".singlenode-editor.nodelabel");
+            this.NodeNumber = document.querySelector(".singlenode-editor.nodenumber");
+            this.DummyDiv = document.querySelector(".singlenode-editor.dummydiv");
         }
+        SingleNodeEditorPanel.prototype.UpdateCSS = function (CSS) {
+            this.Element.css(CSS);
+        };
+        SingleNodeEditorPanel.prototype.EnableEditor = function (WGSN, NodeView, IsRecursive, IsAppendOnly) {
+            var _this = this;
+            if (IsRecursive && (NodeView.Status == 1 /* SingleEditable */)) {
+                return;
+            }
+            var Model = NodeView.Model;
+            this.IsVisible = false;
+            this.App.SocketManager.StartEdit({ "UID": Model.UID, "IsRecursive": IsRecursive, "IsAppendOnly": IsAppendOnly, "UserName": this.App.GetUserName() });
+            this.Editor.value = AssureNote.AssureNoteUtils.RemoveFirstLine(WGSN).trim();
+            this.LabelEditor.value = Model.LabelName != null ? Model.LabelName.split(":")[1] : "";
+            this.NodeNumber.textContent = "*" + Model.GetLabel();
+            this.OnOutSideClicked = function () {
+                _this.DisableEditor(NodeView, WGSN);
+            };
+            var BackGround = $("#editor-background");
+            BackGround.off("click").on("click", this.OnOutSideClicked);
+            BackGround.off("contextmenu").on("contextmenu", this.OnOutSideClicked);
+            BackGround.stop(true, true).css("opacity", this.DarkenBackGround() ? 0.4 : 0).show();
+            this.Element.stop(true, true).css("opacity", 1).show();
+            var Style = window.getComputedStyle(this.NodeNumber, null);
+            this.WrapperMinimumHeight = this.Wrapper.clientHeight;
+            this.EditorMinimumHeight = this.WrapperMinimumHeight - parseFloat(Style.lineHeight) - 15;
+            this.Editor.style.height = this.EditorMinimumHeight.toString() + "px";
+            this.DummyDiv.style.width = this.Editor.clientWidth.toString() + "px";
+            this.OnKeyUp = function () {
+                _this.DummyDiv.textContent = _this.Editor.value.replace(/^$/mg, "@");
+                var height = Math.max(_this.EditorMinimumHeight, _this.DummyDiv.clientHeight);
+                _this.Editor.style.height = height.toString() + "px";
+                _this.Wrapper.style.height = (_this.WrapperMinimumHeight - _this.EditorMinimumHeight + height).toString() + "px";
+            };
+            this.Editor.addEventListener("keyup", this.OnKeyUp);
+            this.Editor.focus();
+            this.Activate();
+        };
+        SingleNodeEditorPanel.prototype.DisableEditor = function (OldNodeView, OldWGSN) {
+            var _this = this;
+            this.App.EditDocument("todo", "test", function () {
+                var Label = _this.LabelEditor.value;
+                var OldModel = OldNodeView.Model;
+                var Writer = new AssureNote.StringWriter();
+                Writer.print("* ");
+                Writer.print(AssureNote.WikiSyntax.FormatNodeType(OldModel.NodeType));
+                Writer.print(OldModel.AssignedLabelNumber);
+                if (Label && Label.length > 0) {
+                    Writer.print(":");
+                    Writer.print(Label);
+                }
+                Writer.print(" &");
+                Writer.print(AssureNote.Lib.DecToHex(OldModel.UID));
+                var Header = Writer.toString();
+                var WGSN = Header + "\n" + _this.Editor.value;
+                if (WGSN.length == 0) {
+                    return false;
+                }
+                try {
+                    var Node = _this.App.MasterRecord.EditingDoc.GetNode(OldNodeView.Model.UID);
+                    var NewNode;
+                    NewNode = Node.ReplaceSubNodeWithText(WGSN, true, true);
+                }
+                catch (e) {
+                    if (e.constructor.name == "SyntaxError" || e.constructor.name == "WGSNSyntaxError") {
+                        AssureNote.AssureNoteUtils.Notify("Invalid WGSN is given");
+                        return false;
+                    }
+                    throw e;
+                }
+                var Writer = new AssureNote.StringWriter();
+                var WGSNChanged = (NewNode.FormatSubNode(1, Writer, true), Writer.toString().trim() != OldWGSN.trim());
+                if (!NewNode || !WGSNChanged) {
+                    return false;
+                }
+                _this.App.FullScreenEditorPanel.IsVisible = true;
+            });
+            this.App.SocketManager.Emit('finishedit', OldNodeView.Model.UID);
+            $(this.Wrapper).animate({ opacity: 0 }, 300).hide(0);
+            $("#editor-background").animate({ opacity: 0 }, 300).hide(0);
+            this.Editor.removeEventListener("keyup", this.OnKeyUp);
+            this.App.PictgramPanel.Activate();
+        };
+        SingleNodeEditorPanel.prototype.OnKeyDown = function (Event) {
+            if (Event.keyCode == 27) {
+                Event.stopPropagation();
+                this.OnOutSideClicked();
+            }
+        };
         SingleNodeEditorPanel.prototype.DarkenBackGround = function () {
             return false;
         };
         return SingleNodeEditorPanel;
-    })(CodeMirrorEditorPanel);
+    })(AssureNote.Panel);
     AssureNote.SingleNodeEditorPanel = SingleNodeEditorPanel;
-    var WGSNEditorPanel = (function (_super) {
-        __extends(WGSNEditorPanel, _super);
-        function WGSNEditorPanel(App) {
-            var TextArea = document.getElementById('editor');
-            var Wrapper = document.getElementById('editor-wrapper');
-            _super.call(this, App, true, TextArea, { lineNumbers: true, mode: 'wgsn', lineWrapping: true, extraKeys: { "Shift-Space": "autocomplete" } }, Wrapper, { position: "fixed", top: "5%", left: "5%", width: "90%", height: "90%" });
-        }
-        return WGSNEditorPanel;
-    })(CodeMirrorEditorPanel);
-    AssureNote.WGSNEditorPanel = WGSNEditorPanel;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -3232,6 +2709,21 @@ var AssureNote;
         return CommandMissingCommand;
     })(Command);
     AssureNote.CommandMissingCommand = CommandMissingCommand;
+    var ForbiddenCommand = (function (_super) {
+        __extends(ForbiddenCommand, _super);
+        function ForbiddenCommand(App) {
+            _super.call(this, App);
+        }
+        ForbiddenCommand.prototype.Invoke = function (CommandName, Params) {
+            if (CommandName == null) {
+                return;
+            }
+            AssureNote.AssureNoteUtils.Notify("This action is not allowed on View mode.");
+            this.App.DebugP("forbidden command: " + CommandName);
+        };
+        return ForbiddenCommand;
+    })(Command);
+    AssureNote.ForbiddenCommand = ForbiddenCommand;
     var SaveCommand = (function (_super) {
         __extends(SaveCommand, _super);
         function SaveCommand(App) {
@@ -3536,11 +3028,10 @@ var AssureNote;
             return "<code>new [name]</code><br>Create new file.";
         };
         NewCommand.prototype.Invoke = function (CommandName, Params) {
-            var History = new AssureNote.GSNHistory(0, this.App.GetUserName(), 'todo', null, 'test', null);
+            var History = new AssureNote.GSNHistory(0, this.App.GetUserName(), '-', new Date(), '-', null);
             var Writer = new AssureNote.StringWriter();
             AssureNote.TagUtils.FormatHistoryTag([History], 0, Writer);
-            console.log(Writer.toString());
-            var WGSN = Writer.toString() + 'Revision:: 0\n*G';
+            var WGSN = Writer.toString() + '\n*G';
             if (Params.length > 0) {
                 this.App.LoadNewWGSN(Params[0], WGSN);
             }
@@ -3553,9 +3044,7 @@ var AssureNote;
                     this.App.LoadNewWGSN(Name, WGSN);
                 }
             }
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNote.AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         };
         NewCommand.prototype.CanUseOnViewOnlyMode = function () {
             return true;
@@ -3654,7 +3143,7 @@ var AssureNote;
             return "<code>commit</code><br>Commit.";
         };
         CommitCommand.prototype.Invoke = function (CommandName, Params) {
-            if (this.App.IsUserGuest()) {
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
                 alert("Please login first.");
                 return;
             }
@@ -3687,9 +3176,7 @@ var AssureNote;
                 _this.App.LoadFiles(target.files);
             });
             $("#file-open-dialog").click();
-            if (history.replaceState) {
-                history.replaceState(null, null, Config.BASEPATH);
-            }
+            AssureNote.AssureNoteUtils.ChangeLocation(Config.BASEPATH);
         };
         OpenCommand.prototype.CanUseOnViewOnlyMode = function () {
             return true;
@@ -3742,6 +3229,10 @@ var AssureNote;
         };
         ShareCommand.prototype.Invoke = function (CommandName, Params) {
             var _this = this;
+            if (this.App.IsOfflineVersion()) {
+                AssureNote.AssureNoteUtils.Notify("This feature is not supported on offline version.");
+                return;
+            }
             if (this.App.IsUserGuest()) {
                 AssureNote.AssureNoteUtils.Notify("Please login first");
                 return;
@@ -3753,12 +3244,7 @@ var AssureNote;
             var fileId = paths[paths.length - 1];
             AssureNote.AssureNoteUtils.postJsonRPC("upload", { content: Writer.toString(), fileId: fileId }, function (result) {
                 var NewURI = Config.BASEPATH + "/file/" + result.fileId;
-                if (history.replaceState) {
-                    history.replaceState(null, null, NewURI);
-                }
-                else {
-                    window.location.href = NewURI;
-                }
+                AssureNote.AssureNoteUtils.ChangeLocation(NewURI);
                 _this.OpenShareModal(NewURI);
                 _this.App.SetLoading(false);
             }, function () {
@@ -3782,7 +3268,7 @@ var AssureNote;
         SetGuestUserNameCommand.prototype.Invoke = function (CommandName, Params) {
             var Name = Params[0];
             if (!Name || Name == '') {
-                Name = prompt('Enter the new name for guest', '');
+                Name = prompt('Enter the new name for guest', this.App.GetUserName());
             }
             if (!Name || Name == '') {
                 Name = 'Guest';
@@ -3837,17 +3323,14 @@ var AssureNote;
             return "<code>copy node</code><br>Copy the nodes.";
         };
         CopyCommand.prototype.Invoke = function (CommandName, Params) {
-            console.log("invoke");
-            console.log(Params);
             if (Params.length == 1) {
                 var TargetLabel = Params[0];
-                console.log(Params);
                 var Node = this.App.PictgramPanel.ViewMap[TargetLabel];
                 if (Node != null) {
                     var Writer = new AssureNote.StringWriter();
                     Node.Model.FormatSubNode(1, Writer, true);
                     var Text = Writer.toString();
-                    console.log(Text);
+                    this.App.Clipboard = Text;
                 }
                 else {
                     AssureNote.AssureNoteUtils.Notify("Node " + Params[0] + "not found");
@@ -3858,7 +3341,7 @@ var AssureNote;
             }
         };
         CopyCommand.prototype.CanUseOnViewOnlyMode = function () {
-            return false;
+            return true;
         };
         return CopyCommand;
     })(Command);
@@ -3872,9 +3355,27 @@ var AssureNote;
             return ["paste"];
         };
         PasteCommand.prototype.GetHelpHTML = function () {
-            return "<code>Paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
+            return "<code>paste node</code><br>Paste the nodes as the sub-tree of the specified nodes.";
         };
         PasteCommand.prototype.Invoke = function (CommandName, Params) {
+            var _this = this;
+            var WGSN = this.App.Clipboard || "";
+            if (WGSN.length > 0) {
+                var TargetLabel = Params[0];
+                var Node = this.App.PictgramPanel.ViewMap[TargetLabel].Model;
+                var PasetedNode = AssureNote.Parser.ParseTree(Node.BaseDoc, WGSN);
+                var PasetedLevel = Node.GetGoalLevel();
+                if (PasetedNode.NodeType == 0 /* Goal */) {
+                    PasetedLevel += 1;
+                }
+                if (AssureNote.GSNNode.IsCollectRelation(Node.NodeType, Node.GetGoalLevel(), PasetedNode.NodeType, PasetedLevel)) {
+                    this.App.EditDocument("todo", "test", function () {
+                        var TargetNode = _this.App.MasterRecord.EditingDoc.GetNode(Node.UID);
+                        TargetNode.AppendSubNode(PasetedNode);
+                        PasetedNode.ParentNode = TargetNode;
+                    });
+                }
+            }
         };
         PasteCommand.prototype.CanUseOnViewOnlyMode = function () {
             return false;
@@ -3882,6 +3383,52 @@ var AssureNote;
         return PasteCommand;
     })(Command);
     AssureNote.PasteCommand = PasteCommand;
+    var UndoCommand = (function (_super) {
+        __extends(UndoCommand, _super);
+        function UndoCommand(App) {
+            _super.call(this, App);
+        }
+        UndoCommand.prototype.GetCommandLineNames = function () {
+            return ["undo", "u"];
+        };
+        UndoCommand.prototype.GetHelpHTML = function () {
+            return "<code>undo</code><br>Undo it.";
+        };
+        UndoCommand.prototype.Invoke = function (CommandName, Params) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanUndo()) {
+                this.App.Undo();
+            }
+        };
+        UndoCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return UndoCommand;
+    })(Command);
+    AssureNote.UndoCommand = UndoCommand;
+    var RedoCommand = (function (_super) {
+        __extends(RedoCommand, _super);
+        function RedoCommand(App) {
+            _super.call(this, App);
+        }
+        RedoCommand.prototype.GetCommandLineNames = function () {
+            return ["redo", "u"];
+        };
+        RedoCommand.prototype.GetHelpHTML = function () {
+            return "<code>redo</code><br>Redo it.";
+        };
+        RedoCommand.prototype.Invoke = function (CommandName, Params) {
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            if (this.App.MasterRecord.CanRedo()) {
+                this.App.Redo();
+            }
+        };
+        RedoCommand.prototype.CanUseOnViewOnlyMode = function () {
+            return false;
+        };
+        return RedoCommand;
+    })(Command);
+    AssureNote.RedoCommand = RedoCommand;
 })(AssureNote || (AssureNote = {}));
 var AssureNote;
 (function (AssureNote) {
@@ -3904,13 +3451,8 @@ var AssureNote;
             else {
                 Label = Params[0].toUpperCase();
             }
-            var event = document.createEvent("UIEvents");
             var TargetView = this.App.PictgramPanel.ViewMap[Label];
             if (TargetView != null) {
-                if (TargetView.GetNodeType() == 2 /* Strategy */) {
-                    AssureNote.AssureNoteUtils.Notify("Subtree editor cannot open at Strategy");
-                    return;
-                }
                 var Writer = new AssureNote.StringWriter();
                 TargetView.Model.FormatSubNode(1, Writer, true);
                 this.App.FullScreenEditorPanel.EnableEditor(Writer.toString().trim(), TargetView, true);
@@ -3933,9 +3475,6 @@ var AssureNote;
         }
         FullScreenEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
             var _this = this;
-            if (NodeView.GetNodeType() == 2 /* Strategy */) {
-                return null;
-            }
             return new AssureNote.NodeMenuItem("fullscreeneditor-id", "/images/editor.png", "fullscreeneditor", function (event, TargetView) {
                 var Command = _this.AssureNoteApp.FindCommandByCommandLineName("edit");
                 if (Command) {
@@ -3944,22 +3483,15 @@ var AssureNote;
             });
         };
         FullScreenEditorPlugin.prototype.MoveBackgroundNode = function (doc) {
-            var UID = null;
-            var line = doc.getCursor().line;
-            while (line >= 0) {
-                var LineString = doc.getLine(line);
-                if (LineString.indexOf('*') == 0) {
-                    UID = AssureNote.WikiSyntax.ParseUID(LineString);
-                    break;
-                }
-                line -= 1;
-            }
-            if (UID != null) {
-                var Keys = Object.keys(this.AssureNoteApp.PictgramPanel.ViewMap);
-                for (var i in Keys) {
-                    var View = this.AssureNoteApp.PictgramPanel.ViewMap[Keys[i]];
-                    if (View && View.Model && AssureNote.Lib.DecToHex(View.Model.UID) == UID) {
-                        console.log(View.GetCenterGX() + ' ' + View.GetCenterGY());
+            var Line = doc.getCursor().line;
+            var LineText = doc.getLine(Line);
+            var MatchResult = LineText.match(/^\*.*?&([0-9a-fA-F]+)/);
+            if (MatchResult && MatchResult[1]) {
+                var UID = parseInt(MatchResult[1], 16);
+                var ViewMap = this.AssureNoteApp.PictgramPanel.ViewMap;
+                for (var key in ViewMap) {
+                    var View = ViewMap[key];
+                    if (View && View.Model && View.Model.UID == UID) {
                         this.AssureNoteApp.PictgramPanel.Viewport.SetCameraPosition(View.GetCenterGX(), View.GetCenterGY());
                     }
                 }
@@ -4019,7 +3551,7 @@ var AssureNote;
                     CSS["mozTransform"] = CSS["msTransform"] = CSS["webkitTransform"] = CSS["transform"] = "";
                 }
                 this.App.SingleNodeEditorPanel.UpdateCSS(CSS);
-                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, false);
+                this.App.SingleNodeEditorPanel.EnableEditor(Writer.toString().trim(), NodeView, true, true);
             }
             else {
                 AssureNote.AssureNoteUtils.Notify(Label + " is not found");
@@ -4033,20 +3565,10 @@ var AssureNote;
         function SingleNodeEditorPlugin(App) {
             _super.call(this);
             this.App = App;
-            this.SetHasMenuBarButton(true);
             this.SetHasEditor(true);
             this.SetHasDoubleClicked(true);
             this.App.RegistCommand(new SingleNodeEditorCommand(this.App));
         }
-        SingleNodeEditorPlugin.prototype.CreateMenuBarButton = function (NodeView) {
-            var _this = this;
-            return new AssureNote.NodeMenuItem("singlenodeeditor-id", "/images/pencil.png", "editor", function (event, TargetView) {
-                var Command = _this.App.FindCommandByCommandLineName("SingleEdit");
-                if (Command) {
-                    Command.Invoke(null, [TargetView.Label]);
-                }
-            });
-        };
         SingleNodeEditorPlugin.prototype.OnNodeDoubleClicked = function (NodeView) {
             if (AssureNote.AssureNoteApp.Current.ModeManager.GetMode() == 0 /* Edit */) {
                 var Command = this.App.FindCommandByCommandLineName("SingleEdit");
@@ -4262,7 +3784,6 @@ var AssureNote;
             this.NodeTooltip = new AssureNote.Tooltip(App);
             this.ContentLayer.addEventListener("click", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
-                _this.App.DebugP("click:" + Label);
                 if (_this.IsActive()) {
                     _this.ChangeFocusedLabel(Label);
                 }
@@ -4313,7 +3834,6 @@ var AssureNote;
             this.ContentLayer.addEventListener("dblclick", function (event) {
                 var Label = AssureNote.AssureNoteUtils.GetNodeLabelFromEvent(event);
                 var NodeView = _this.ViewMap[Label];
-                _this.App.DebugP("double click:" + Label);
                 if (_this.ContextMenu.IsEnable) {
                     _this.ContextMenu.Remove();
                 }
@@ -4478,6 +3998,34 @@ var AssureNote;
                     }
                     Event.preventDefault();
                     break;
+                case 67:
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        if (this.FocusedLabel) {
+                            this.App.ExecCommandByName("copy", this.GetFocusedLabel());
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 86:
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        if (this.FocusedLabel) {
+                            this.App.ExecCommandByName("paste", this.GetFocusedLabel());
+                        }
+                    }
+                    Event.preventDefault();
+                    break;
+                case 89:
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("redo");
+                    }
+                    Event.preventDefault();
+                    break;
+                case 90:
+                    if (Event.shiftKey || Event.ctrlKey) {
+                        this.App.ExecCommandByName("undo");
+                    }
+                    Event.preventDefault();
+                    break;
                 default:
                     handled = false;
                     break;
@@ -4600,6 +4148,11 @@ var AssureNote;
             }
             return false;
         };
+        PictgramPanel.prototype.DrawGSN = function (Node) {
+            var NewNodeView = new AssureNote.NodeView(Node, true);
+            this.InitializeView(NewNodeView);
+            this.Draw();
+        };
         PictgramPanel.prototype.InitializeView = function (NodeView) {
             this.TopNodeView = NodeView;
             this.ViewMap = {};
@@ -4610,7 +4163,6 @@ var AssureNote;
             var t0 = AssureNote.AssureNoteUtils.GetTime();
             this.Clear();
             var t1 = AssureNote.AssureNoteUtils.GetTime();
-            console.log("Clear: " + (t1 - t0));
             var TargetView = this.ViewMap[Label];
             if (TargetView == null) {
                 TargetView = this.TopNodeView;
@@ -4626,8 +4178,6 @@ var AssureNote;
             this.LayoutEngine.DoLayout(this, TargetView);
             this.ContentLayer.style.display = "none";
             this.SVGLayer.style.display = "none";
-            AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount = 0;
-            AssureNote.GSNShape.__Debug_Animation_TotalNodeCount = 0;
             this.FoldingAnimationTask.Cancel(true);
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(true);
             var FoldingAnimationCallbacks = [];
@@ -4662,7 +4212,6 @@ var AssureNote;
             TargetView.UpdateNodePosition(FoldingAnimationCallbacks, Duration, ScreenRect);
             TargetView.ClearAnimationCache();
             var t3 = AssureNote.AssureNoteUtils.GetTime();
-            console.log("Update: " + (t3 - t2));
             this.FoldingAnimationTask.StartMany(Duration, FoldingAnimationCallbacks);
             var Shape = TargetView.GetShape();
             this.Viewport.CameraLimitRect = new AssureNote.Rect(Shape.GetTreeLeftLocalX() - 100, -100, Shape.GetTreeWidth() + 200, Shape.GetTreeHeight() + 200);
@@ -4680,7 +4229,6 @@ var AssureNote;
             AssureNote.NodeView.SetGlobalPositionCacheEnabled(false);
             this.ContentLayer.style.display = "";
             this.SVGLayer.style.display = "";
-            console.log("Animation: " + AssureNote.GSNShape.__Debug_Animation_TotalNodeCount + " nodes moved, " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount + " nodes skipped. reduce rate = " + AssureNote.GSNShape.__Debug_Animation_SkippedNodeCount / AssureNote.GSNShape.__Debug_Animation_TotalNodeCount);
         };
         PictgramPanel.prototype.ForceAppendAllOutOfScreenNode = function () {
             var _this = this;
@@ -5126,10 +4674,11 @@ var AssureNote;
             this.IsEnabled = IsEnabled;
             this.ButtonId = null;
             this.ElementId = null;
-            if (ButtonId) {
-                this.ButtonId = ButtonId;
-                this.ElementId = ButtonId + "-menu-button";
+            if (!ButtonId) {
+                ButtonId = TopMenuItem.CreateID();
             }
+            this.ButtonId = ButtonId;
+            this.ElementId = ButtonId + "-menu-button";
         }
         TopMenuItem.prototype.GetIconName = function () {
             return "";
@@ -5162,7 +4711,7 @@ var AssureNote;
             var item;
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
             var spaceChar = "\u00a0";
-            var text = document.createTextNode(spaceChar + this.GetDisplayName());
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode(spaceChar + this.GetDisplayName()) : null;
             if (IsTopLevel) {
                 item = document.createElement("button");
                 item.type = "button";
@@ -5173,11 +4722,13 @@ var AssureNote;
                 var classes = "btn navbar-btn btn-default clickable navbar-left";
                 if (!this.IsEnabled) {
                     classes += " disabled";
-                    item.setAttribute("disabled");
+                    item.setAttribute("disabled", "");
                 }
                 item.className = classes;
                 item.appendChild(icon);
-                item.appendChild(text);
+                if (text) {
+                    item.appendChild(text);
+                }
             }
             else {
                 item = document.createElement("li");
@@ -5187,7 +4738,9 @@ var AssureNote;
                 var a = document.createElement("a");
                 a.href = "#";
                 a.appendChild(icon);
-                a.appendChild(text);
+                if (text) {
+                    a.appendChild(text);
+                }
                 item.appendChild(a);
                 if (!this.IsEnabled) {
                     item.className = "disabled";
@@ -5213,7 +4766,7 @@ var AssureNote;
             _super.call(this, IsEnabled, ButtonId);
             this.DisplayName = DisplayName;
             this.IconName = IconName;
-            this.SubMenuList = SubMenuList;
+            this.SubMenuList = SubMenuList.filter(function (Menu) { return Menu != null; });
         }
         SubMenuItem.prototype.GetIconName = function () {
             return this.IconName;
@@ -5223,7 +4776,7 @@ var AssureNote;
         };
         SubMenuItem.prototype.Render = function (App, Target, IsTopLevel) {
             var icon = TopMenuItem.CreateIconElement(this.GetIconName());
-            var text = document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0");
+            var text = this.GetDisplayName().length > 0 ? document.createTextNode("\u00a0" + this.GetDisplayName() + "\u00a0") : null;
             if (IsTopLevel) {
                 var dropdown = document.createElement("div");
                 dropdown.className = "dropdown clickable navbar-left";
@@ -5242,16 +4795,16 @@ var AssureNote;
                 var caret = document.createElement("span");
                 caret.className = "caret";
                 button.appendChild(icon);
-                button.appendChild(text);
+                if (text) {
+                    button.appendChild(text);
+                }
                 button.appendChild(caret);
                 var ul = document.createElement("ul");
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
                 ul.style.right = "auto";
                 ul.style.width = "250px";
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(function (Menu) { return Menu.Render(App, ul, false); });
                 dropdown.appendChild(button);
                 dropdown.appendChild(ul);
                 Target.appendChild(dropdown);
@@ -5266,21 +4819,19 @@ var AssureNote;
                 a.href = "#";
                 li.appendChild(a);
                 a.appendChild(icon);
-                a.appendChild(text);
+                if (text) {
+                    a.appendChild(text);
+                }
                 var ul = document.createElement("ul");
                 ul.setAttribute("oncontextmenu", "return false");
                 ul.className = "dropdown-menu";
-                for (var i = 0; i < this.SubMenuList.length; i++) {
-                    this.SubMenuList[i].Render(App, ul, false);
-                }
+                this.SubMenuList.forEach(function (Menu) { return Menu.Render(App, ul, false); });
                 li.appendChild(ul);
                 Target.appendChild(li);
             }
         };
         SubMenuItem.prototype.Update = function () {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(function (Menu) { return Menu.Update(); });
         };
         return SubMenuItem;
     })(TopMenuItem);
@@ -5288,14 +4839,15 @@ var AssureNote;
     var TopMenuTopItem = (function (_super) {
         __extends(TopMenuTopItem, _super);
         function TopMenuTopItem(SubMenuList) {
+            var _this = this;
             _super.call(this, true);
             this.SubMenuList = SubMenuList;
             this.SubMenuMap = {};
-            for (var i; i < SubMenuList.length; i++) {
-                if (SubMenuList[i].ButtonId) {
-                    this.SubMenuMap[SubMenuList[i].ButtonId] = SubMenuList[i];
+            this.SubMenuList.forEach(function (Menu) {
+                if (Menu.ButtonId) {
+                    _this.SubMenuMap[Menu.ButtonId] = Menu;
                 }
-            }
+            });
         }
         TopMenuTopItem.prototype.AppendSubMenu = function (SubMenu) {
             this.SubMenuList.unshift(SubMenu);
@@ -5304,15 +4856,11 @@ var AssureNote;
             }
         };
         TopMenuTopItem.prototype.Render = function (App, Target, IsTopLevel) {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Render(App, Target, true);
-            }
+            this.SubMenuList.forEach(function (Menu) { return Menu.Render(App, Target, true); });
             $(".dropdown-toggle").dropdown();
         };
         TopMenuTopItem.prototype.Update = function () {
-            for (var i = 0; i < this.SubMenuList.length; i++) {
-                this.SubMenuList[i].Update();
-            }
+            this.SubMenuList.forEach(function (Menu) { return Menu.Update(); });
         };
         return TopMenuTopItem;
     })(TopMenuItem);
@@ -5330,6 +4878,26 @@ var AssureNote;
         return DividerMenuItem;
     })(TopMenuItem);
     AssureNote.DividerMenuItem = DividerMenuItem;
+    var UserNameMenuItem = (function (_super) {
+        __extends(UserNameMenuItem, _super);
+        function UserNameMenuItem() {
+            _super.apply(this, arguments);
+        }
+        UserNameMenuItem.prototype.GetIconName = function () {
+            return "cog";
+        };
+        UserNameMenuItem.prototype.GetDisplayName = function () {
+            return "";
+        };
+        UserNameMenuItem.prototype.Invoke = function (App) {
+            var Name = prompt('Enter user name', App.GetUserName());
+            if (Name && Name.length > 0 && App.GetUserName() != Name) {
+                App.ExecCommandByName("set-user", Name);
+            }
+        };
+        return UserNameMenuItem;
+    })(TopMenuItem);
+    AssureNote.UserNameMenuItem = UserNameMenuItem;
     var NewMenuItem = (function (_super) {
         __extends(NewMenuItem, _super);
         function NewMenuItem() {
@@ -5650,6 +5218,103 @@ var AssureNote;
         return ZoomMenuItem;
     })(TopMenuItem);
     AssureNote.ZoomMenuItem = ZoomMenuItem;
+    var CopyMenuItem = (function (_super) {
+        __extends(CopyMenuItem, _super);
+        function CopyMenuItem() {
+            _super.apply(this, arguments);
+        }
+        CopyMenuItem.prototype.GetIconName = function () {
+            return "file";
+        };
+        CopyMenuItem.prototype.GetDisplayName = function () {
+            return "Copy";
+        };
+        CopyMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("copy", App.PictgramPanel.GetFocusedLabel());
+        };
+        return CopyMenuItem;
+    })(TopMenuItem);
+    AssureNote.CopyMenuItem = CopyMenuItem;
+    var PasteMenuItem = (function (_super) {
+        __extends(PasteMenuItem, _super);
+        function PasteMenuItem() {
+            _super.apply(this, arguments);
+        }
+        PasteMenuItem.prototype.GetIconName = function () {
+            return "file";
+        };
+        PasteMenuItem.prototype.GetDisplayName = function () {
+            return "Paste";
+        };
+        PasteMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("paste", App.PictgramPanel.GetFocusedLabel());
+        };
+        PasteMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            if (Mode == 0 /* Edit */) {
+                this.Enable();
+            }
+            else {
+                this.Disable();
+            }
+        };
+        return PasteMenuItem;
+    })(TopMenuItem);
+    AssureNote.PasteMenuItem = PasteMenuItem;
+    var UndoMenuItem = (function (_super) {
+        __extends(UndoMenuItem, _super);
+        function UndoMenuItem() {
+            _super.apply(this, arguments);
+        }
+        UndoMenuItem.prototype.GetIconName = function () {
+            return "step-backward";
+        };
+        UndoMenuItem.prototype.GetDisplayName = function () {
+            return "Undo";
+        };
+        UndoMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("undo");
+        };
+        UndoMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            var CanUndo = AssureNote.AssureNoteApp.Current.MasterRecord.CanUndo();
+            if (Mode == 0 /* Edit */ && CanUndo) {
+                this.Enable();
+            }
+            else {
+                this.Disable();
+            }
+        };
+        return UndoMenuItem;
+    })(TopMenuItem);
+    AssureNote.UndoMenuItem = UndoMenuItem;
+    var RedoMenuItem = (function (_super) {
+        __extends(RedoMenuItem, _super);
+        function RedoMenuItem() {
+            _super.apply(this, arguments);
+        }
+        RedoMenuItem.prototype.GetIconName = function () {
+            return "step-forward";
+        };
+        RedoMenuItem.prototype.GetDisplayName = function () {
+            return "Redo";
+        };
+        RedoMenuItem.prototype.Invoke = function (App) {
+            App.ExecCommandByName("redo");
+        };
+        RedoMenuItem.prototype.Update = function () {
+            var Mode = AssureNote.AssureNoteApp.Current.ModeManager.GetMode();
+            var CanRedo = AssureNote.AssureNoteApp.Current.MasterRecord.CanRedo();
+            if (Mode == 0 /* Edit */ && CanRedo) {
+                this.Enable();
+            }
+            else {
+                this.Disable();
+            }
+        };
+        return RedoMenuItem;
+    })(TopMenuItem);
+    AssureNote.RedoMenuItem = RedoMenuItem;
     var DummyMenuItem = (function (_super) {
         __extends(DummyMenuItem, _super);
         function DummyMenuItem(DisplayName, IconName) {
@@ -5694,7 +5359,7 @@ var AssureNote;
                     found = true;
                 }
             }
-            this.App.ModeManager.ReadOnly(found);
+            this.App.ModeManager.SetReadOnly(found);
             $('.user-name').text(this.App.GetUserName());
             $('#user-list-tmpl').tmpl(this.UserList).appendTo($('#user-list').empty());
         };
@@ -5763,7 +5428,7 @@ var AssureNote;
             this.links = {};
             this.Text2NodeTypeMap = { "Goal": 0 /* Goal */, "Strategy": 2 /* Strategy */, "Context": 1 /* Context */, "Pattern": 1 /* Context */, "Evidence": 3 /* Evidence */ };
             this.Doc = new AssureNote.GSNDoc(this.Record);
-            this.Record.AddHistory(0, "unknown", "converter", "2013-12-09T13:16:18+0900", "-", this.Doc);
+            this.Record.AddHistory(0, "unknown", "converter", new Date(), "-", this.Doc);
         }
         DCaseModelXMLParser.prototype.MakeTree = function (Id) {
             var ThisNode = this.nodes[Id];
@@ -5855,121 +5520,113 @@ var AssureNote;
             this.App.HistoryPanel = this;
         }
         HistoryPanel.prototype.Show = function () {
-            this.Index = this.App.MasterRecord.HistoryList.length - 1;
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            this.VisibleRevisionList = HistoryList.filter(function (rev) { return rev.IsCommitRevision; }).map(function (rev) { return rev.Rev; });
+            this.VisibleRevisionList.push(HistoryList.length - 1);
+            this.Index = this.VisibleRevisionList.length - 1;
             this.Update();
             this.Element.show();
             this.IsVisible = true;
+            var ModeManager = this.App.ModeManager;
+            this.IsModeEditBeforeHistoryPanelOpened = ModeManager.GetMode() == 0 /* Edit */;
+            ModeManager.ChangeMode(1 /* View */);
+            ModeManager.SetReadOnly(true);
         };
         HistoryPanel.prototype.Hide = function () {
             this.Element.empty();
             this.Element.hide();
-            if (this.Index != this.App.MasterRecord.HistoryList.length - 1) {
-                this.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
+            if (this.Index != this.VisibleRevisionList.length - 1) {
+                this.App.PictgramPanel.DrawGSN(this.App.MasterRecord.GetLatestDoc().TopNode);
             }
             this.IsVisible = false;
+            this.VisibleRevisionList = null;
+            var ModeManager = this.App.ModeManager;
+            ModeManager.SetReadOnly(false);
+            if (this.IsModeEditBeforeHistoryPanelOpened) {
+                ModeManager.ChangeMode(0 /* Edit */);
+            }
         };
-        HistoryPanel.prototype.DrawGSN = function (TopGoal) {
-            var NewNodeView = new AssureNote.NodeView(TopGoal, true);
-            this.App.PictgramPanel.InitializeView(NewNodeView);
-            this.App.PictgramPanel.Draw();
+        HistoryPanel.prototype.OnRevisionChanged = function (OldRevision) {
+            if (OldRevision != this.Index) {
+                var TopGoal = this.App.MasterRecord.HistoryList[this.VisibleRevisionList[this.Index]].Doc.TopNode;
+                this.App.PictgramPanel.DrawGSN(TopGoal);
+                $("#history-panel-close").off("click");
+                $("#prev-revision").off("click");
+                $("#first-revision").off("click");
+                $("#next-revision").off("click");
+                $("#last-revision").off("click");
+                this.Update();
+            }
         };
         HistoryPanel.prototype.Update = function () {
             var _this = this;
             this.Element.empty();
-            var h = this.App.MasterRecord.HistoryList[this.Index];
+            var HistoryList = this.App.MasterRecord.HistoryList;
+            var h = HistoryList[this.VisibleRevisionList[this.Index]];
             var message = h.GetCommitMessage() || "(No Commit Message)";
+            var Counts = h.Doc.GetNodeCountForEachType();
+            var AllCount = 0;
+            for (var k in Counts) {
+                AllCount += Counts[k];
+            }
             var t = {
+                Rev: this.Index + 1,
                 Message: message,
                 User: h.Author,
-                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.DateString),
-                DateTimeString: new Date(h.DateString).toLocaleString(),
+                DateTime: AssureNote.AssureNoteUtils.FormatDate(h.Date.toUTCString()),
+                DateTimeString: h.Date.toLocaleString(),
                 Count: {
-                    All: h.Doc.GetNodeCount(),
-                    Goal: h.Doc.GetNodeCountTypeOf(0 /* Goal */),
-                    Evidence: h.Doc.GetNodeCountTypeOf(3 /* Evidence */),
-                    Context: h.Doc.GetNodeCountTypeOf(1 /* Context */),
-                    Strategy: h.Doc.GetNodeCountTypeOf(2 /* Strategy */)
+                    All: AllCount,
+                    Goal: Counts[0 /* Goal */],
+                    Evidence: Counts[3 /* Evidence */],
+                    Context: Counts[1 /* Context */],
+                    Assumption: Counts[6 /* Assumption */],
+                    Justification: Counts[5 /* Justification */],
+                    Exception: Counts[7 /* Exception */],
+                    Strategy: Counts[2 /* Strategy */]
                 }
             };
             $("#history_tmpl").tmpl([t]).appendTo(this.Element);
             $("#history-panel-date").tooltip({});
             $("#history-panel-count").tooltip({
                 html: true,
-                title: "Goal: " + t.Count.Goal + "" + "<br>Evidence: " + t.Count.Evidence + "" + "<br>Context: " + t.Count.Context + "" + "<br>Strategy: " + t.Count.Strategy + ""
+                title: "Goal: " + t.Count.Goal + "<br>Evidence: " + t.Count.Evidence + "<br>Context: " + t.Count.Context + "<br>Assumption: " + t.Count.Assumption + "<br>Justification: " + t.Count.Justification + "<br>Exception: " + t.Count.Exception + "<br>Strategy: " + t.Count.Strategy
             });
-            if (this.Index == 0) {
+            if (this.Index <= 0) {
                 $("#prev-revision").addClass("disabled");
                 $("#first-revision").addClass("disabled");
             }
-            if (this.Index == this.App.MasterRecord.HistoryList.length - 1) {
+            else {
+                $("#prev-revision").on("click", function () {
+                    var OldIndex = _this.Index;
+                    _this.Index--;
+                    _this.OnRevisionChanged(OldIndex);
+                });
+                $("#first-revision").on("click", function () {
+                    var OldIndex = _this.Index;
+                    _this.Index = 0;
+                    _this.OnRevisionChanged(OldIndex);
+                });
+            }
+            if (this.Index >= this.VisibleRevisionList.length - 1) {
                 $("#next-revision").addClass("disabled");
                 $("#last-revision").addClass("disabled");
             }
-            $("#history-panel-close").click(function () {
-                _this.Hide();
-            });
-            $("#prev-revision").click(function () {
-                var length = _this.App.MasterRecord.HistoryList.length;
-                var OldIndex = _this.Index;
-                _this.Index--;
-                if (_this.Index < 0) {
-                    _this.Index = 0;
-                }
-                while (!_this.App.MasterRecord.HistoryList[_this.Index].IsCommitRevision) {
-                    if (_this.Index < 0) {
-                        _this.Index = 0;
-                        break;
-                    }
-                    _this.Index--;
-                }
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
-            });
-            $("#first-revision").click(function () {
-                var OldIndex = _this.Index;
-                _this.Index = 0;
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
-            });
-            $("#next-revision").click(function () {
-                var length = _this.App.MasterRecord.HistoryList.length;
-                var OldIndex = _this.Index;
-                _this.Index++;
-                if (_this.Index >= length) {
-                    _this.Index = length - 1;
-                }
-                while (!_this.App.MasterRecord.HistoryList[_this.Index].IsCommitRevision) {
+            else {
+                $("#next-revision").on("click", function () {
+                    var OldIndex = _this.Index;
                     _this.Index++;
-                    if (_this.Index >= length) {
-                        _this.Index = length - 1;
-                        break;
-                    }
-                }
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
-            });
-            $("#last-revision").click(function () {
-                var length = _this.App.MasterRecord.HistoryList.length;
-                var OldIndex = _this.Index;
-                _this.Index = length - 1;
-                console.log(_this.Index);
-                if (OldIndex != _this.Index) {
-                    var TopGoal = _this.App.MasterRecord.HistoryList[_this.Index].Doc.TopNode;
-                    _this.DrawGSN(TopGoal);
-                    _this.Update();
-                }
+                    _this.OnRevisionChanged(OldIndex);
+                });
+                $("#last-revision").on("click", function () {
+                    var length = _this.VisibleRevisionList.length;
+                    var OldIndex = _this.Index;
+                    _this.Index = length - 1;
+                    _this.OnRevisionChanged(OldIndex);
+                });
+            }
+            $("#history-panel-close").on("click", function () {
+                _this.Hide();
             });
         };
         return HistoryPanel;
@@ -5983,6 +5640,7 @@ var AssureNote;
             this.IsGuestUser = true;
             this.LoadingIndicatorVisible = true;
             this.LoadingIndicator = document.getElementById("loading-indicator");
+            this.DebugP = console.log.bind(console);
             AssureNoteApp.Current = this;
             this.Commands = [];
             this.CommandLineTable = {};
@@ -5994,6 +5652,7 @@ var AssureNote;
             this.ModeManager = new AssureNote.ModeManager(this, 1 /* View */);
             AssureNote.ShapeFactory.SetFactory(new AssureNote.DefaultShapeFactory());
             this.DefaultCommand = new AssureNote.CommandMissingCommand(this);
+            this.ForbiddenCommand = new AssureNote.ForbiddenCommand(this);
             this.RegistCommand(new AssureNote.SaveCommand(this));
             this.RegistCommand(new AssureNote.SaveSVGCommand(this));
             this.RegistCommand(new AssureNote.SaveWGSNCommand(this));
@@ -6013,6 +5672,8 @@ var AssureNote;
             this.RegistCommand(new AssureNote.SearchCommand(this));
             this.RegistCommand(new AssureNote.CopyCommand(this));
             this.RegistCommand(new AssureNote.PasteCommand(this));
+            this.RegistCommand(new AssureNote.UndoCommand(this));
+            this.RegistCommand(new AssureNote.RedoCommand(this));
             this.TopMenu = new AssureNote.TopMenuTopItem([]);
             this.TopMenuRight = new AssureNote.TopMenuTopItem([]);
             this.PluginManager.LoadPlugin();
@@ -6034,16 +5695,16 @@ var AssureNote;
                 ]),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.ShowHistoryPanelMenuItem(true, "history"),
-                new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
-                new AssureNote.SetMonitorMenuItem(true, "setmonitor"),
+                this.IsOfflineVersion() ? null : new AssureNote.ShowMonitorListMenuItem(true, "monitorlist"),
+                this.IsOfflineVersion() ? null : new AssureNote.SetMonitorMenuItem(true, "setmonitor"),
                 new AssureNote.ShowNodeCountPanelMenuItem(true, "nodecount")
             ]));
             this.TopMenu.AppendSubMenu(new AssureNote.SubMenuItem(true, "edit", "Edit", "pencil", [
-                new AssureNote.DummyMenuItem("Undo (Coming soon)", "step-backward"),
-                new AssureNote.DummyMenuItem("Redo (Coming soon)", "step-forward"),
+                new AssureNote.UndoMenuItem(false),
+                new AssureNote.RedoMenuItem(false),
                 new AssureNote.DividerMenuItem(true),
-                new AssureNote.DummyMenuItem("Copy (Coming soon)", "file"),
-                new AssureNote.DummyMenuItem("Paste (Coming soon)", "file"),
+                new AssureNote.CopyMenuItem(true),
+                new AssureNote.PasteMenuItem(false),
                 new AssureNote.DividerMenuItem(true),
                 new AssureNote.SearchMenuItem(true),
                 new AssureNote.CommitMenuItem(true)
@@ -6062,7 +5723,12 @@ var AssureNote;
                 new AssureNote.HelpMenuItem(true),
                 new AssureNote.AboutMenuItem(true)
             ]));
-            this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
+            if (this.IsOfflineVersion()) {
+                this.TopMenuRight.AppendSubMenu(new AssureNote.UserNameMenuItem(true));
+            }
+            if (!this.IsUserGuest()) {
+                this.TopMenuRight.AppendSubMenu(new AssureNote.UploadMenuItem(true));
+            }
             this.TopMenu.Render(this, $("#top-menu").empty()[0], true);
             this.TopMenuRight.Render(this, $("#top-menu-right").empty()[0], true);
         }
@@ -6080,9 +5746,6 @@ var AssureNote;
                 this.CommandLineTable[Names[i].toLowerCase()] = Command;
             }
         };
-        AssureNoteApp.prototype.DebugP = function (Message) {
-            console.log(Message);
-        };
         AssureNoteApp.Assert = function (b, message) {
             if (b == false) {
                 console.log("Assert: " + message);
@@ -6097,7 +5760,7 @@ var AssureNote;
         AssureNoteApp.prototype.FindCommandByCommandLineName = function (Name) {
             var Command = this.CommandLineTable[Name.toLowerCase()] || this.DefaultCommand;
             if (this.ModeManager.GetMode() == 1 /* View */ && !Command.CanUseOnViewOnlyMode()) {
-                return this.DefaultCommand;
+                return this.ForbiddenCommand;
             }
             return Command;
         };
@@ -6140,6 +5803,9 @@ var AssureNote;
             }
             this.SetLoading(false);
         };
+        AssureNoteApp.prototype.IsOfflineVersion = function () {
+            return window.location.toString().indexOf("file:///") == 0;
+        };
         AssureNoteApp.prototype.IsUserGuest = function () {
             return this.IsGuestUser;
         };
@@ -6149,23 +5815,25 @@ var AssureNote;
         AssureNoteApp.prototype.SetUserName = function (Name) {
             if (this.IsGuestUser) {
                 this.UserName = Name;
+                $(".user-name").text("\u00a0" + Name);
             }
         };
         AssureNoteApp.prototype.LoadNewWGSN = function (Name, WGSN) {
             this.SetLoading(true);
             var Extention = Name.split(".").pop();
             this.WGSNName = Name;
-            this.MasterRecord = new AssureNote.GSNRecord();
             switch (Extention) {
                 case "dcase_model":
+                    this.MasterRecord = new AssureNote.GSNRecord();
                     new AssureNote.DCaseModelXMLParser(this.MasterRecord).Parse(WGSN);
                     break;
                 case "xmi":
+                    this.MasterRecord = new AssureNote.GSNRecord();
                     new AssureNote.XMIParser(this.MasterRecord).Parse(WGSN);
                     break;
                 default:
                 case "wgsn":
-                    this.MasterRecord.Parse(WGSN);
+                    this.MasterRecord = AssureNote.Parser.ParseRecord(WGSN);
                     this.MasterRecord.RenumberAll();
                     break;
             }
@@ -6215,6 +5883,16 @@ var AssureNote;
                 reader.readAsText(Files[0], 'utf-8');
             }
         };
+        AssureNoteApp.prototype.RefreshGSN = function (Doc) {
+            var TopNode = Doc.TopNode;
+            var NewNodeView = new AssureNote.NodeView(TopNode, true);
+            var OldViewMap = this.PictgramPanel.ViewMap;
+            NewNodeView.SaveFlags(OldViewMap);
+            this.PictgramPanel.InitializeView(NewNodeView);
+            this.PictgramPanel.Draw(TopNode.GetLabel());
+            this.TopMenu.Update();
+            this.TopMenuRight.Update();
+        };
         AssureNoteApp.prototype.EditDocument = function (Role, Process, Action) {
             this.MasterRecord.OpenEditor(this.GetUserName(), Role, null, Process);
             var ReturnCode = Action();
@@ -6225,16 +5903,16 @@ var AssureNote;
                 var Doc = this.MasterRecord.EditingDoc;
                 Doc.RenumberAll();
                 this.MasterRecord.CloseEditor();
-                var TopNode = Doc.TopNode;
-                var NewNodeView = new AssureNote.NodeView(TopNode, true);
-                var OldViewMap = this.PictgramPanel.ViewMap;
-                NewNodeView.SaveFlags(OldViewMap);
-                this.PictgramPanel.InitializeView(NewNodeView);
-                this.PictgramPanel.Draw(TopNode.GetLabel());
-                this.SocketManager.UpdateWGSN();
-                this.TopMenu.Update();
-                this.TopMenuRight.Update();
+                this.RefreshGSN(Doc);
             }
+        };
+        AssureNoteApp.prototype.Undo = function () {
+            this.MasterRecord.Undo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
+        };
+        AssureNoteApp.prototype.Redo = function () {
+            this.MasterRecord.Redo();
+            this.RefreshGSN(this.MasterRecord.GetLatestDoc());
         };
         AssureNoteApp.prototype.GetNodeFromLabel = function (Label, ReportError) {
             var Node = this.PictgramPanel.ViewMap[Label];
@@ -6624,11 +6302,13 @@ var AssureNote;
         ViewportManager.prototype.UpdateAttr = function () {
             var OffsetPageX = this.GetOffsetPageX();
             var OffsetPageY = this.GetOffsetPageY();
-            var attr = ViewportManager.CreateTranformAttr(OffsetPageX, OffsetPageY, this.Scale);
-            var style = ViewportManager.CreateTransformStyle(OffsetPageX, OffsetPageY, this.Scale);
-            this.SVGLayer.setAttribute("transform", attr);
-            AssureNote.AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
-            AssureNote.AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
+            if (!isNaN(OffsetPageX) && !isNaN(OffsetPageY)) {
+                var attr = ViewportManager.CreateTranformAttr(OffsetPageX, OffsetPageY, this.Scale);
+                var style = ViewportManager.CreateTransformStyle(OffsetPageX, OffsetPageY, this.Scale);
+                this.SVGLayer.setAttribute("transform", attr);
+                AssureNote.AssureNoteUtils.SetTransformToElement(this.ContentLayer, style);
+                AssureNote.AssureNoteUtils.SetTransformToElement(this.ControlLayer, style);
+            }
             if (this.OnScroll) {
                 this.OnScroll(this);
             }
@@ -6774,7 +6454,7 @@ var AssureNote;
                     room = Params[0];
                 }
             }
-            this.App.ModeManager.SetMode(1 /* View */);
+            this.App.ModeManager.ChangeMode(1 /* View */);
             if (this.App.SocketManager.IsOperational()) {
                 this.App.SocketManager.Connect(room, url);
             }
@@ -6845,7 +6525,7 @@ var AssureNote;
         };
         VariableInterpolationPlugin.prototype.Supplant = function (str, LabelMap, TagMap) {
             var _this = this;
-            return str.replace(/\[([^\[\]]*)\]/g, (function (v) {
+            return str.replace(VariableInterpolationPlugin.ReferenceRegExp, (function (v) {
                 var params = [];
                 for (var _i = 1; _i < arguments.length; _i++) {
                     params[_i - 1] = arguments[_i];
@@ -6869,13 +6549,14 @@ var AssureNote;
             }));
         };
         VariableInterpolationPlugin.prototype.RenderHTML = function (NodeDoc, Model) {
-            if (NodeDoc.match(/\[([^\[\]]*)\]/)) {
+            if (Model.HasTagOrLabelReference) {
                 var Map = Model.GetTagMapWithLexicalScope();
                 var LabelMap = Model.BaseDoc.GetLabelMap();
-                return this.Supplant(NodeDoc, LabelMap.hash, Map ? Map.hash : {});
+                return this.Supplant(NodeDoc, LabelMap, Map ? Map : {});
             }
             return NodeDoc;
         };
+        VariableInterpolationPlugin.ReferenceRegExp = /\[([^\[\]]*)\]/g;
         return VariableInterpolationPlugin;
     })(AssureNote.Plugin);
     AssureNote.VariableInterpolationPlugin = VariableInterpolationPlugin;
@@ -6897,12 +6578,11 @@ var AssureNote;
             var TagMap = NodeView.Model.GetTagMap();
             if (!TagMap)
                 return;
-            if (TagMap.get('TODO') || TagMap.get('TODO') == '') {
+            if (TagMap['TODO'] || TagMap['TODO'] == '') {
                 NodeView.AddColorStyle(AssureNote.ColorStyle.ToDo);
             }
-            var KeySet = TagMap.keySet();
-            for (var key in KeySet) {
-                if (TagMap.get(KeySet[key]) == '') {
+            for (var key in TagMap) {
+                if (TagMap[key] == '') {
                     NodeView.AddColorStyle(AssureNote.ColorStyle.ToDo);
                 }
             }
@@ -6949,7 +6629,7 @@ $(function () {
         }, 100);
     };
     Debug.StartEditMode = function () {
-        App.ModeManager.SetMode(0 /* Edit */);
+        App.ModeManager.ChangeMode(0 /* Edit */);
     };
     App.LoadDefaultWGSN();
 });
@@ -6974,7 +6654,10 @@ var AssureNote;
                 for (var i = 0; i < Model.SubNodeList.length; i++) {
                     var SubNode = Model.SubNodeList[i];
                     var SubView = new NodeView(SubNode, IsRecursive);
-                    if (SubNode.NodeType == 1 /* Context */) {
+                    if (SubNode.NodeType == 6 /* Assumption */ || SubNode.NodeType == 7 /* Exception */) {
+                        this.AppendLeftNode(SubView);
+                    }
+                    else if (SubNode.NodeType == 1 /* Context */ || SubNode.NodeType == 5 /* Justification */) {
                         this.AppendRightNode(SubView);
                     }
                     else {
@@ -7309,7 +6992,7 @@ var AssureNote;
             if (!ThisModel.IsEvidence()) {
                 return false;
             }
-            var GoalModel = ThisModel.GetCloseGoal();
+            var GoalModel = ThisModel.GetUpperNearestGoal();
             var ContextModel = null;
             for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
                 var BroutherModel = GoalModel.SubNodeList[i];
@@ -7321,8 +7004,8 @@ var AssureNote;
             if (ContextModel) {
                 var TagMap = ContextModel.GetTagMapWithLexicalScope();
                 if (TagMap) {
-                    var Location = TagMap.get("Location");
-                    var Condition = TagMap.get("Condition");
+                    var Location = TagMap["Location"];
+                    var Condition = TagMap["Condition"];
                     if (Location && Condition) {
                         return true;
                     }
@@ -7420,6 +7103,9 @@ var AssureNote;
                 case 0 /* Goal */:
                     return new GSNGoalShape(Node);
                 case 1 /* Context */:
+                case 5 /* Justification */:
+                case 6 /* Assumption */:
+                case 7 /* Exception */:
                     return new GSNContextShape(Node);
                 case 2 /* Strategy */:
                     return new GSNStrategyShape(Node);
@@ -7526,7 +7212,7 @@ var AssureNote;
             this.Content.className = "node";
         };
         GSNShape.prototype.FormatNewLine = function (doc) {
-            return doc.replace(/\n/g, '<br>');
+            return doc.replace(/\r\n|\n|\r/g, '<br>');
         };
         GSNShape.prototype.PrerenderHTMLContent = function (manager) {
             if (this.Content == null) {
@@ -7605,18 +7291,15 @@ var AssureNote;
                 return;
             }
             if (this.WillFadein()) {
-                GSNShape.__Debug_Animation_TotalNodeCount++;
                 if (ScreenRect && (y + this.GetNodeHeight() < ScreenRect.Y || y > ScreenRect.Y + ScreenRect.Height)) {
                     this.SetPosition(x, y);
                     this.willFadein = false;
-                    GSNShape.__Debug_Animation_SkippedNodeCount++;
                     return;
                 }
                 this.Fadein(AnimationCallbacks, Duration);
                 this.willFadein = false;
                 if (this.GXCache == null || this.GYCache == null) {
                     this.SetPosition(x, y);
-                    GSNShape.__Debug_Animation_SkippedNodeCount++;
                     return;
                 }
             }
@@ -7624,13 +7307,11 @@ var AssureNote;
                 GSNShape.__Debug_Animation_TotalNodeCount++;
                 if (this.GXCache + this.GetNodeWidth() < ScreenRect.X || this.GXCache > ScreenRect.X + ScreenRect.Width) {
                     if (x + this.GetNodeWidth() < ScreenRect.X || x > ScreenRect.X + ScreenRect.Width) {
-                        GSNShape.__Debug_Animation_SkippedNodeCount++;
                         this.SetPosition(x, y);
                         return;
                     }
                 }
                 if (this.GYCache + this.GetNodeHeight() < ScreenRect.Y || this.GYCache > ScreenRect.Y + ScreenRect.Height) {
-                    GSNShape.__Debug_Animation_SkippedNodeCount++;
                     this.SetPosition(x, y);
                     return;
                 }
@@ -7965,33 +7646,29 @@ var AssureNote;
             if (Mode == 0 /* Edit */) {
                 this.Input.setAttribute('checked', '');
             }
-            this.Input.setAttribute('data-on-label', 'Edit');
-            this.Input.setAttribute('data-off-label', 'View');
+            this.Input.setAttribute('data-on-text', 'Edit');
+            this.Input.setAttribute('data-off-text', 'View');
             this.Enable();
         }
         ModeManager.prototype.GetMode = function () {
             return this.Mode;
         };
-        ModeManager.prototype.SetMode = function (Mode) {
-            this.Mode = Mode;
-            if (Mode == 0 /* Edit */) {
-                this.Input.setAttribute('checked', '');
-            }
-            else {
-                this.Input.removeAttribute('checked');
+        ModeManager.prototype.ChangeMode = function (Mode) {
+            if (this.Mode != Mode) {
+                $('#mode-switch').bootstrapSwitch('state', Mode == 0 /* Edit */);
+                this.SetMode(Mode);
             }
         };
-        ModeManager.prototype.ReadOnly = function (b) {
-            if (b) {
-                this.Input.setAttribute('disabled', '');
-                this.Input.setAttribute('readonly', '');
-                this.Input.className += 'disabled';
+        ModeManager.prototype.SetMode = function (Mode) {
+            if (this.Mode != Mode) {
+                this.Mode = Mode;
+                this.App.TopMenu.Update();
+                this.App.TopMenuRight.Update();
+                this.App.SocketManager.UpdateEditMode(this.Mode);
             }
-            else {
-                this.Input.removeAttribute('disabled');
-                this.Input.removeAttribute('readonly');
-                $(this.Input).removeClass('disabled');
-            }
+        };
+        ModeManager.prototype.SetReadOnly = function (b) {
+            $('#mode-switch').bootstrapSwitch('disabled', b).bootstrapSwitch('readonly', b);
         };
         ModeManager.prototype.Disable = function () {
             $(this.WrapperElement.empty());
@@ -7999,25 +7676,18 @@ var AssureNote;
         ModeManager.prototype.Enable = function () {
             var _this = this;
             $(this.Input).appendTo(this.WrapperElement.empty());
-            $('#mode-switch').bootstrapSwitch();
-            $('#mode-switch').bootstrapSwitch('setSizeClass', '').on('switch-change', function (e) {
-                var data = [];
-                for (var _i = 1; _i < arguments.length; _i++) {
-                    data[_i - 1] = arguments[_i];
-                }
-                var value = data[0].value;
-                if (_this.App.IsUserGuest() && value) {
+            $('#mode-switch').bootstrapSwitch().on('switchChange.bootstrapSwitch', function (e, state) {
+                if (!_this.App.IsOfflineVersion() && _this.App.IsUserGuest() && state) {
                     AssureNote.AssureNoteUtils.Notify("Please login first");
                     _this.SetMode(1 /* View */);
-                    _this.ReadOnly(true);
+                    _this.SetReadOnly(true);
                 }
                 else {
-                    _this.SetMode((value) ? 0 /* Edit */ : 1 /* View */);
-                    _this.App.SocketManager.UpdateEditMode(_this.Mode);
+                    _this.SetMode(state ? 0 /* Edit */ : 1 /* View */);
                 }
             });
-            if (this.App.IsUserGuest()) {
-                this.ReadOnly(true);
+            if (!this.App.IsOfflineVersion() && this.App.IsUserGuest()) {
+                this.SetReadOnly(true);
             }
         };
         return ModeManager;
@@ -8142,7 +7812,7 @@ var AssureNote;
             this.links = {};
             this.Text2NodeTypeMap = { "GSN.Goal": 0 /* Goal */, "GSN.Strategy": 2 /* Strategy */, "GSN.Context": 1 /* Context */, "GSN.Solution": 3 /* Evidence */ };
             this.Doc = new AssureNote.GSNDoc(this.Record);
-            this.Record.AddHistory(0, "unknown", "converter", "2013-12-09T13:16:18+0900", "-", this.Doc);
+            this.Record.AddHistory(0, "unknown", "converter", new Date(), "-", this.Doc);
         }
         XMIParser.prototype.MakeTree = function (Id) {
             var ThisNode = this.nodes[Id];
@@ -8277,14 +7947,22 @@ var AssureNote;
             else {
                 head = this.App.MasterRecord.GetLatestDoc().TopNode;
             }
+            var Counts = head.GetNodeCountForEachType();
+            var AllCount = 0;
+            for (var k in Counts) {
+                AllCount += Counts[k];
+            }
             var t = {
                 Name: head.GetLabel(),
                 Count: {
-                    All: head.GetNodeCount(),
-                    Goal: head.GetNodeCountTypeOf(0 /* Goal */),
-                    Evidence: head.GetNodeCountTypeOf(3 /* Evidence */),
-                    Context: head.GetNodeCountTypeOf(1 /* Context */),
-                    Strategy: head.GetNodeCountTypeOf(2 /* Strategy */)
+                    All: AllCount,
+                    Goal: Counts[0 /* Goal */],
+                    Evidence: Counts[3 /* Evidence */],
+                    Context: Counts[1 /* Context */],
+                    Assumption: Counts[6 /* Assumption */],
+                    Justification: Counts[5 /* Justification */],
+                    Exception: Counts[7 /* Exception */],
+                    Strategy: Counts[2 /* Strategy */]
                 }
             };
             $("#nodecount_tmpl").tmpl([t]).appendTo(this.Element);
@@ -8382,7 +8060,15 @@ var AssureNote;
         __extends(AddNodeCommand, _super);
         function AddNodeCommand(App) {
             _super.call(this, App);
-            this.Text2NodeTypeMap = { "goal": 0 /* Goal */, "strategy": 2 /* Strategy */, "context": 1 /* Context */, "evidence": 3 /* Evidence */ };
+            this.Text2NodeTypeMap = {
+                "goal": 0 /* Goal */,
+                "strategy": 2 /* Strategy */,
+                "context": 1 /* Context */,
+                "assumption": 6 /* Assumption */,
+                "exception": 7 /* Exception */,
+                "justification": 5 /* Justification */,
+                "evidence": 3 /* Evidence */
+            };
         }
         AddNodeCommand.prototype.GetCommandLineNames = function () {
             return ["addnode", "add-node"];
@@ -8438,10 +8124,10 @@ var AssureNote;
             var NodeType = View.GetNodeType();
             switch (NodeType) {
                 case 0 /* Goal */:
-                    res = res.concat([this.CreateContextMenu(View), this.CreateStrategyMenu(View), this.CreateEvidenceMenu(View)]);
+                    res = [this.CreateContextMenu(View), this.CreateStrategyMenu(View), this.CreateEvidenceMenu(View)];
                     break;
                 case 2 /* Strategy */:
-                    res = res.concat([this.CreateContextMenu(View), this.CreateGoalMenu(View)]);
+                    res = [this.CreateContextMenu(View), this.CreateGoalMenu(View)];
                     break;
                 case 1 /* Context */:
                     break;
@@ -8486,7 +8172,7 @@ var AssureNote;
                 }
                 span.textContent = Author + '&nbsp';
                 var small = document.createElement('small');
-                small.innerHTML = icon_time.outerHTML + '&nbsp' + AssureNote.AssureNoteUtils.FormatDate(Model.LastModified.DateString);
+                small.innerHTML = icon_time.outerHTML + '&nbsp' + AssureNote.AssureNoteUtils.FormatDate(Model.LastModified.Date);
                 span.innerHTML = icon_user.outerHTML + span.textContent + small.outerHTML;
                 return NodeDoc + span.outerHTML;
             }
@@ -8494,48 +8180,28 @@ var AssureNote;
                 return NodeDoc;
             }
         };
+        LastModifiedPlugin.prototype.CreateElement = function (Prefix, History) {
+            var li = document.createElement('li');
+            if (History.Author == 'unknown') {
+                li.innerHTML = Prefix + ' at ' + AssureNote.AssureNoteUtils.FormatDateTime(History.Date);
+            }
+            else {
+                li.innerHTML = Prefix + ' by <b>' + History.Author + '</b> at ' + AssureNote.AssureNoteUtils.FormatDateTime(History.Date);
+            }
+            return li;
+        };
         LastModifiedPlugin.prototype.CreateTooltipContents = function (NodeView) {
-            var res = [];
-            var li = null;
-            var nodeHistory = Array();
-            var modifieds = this.AssureNoteApp.MasterRecord.HistoryList;
-            var hashKey = modifieds[NodeView.Model.LastModified.Rev].Doc.NodeMap.keySet();
-            var prevNode = null;
-            var currentNode = null;
-            for (var node_i = 0; node_i < modifieds[NodeView.Model.LastModified.Rev].Doc.NodeMap.size(); node_i++) {
-                if (NodeView.Model.UID.toString() == hashKey[node_i]) {
-                    for (var history_i = NodeView.Model.Created.Rev + 1; history_i <= NodeView.Model.LastModified.Rev; history_i++) {
-                        if (history_i == NodeView.Model.Created.Rev + 1) {
-                            prevNode = modifieds[history_i].Doc.NodeMap.hash[hashKey[node_i]];
-                        }
-                        if (history_i != NodeView.Model.Created.Rev + 1) {
-                            currentNode = modifieds[history_i].Doc.NodeMap.hash[hashKey[node_i]];
-                            if (!currentNode.LastModified.EqualsHistory(prevNode.LastModified)) {
-                                nodeHistory.push(currentNode.LastModified);
-                            }
-                            prevNode = currentNode;
-                        }
-                    }
+            var _this = this;
+            var ret = [];
+            var isFirst = true;
+            NodeView.Model.GetNodeHistoryList().forEach(function (History) {
+                if (History.Author != 'unknown') {
+                    ret.push(_this.CreateElement(isFirst ? "Created" : "Modified", History));
+                    ;
                 }
-            }
-            if (NodeView.Model.Created.Author != 'unknown') {
-                li = document.createElement('li');
-                li.innerHTML = 'Created by <b>' + NodeView.Model.Created.Author + '</b> ' + NodeView.Model.Created.DateString;
-                res.push(li);
-            }
-            for (var i = 0; i < nodeHistory.length; i++) {
-                if (nodeHistory[i].Author != 'unknown') {
-                    li = document.createElement('li');
-                    li.innerHTML = 'Modified by <b>' + nodeHistory[i].Author + '</b> ' + nodeHistory[i].DateString;
-                    res.push(li);
-                }
-            }
-            if (NodeView.Model.LastModified.Author != 'unknown') {
-                li = document.createElement('li');
-                li.innerHTML = 'Last modified by <b>' + NodeView.Model.LastModified.Author + '</b> ' + NodeView.Model.LastModified.DateString;
-                res.push(li);
-            }
-            return res;
+                isFirst = false;
+            });
+            return ret;
         };
         return LastModifiedPlugin;
     })(AssureNote.Plugin);
@@ -8555,7 +8221,7 @@ var AssureNote;
             this.PastStatus = [];
             this.PastLogs = [];
             var ThisModel = this.GetModel();
-            var GoalModel = ThisModel.GetCloseGoal();
+            var GoalModel = ThisModel.GetUpperNearestGoal();
             var ContextModel = null;
             for (var i = 0; i < GoalModel.SubNodeList.length; i++) {
                 var BroutherModel = GoalModel.SubNodeList[i];
@@ -8622,10 +8288,10 @@ var AssureNote;
         MonitorNode.prototype.UpdateModel = function () {
             var Model = this.GetModel();
             if (Model.TagMap == null) {
-                Model.TagMap = new AssureNote.HashMap();
+                Model.TagMap = {};
             }
             var Value = (this.Data != null) ? this.Data + "" : "";
-            Model.TagMap.put(this.Type, Value);
+            Model.TagMap[this.Type] = Value;
             Model.HasTag = true;
             var NodeDoc = Model.NodeDoc + AssureNote.Lib.LineFeed;
             ;
@@ -8733,13 +8399,13 @@ var AssureNote;
                 var Model = View.Model;
                 if (Model.HasTag) {
                     var PresumedNodeLabelName = null;
-                    var TagValue = Model.GetTagMap().get("Presume");
+                    var TagValue = Model.GetTagMap()["Presume"];
                     if (TagValue != null) {
                         PresumedNodeLabelName = TagValue.replace(/\[|\]/g, "");
                     }
                     var PresumedNodeLabel = null;
                     if (PresumedNodeLabelName != null) {
-                        PresumedNodeLabel = LabelMap.get(PresumedNodeLabelName);
+                        PresumedNodeLabel = LabelMap[PresumedNodeLabelName];
                     }
                     if (PresumedNodeLabel == null) {
                         PresumedNodeLabel = PresumedNodeLabelName;
